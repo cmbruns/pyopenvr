@@ -23,10 +23,9 @@ EVRApplicationType_VRApplication_VRMonitor = 5
 
 _openvr.VR_InitInternal.restype = POINTER(c_int)
 _openvr.VR_InitInternal.argtypes = [POINTER(EVRInitError), EVRApplicationType]
-def vr_init():
+def init():
     error_result = EVRInitError()
     result = _openvr.VR_InitInternal(byref(error_result), EVRApplicationType_VRApplication_Scene)
-    print error_result
 
 _openvr.VR_IsHmdPresent.restype = c_bool
 _openvr.VR_IsHmdPresent.argtypes = []
@@ -35,24 +34,15 @@ def is_hmd_present():
 
 _openvr.VR_ShutdownInternal.restype = None
 _openvr.VR_ShutdownInternal.argtypes = []
-def vr_shutdown():
+def shutdown():
     _openvr.VR_ShutdownInternal()
 
 
 class IVRSystem:
     def __init__(self):
-        self.ptr = vr_init()
+        self.ptr = init()
 
     def shutdown():
-        vr_shutdown()
+        shutdown()
         self.ptr = None
-
-
-print "Hello"
-
-if not is_hmd_present():
-    sys.exit(0)
-
-vr_init()
-vr_shutdown()
 
