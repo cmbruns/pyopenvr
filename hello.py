@@ -1,5 +1,6 @@
 #!/bin/env python
 
+import sys
 import openvr
 
 print "Hello"
