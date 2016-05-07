@@ -612,19 +612,6 @@ class OpenVRError(RuntimeError):
     """
     pass
 
-# Anonymous structures
-class IVRSystem(Structure):
-    pass
-class IVRChaperone(Structure):
-    pass
-class IVRCompositor(Structure):
-    pass
-class IVROverlay(Structure):
-    pass
-class IVRRenderModels(Structure):
-    pass
-
-
 class HmdMatrix34_t(Structure):
     _fields_ = [
         ("m", (c_float * 4) * 3),
@@ -1290,6 +1277,11 @@ class IVRSettings_FnTable(Structure):
 ### Expose functions ###
 ########################
 
+def _checkInitError(error):
+    if error.value != EVRInitError_VRInitError_None.value:
+        shutdown()
+        raise OpenVRError(getInitErrorAsSymbol(error) + str(error))    
+
 _openvr.VR_GetGenericInterface.restype = POINTER(IVRSystem_FnTable)
 _openvr.VR_GetGenericInterface.argtypes = [c_char_p, POINTER(EVRInitError)]
 def getGenericInterface(interfaceVersion, error):
@@ -1309,12 +1301,12 @@ _openvr.VR_InitInternal.argtypes = [POINTER(EVRInitError), EVRApplicationType]
 def init():
     eError = EVRInitError()
     vrToken = _openvr.VR_InitInternal(byref(eError), EVRApplicationType_VRApplication_Scene)
-    if eError.value != EVRInitError_VRInitError_None.value:
-        shutdown()
-        raise OpenVRError(getInitErrorAsSymbol(eError) + str(eError))
+    _checkInitError(eError)
     systemFunctions = getGenericInterface(IVRSystem_Version, eError)
-    print systemFunctions
-    # TODO: 
+    _checkInitError(eError)
+    if (systemFunctions is None):
+        raise OpenVRError("Error retrieving VR API")
+    return IVRSystem(vr_token=vrToken, system_functions=systemFunctions)
 
 
 _openvr.VR_IsHmdPresent.restype = c_bool
@@ -1335,17 +1327,18 @@ def shutdown():
     _openvr.VR_ShutdownInternal() # OK, this is just like inline definition in openvr.h
 
 
-##########################################
-### Wrap API in Object Oriented python ###
-##########################################
+#################################################
+### Wrap OpenVR API in Object Oriented python ###
+#################################################
 
-class System:
-    def __init__(self):
-        self.ptr = init()
+class IVRSystem:
+    def __init__(self, vr_token, system_functions):
+        self.system_functions = system_functions
+        self.vr_token = vr_token
 
-    def shutdown():
-        if self.ptr is None:
+    def shutdown(self):
+        if self.system_functions is None:
             return
         shutdown()
-        self.ptr = None
-
+        self.system_functions = None
+        self.vr_token = None
