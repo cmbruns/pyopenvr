@@ -1284,13 +1284,13 @@ def _checkInitError(error):
         shutdown()
         raise OpenVRError(getInitErrorAsSymbol(error) + str(error))    
 
-_openvr.VR_GetGenericInterface.restype = POINTER(IVRSystem_FnTable)
+_openvr.VR_GetGenericInterface.restype = c_void_p
 _openvr.VR_GetGenericInterface.argtypes = [c_char_p, POINTER(EVRInitError)]
 def getGenericInterface(interfaceVersion):
     error = EVRInitError()
-    ptr = _openvr.VR_GetGenericInterface(interfaceVersion, error)
+    ptr = _openvr.VR_GetGenericInterface(interfaceVersion, byref(error))
     _checkInitError(error)
-    return ptr.contents
+    return ptr
 
 _openvr.VR_GetVRInitErrorAsSymbol.restype = c_char_p
 _openvr.VR_GetVRInitErrorAsSymbol.argtypes = [EVRInitError]
@@ -1316,7 +1316,9 @@ def init(applicationType):
     # Retrieve "System" API
     if not isInterfaceVersionValid(IVRSystem_Version):
         _checkInitError(EVRInitError_VRInitError_Init_InterfaceNotFound)
-    systemFunctions = getGenericInterface(IVRSystem_Version)
+    systemFunctionsPtr = cast(getGenericInterface(IVRSystem_Version), 
+        POINTER(IVRSystem_FnTable))
+    systemFunctions = systemFunctionsPtr.contents
     if systemFunctions is None:
         raise OpenVRError("Error retrieving VR API")
     return IVRSystem(system_functions=systemFunctions)

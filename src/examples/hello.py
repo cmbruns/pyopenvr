@@ -15,7 +15,7 @@ vr_system = openvr.init(openvr.EVRApplicationType_VRApplication_Scene)
 
 print openvr.runtimePath()
 
-# print vr_system.getRecommendedRenderTargetSize()
+print vr_system.getRecommendedRenderTargetSize()
 
 print vr_system.isDisplayOnDesktop()
 
