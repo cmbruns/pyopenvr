@@ -1342,3 +1342,11 @@ class IVRSystem:
         shutdown()
         self.system_functions = None
         self.vr_token = None
+
+    def getEyeToHeadTransform(self, eye):
+        fn = self.system_functions.contents.getEyeToHeadTransform
+        return fn(eye)
+
+    def isDisplayOnDesktop(self):
+        fn = self.system_functions.contents.isDisplayOnDesktop
+        return fn()

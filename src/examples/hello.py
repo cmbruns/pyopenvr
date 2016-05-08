@@ -12,4 +12,11 @@ if openvr.isRuntimeInstalled():
     print "Runtime is installed"
 
 vr_system = openvr.init()
+
+print vr_system.isDisplayOnDesktop()
+
+for i in range(50):
+    xform = vr_system.getEyeToHeadTransform(openvr.EVREye_Eye_Left)
+    print xform
+
 vr_system.shutdown()
