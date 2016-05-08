@@ -11,7 +11,11 @@ if openvr.isHmdPresent():
 if openvr.isRuntimeInstalled():
     print "Runtime is installed"
 
-vr_system = openvr.init()
+vr_system = openvr.init(openvr.EVRApplicationType_VRApplication_Scene)
+
+print openvr.runtimePath()
+
+# print vr_system.getRecommendedRenderTargetSize()
 
 print vr_system.isDisplayOnDesktop()
 
