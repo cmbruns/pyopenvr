@@ -619,6 +619,15 @@ class HmdMatrix34_t(Structure):
         ("m", (c_float * 4) * 3),
     ]
 
+    def __str__(self):
+        result = "["
+        for i in range(3):
+            result += "["
+            result += ",".join(str(e) for e in self.m[i])
+            result += "]\n"
+        result += "]"
+        return result;
+
 
 class HmdMatrix44_t(Structure):
     _fields_ = [
@@ -1316,7 +1325,9 @@ def init(applicationType):
     # Retrieve "System" API
     if not isInterfaceVersionValid(IVRSystem_Version):
         _checkInitError(EVRInitError_VRInitError_Init_InterfaceNotFound)
-    systemFunctionsPtr = cast(getGenericInterface(IVRSystem_Version), 
+    # Thank you lukexi https://github.com/lukexi/openvr-hs/blob/master/cbits/openvr_capi_helper.c#L9
+    system_fn_key = "FnTable:" + IVRSystem_Version
+    systemFunctionsPtr = cast(getGenericInterface(system_fn_key), 
         POINTER(IVRSystem_FnTable))
     systemFunctions = systemFunctionsPtr.contents
     if systemFunctions is None:

@@ -19,7 +19,7 @@ print vr_system.getRecommendedRenderTargetSize()
 
 print vr_system.isDisplayOnDesktop()
 
-for i in range(50):
+for i in range(10):
     xform = vr_system.getEyeToHeadTransform(openvr.EVREye_Eye_Left)
     print xform
 
