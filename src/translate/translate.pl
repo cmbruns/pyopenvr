@@ -18,15 +18,95 @@ sub translate_all {
 
 	# print $header_string;
 
-	# translate_enums($header_string);
+	write_preamble();
 
-	# translate_typedefs($header_string);
+	translate_constants($header_string);
+
+	translate_enums($header_string);
+
+	translate_typedefs($header_string);
 
 	translate_structs($header_string);
+
+	translate_functions($header_string);
+
+	# TODO: translate interface classes
+}
+
+sub translate_functions {
+	my $header_string = shift;
+
+	print <<EOF;
+
+########################
+### Expose functions ###
+########################
+
+def _checkInitError(error):
+    if error.value != EVRInitError_VRInitError_None.value:
+        shutdown()
+        raise OpenVRError(getInitErrorAsSymbol(error) + str(error))    
+
+EOF
+
+	# TODO:
+}
+
+sub translate_constants
+{
+	print <<EOF;
+
+########################
+### Expose constants ###
+########################
+
+EOF
+	my $header_string = shift;
+	while ($header_string =~ m/
+		\nstatic\sconst\s(?:[^\n]+)\s(\S+)\s=\s(\S+);
+		/xg) 
+	{
+		my $var = $1;
+		my $val = $2;
+		print "$var = $val\n";
+	}
+}
+
+sub write_preamble
+{
+	print <<EOF;
+#!/bin/env python
+
+# Python bindings for OpenVR API version 0.9.20
+# from https://github.com/ValveSoftware/openvr
+# Created May 7, 2016 Christopher Bruns
+
+import os
+import ctypes
+from ctypes import *
+
+####################################################################
+### Load OpenVR shared library, so we can access it using ctypes ###
+####################################################################
+
+# Add current directory to PATH, so we can load the DLL from right here.
+os.environ['PATH'] = os.path.dirname(__file__) + ';' + os.environ['PATH']
+_openvr_windll = windll.openvr_api
+_openvr_cdll = cdll.openvr_api
+_openvr = _openvr_cdll
+
+EOF
 }
 
 sub translate_typedefs {
 	my $header_string = shift;
+	print <<EOF;
+
+#######################
+### Expose Typedefs ###
+#######################
+
+EOF
 	while ($header_string =~ m/
 		typedef\s+ # typedef keyword
 		(\S[^;{}]*\S) # existing type name
@@ -46,6 +126,16 @@ sub translate_typedefs {
 
 sub translate_enums {
 	my $header_string = shift;
+
+	print <<EOF;
+
+#############################
+### Expose enum constants ###
+#############################
+
+ENUM_TYPE = c_uint32
+
+EOF
 
 	# First pass - sanity check total enum count
 	my $enum_count = 0;
@@ -71,7 +161,7 @@ sub translate_enums {
 		my $enum_name1 = $1;
 		my $enum_values = $2;
 
-		print $enum_name1, " = ENUM_TYPE\n";
+		print "$enum_name1 = ENUM_TYPE\n";
 
 		my @vals = split "\n", $enum_values;
 		foreach my $val (@vals) {
@@ -94,6 +184,21 @@ sub translate_enums {
 sub translate_structs {
 	my $header_string = shift;
 
+	print <<EOF;
+
+######################
+### Expose classes ###
+######################
+
+class OpenVRError(RuntimeError):
+    """
+    OpenVRError is a custom exception type for when OpenVR functions return a failure code.
+    Such a specific exception type allows more precise exception handling that does just raising Exception().
+    """
+    pass
+
+
+EOF
 	# sanity check total struct count
 	my $struct_count = 0;
 	while ($header_string =~ m/\b(?:struct|union)\b/g)

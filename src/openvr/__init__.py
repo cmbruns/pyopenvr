@@ -614,6 +614,7 @@ class OpenVRError(RuntimeError):
     """
     pass
 
+
 class HmdMatrix34_t(Structure):
     _fields_ = [
         ("m", (c_float * 4) * 3),
