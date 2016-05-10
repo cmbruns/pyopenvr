@@ -18,17 +18,17 @@ sub translate_all {
 
 	# print $header_string;
 
-	write_preamble();
+	# write_preamble();
 
-	translate_constants($header_string);
+	# translate_constants($header_string);
 
-	translate_enums($header_string);
+	# translate_enums($header_string);
 
-	translate_typedefs($header_string);
+	# translate_typedefs($header_string);
 
 	translate_structs($header_string);
 
-	translate_functions($header_string);
+	# translate_functions($header_string);
 
 	# TODO: translate interface classes
 }
@@ -309,6 +309,98 @@ EOF
 			}
 		}
 		print "    ]\n\n\n";
+
+		# Create a SECOND class definition for the foo_FnTable structs,
+		# this time with a user-quality interface
+
+		if ($struct_name =~ m/^(\S+)_FnTable$/) 
+		{
+			my $interface_name = $1;
+
+			# Create special interface class, e.g. IVRSystem, based on IVRSystem_FnTable
+			print <<EOF;
+class $interface_name:
+    def __init__(self, function_table):
+        self.function_table = function_table
+
+EOF
+
+			foreach my $field (@fields) {
+				# TODO: For now I'm ignoring everything that's not a function pointer
+				if ($field =~ m/OPENVR_FNTABLE_CALLTYPE/) 
+				{ # this member is a function pointer
+					die unless $field =~ m/
+						^\s*
+						(\S.*\S) # return type
+						\s*\(OPENVR_FNTABLE_CALLTYPE\s+\*
+						(\w+) # function name
+						\)\(
+						([^)]*) # function arguments
+						\)
+						/x;
+
+					my $return_type = $1;
+					my $fn_name = $2;
+					my $fn_args0 = $3;
+
+					my @arg_types = ();
+					my @call_arg_names = ("self",);
+					my @internal_arg_names = ();
+					my @return_arg_names = ();
+					my @return_arg_types = ();
+					# "first" argument is the return type
+					push @arg_types, translate_type($return_type);
+
+					if ($return_type !~ m/^void$/) {
+						push @return_arg_names, "result";
+					}
+
+
+					foreach my $arg (split ",", $fn_args0) {
+						die unless $arg =~ m/^\s*(.*)\s+(\S+)\s*$/;
+						my $arg_type = $1;
+						my $arg_name = $2;
+
+						$arg_type = translate_type($arg_type);
+						push @arg_types, $arg_type;
+						if ($arg_type =~ m/^POINTER\((.*)\)/) {
+							my $pointee_type = $1;
+							push @return_arg_types, $pointee_type;
+							push @internal_arg_names, "byref($arg_name)";
+							push @return_arg_names, $arg_name;
+						}
+						else {
+							push @internal_arg_names, $arg_name;
+							push @call_arg_names, $arg_name;
+						}
+					}
+
+					$fn_name = lcfirst($fn_name); # first character lower case for python functions
+
+					print "    def $fn_name(";
+					print join ", ", @call_arg_names;
+					print "):\n";
+					print "        fn = self.function_table.$fn_name\n";
+					foreach my $ret_name (@return_arg_names) {
+						next if $ret_name =~ m/^result$/;
+						print "        $ret_name = ";
+						print shift @return_arg_types;
+						print "()\n";
+					}
+					print "        result = fn(";
+					print join ", ", @internal_arg_names;
+					print ")\n";
+					if ($#return_arg_names >= 0) {
+						print "        return ";
+						print join ", ", @return_arg_names;
+						print "\n";
+					}
+					print "\n";
+				}
+			}
+
+			print "\n\n";
+		}
 
 	}
 	# print $struct_count2, "\n";	
