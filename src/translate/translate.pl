@@ -40,7 +40,7 @@ sub translate_functions {
 ########################
 
 def _checkInitError(error):
-    if error.value != EVRInitError_VRInitError_None.value:
+    if error.value != VRInitError_None.value:
         shutdown()
         raise OpenVRError(getInitErrorAsSymbol(error) + str(error))    
 
@@ -250,6 +250,10 @@ EOF
             die $val unless $val =~ m/(\S+) = (\S+)/;
             my $item = $1;
             my $value = $2;
+            if ($enum_name1 !~ /EVRNotificationStyle|VROverlayFlags|VROverlayInputMethod|ChaperoneCalibrationState|EChaperoneConfigFile/) 
+            {
+            	$item =~ s/^${enum_name1}_//; # strip outer enum name from value
+            }
             print "$item = ENUM_TYPE($value)\n"
         }
         print "\n";
@@ -402,7 +406,7 @@ class $interface_name:
     def __init__(self):
         version_key = ${interface_name}_Version
         if not isInterfaceVersionValid(version_key):
-            _checkInitError(EVRInitError_VRInitError_Init_InterfaceNotFound)
+            _checkInitError(VRInitError_Init_InterfaceNotFound)
         # Thank you lukexi https://github.com/lukexi/openvr-hs/blob/master/cbits/openvr_capi_helper.c#L9
         fn_key = "FnTable:" + version_key
         fn_type = $struct_name

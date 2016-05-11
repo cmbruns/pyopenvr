@@ -23,8 +23,133 @@ _openvr = _openvr_cdll
 ### Expose constants ###
 ########################
 
+k_unTrackingStringSize = 32
+k_unMaxDriverDebugResponseSize = 32768
+k_unTrackedDeviceIndex_Hmd = 0
+k_unMaxTrackedDeviceCount = 16
+k_unTrackedDeviceIndexInvalid = 4294967295
+k_unMaxPropertyStringSize = 32768
+k_unControllerStateAxisCount = 5
+k_ulOverlayHandleInvalid = 0
 IVRSystem_Version = "IVRSystem_012"
-
+IVRExtendedDisplay_Version = "IVRExtendedDisplay_001"
+k_unMaxApplicationKeyLength = 128
+IVRApplications_Version = "IVRApplications_005"
+IVRChaperone_Version = "IVRChaperone_003"
+IVRChaperoneSetup_Version = "IVRChaperoneSetup_005"
+IVRCompositor_Version = "IVRCompositor_014"
+k_unVROverlayMaxKeyLength = 128
+k_unVROverlayMaxNameLength = 128
+k_unMaxOverlayCount = 32
+IVROverlay_Version = "IVROverlay_011"
+k_pch_Controller_Component_GDC2015 = "gdc2015"
+k_pch_Controller_Component_Base = "base"
+k_pch_Controller_Component_Tip = "tip"
+k_pch_Controller_Component_HandGrip = "handgrip"
+k_pch_Controller_Component_Status = "status"
+IVRRenderModels_Version = "IVRRenderModels_005"
+k_unNotificationTextMaxSize = 256
+IVRNotifications_Version = "IVRNotifications_002"
+k_unMaxSettingsKeyLength = 128
+IVRSettings_Version = "IVRSettings_001"
+k_pch_SteamVR_Section = "steamvr"
+k_pch_SteamVR_RequireHmd_String = "requireHmd"
+k_pch_SteamVR_ForcedDriverKey_String = "forcedDriver"
+k_pch_SteamVR_ForcedHmdKey_String = "forcedHmd"
+k_pch_SteamVR_DisplayDebug_Bool = "displayDebug"
+k_pch_SteamVR_DebugProcessPipe_String = "debugProcessPipe"
+k_pch_SteamVR_EnableDistortion_Bool = "enableDistortion"
+k_pch_SteamVR_DisplayDebugX_Int32 = "displayDebugX"
+k_pch_SteamVR_DisplayDebugY_Int32 = "displayDebugY"
+k_pch_SteamVR_SendSystemButtonToAllApps_Bool = "sendSystemButtonToAllApps"
+k_pch_SteamVR_LogLevel_Int32 = "loglevel"
+k_pch_SteamVR_IPD_Float = "ipd"
+k_pch_SteamVR_Background_String = "background"
+k_pch_SteamVR_GridColor_String = "gridColor"
+k_pch_SteamVR_PlayAreaColor_String = "playAreaColor"
+k_pch_SteamVR_ActivateMultipleDrivers_Bool = "activateMultipleDrivers"
+k_pch_SteamVR_PowerOffOnExit_Bool = "powerOffOnExit"
+k_pch_SteamVR_StandbyAppRunningTimeout_Float = "standbyAppRunningTimeout"
+k_pch_SteamVR_StandbyNoAppTimeout_Float = "standbyNoAppTimeout"
+k_pch_SteamVR_DirectMode_Bool = "directMode"
+k_pch_SteamVR_DirectModeEdidVid_Int32 = "directModeEdidVid"
+k_pch_SteamVR_DirectModeEdidPid_Int32 = "directModeEdidPid"
+k_pch_SteamVR_UsingSpeakers_Bool = "usingSpeakers"
+k_pch_SteamVR_SpeakersForwardYawOffsetDegrees_Float = "speakersForwardYawOffsetDegrees"
+k_pch_SteamVR_BaseStationPowerManagement_Bool = "basestationPowerManagement"
+k_pch_SteamVR_NeverKillProcesses_Bool = "neverKillProcesses"
+k_pch_SteamVR_RenderTargetMultiplier_Float = "renderTargetMultiplier"
+k_pch_SteamVR_AllowReprojection_Bool = "allowReprojection"
+k_pch_Lighthouse_Section = "driver_lighthouse"
+k_pch_Lighthouse_DisableIMU_Bool = "disableimu"
+k_pch_Lighthouse_UseDisambiguation_String = "usedisambiguation"
+k_pch_Lighthouse_DisambiguationDebug_Int32 = "disambiguationdebug"
+k_pch_Lighthouse_PrimaryBasestation_Int32 = "primarybasestation"
+k_pch_Lighthouse_LighthouseName_String = "lighthousename"
+k_pch_Lighthouse_MaxIncidenceAngleDegrees_Float = "maxincidenceangledegrees"
+k_pch_Lighthouse_UseLighthouseDirect_Bool = "uselighthousedirect"
+k_pch_Lighthouse_DBHistory_Bool = "dbhistory"
+k_pch_Lighthouse_OriginOffsetX_Float = "originoffsetx"
+k_pch_Lighthouse_OriginOffsetY_Float = "originoffsety"
+k_pch_Lighthouse_OriginOffsetZ_Float = "originoffsetz"
+k_pch_Lighthouse_HeadingOffset_Float = "headingoffset"
+k_pch_Null_Section = "driver_null"
+k_pch_Null_EnableNullDriver_Bool = "enable"
+k_pch_Null_SerialNumber_String = "serialNumber"
+k_pch_Null_ModelNumber_String = "modelNumber"
+k_pch_Null_WindowX_Int32 = "windowX"
+k_pch_Null_WindowY_Int32 = "windowY"
+k_pch_Null_WindowWidth_Int32 = "windowWidth"
+k_pch_Null_WindowHeight_Int32 = "windowHeight"
+k_pch_Null_RenderWidth_Int32 = "renderWidth"
+k_pch_Null_RenderHeight_Int32 = "renderHeight"
+k_pch_Null_SecondsFromVsyncToPhotons_Float = "secondsFromVsyncToPhotons"
+k_pch_Null_DisplayFrequency_Float = "displayFrequency"
+k_pch_UserInterface_Section = "userinterface"
+k_pch_UserInterface_StatusAlwaysOnTop_Bool = "StatusAlwaysOnTop"
+k_pch_Notifications_Section = "notifications"
+k_pch_Notifications_DoNotDisturb_Bool = "DoNotDisturb"
+k_pch_Keyboard_Section = "keyboard"
+k_pch_Keyboard_TutorialCompletions = "TutorialCompletions"
+k_pch_Keyboard_ScaleX = "ScaleX"
+k_pch_Keyboard_ScaleY = "ScaleY"
+k_pch_Keyboard_OffsetLeftX = "OffsetLeftX"
+k_pch_Keyboard_OffsetRightX = "OffsetRightX"
+k_pch_Keyboard_OffsetY = "OffsetY"
+k_pch_Keyboard_Smoothing = "Smoothing"
+k_pch_Perf_Section = "perfcheck"
+k_pch_Perf_HeuristicActive_Bool = "heuristicActive"
+k_pch_Perf_NotifyInHMD_Bool = "warnInHMD"
+k_pch_Perf_NotifyOnlyOnce_Bool = "warnOnlyOnce"
+k_pch_Perf_AllowTimingStore_Bool = "allowTimingStore"
+k_pch_Perf_SaveTimingsOnExit_Bool = "saveTimingsOnExit"
+k_pch_Perf_TestData_Float = "perfTestData"
+k_pch_CollisionBounds_Section = "collisionBounds"
+k_pch_CollisionBounds_Style_Int32 = "CollisionBoundsStyle"
+k_pch_CollisionBounds_GroundPerimeterOn_Bool = "CollisionBoundsGroundPerimeterOn"
+k_pch_CollisionBounds_CenterMarkerOn_Bool = "CollisionBoundsCenterMarkerOn"
+k_pch_CollisionBounds_PlaySpaceOn_Bool = "CollisionBoundsPlaySpaceOn"
+k_pch_CollisionBounds_FadeDistance_Float = "CollisionBoundsFadeDistance"
+k_pch_CollisionBounds_ColorGammaR_Int32 = "CollisionBoundsColorGammaR"
+k_pch_CollisionBounds_ColorGammaG_Int32 = "CollisionBoundsColorGammaG"
+k_pch_CollisionBounds_ColorGammaB_Int32 = "CollisionBoundsColorGammaB"
+k_pch_CollisionBounds_ColorGammaA_Int32 = "CollisionBoundsColorGammaA"
+k_pch_Camera_Section = "camera"
+k_pch_Camera_EnableCamera_Bool = "enableCamera"
+k_pch_Camera_EnableCameraInDashboard_Bool = "enableCameraInDashboard"
+k_pch_Camera_EnableCameraForCollisionBounds_Bool = "enableCameraForCollisionBounds"
+k_pch_Camera_EnableCameraForRoomView_Bool = "enableCameraForRoomView"
+k_pch_Camera_BoundsColorGammaR_Int32 = "cameraBoundsColorGammaR"
+k_pch_Camera_BoundsColorGammaG_Int32 = "cameraBoundsColorGammaG"
+k_pch_Camera_BoundsColorGammaB_Int32 = "cameraBoundsColorGammaB"
+k_pch_Camera_BoundsColorGammaA_Int32 = "cameraBoundsColorGammaA"
+k_pch_audio_Section = "audio"
+k_pch_audio_OnPlaybackDevice_String = "onPlaybackDevice"
+k_pch_audio_OnRecordDevice_String = "onRecordDevice"
+k_pch_audio_OnPlaybackMirrorDevice_String = "onPlaybackMirrorDevice"
+k_pch_audio_OffPlaybackDevice_String = "offPlaybackDevice"
+k_pch_audio_OffRecordDevice_String = "offRecordDevice"
+k_pch_audio_VIVEHDMIGain = "viveHDMIGain"
 
 #############################
 ### Expose enum constants ###
@@ -33,437 +158,437 @@ IVRSystem_Version = "IVRSystem_012"
 ENUM_TYPE = c_uint32
 
 EVREye = ENUM_TYPE
-EVREye_Eye_Left = ENUM_TYPE(0)
-EVREye_Eye_Right = ENUM_TYPE(1)
+Eye_Left = ENUM_TYPE(0)
+Eye_Right = ENUM_TYPE(1)
 
 EGraphicsAPIConvention = ENUM_TYPE
-EGraphicsAPIConvention_API_DirectX = ENUM_TYPE(0)
-EGraphicsAPIConvention_API_OpenGL = ENUM_TYPE(1)
+API_DirectX = ENUM_TYPE(0)
+API_OpenGL = ENUM_TYPE(1)
 
 EColorSpace = ENUM_TYPE
-EColorSpace_ColorSpace_Auto = ENUM_TYPE(0)
-EColorSpace_ColorSpace_Gamma = ENUM_TYPE(1)
-EColorSpace_ColorSpace_Linear = ENUM_TYPE(2)
+ColorSpace_Auto = ENUM_TYPE(0)
+ColorSpace_Gamma = ENUM_TYPE(1)
+ColorSpace_Linear = ENUM_TYPE(2)
 
 ETrackingResult = ENUM_TYPE
-ETrackingResult_TrackingResult_Uninitialized = ENUM_TYPE(1)
-ETrackingResult_TrackingResult_Calibrating_InProgress = ENUM_TYPE(100)
-ETrackingResult_TrackingResult_Calibrating_OutOfRange = ENUM_TYPE(101)
-ETrackingResult_TrackingResult_Running_OK = ENUM_TYPE(200)
-ETrackingResult_TrackingResult_Running_OutOfRange = ENUM_TYPE(201)
+TrackingResult_Uninitialized = ENUM_TYPE(1)
+TrackingResult_Calibrating_InProgress = ENUM_TYPE(100)
+TrackingResult_Calibrating_OutOfRange = ENUM_TYPE(101)
+TrackingResult_Running_OK = ENUM_TYPE(200)
+TrackingResult_Running_OutOfRange = ENUM_TYPE(201)
 
 ETrackedDeviceClass = ENUM_TYPE
-ETrackedDeviceClass_TrackedDeviceClass_Invalid = ENUM_TYPE(0)
-ETrackedDeviceClass_TrackedDeviceClass_HMD = ENUM_TYPE(1)
-ETrackedDeviceClass_TrackedDeviceClass_Controller = ENUM_TYPE(2)
-ETrackedDeviceClass_TrackedDeviceClass_TrackingReference = ENUM_TYPE(4)
-ETrackedDeviceClass_TrackedDeviceClass_Other = ENUM_TYPE(1000)
+TrackedDeviceClass_Invalid = ENUM_TYPE(0)
+TrackedDeviceClass_HMD = ENUM_TYPE(1)
+TrackedDeviceClass_Controller = ENUM_TYPE(2)
+TrackedDeviceClass_TrackingReference = ENUM_TYPE(4)
+TrackedDeviceClass_Other = ENUM_TYPE(1000)
 
 ETrackedControllerRole = ENUM_TYPE
-ETrackedControllerRole_TrackedControllerRole_Invalid = ENUM_TYPE(0)
-ETrackedControllerRole_TrackedControllerRole_LeftHand = ENUM_TYPE(1)
-ETrackedControllerRole_TrackedControllerRole_RightHand = ENUM_TYPE(2)
+TrackedControllerRole_Invalid = ENUM_TYPE(0)
+TrackedControllerRole_LeftHand = ENUM_TYPE(1)
+TrackedControllerRole_RightHand = ENUM_TYPE(2)
 
 ETrackingUniverseOrigin = ENUM_TYPE
-ETrackingUniverseOrigin_TrackingUniverseSeated = ENUM_TYPE(0)
-ETrackingUniverseOrigin_TrackingUniverseStanding = ENUM_TYPE(1)
-ETrackingUniverseOrigin_TrackingUniverseRawAndUncalibrated = ENUM_TYPE(2)
+TrackingUniverseSeated = ENUM_TYPE(0)
+TrackingUniverseStanding = ENUM_TYPE(1)
+TrackingUniverseRawAndUncalibrated = ENUM_TYPE(2)
 
 ETrackedDeviceProperty = ENUM_TYPE
-ETrackedDeviceProperty_Prop_TrackingSystemName_String = ENUM_TYPE(1000)
-ETrackedDeviceProperty_Prop_ModelNumber_String = ENUM_TYPE(1001)
-ETrackedDeviceProperty_Prop_SerialNumber_String = ENUM_TYPE(1002)
-ETrackedDeviceProperty_Prop_RenderModelName_String = ENUM_TYPE(1003)
-ETrackedDeviceProperty_Prop_WillDriftInYaw_Bool = ENUM_TYPE(1004)
-ETrackedDeviceProperty_Prop_ManufacturerName_String = ENUM_TYPE(1005)
-ETrackedDeviceProperty_Prop_TrackingFirmwareVersion_String = ENUM_TYPE(1006)
-ETrackedDeviceProperty_Prop_HardwareRevision_String = ENUM_TYPE(1007)
-ETrackedDeviceProperty_Prop_AllWirelessDongleDescriptions_String = ENUM_TYPE(1008)
-ETrackedDeviceProperty_Prop_ConnectedWirelessDongle_String = ENUM_TYPE(1009)
-ETrackedDeviceProperty_Prop_DeviceIsWireless_Bool = ENUM_TYPE(1010)
-ETrackedDeviceProperty_Prop_DeviceIsCharging_Bool = ENUM_TYPE(1011)
-ETrackedDeviceProperty_Prop_DeviceBatteryPercentage_Float = ENUM_TYPE(1012)
-ETrackedDeviceProperty_Prop_StatusDisplayTransform_Matrix34 = ENUM_TYPE(1013)
-ETrackedDeviceProperty_Prop_Firmware_UpdateAvailable_Bool = ENUM_TYPE(1014)
-ETrackedDeviceProperty_Prop_Firmware_ManualUpdate_Bool = ENUM_TYPE(1015)
-ETrackedDeviceProperty_Prop_Firmware_ManualUpdateURL_String = ENUM_TYPE(1016)
-ETrackedDeviceProperty_Prop_HardwareRevision_Uint64 = ENUM_TYPE(1017)
-ETrackedDeviceProperty_Prop_FirmwareVersion_Uint64 = ENUM_TYPE(1018)
-ETrackedDeviceProperty_Prop_FPGAVersion_Uint64 = ENUM_TYPE(1019)
-ETrackedDeviceProperty_Prop_VRCVersion_Uint64 = ENUM_TYPE(1020)
-ETrackedDeviceProperty_Prop_RadioVersion_Uint64 = ENUM_TYPE(1021)
-ETrackedDeviceProperty_Prop_DongleVersion_Uint64 = ENUM_TYPE(1022)
-ETrackedDeviceProperty_Prop_BlockServerShutdown_Bool = ENUM_TYPE(1023)
-ETrackedDeviceProperty_Prop_CanUnifyCoordinateSystemWithHmd_Bool = ENUM_TYPE(1024)
-ETrackedDeviceProperty_Prop_ContainsProximitySensor_Bool = ENUM_TYPE(1025)
-ETrackedDeviceProperty_Prop_DeviceProvidesBatteryStatus_Bool = ENUM_TYPE(1026)
-ETrackedDeviceProperty_Prop_DeviceCanPowerOff_Bool = ENUM_TYPE(1027)
-ETrackedDeviceProperty_Prop_Firmware_ProgrammingTarget_String = ENUM_TYPE(1028)
-ETrackedDeviceProperty_Prop_DeviceClass_Int32 = ENUM_TYPE(1029)
-ETrackedDeviceProperty_Prop_HasCamera_Bool = ENUM_TYPE(1030)
-ETrackedDeviceProperty_Prop_DriverVersion_String = ENUM_TYPE(1031)
-ETrackedDeviceProperty_Prop_Firmware_ForceUpdateRequired_Bool = ENUM_TYPE(1032)
-ETrackedDeviceProperty_Prop_ReportsTimeSinceVSync_Bool = ENUM_TYPE(2000)
-ETrackedDeviceProperty_Prop_SecondsFromVsyncToPhotons_Float = ENUM_TYPE(2001)
-ETrackedDeviceProperty_Prop_DisplayFrequency_Float = ENUM_TYPE(2002)
-ETrackedDeviceProperty_Prop_UserIpdMeters_Float = ENUM_TYPE(2003)
-ETrackedDeviceProperty_Prop_CurrentUniverseId_Uint64 = ENUM_TYPE(2004)
-ETrackedDeviceProperty_Prop_PreviousUniverseId_Uint64 = ENUM_TYPE(2005)
-ETrackedDeviceProperty_Prop_DisplayFirmwareVersion_Uint64 = ENUM_TYPE(2006)
-ETrackedDeviceProperty_Prop_IsOnDesktop_Bool = ENUM_TYPE(2007)
-ETrackedDeviceProperty_Prop_DisplayMCType_Int32 = ENUM_TYPE(2008)
-ETrackedDeviceProperty_Prop_DisplayMCOffset_Float = ENUM_TYPE(2009)
-ETrackedDeviceProperty_Prop_DisplayMCScale_Float = ENUM_TYPE(2010)
-ETrackedDeviceProperty_Prop_EdidVendorID_Int32 = ENUM_TYPE(2011)
-ETrackedDeviceProperty_Prop_DisplayMCImageLeft_String = ENUM_TYPE(2012)
-ETrackedDeviceProperty_Prop_DisplayMCImageRight_String = ENUM_TYPE(2013)
-ETrackedDeviceProperty_Prop_DisplayGCBlackClamp_Float = ENUM_TYPE(2014)
-ETrackedDeviceProperty_Prop_EdidProductID_Int32 = ENUM_TYPE(2015)
-ETrackedDeviceProperty_Prop_CameraToHeadTransform_Matrix34 = ENUM_TYPE(2016)
-ETrackedDeviceProperty_Prop_DisplayGCType_Int32 = ENUM_TYPE(2017)
-ETrackedDeviceProperty_Prop_DisplayGCOffset_Float = ENUM_TYPE(2018)
-ETrackedDeviceProperty_Prop_DisplayGCScale_Float = ENUM_TYPE(2019)
-ETrackedDeviceProperty_Prop_DisplayGCPrescale_Float = ENUM_TYPE(2020)
-ETrackedDeviceProperty_Prop_DisplayGCImage_String = ENUM_TYPE(2021)
-ETrackedDeviceProperty_Prop_LensCenterLeftU_Float = ENUM_TYPE(2022)
-ETrackedDeviceProperty_Prop_LensCenterLeftV_Float = ENUM_TYPE(2023)
-ETrackedDeviceProperty_Prop_LensCenterRightU_Float = ENUM_TYPE(2024)
-ETrackedDeviceProperty_Prop_LensCenterRightV_Float = ENUM_TYPE(2025)
-ETrackedDeviceProperty_Prop_UserHeadToEyeDepthMeters_Float = ENUM_TYPE(2026)
-ETrackedDeviceProperty_Prop_CameraFirmwareVersion_Uint64 = ENUM_TYPE(2027)
-ETrackedDeviceProperty_Prop_CameraFirmwareDescription_String = ENUM_TYPE(2028)
-ETrackedDeviceProperty_Prop_DisplayFPGAVersion_Uint64 = ENUM_TYPE(2029)
-ETrackedDeviceProperty_Prop_DisplayBootloaderVersion_Uint64 = ENUM_TYPE(2030)
-ETrackedDeviceProperty_Prop_DisplayHardwareVersion_Uint64 = ENUM_TYPE(2031)
-ETrackedDeviceProperty_Prop_AudioFirmwareVersion_Uint64 = ENUM_TYPE(2032)
-ETrackedDeviceProperty_Prop_CameraCompatibilityMode_Int32 = ENUM_TYPE(2033)
-ETrackedDeviceProperty_Prop_AttachedDeviceId_String = ENUM_TYPE(3000)
-ETrackedDeviceProperty_Prop_SupportedButtons_Uint64 = ENUM_TYPE(3001)
-ETrackedDeviceProperty_Prop_Axis0Type_Int32 = ENUM_TYPE(3002)
-ETrackedDeviceProperty_Prop_Axis1Type_Int32 = ENUM_TYPE(3003)
-ETrackedDeviceProperty_Prop_Axis2Type_Int32 = ENUM_TYPE(3004)
-ETrackedDeviceProperty_Prop_Axis3Type_Int32 = ENUM_TYPE(3005)
-ETrackedDeviceProperty_Prop_Axis4Type_Int32 = ENUM_TYPE(3006)
-ETrackedDeviceProperty_Prop_FieldOfViewLeftDegrees_Float = ENUM_TYPE(4000)
-ETrackedDeviceProperty_Prop_FieldOfViewRightDegrees_Float = ENUM_TYPE(4001)
-ETrackedDeviceProperty_Prop_FieldOfViewTopDegrees_Float = ENUM_TYPE(4002)
-ETrackedDeviceProperty_Prop_FieldOfViewBottomDegrees_Float = ENUM_TYPE(4003)
-ETrackedDeviceProperty_Prop_TrackingRangeMinimumMeters_Float = ENUM_TYPE(4004)
-ETrackedDeviceProperty_Prop_TrackingRangeMaximumMeters_Float = ENUM_TYPE(4005)
-ETrackedDeviceProperty_Prop_ModeLabel_String = ENUM_TYPE(4006)
-ETrackedDeviceProperty_Prop_VendorSpecific_Reserved_Start = ENUM_TYPE(10000)
-ETrackedDeviceProperty_Prop_VendorSpecific_Reserved_End = ENUM_TYPE(10999)
+Prop_TrackingSystemName_String = ENUM_TYPE(1000)
+Prop_ModelNumber_String = ENUM_TYPE(1001)
+Prop_SerialNumber_String = ENUM_TYPE(1002)
+Prop_RenderModelName_String = ENUM_TYPE(1003)
+Prop_WillDriftInYaw_Bool = ENUM_TYPE(1004)
+Prop_ManufacturerName_String = ENUM_TYPE(1005)
+Prop_TrackingFirmwareVersion_String = ENUM_TYPE(1006)
+Prop_HardwareRevision_String = ENUM_TYPE(1007)
+Prop_AllWirelessDongleDescriptions_String = ENUM_TYPE(1008)
+Prop_ConnectedWirelessDongle_String = ENUM_TYPE(1009)
+Prop_DeviceIsWireless_Bool = ENUM_TYPE(1010)
+Prop_DeviceIsCharging_Bool = ENUM_TYPE(1011)
+Prop_DeviceBatteryPercentage_Float = ENUM_TYPE(1012)
+Prop_StatusDisplayTransform_Matrix34 = ENUM_TYPE(1013)
+Prop_Firmware_UpdateAvailable_Bool = ENUM_TYPE(1014)
+Prop_Firmware_ManualUpdate_Bool = ENUM_TYPE(1015)
+Prop_Firmware_ManualUpdateURL_String = ENUM_TYPE(1016)
+Prop_HardwareRevision_Uint64 = ENUM_TYPE(1017)
+Prop_FirmwareVersion_Uint64 = ENUM_TYPE(1018)
+Prop_FPGAVersion_Uint64 = ENUM_TYPE(1019)
+Prop_VRCVersion_Uint64 = ENUM_TYPE(1020)
+Prop_RadioVersion_Uint64 = ENUM_TYPE(1021)
+Prop_DongleVersion_Uint64 = ENUM_TYPE(1022)
+Prop_BlockServerShutdown_Bool = ENUM_TYPE(1023)
+Prop_CanUnifyCoordinateSystemWithHmd_Bool = ENUM_TYPE(1024)
+Prop_ContainsProximitySensor_Bool = ENUM_TYPE(1025)
+Prop_DeviceProvidesBatteryStatus_Bool = ENUM_TYPE(1026)
+Prop_DeviceCanPowerOff_Bool = ENUM_TYPE(1027)
+Prop_Firmware_ProgrammingTarget_String = ENUM_TYPE(1028)
+Prop_DeviceClass_Int32 = ENUM_TYPE(1029)
+Prop_HasCamera_Bool = ENUM_TYPE(1030)
+Prop_DriverVersion_String = ENUM_TYPE(1031)
+Prop_Firmware_ForceUpdateRequired_Bool = ENUM_TYPE(1032)
+Prop_ReportsTimeSinceVSync_Bool = ENUM_TYPE(2000)
+Prop_SecondsFromVsyncToPhotons_Float = ENUM_TYPE(2001)
+Prop_DisplayFrequency_Float = ENUM_TYPE(2002)
+Prop_UserIpdMeters_Float = ENUM_TYPE(2003)
+Prop_CurrentUniverseId_Uint64 = ENUM_TYPE(2004)
+Prop_PreviousUniverseId_Uint64 = ENUM_TYPE(2005)
+Prop_DisplayFirmwareVersion_Uint64 = ENUM_TYPE(2006)
+Prop_IsOnDesktop_Bool = ENUM_TYPE(2007)
+Prop_DisplayMCType_Int32 = ENUM_TYPE(2008)
+Prop_DisplayMCOffset_Float = ENUM_TYPE(2009)
+Prop_DisplayMCScale_Float = ENUM_TYPE(2010)
+Prop_EdidVendorID_Int32 = ENUM_TYPE(2011)
+Prop_DisplayMCImageLeft_String = ENUM_TYPE(2012)
+Prop_DisplayMCImageRight_String = ENUM_TYPE(2013)
+Prop_DisplayGCBlackClamp_Float = ENUM_TYPE(2014)
+Prop_EdidProductID_Int32 = ENUM_TYPE(2015)
+Prop_CameraToHeadTransform_Matrix34 = ENUM_TYPE(2016)
+Prop_DisplayGCType_Int32 = ENUM_TYPE(2017)
+Prop_DisplayGCOffset_Float = ENUM_TYPE(2018)
+Prop_DisplayGCScale_Float = ENUM_TYPE(2019)
+Prop_DisplayGCPrescale_Float = ENUM_TYPE(2020)
+Prop_DisplayGCImage_String = ENUM_TYPE(2021)
+Prop_LensCenterLeftU_Float = ENUM_TYPE(2022)
+Prop_LensCenterLeftV_Float = ENUM_TYPE(2023)
+Prop_LensCenterRightU_Float = ENUM_TYPE(2024)
+Prop_LensCenterRightV_Float = ENUM_TYPE(2025)
+Prop_UserHeadToEyeDepthMeters_Float = ENUM_TYPE(2026)
+Prop_CameraFirmwareVersion_Uint64 = ENUM_TYPE(2027)
+Prop_CameraFirmwareDescription_String = ENUM_TYPE(2028)
+Prop_DisplayFPGAVersion_Uint64 = ENUM_TYPE(2029)
+Prop_DisplayBootloaderVersion_Uint64 = ENUM_TYPE(2030)
+Prop_DisplayHardwareVersion_Uint64 = ENUM_TYPE(2031)
+Prop_AudioFirmwareVersion_Uint64 = ENUM_TYPE(2032)
+Prop_CameraCompatibilityMode_Int32 = ENUM_TYPE(2033)
+Prop_AttachedDeviceId_String = ENUM_TYPE(3000)
+Prop_SupportedButtons_Uint64 = ENUM_TYPE(3001)
+Prop_Axis0Type_Int32 = ENUM_TYPE(3002)
+Prop_Axis1Type_Int32 = ENUM_TYPE(3003)
+Prop_Axis2Type_Int32 = ENUM_TYPE(3004)
+Prop_Axis3Type_Int32 = ENUM_TYPE(3005)
+Prop_Axis4Type_Int32 = ENUM_TYPE(3006)
+Prop_FieldOfViewLeftDegrees_Float = ENUM_TYPE(4000)
+Prop_FieldOfViewRightDegrees_Float = ENUM_TYPE(4001)
+Prop_FieldOfViewTopDegrees_Float = ENUM_TYPE(4002)
+Prop_FieldOfViewBottomDegrees_Float = ENUM_TYPE(4003)
+Prop_TrackingRangeMinimumMeters_Float = ENUM_TYPE(4004)
+Prop_TrackingRangeMaximumMeters_Float = ENUM_TYPE(4005)
+Prop_ModeLabel_String = ENUM_TYPE(4006)
+Prop_VendorSpecific_Reserved_Start = ENUM_TYPE(10000)
+Prop_VendorSpecific_Reserved_End = ENUM_TYPE(10999)
 
 ETrackedPropertyError = ENUM_TYPE
-ETrackedPropertyError_TrackedProp_Success = ENUM_TYPE(0)
-ETrackedPropertyError_TrackedProp_WrongDataType = ENUM_TYPE(1)
-ETrackedPropertyError_TrackedProp_WrongDeviceClass = ENUM_TYPE(2)
-ETrackedPropertyError_TrackedProp_BufferTooSmall = ENUM_TYPE(3)
-ETrackedPropertyError_TrackedProp_UnknownProperty = ENUM_TYPE(4)
-ETrackedPropertyError_TrackedProp_InvalidDevice = ENUM_TYPE(5)
-ETrackedPropertyError_TrackedProp_CouldNotContactServer = ENUM_TYPE(6)
-ETrackedPropertyError_TrackedProp_ValueNotProvidedByDevice = ENUM_TYPE(7)
-ETrackedPropertyError_TrackedProp_StringExceedsMaximumLength = ENUM_TYPE(8)
-ETrackedPropertyError_TrackedProp_NotYetAvailable = ENUM_TYPE(9)
+TrackedProp_Success = ENUM_TYPE(0)
+TrackedProp_WrongDataType = ENUM_TYPE(1)
+TrackedProp_WrongDeviceClass = ENUM_TYPE(2)
+TrackedProp_BufferTooSmall = ENUM_TYPE(3)
+TrackedProp_UnknownProperty = ENUM_TYPE(4)
+TrackedProp_InvalidDevice = ENUM_TYPE(5)
+TrackedProp_CouldNotContactServer = ENUM_TYPE(6)
+TrackedProp_ValueNotProvidedByDevice = ENUM_TYPE(7)
+TrackedProp_StringExceedsMaximumLength = ENUM_TYPE(8)
+TrackedProp_NotYetAvailable = ENUM_TYPE(9)
 
 EVRSubmitFlags = ENUM_TYPE
-EVRSubmitFlags_Submit_Default = ENUM_TYPE(0)
-EVRSubmitFlags_Submit_LensDistortionAlreadyApplied = ENUM_TYPE(1)
-EVRSubmitFlags_Submit_GlRenderBuffer = ENUM_TYPE(2)
+Submit_Default = ENUM_TYPE(0)
+Submit_LensDistortionAlreadyApplied = ENUM_TYPE(1)
+Submit_GlRenderBuffer = ENUM_TYPE(2)
 
 EVRState = ENUM_TYPE
-EVRState_VRState_Undefined = ENUM_TYPE(-1)
-EVRState_VRState_Off = ENUM_TYPE(0)
-EVRState_VRState_Searching = ENUM_TYPE(1)
-EVRState_VRState_Searching_Alert = ENUM_TYPE(2)
-EVRState_VRState_Ready = ENUM_TYPE(3)
-EVRState_VRState_Ready_Alert = ENUM_TYPE(4)
-EVRState_VRState_NotReady = ENUM_TYPE(5)
-EVRState_VRState_Standby = ENUM_TYPE(6)
+VRState_Undefined = ENUM_TYPE(-1)
+VRState_Off = ENUM_TYPE(0)
+VRState_Searching = ENUM_TYPE(1)
+VRState_Searching_Alert = ENUM_TYPE(2)
+VRState_Ready = ENUM_TYPE(3)
+VRState_Ready_Alert = ENUM_TYPE(4)
+VRState_NotReady = ENUM_TYPE(5)
+VRState_Standby = ENUM_TYPE(6)
 
 EVREventType = ENUM_TYPE
-EVREventType_VREvent_None = ENUM_TYPE(0)
-EVREventType_VREvent_TrackedDeviceActivated = ENUM_TYPE(100)
-EVREventType_VREvent_TrackedDeviceDeactivated = ENUM_TYPE(101)
-EVREventType_VREvent_TrackedDeviceUpdated = ENUM_TYPE(102)
-EVREventType_VREvent_TrackedDeviceUserInteractionStarted = ENUM_TYPE(103)
-EVREventType_VREvent_TrackedDeviceUserInteractionEnded = ENUM_TYPE(104)
-EVREventType_VREvent_IpdChanged = ENUM_TYPE(105)
-EVREventType_VREvent_EnterStandbyMode = ENUM_TYPE(106)
-EVREventType_VREvent_LeaveStandbyMode = ENUM_TYPE(107)
-EVREventType_VREvent_TrackedDeviceRoleChanged = ENUM_TYPE(108)
-EVREventType_VREvent_ButtonPress = ENUM_TYPE(200)
-EVREventType_VREvent_ButtonUnpress = ENUM_TYPE(201)
-EVREventType_VREvent_ButtonTouch = ENUM_TYPE(202)
-EVREventType_VREvent_ButtonUntouch = ENUM_TYPE(203)
-EVREventType_VREvent_MouseMove = ENUM_TYPE(300)
-EVREventType_VREvent_MouseButtonDown = ENUM_TYPE(301)
-EVREventType_VREvent_MouseButtonUp = ENUM_TYPE(302)
-EVREventType_VREvent_FocusEnter = ENUM_TYPE(303)
-EVREventType_VREvent_FocusLeave = ENUM_TYPE(304)
-EVREventType_VREvent_Scroll = ENUM_TYPE(305)
-EVREventType_VREvent_TouchPadMove = ENUM_TYPE(306)
-EVREventType_VREvent_InputFocusCaptured = ENUM_TYPE(400)
-EVREventType_VREvent_InputFocusReleased = ENUM_TYPE(401)
-EVREventType_VREvent_SceneFocusLost = ENUM_TYPE(402)
-EVREventType_VREvent_SceneFocusGained = ENUM_TYPE(403)
-EVREventType_VREvent_SceneApplicationChanged = ENUM_TYPE(404)
-EVREventType_VREvent_SceneFocusChanged = ENUM_TYPE(405)
-EVREventType_VREvent_InputFocusChanged = ENUM_TYPE(406)
-EVREventType_VREvent_HideRenderModels = ENUM_TYPE(410)
-EVREventType_VREvent_ShowRenderModels = ENUM_TYPE(411)
-EVREventType_VREvent_OverlayShown = ENUM_TYPE(500)
-EVREventType_VREvent_OverlayHidden = ENUM_TYPE(501)
-EVREventType_VREvent_DashboardActivated = ENUM_TYPE(502)
-EVREventType_VREvent_DashboardDeactivated = ENUM_TYPE(503)
-EVREventType_VREvent_DashboardThumbSelected = ENUM_TYPE(504)
-EVREventType_VREvent_DashboardRequested = ENUM_TYPE(505)
-EVREventType_VREvent_ResetDashboard = ENUM_TYPE(506)
-EVREventType_VREvent_RenderToast = ENUM_TYPE(507)
-EVREventType_VREvent_ImageLoaded = ENUM_TYPE(508)
-EVREventType_VREvent_ShowKeyboard = ENUM_TYPE(509)
-EVREventType_VREvent_HideKeyboard = ENUM_TYPE(510)
-EVREventType_VREvent_OverlayGamepadFocusGained = ENUM_TYPE(511)
-EVREventType_VREvent_OverlayGamepadFocusLost = ENUM_TYPE(512)
-EVREventType_VREvent_OverlaySharedTextureChanged = ENUM_TYPE(513)
-EVREventType_VREvent_DashboardGuideButtonDown = ENUM_TYPE(514)
-EVREventType_VREvent_DashboardGuideButtonUp = ENUM_TYPE(515)
-EVREventType_VREvent_Notification_Shown = ENUM_TYPE(600)
-EVREventType_VREvent_Notification_Hidden = ENUM_TYPE(601)
-EVREventType_VREvent_Notification_BeginInteraction = ENUM_TYPE(602)
-EVREventType_VREvent_Notification_Destroyed = ENUM_TYPE(603)
-EVREventType_VREvent_Quit = ENUM_TYPE(700)
-EVREventType_VREvent_ProcessQuit = ENUM_TYPE(701)
-EVREventType_VREvent_QuitAborted_UserPrompt = ENUM_TYPE(702)
-EVREventType_VREvent_QuitAcknowledged = ENUM_TYPE(703)
-EVREventType_VREvent_DriverRequestedQuit = ENUM_TYPE(704)
-EVREventType_VREvent_ChaperoneDataHasChanged = ENUM_TYPE(800)
-EVREventType_VREvent_ChaperoneUniverseHasChanged = ENUM_TYPE(801)
-EVREventType_VREvent_ChaperoneTempDataHasChanged = ENUM_TYPE(802)
-EVREventType_VREvent_ChaperoneSettingsHaveChanged = ENUM_TYPE(803)
-EVREventType_VREvent_SeatedZeroPoseReset = ENUM_TYPE(804)
-EVREventType_VREvent_AudioSettingsHaveChanged = ENUM_TYPE(820)
-EVREventType_VREvent_BackgroundSettingHasChanged = ENUM_TYPE(850)
-EVREventType_VREvent_CameraSettingsHaveChanged = ENUM_TYPE(851)
-EVREventType_VREvent_ReprojectionSettingHasChanged = ENUM_TYPE(852)
-EVREventType_VREvent_StatusUpdate = ENUM_TYPE(900)
-EVREventType_VREvent_MCImageUpdated = ENUM_TYPE(1000)
-EVREventType_VREvent_FirmwareUpdateStarted = ENUM_TYPE(1100)
-EVREventType_VREvent_FirmwareUpdateFinished = ENUM_TYPE(1101)
-EVREventType_VREvent_KeyboardClosed = ENUM_TYPE(1200)
-EVREventType_VREvent_KeyboardCharInput = ENUM_TYPE(1201)
-EVREventType_VREvent_KeyboardDone = ENUM_TYPE(1202)
-EVREventType_VREvent_ApplicationTransitionStarted = ENUM_TYPE(1300)
-EVREventType_VREvent_ApplicationTransitionAborted = ENUM_TYPE(1301)
-EVREventType_VREvent_ApplicationTransitionNewAppStarted = ENUM_TYPE(1302)
-EVREventType_VREvent_Compositor_MirrorWindowShown = ENUM_TYPE(1400)
-EVREventType_VREvent_Compositor_MirrorWindowHidden = ENUM_TYPE(1401)
-EVREventType_VREvent_Compositor_ChaperoneBoundsShown = ENUM_TYPE(1410)
-EVREventType_VREvent_Compositor_ChaperoneBoundsHidden = ENUM_TYPE(1411)
-EVREventType_VREvent_TrackedCamera_StartVideoStream = ENUM_TYPE(1500)
-EVREventType_VREvent_TrackedCamera_StopVideoStream = ENUM_TYPE(1501)
-EVREventType_VREvent_TrackedCamera_PauseVideoStream = ENUM_TYPE(1502)
-EVREventType_VREvent_TrackedCamera_ResumeVideoStream = ENUM_TYPE(1503)
-EVREventType_VREvent_PerformanceTest_EnableCapture = ENUM_TYPE(1600)
-EVREventType_VREvent_PerformanceTest_DisableCapture = ENUM_TYPE(1601)
-EVREventType_VREvent_PerformanceTest_FidelityLevel = ENUM_TYPE(1602)
-EVREventType_VREvent_VendorSpecific_Reserved_Start = ENUM_TYPE(10000)
-EVREventType_VREvent_VendorSpecific_Reserved_End = ENUM_TYPE(19999)
+VREvent_None = ENUM_TYPE(0)
+VREvent_TrackedDeviceActivated = ENUM_TYPE(100)
+VREvent_TrackedDeviceDeactivated = ENUM_TYPE(101)
+VREvent_TrackedDeviceUpdated = ENUM_TYPE(102)
+VREvent_TrackedDeviceUserInteractionStarted = ENUM_TYPE(103)
+VREvent_TrackedDeviceUserInteractionEnded = ENUM_TYPE(104)
+VREvent_IpdChanged = ENUM_TYPE(105)
+VREvent_EnterStandbyMode = ENUM_TYPE(106)
+VREvent_LeaveStandbyMode = ENUM_TYPE(107)
+VREvent_TrackedDeviceRoleChanged = ENUM_TYPE(108)
+VREvent_ButtonPress = ENUM_TYPE(200)
+VREvent_ButtonUnpress = ENUM_TYPE(201)
+VREvent_ButtonTouch = ENUM_TYPE(202)
+VREvent_ButtonUntouch = ENUM_TYPE(203)
+VREvent_MouseMove = ENUM_TYPE(300)
+VREvent_MouseButtonDown = ENUM_TYPE(301)
+VREvent_MouseButtonUp = ENUM_TYPE(302)
+VREvent_FocusEnter = ENUM_TYPE(303)
+VREvent_FocusLeave = ENUM_TYPE(304)
+VREvent_Scroll = ENUM_TYPE(305)
+VREvent_TouchPadMove = ENUM_TYPE(306)
+VREvent_InputFocusCaptured = ENUM_TYPE(400)
+VREvent_InputFocusReleased = ENUM_TYPE(401)
+VREvent_SceneFocusLost = ENUM_TYPE(402)
+VREvent_SceneFocusGained = ENUM_TYPE(403)
+VREvent_SceneApplicationChanged = ENUM_TYPE(404)
+VREvent_SceneFocusChanged = ENUM_TYPE(405)
+VREvent_InputFocusChanged = ENUM_TYPE(406)
+VREvent_HideRenderModels = ENUM_TYPE(410)
+VREvent_ShowRenderModels = ENUM_TYPE(411)
+VREvent_OverlayShown = ENUM_TYPE(500)
+VREvent_OverlayHidden = ENUM_TYPE(501)
+VREvent_DashboardActivated = ENUM_TYPE(502)
+VREvent_DashboardDeactivated = ENUM_TYPE(503)
+VREvent_DashboardThumbSelected = ENUM_TYPE(504)
+VREvent_DashboardRequested = ENUM_TYPE(505)
+VREvent_ResetDashboard = ENUM_TYPE(506)
+VREvent_RenderToast = ENUM_TYPE(507)
+VREvent_ImageLoaded = ENUM_TYPE(508)
+VREvent_ShowKeyboard = ENUM_TYPE(509)
+VREvent_HideKeyboard = ENUM_TYPE(510)
+VREvent_OverlayGamepadFocusGained = ENUM_TYPE(511)
+VREvent_OverlayGamepadFocusLost = ENUM_TYPE(512)
+VREvent_OverlaySharedTextureChanged = ENUM_TYPE(513)
+VREvent_DashboardGuideButtonDown = ENUM_TYPE(514)
+VREvent_DashboardGuideButtonUp = ENUM_TYPE(515)
+VREvent_Notification_Shown = ENUM_TYPE(600)
+VREvent_Notification_Hidden = ENUM_TYPE(601)
+VREvent_Notification_BeginInteraction = ENUM_TYPE(602)
+VREvent_Notification_Destroyed = ENUM_TYPE(603)
+VREvent_Quit = ENUM_TYPE(700)
+VREvent_ProcessQuit = ENUM_TYPE(701)
+VREvent_QuitAborted_UserPrompt = ENUM_TYPE(702)
+VREvent_QuitAcknowledged = ENUM_TYPE(703)
+VREvent_DriverRequestedQuit = ENUM_TYPE(704)
+VREvent_ChaperoneDataHasChanged = ENUM_TYPE(800)
+VREvent_ChaperoneUniverseHasChanged = ENUM_TYPE(801)
+VREvent_ChaperoneTempDataHasChanged = ENUM_TYPE(802)
+VREvent_ChaperoneSettingsHaveChanged = ENUM_TYPE(803)
+VREvent_SeatedZeroPoseReset = ENUM_TYPE(804)
+VREvent_AudioSettingsHaveChanged = ENUM_TYPE(820)
+VREvent_BackgroundSettingHasChanged = ENUM_TYPE(850)
+VREvent_CameraSettingsHaveChanged = ENUM_TYPE(851)
+VREvent_ReprojectionSettingHasChanged = ENUM_TYPE(852)
+VREvent_StatusUpdate = ENUM_TYPE(900)
+VREvent_MCImageUpdated = ENUM_TYPE(1000)
+VREvent_FirmwareUpdateStarted = ENUM_TYPE(1100)
+VREvent_FirmwareUpdateFinished = ENUM_TYPE(1101)
+VREvent_KeyboardClosed = ENUM_TYPE(1200)
+VREvent_KeyboardCharInput = ENUM_TYPE(1201)
+VREvent_KeyboardDone = ENUM_TYPE(1202)
+VREvent_ApplicationTransitionStarted = ENUM_TYPE(1300)
+VREvent_ApplicationTransitionAborted = ENUM_TYPE(1301)
+VREvent_ApplicationTransitionNewAppStarted = ENUM_TYPE(1302)
+VREvent_Compositor_MirrorWindowShown = ENUM_TYPE(1400)
+VREvent_Compositor_MirrorWindowHidden = ENUM_TYPE(1401)
+VREvent_Compositor_ChaperoneBoundsShown = ENUM_TYPE(1410)
+VREvent_Compositor_ChaperoneBoundsHidden = ENUM_TYPE(1411)
+VREvent_TrackedCamera_StartVideoStream = ENUM_TYPE(1500)
+VREvent_TrackedCamera_StopVideoStream = ENUM_TYPE(1501)
+VREvent_TrackedCamera_PauseVideoStream = ENUM_TYPE(1502)
+VREvent_TrackedCamera_ResumeVideoStream = ENUM_TYPE(1503)
+VREvent_PerformanceTest_EnableCapture = ENUM_TYPE(1600)
+VREvent_PerformanceTest_DisableCapture = ENUM_TYPE(1601)
+VREvent_PerformanceTest_FidelityLevel = ENUM_TYPE(1602)
+VREvent_VendorSpecific_Reserved_Start = ENUM_TYPE(10000)
+VREvent_VendorSpecific_Reserved_End = ENUM_TYPE(19999)
 
 EDeviceActivityLevel = ENUM_TYPE
-EDeviceActivityLevel_k_EDeviceActivityLevel_Unknown = ENUM_TYPE(-1)
-EDeviceActivityLevel_k_EDeviceActivityLevel_Idle = ENUM_TYPE(0)
-EDeviceActivityLevel_k_EDeviceActivityLevel_UserInteraction = ENUM_TYPE(1)
-EDeviceActivityLevel_k_EDeviceActivityLevel_UserInteraction_Timeout = ENUM_TYPE(2)
-EDeviceActivityLevel_k_EDeviceActivityLevel_Standby = ENUM_TYPE(3)
+k_EDeviceActivityLevel_Unknown = ENUM_TYPE(-1)
+k_EDeviceActivityLevel_Idle = ENUM_TYPE(0)
+k_EDeviceActivityLevel_UserInteraction = ENUM_TYPE(1)
+k_EDeviceActivityLevel_UserInteraction_Timeout = ENUM_TYPE(2)
+k_EDeviceActivityLevel_Standby = ENUM_TYPE(3)
 
 EVRButtonId = ENUM_TYPE
-EVRButtonId_k_EButton_System = ENUM_TYPE(0)
-EVRButtonId_k_EButton_ApplicationMenu = ENUM_TYPE(1)
-EVRButtonId_k_EButton_Grip = ENUM_TYPE(2)
-EVRButtonId_k_EButton_DPad_Left = ENUM_TYPE(3)
-EVRButtonId_k_EButton_DPad_Up = ENUM_TYPE(4)
-EVRButtonId_k_EButton_DPad_Right = ENUM_TYPE(5)
-EVRButtonId_k_EButton_DPad_Down = ENUM_TYPE(6)
-EVRButtonId_k_EButton_A = ENUM_TYPE(7)
-EVRButtonId_k_EButton_Axis0 = ENUM_TYPE(32)
-EVRButtonId_k_EButton_Axis1 = ENUM_TYPE(33)
-EVRButtonId_k_EButton_Axis2 = ENUM_TYPE(34)
-EVRButtonId_k_EButton_Axis3 = ENUM_TYPE(35)
-EVRButtonId_k_EButton_Axis4 = ENUM_TYPE(36)
-EVRButtonId_k_EButton_SteamVR_Touchpad = ENUM_TYPE(32)
-EVRButtonId_k_EButton_SteamVR_Trigger = ENUM_TYPE(33)
-EVRButtonId_k_EButton_Dashboard_Back = ENUM_TYPE(2)
-EVRButtonId_k_EButton_Max = ENUM_TYPE(64)
+k_EButton_System = ENUM_TYPE(0)
+k_EButton_ApplicationMenu = ENUM_TYPE(1)
+k_EButton_Grip = ENUM_TYPE(2)
+k_EButton_DPad_Left = ENUM_TYPE(3)
+k_EButton_DPad_Up = ENUM_TYPE(4)
+k_EButton_DPad_Right = ENUM_TYPE(5)
+k_EButton_DPad_Down = ENUM_TYPE(6)
+k_EButton_A = ENUM_TYPE(7)
+k_EButton_Axis0 = ENUM_TYPE(32)
+k_EButton_Axis1 = ENUM_TYPE(33)
+k_EButton_Axis2 = ENUM_TYPE(34)
+k_EButton_Axis3 = ENUM_TYPE(35)
+k_EButton_Axis4 = ENUM_TYPE(36)
+k_EButton_SteamVR_Touchpad = ENUM_TYPE(32)
+k_EButton_SteamVR_Trigger = ENUM_TYPE(33)
+k_EButton_Dashboard_Back = ENUM_TYPE(2)
+k_EButton_Max = ENUM_TYPE(64)
 
 EVRMouseButton = ENUM_TYPE
-EVRMouseButton_VRMouseButton_Left = ENUM_TYPE(1)
-EVRMouseButton_VRMouseButton_Right = ENUM_TYPE(2)
-EVRMouseButton_VRMouseButton_Middle = ENUM_TYPE(4)
+VRMouseButton_Left = ENUM_TYPE(1)
+VRMouseButton_Right = ENUM_TYPE(2)
+VRMouseButton_Middle = ENUM_TYPE(4)
 
 EVRControllerAxisType = ENUM_TYPE
-EVRControllerAxisType_k_eControllerAxis_None = ENUM_TYPE(0)
-EVRControllerAxisType_k_eControllerAxis_TrackPad = ENUM_TYPE(1)
-EVRControllerAxisType_k_eControllerAxis_Joystick = ENUM_TYPE(2)
-EVRControllerAxisType_k_eControllerAxis_Trigger = ENUM_TYPE(3)
+k_eControllerAxis_None = ENUM_TYPE(0)
+k_eControllerAxis_TrackPad = ENUM_TYPE(1)
+k_eControllerAxis_Joystick = ENUM_TYPE(2)
+k_eControllerAxis_Trigger = ENUM_TYPE(3)
 
 EVRControllerEventOutputType = ENUM_TYPE
-EVRControllerEventOutputType_ControllerEventOutput_OSEvents = ENUM_TYPE(0)
-EVRControllerEventOutputType_ControllerEventOutput_VREvents = ENUM_TYPE(1)
+ControllerEventOutput_OSEvents = ENUM_TYPE(0)
+ControllerEventOutput_VREvents = ENUM_TYPE(1)
 
 ECollisionBoundsStyle = ENUM_TYPE
-ECollisionBoundsStyle_COLLISION_BOUNDS_STYLE_BEGINNER = ENUM_TYPE(0)
-ECollisionBoundsStyle_COLLISION_BOUNDS_STYLE_INTERMEDIATE = ENUM_TYPE(1)
-ECollisionBoundsStyle_COLLISION_BOUNDS_STYLE_SQUARES = ENUM_TYPE(2)
-ECollisionBoundsStyle_COLLISION_BOUNDS_STYLE_ADVANCED = ENUM_TYPE(3)
-ECollisionBoundsStyle_COLLISION_BOUNDS_STYLE_NONE = ENUM_TYPE(4)
-ECollisionBoundsStyle_COLLISION_BOUNDS_STYLE_COUNT = ENUM_TYPE(5)
+COLLISION_BOUNDS_STYLE_BEGINNER = ENUM_TYPE(0)
+COLLISION_BOUNDS_STYLE_INTERMEDIATE = ENUM_TYPE(1)
+COLLISION_BOUNDS_STYLE_SQUARES = ENUM_TYPE(2)
+COLLISION_BOUNDS_STYLE_ADVANCED = ENUM_TYPE(3)
+COLLISION_BOUNDS_STYLE_NONE = ENUM_TYPE(4)
+COLLISION_BOUNDS_STYLE_COUNT = ENUM_TYPE(5)
 
 EVROverlayError = ENUM_TYPE
-EVROverlayError_VROverlayError_None = ENUM_TYPE(0)
-EVROverlayError_VROverlayError_UnknownOverlay = ENUM_TYPE(10)
-EVROverlayError_VROverlayError_InvalidHandle = ENUM_TYPE(11)
-EVROverlayError_VROverlayError_PermissionDenied = ENUM_TYPE(12)
-EVROverlayError_VROverlayError_OverlayLimitExceeded = ENUM_TYPE(13)
-EVROverlayError_VROverlayError_WrongVisibilityType = ENUM_TYPE(14)
-EVROverlayError_VROverlayError_KeyTooLong = ENUM_TYPE(15)
-EVROverlayError_VROverlayError_NameTooLong = ENUM_TYPE(16)
-EVROverlayError_VROverlayError_KeyInUse = ENUM_TYPE(17)
-EVROverlayError_VROverlayError_WrongTransformType = ENUM_TYPE(18)
-EVROverlayError_VROverlayError_InvalidTrackedDevice = ENUM_TYPE(19)
-EVROverlayError_VROverlayError_InvalidParameter = ENUM_TYPE(20)
-EVROverlayError_VROverlayError_ThumbnailCantBeDestroyed = ENUM_TYPE(21)
-EVROverlayError_VROverlayError_ArrayTooSmall = ENUM_TYPE(22)
-EVROverlayError_VROverlayError_RequestFailed = ENUM_TYPE(23)
-EVROverlayError_VROverlayError_InvalidTexture = ENUM_TYPE(24)
-EVROverlayError_VROverlayError_UnableToLoadFile = ENUM_TYPE(25)
-EVROverlayError_VROVerlayError_KeyboardAlreadyInUse = ENUM_TYPE(26)
-EVROverlayError_VROverlayError_NoNeighbor = ENUM_TYPE(27)
+VROverlayError_None = ENUM_TYPE(0)
+VROverlayError_UnknownOverlay = ENUM_TYPE(10)
+VROverlayError_InvalidHandle = ENUM_TYPE(11)
+VROverlayError_PermissionDenied = ENUM_TYPE(12)
+VROverlayError_OverlayLimitExceeded = ENUM_TYPE(13)
+VROverlayError_WrongVisibilityType = ENUM_TYPE(14)
+VROverlayError_KeyTooLong = ENUM_TYPE(15)
+VROverlayError_NameTooLong = ENUM_TYPE(16)
+VROverlayError_KeyInUse = ENUM_TYPE(17)
+VROverlayError_WrongTransformType = ENUM_TYPE(18)
+VROverlayError_InvalidTrackedDevice = ENUM_TYPE(19)
+VROverlayError_InvalidParameter = ENUM_TYPE(20)
+VROverlayError_ThumbnailCantBeDestroyed = ENUM_TYPE(21)
+VROverlayError_ArrayTooSmall = ENUM_TYPE(22)
+VROverlayError_RequestFailed = ENUM_TYPE(23)
+VROverlayError_InvalidTexture = ENUM_TYPE(24)
+VROverlayError_UnableToLoadFile = ENUM_TYPE(25)
+VROVerlayError_KeyboardAlreadyInUse = ENUM_TYPE(26)
+VROverlayError_NoNeighbor = ENUM_TYPE(27)
 
 EVRApplicationType = ENUM_TYPE
-EVRApplicationType_VRApplication_Other = ENUM_TYPE(0)
-EVRApplicationType_VRApplication_Scene = ENUM_TYPE(1)
-EVRApplicationType_VRApplication_Overlay = ENUM_TYPE(2)
-EVRApplicationType_VRApplication_Background = ENUM_TYPE(3)
-EVRApplicationType_VRApplication_Utility = ENUM_TYPE(4)
-EVRApplicationType_VRApplication_VRMonitor = ENUM_TYPE(5)
+VRApplication_Other = ENUM_TYPE(0)
+VRApplication_Scene = ENUM_TYPE(1)
+VRApplication_Overlay = ENUM_TYPE(2)
+VRApplication_Background = ENUM_TYPE(3)
+VRApplication_Utility = ENUM_TYPE(4)
+VRApplication_VRMonitor = ENUM_TYPE(5)
 
 EVRFirmwareError = ENUM_TYPE
-EVRFirmwareError_VRFirmwareError_None = ENUM_TYPE(0)
-EVRFirmwareError_VRFirmwareError_Success = ENUM_TYPE(1)
-EVRFirmwareError_VRFirmwareError_Fail = ENUM_TYPE(2)
+VRFirmwareError_None = ENUM_TYPE(0)
+VRFirmwareError_Success = ENUM_TYPE(1)
+VRFirmwareError_Fail = ENUM_TYPE(2)
 
 EVRNotificationError = ENUM_TYPE
-EVRNotificationError_VRNotificationError_OK = ENUM_TYPE(0)
-EVRNotificationError_VRNotificationError_InvalidNotificationId = ENUM_TYPE(100)
-EVRNotificationError_VRNotificationError_NotificationQueueFull = ENUM_TYPE(101)
-EVRNotificationError_VRNotificationError_InvalidOverlayHandle = ENUM_TYPE(102)
+VRNotificationError_OK = ENUM_TYPE(0)
+VRNotificationError_InvalidNotificationId = ENUM_TYPE(100)
+VRNotificationError_NotificationQueueFull = ENUM_TYPE(101)
+VRNotificationError_InvalidOverlayHandle = ENUM_TYPE(102)
 
 EVRInitError = ENUM_TYPE
-EVRInitError_VRInitError_None = ENUM_TYPE(0)
-EVRInitError_VRInitError_Unknown = ENUM_TYPE(1)
-EVRInitError_VRInitError_Init_InstallationNotFound = ENUM_TYPE(100)
-EVRInitError_VRInitError_Init_InstallationCorrupt = ENUM_TYPE(101)
-EVRInitError_VRInitError_Init_VRClientDLLNotFound = ENUM_TYPE(102)
-EVRInitError_VRInitError_Init_FileNotFound = ENUM_TYPE(103)
-EVRInitError_VRInitError_Init_FactoryNotFound = ENUM_TYPE(104)
-EVRInitError_VRInitError_Init_InterfaceNotFound = ENUM_TYPE(105)
-EVRInitError_VRInitError_Init_InvalidInterface = ENUM_TYPE(106)
-EVRInitError_VRInitError_Init_UserConfigDirectoryInvalid = ENUM_TYPE(107)
-EVRInitError_VRInitError_Init_HmdNotFound = ENUM_TYPE(108)
-EVRInitError_VRInitError_Init_NotInitialized = ENUM_TYPE(109)
-EVRInitError_VRInitError_Init_PathRegistryNotFound = ENUM_TYPE(110)
-EVRInitError_VRInitError_Init_NoConfigPath = ENUM_TYPE(111)
-EVRInitError_VRInitError_Init_NoLogPath = ENUM_TYPE(112)
-EVRInitError_VRInitError_Init_PathRegistryNotWritable = ENUM_TYPE(113)
-EVRInitError_VRInitError_Init_AppInfoInitFailed = ENUM_TYPE(114)
-EVRInitError_VRInitError_Init_Retry = ENUM_TYPE(115)
-EVRInitError_VRInitError_Init_InitCanceledByUser = ENUM_TYPE(116)
-EVRInitError_VRInitError_Init_AnotherAppLaunching = ENUM_TYPE(117)
-EVRInitError_VRInitError_Init_SettingsInitFailed = ENUM_TYPE(118)
-EVRInitError_VRInitError_Init_ShuttingDown = ENUM_TYPE(119)
-EVRInitError_VRInitError_Init_TooManyObjects = ENUM_TYPE(120)
-EVRInitError_VRInitError_Init_NoServerForBackgroundApp = ENUM_TYPE(121)
-EVRInitError_VRInitError_Init_NotSupportedWithCompositor = ENUM_TYPE(122)
-EVRInitError_VRInitError_Init_NotAvailableToUtilityApps = ENUM_TYPE(123)
-EVRInitError_VRInitError_Init_Internal = ENUM_TYPE(124)
-EVRInitError_VRInitError_Driver_Failed = ENUM_TYPE(200)
-EVRInitError_VRInitError_Driver_Unknown = ENUM_TYPE(201)
-EVRInitError_VRInitError_Driver_HmdUnknown = ENUM_TYPE(202)
-EVRInitError_VRInitError_Driver_NotLoaded = ENUM_TYPE(203)
-EVRInitError_VRInitError_Driver_RuntimeOutOfDate = ENUM_TYPE(204)
-EVRInitError_VRInitError_Driver_HmdInUse = ENUM_TYPE(205)
-EVRInitError_VRInitError_Driver_NotCalibrated = ENUM_TYPE(206)
-EVRInitError_VRInitError_Driver_CalibrationInvalid = ENUM_TYPE(207)
-EVRInitError_VRInitError_Driver_HmdDisplayNotFound = ENUM_TYPE(208)
-EVRInitError_VRInitError_IPC_ServerInitFailed = ENUM_TYPE(300)
-EVRInitError_VRInitError_IPC_ConnectFailed = ENUM_TYPE(301)
-EVRInitError_VRInitError_IPC_SharedStateInitFailed = ENUM_TYPE(302)
-EVRInitError_VRInitError_IPC_CompositorInitFailed = ENUM_TYPE(303)
-EVRInitError_VRInitError_IPC_MutexInitFailed = ENUM_TYPE(304)
-EVRInitError_VRInitError_IPC_Failed = ENUM_TYPE(305)
-EVRInitError_VRInitError_Compositor_Failed = ENUM_TYPE(400)
-EVRInitError_VRInitError_Compositor_D3D11HardwareRequired = ENUM_TYPE(401)
-EVRInitError_VRInitError_Compositor_FirmwareRequiresUpdate = ENUM_TYPE(402)
-EVRInitError_VRInitError_VendorSpecific_UnableToConnectToOculusRuntime = ENUM_TYPE(1000)
-EVRInitError_VRInitError_VendorSpecific_HmdFound_CantOpenDevice = ENUM_TYPE(1101)
-EVRInitError_VRInitError_VendorSpecific_HmdFound_UnableToRequestConfigStart = ENUM_TYPE(1102)
-EVRInitError_VRInitError_VendorSpecific_HmdFound_NoStoredConfig = ENUM_TYPE(1103)
-EVRInitError_VRInitError_VendorSpecific_HmdFound_ConfigTooBig = ENUM_TYPE(1104)
-EVRInitError_VRInitError_VendorSpecific_HmdFound_ConfigTooSmall = ENUM_TYPE(1105)
-EVRInitError_VRInitError_VendorSpecific_HmdFound_UnableToInitZLib = ENUM_TYPE(1106)
-EVRInitError_VRInitError_VendorSpecific_HmdFound_CantReadFirmwareVersion = ENUM_TYPE(1107)
-EVRInitError_VRInitError_VendorSpecific_HmdFound_UnableToSendUserDataStart = ENUM_TYPE(1108)
-EVRInitError_VRInitError_VendorSpecific_HmdFound_UnableToGetUserDataStart = ENUM_TYPE(1109)
-EVRInitError_VRInitError_VendorSpecific_HmdFound_UnableToGetUserDataNext = ENUM_TYPE(1110)
-EVRInitError_VRInitError_VendorSpecific_HmdFound_UserDataAddressRange = ENUM_TYPE(1111)
-EVRInitError_VRInitError_VendorSpecific_HmdFound_UserDataError = ENUM_TYPE(1112)
-EVRInitError_VRInitError_VendorSpecific_HmdFound_ConfigFailedSanityCheck = ENUM_TYPE(1113)
-EVRInitError_VRInitError_Steam_SteamInstallationNotFound = ENUM_TYPE(2000)
+VRInitError_None = ENUM_TYPE(0)
+VRInitError_Unknown = ENUM_TYPE(1)
+VRInitError_Init_InstallationNotFound = ENUM_TYPE(100)
+VRInitError_Init_InstallationCorrupt = ENUM_TYPE(101)
+VRInitError_Init_VRClientDLLNotFound = ENUM_TYPE(102)
+VRInitError_Init_FileNotFound = ENUM_TYPE(103)
+VRInitError_Init_FactoryNotFound = ENUM_TYPE(104)
+VRInitError_Init_InterfaceNotFound = ENUM_TYPE(105)
+VRInitError_Init_InvalidInterface = ENUM_TYPE(106)
+VRInitError_Init_UserConfigDirectoryInvalid = ENUM_TYPE(107)
+VRInitError_Init_HmdNotFound = ENUM_TYPE(108)
+VRInitError_Init_NotInitialized = ENUM_TYPE(109)
+VRInitError_Init_PathRegistryNotFound = ENUM_TYPE(110)
+VRInitError_Init_NoConfigPath = ENUM_TYPE(111)
+VRInitError_Init_NoLogPath = ENUM_TYPE(112)
+VRInitError_Init_PathRegistryNotWritable = ENUM_TYPE(113)
+VRInitError_Init_AppInfoInitFailed = ENUM_TYPE(114)
+VRInitError_Init_Retry = ENUM_TYPE(115)
+VRInitError_Init_InitCanceledByUser = ENUM_TYPE(116)
+VRInitError_Init_AnotherAppLaunching = ENUM_TYPE(117)
+VRInitError_Init_SettingsInitFailed = ENUM_TYPE(118)
+VRInitError_Init_ShuttingDown = ENUM_TYPE(119)
+VRInitError_Init_TooManyObjects = ENUM_TYPE(120)
+VRInitError_Init_NoServerForBackgroundApp = ENUM_TYPE(121)
+VRInitError_Init_NotSupportedWithCompositor = ENUM_TYPE(122)
+VRInitError_Init_NotAvailableToUtilityApps = ENUM_TYPE(123)
+VRInitError_Init_Internal = ENUM_TYPE(124)
+VRInitError_Driver_Failed = ENUM_TYPE(200)
+VRInitError_Driver_Unknown = ENUM_TYPE(201)
+VRInitError_Driver_HmdUnknown = ENUM_TYPE(202)
+VRInitError_Driver_NotLoaded = ENUM_TYPE(203)
+VRInitError_Driver_RuntimeOutOfDate = ENUM_TYPE(204)
+VRInitError_Driver_HmdInUse = ENUM_TYPE(205)
+VRInitError_Driver_NotCalibrated = ENUM_TYPE(206)
+VRInitError_Driver_CalibrationInvalid = ENUM_TYPE(207)
+VRInitError_Driver_HmdDisplayNotFound = ENUM_TYPE(208)
+VRInitError_IPC_ServerInitFailed = ENUM_TYPE(300)
+VRInitError_IPC_ConnectFailed = ENUM_TYPE(301)
+VRInitError_IPC_SharedStateInitFailed = ENUM_TYPE(302)
+VRInitError_IPC_CompositorInitFailed = ENUM_TYPE(303)
+VRInitError_IPC_MutexInitFailed = ENUM_TYPE(304)
+VRInitError_IPC_Failed = ENUM_TYPE(305)
+VRInitError_Compositor_Failed = ENUM_TYPE(400)
+VRInitError_Compositor_D3D11HardwareRequired = ENUM_TYPE(401)
+VRInitError_Compositor_FirmwareRequiresUpdate = ENUM_TYPE(402)
+VRInitError_VendorSpecific_UnableToConnectToOculusRuntime = ENUM_TYPE(1000)
+VRInitError_VendorSpecific_HmdFound_CantOpenDevice = ENUM_TYPE(1101)
+VRInitError_VendorSpecific_HmdFound_UnableToRequestConfigStart = ENUM_TYPE(1102)
+VRInitError_VendorSpecific_HmdFound_NoStoredConfig = ENUM_TYPE(1103)
+VRInitError_VendorSpecific_HmdFound_ConfigTooBig = ENUM_TYPE(1104)
+VRInitError_VendorSpecific_HmdFound_ConfigTooSmall = ENUM_TYPE(1105)
+VRInitError_VendorSpecific_HmdFound_UnableToInitZLib = ENUM_TYPE(1106)
+VRInitError_VendorSpecific_HmdFound_CantReadFirmwareVersion = ENUM_TYPE(1107)
+VRInitError_VendorSpecific_HmdFound_UnableToSendUserDataStart = ENUM_TYPE(1108)
+VRInitError_VendorSpecific_HmdFound_UnableToGetUserDataStart = ENUM_TYPE(1109)
+VRInitError_VendorSpecific_HmdFound_UnableToGetUserDataNext = ENUM_TYPE(1110)
+VRInitError_VendorSpecific_HmdFound_UserDataAddressRange = ENUM_TYPE(1111)
+VRInitError_VendorSpecific_HmdFound_UserDataError = ENUM_TYPE(1112)
+VRInitError_VendorSpecific_HmdFound_ConfigFailedSanityCheck = ENUM_TYPE(1113)
+VRInitError_Steam_SteamInstallationNotFound = ENUM_TYPE(2000)
 
 EVRApplicationError = ENUM_TYPE
-EVRApplicationError_VRApplicationError_None = ENUM_TYPE(0)
-EVRApplicationError_VRApplicationError_AppKeyAlreadyExists = ENUM_TYPE(100)
-EVRApplicationError_VRApplicationError_NoManifest = ENUM_TYPE(101)
-EVRApplicationError_VRApplicationError_NoApplication = ENUM_TYPE(102)
-EVRApplicationError_VRApplicationError_InvalidIndex = ENUM_TYPE(103)
-EVRApplicationError_VRApplicationError_UnknownApplication = ENUM_TYPE(104)
-EVRApplicationError_VRApplicationError_IPCFailed = ENUM_TYPE(105)
-EVRApplicationError_VRApplicationError_ApplicationAlreadyRunning = ENUM_TYPE(106)
-EVRApplicationError_VRApplicationError_InvalidManifest = ENUM_TYPE(107)
-EVRApplicationError_VRApplicationError_InvalidApplication = ENUM_TYPE(108)
-EVRApplicationError_VRApplicationError_LaunchFailed = ENUM_TYPE(109)
-EVRApplicationError_VRApplicationError_ApplicationAlreadyStarting = ENUM_TYPE(110)
-EVRApplicationError_VRApplicationError_LaunchInProgress = ENUM_TYPE(111)
-EVRApplicationError_VRApplicationError_OldApplicationQuitting = ENUM_TYPE(112)
-EVRApplicationError_VRApplicationError_TransitionAborted = ENUM_TYPE(113)
-EVRApplicationError_VRApplicationError_IsTemplate = ENUM_TYPE(114)
-EVRApplicationError_VRApplicationError_BufferTooSmall = ENUM_TYPE(200)
-EVRApplicationError_VRApplicationError_PropertyNotSet = ENUM_TYPE(201)
-EVRApplicationError_VRApplicationError_UnknownProperty = ENUM_TYPE(202)
-EVRApplicationError_VRApplicationError_InvalidParameter = ENUM_TYPE(203)
+VRApplicationError_None = ENUM_TYPE(0)
+VRApplicationError_AppKeyAlreadyExists = ENUM_TYPE(100)
+VRApplicationError_NoManifest = ENUM_TYPE(101)
+VRApplicationError_NoApplication = ENUM_TYPE(102)
+VRApplicationError_InvalidIndex = ENUM_TYPE(103)
+VRApplicationError_UnknownApplication = ENUM_TYPE(104)
+VRApplicationError_IPCFailed = ENUM_TYPE(105)
+VRApplicationError_ApplicationAlreadyRunning = ENUM_TYPE(106)
+VRApplicationError_InvalidManifest = ENUM_TYPE(107)
+VRApplicationError_InvalidApplication = ENUM_TYPE(108)
+VRApplicationError_LaunchFailed = ENUM_TYPE(109)
+VRApplicationError_ApplicationAlreadyStarting = ENUM_TYPE(110)
+VRApplicationError_LaunchInProgress = ENUM_TYPE(111)
+VRApplicationError_OldApplicationQuitting = ENUM_TYPE(112)
+VRApplicationError_TransitionAborted = ENUM_TYPE(113)
+VRApplicationError_IsTemplate = ENUM_TYPE(114)
+VRApplicationError_BufferTooSmall = ENUM_TYPE(200)
+VRApplicationError_PropertyNotSet = ENUM_TYPE(201)
+VRApplicationError_UnknownProperty = ENUM_TYPE(202)
+VRApplicationError_InvalidParameter = ENUM_TYPE(203)
 
 EVRApplicationProperty = ENUM_TYPE
-EVRApplicationProperty_VRApplicationProperty_Name_String = ENUM_TYPE(0)
-EVRApplicationProperty_VRApplicationProperty_LaunchType_String = ENUM_TYPE(11)
-EVRApplicationProperty_VRApplicationProperty_WorkingDirectory_String = ENUM_TYPE(12)
-EVRApplicationProperty_VRApplicationProperty_BinaryPath_String = ENUM_TYPE(13)
-EVRApplicationProperty_VRApplicationProperty_Arguments_String = ENUM_TYPE(14)
-EVRApplicationProperty_VRApplicationProperty_URL_String = ENUM_TYPE(15)
-EVRApplicationProperty_VRApplicationProperty_Description_String = ENUM_TYPE(50)
-EVRApplicationProperty_VRApplicationProperty_NewsURL_String = ENUM_TYPE(51)
-EVRApplicationProperty_VRApplicationProperty_ImagePath_String = ENUM_TYPE(52)
-EVRApplicationProperty_VRApplicationProperty_Source_String = ENUM_TYPE(53)
-EVRApplicationProperty_VRApplicationProperty_IsDashboardOverlay_Bool = ENUM_TYPE(60)
-EVRApplicationProperty_VRApplicationProperty_IsTemplate_Bool = ENUM_TYPE(61)
-EVRApplicationProperty_VRApplicationProperty_IsInstanced_Bool = ENUM_TYPE(62)
-EVRApplicationProperty_VRApplicationProperty_LastLaunchTime_Uint64 = ENUM_TYPE(70)
+VRApplicationProperty_Name_String = ENUM_TYPE(0)
+VRApplicationProperty_LaunchType_String = ENUM_TYPE(11)
+VRApplicationProperty_WorkingDirectory_String = ENUM_TYPE(12)
+VRApplicationProperty_BinaryPath_String = ENUM_TYPE(13)
+VRApplicationProperty_Arguments_String = ENUM_TYPE(14)
+VRApplicationProperty_URL_String = ENUM_TYPE(15)
+VRApplicationProperty_Description_String = ENUM_TYPE(50)
+VRApplicationProperty_NewsURL_String = ENUM_TYPE(51)
+VRApplicationProperty_ImagePath_String = ENUM_TYPE(52)
+VRApplicationProperty_Source_String = ENUM_TYPE(53)
+VRApplicationProperty_IsDashboardOverlay_Bool = ENUM_TYPE(60)
+VRApplicationProperty_IsTemplate_Bool = ENUM_TYPE(61)
+VRApplicationProperty_IsInstanced_Bool = ENUM_TYPE(62)
+VRApplicationProperty_LastLaunchTime_Uint64 = ENUM_TYPE(70)
 
 EVRApplicationTransitionState = ENUM_TYPE
-EVRApplicationTransitionState_VRApplicationTransition_None = ENUM_TYPE(0)
-EVRApplicationTransitionState_VRApplicationTransition_OldAppQuitSent = ENUM_TYPE(10)
-EVRApplicationTransitionState_VRApplicationTransition_WaitingForExternalLaunch = ENUM_TYPE(11)
-EVRApplicationTransitionState_VRApplicationTransition_NewAppLaunched = ENUM_TYPE(20)
+VRApplicationTransition_None = ENUM_TYPE(0)
+VRApplicationTransition_OldAppQuitSent = ENUM_TYPE(10)
+VRApplicationTransition_WaitingForExternalLaunch = ENUM_TYPE(11)
+VRApplicationTransition_NewAppLaunched = ENUM_TYPE(20)
 
 ChaperoneCalibrationState = ENUM_TYPE
 ChaperoneCalibrationState_OK = ENUM_TYPE(1)
@@ -482,28 +607,28 @@ EChaperoneConfigFile_Live = ENUM_TYPE(1)
 EChaperoneConfigFile_Temp = ENUM_TYPE(2)
 
 EChaperoneImportFlags = ENUM_TYPE
-EChaperoneImportFlags_EChaperoneImport_BoundsOnly = ENUM_TYPE(1)
+EChaperoneImport_BoundsOnly = ENUM_TYPE(1)
 
 EVRCompositorError = ENUM_TYPE
-EVRCompositorError_VRCompositorError_None = ENUM_TYPE(0)
-EVRCompositorError_VRCompositorError_IncompatibleVersion = ENUM_TYPE(100)
-EVRCompositorError_VRCompositorError_DoNotHaveFocus = ENUM_TYPE(101)
-EVRCompositorError_VRCompositorError_InvalidTexture = ENUM_TYPE(102)
-EVRCompositorError_VRCompositorError_IsNotSceneApplication = ENUM_TYPE(103)
-EVRCompositorError_VRCompositorError_TextureIsOnWrongDevice = ENUM_TYPE(104)
-EVRCompositorError_VRCompositorError_TextureUsesUnsupportedFormat = ENUM_TYPE(105)
-EVRCompositorError_VRCompositorError_SharedTexturesNotSupported = ENUM_TYPE(106)
-EVRCompositorError_VRCompositorError_IndexOutOfRange = ENUM_TYPE(107)
+VRCompositorError_None = ENUM_TYPE(0)
+VRCompositorError_IncompatibleVersion = ENUM_TYPE(100)
+VRCompositorError_DoNotHaveFocus = ENUM_TYPE(101)
+VRCompositorError_InvalidTexture = ENUM_TYPE(102)
+VRCompositorError_IsNotSceneApplication = ENUM_TYPE(103)
+VRCompositorError_TextureIsOnWrongDevice = ENUM_TYPE(104)
+VRCompositorError_TextureUsesUnsupportedFormat = ENUM_TYPE(105)
+VRCompositorError_SharedTexturesNotSupported = ENUM_TYPE(106)
+VRCompositorError_IndexOutOfRange = ENUM_TYPE(107)
 
 VROverlayInputMethod = ENUM_TYPE
 VROverlayInputMethod_None = ENUM_TYPE(0)
 VROverlayInputMethod_Mouse = ENUM_TYPE(1)
 
 VROverlayTransformType = ENUM_TYPE
-VROverlayTransformType_VROverlayTransform_Absolute = ENUM_TYPE(0)
-VROverlayTransformType_VROverlayTransform_TrackedDeviceRelative = ENUM_TYPE(1)
-VROverlayTransformType_VROverlayTransform_SystemOverlay = ENUM_TYPE(2)
-VROverlayTransformType_VROverlayTransform_TrackedComponent = ENUM_TYPE(3)
+VROverlayTransform_Absolute = ENUM_TYPE(0)
+VROverlayTransform_TrackedDeviceRelative = ENUM_TYPE(1)
+VROverlayTransform_SystemOverlay = ENUM_TYPE(2)
+VROverlayTransform_TrackedComponent = ENUM_TYPE(3)
 
 VROverlayFlags = ENUM_TYPE
 VROverlayFlags_None = ENUM_TYPE(0)
@@ -518,43 +643,43 @@ VROverlayFlags_ShowTouchPadScrollWheel = ENUM_TYPE(8)
 VROverlayFlags_TransferOwnershipToInternalProcess = ENUM_TYPE(9)
 
 EGamepadTextInputMode = ENUM_TYPE
-EGamepadTextInputMode_k_EGamepadTextInputModeNormal = ENUM_TYPE(0)
-EGamepadTextInputMode_k_EGamepadTextInputModePassword = ENUM_TYPE(1)
-EGamepadTextInputMode_k_EGamepadTextInputModeSubmit = ENUM_TYPE(2)
+k_EGamepadTextInputModeNormal = ENUM_TYPE(0)
+k_EGamepadTextInputModePassword = ENUM_TYPE(1)
+k_EGamepadTextInputModeSubmit = ENUM_TYPE(2)
 
 EGamepadTextInputLineMode = ENUM_TYPE
-EGamepadTextInputLineMode_k_EGamepadTextInputLineModeSingleLine = ENUM_TYPE(0)
-EGamepadTextInputLineMode_k_EGamepadTextInputLineModeMultipleLines = ENUM_TYPE(1)
+k_EGamepadTextInputLineModeSingleLine = ENUM_TYPE(0)
+k_EGamepadTextInputLineModeMultipleLines = ENUM_TYPE(1)
 
 EOverlayDirection = ENUM_TYPE
-EOverlayDirection_OverlayDirection_Up = ENUM_TYPE(0)
-EOverlayDirection_OverlayDirection_Down = ENUM_TYPE(1)
-EOverlayDirection_OverlayDirection_Left = ENUM_TYPE(2)
-EOverlayDirection_OverlayDirection_Right = ENUM_TYPE(3)
-EOverlayDirection_OverlayDirection_Count = ENUM_TYPE(4)
+OverlayDirection_Up = ENUM_TYPE(0)
+OverlayDirection_Down = ENUM_TYPE(1)
+OverlayDirection_Left = ENUM_TYPE(2)
+OverlayDirection_Right = ENUM_TYPE(3)
+OverlayDirection_Count = ENUM_TYPE(4)
 
 EVRRenderModelError = ENUM_TYPE
-EVRRenderModelError_VRRenderModelError_None = ENUM_TYPE(0)
-EVRRenderModelError_VRRenderModelError_Loading = ENUM_TYPE(100)
-EVRRenderModelError_VRRenderModelError_NotSupported = ENUM_TYPE(200)
-EVRRenderModelError_VRRenderModelError_InvalidArg = ENUM_TYPE(300)
-EVRRenderModelError_VRRenderModelError_InvalidModel = ENUM_TYPE(301)
-EVRRenderModelError_VRRenderModelError_NoShapes = ENUM_TYPE(302)
-EVRRenderModelError_VRRenderModelError_MultipleShapes = ENUM_TYPE(303)
-EVRRenderModelError_VRRenderModelError_TooManyIndices = ENUM_TYPE(304)
-EVRRenderModelError_VRRenderModelError_MultipleTextures = ENUM_TYPE(305)
-EVRRenderModelError_VRRenderModelError_InvalidTexture = ENUM_TYPE(400)
+VRRenderModelError_None = ENUM_TYPE(0)
+VRRenderModelError_Loading = ENUM_TYPE(100)
+VRRenderModelError_NotSupported = ENUM_TYPE(200)
+VRRenderModelError_InvalidArg = ENUM_TYPE(300)
+VRRenderModelError_InvalidModel = ENUM_TYPE(301)
+VRRenderModelError_NoShapes = ENUM_TYPE(302)
+VRRenderModelError_MultipleShapes = ENUM_TYPE(303)
+VRRenderModelError_TooManyIndices = ENUM_TYPE(304)
+VRRenderModelError_MultipleTextures = ENUM_TYPE(305)
+VRRenderModelError_InvalidTexture = ENUM_TYPE(400)
 
 EVRComponentProperty = ENUM_TYPE
-EVRComponentProperty_VRComponentProperty_IsStatic = ENUM_TYPE(1)
-EVRComponentProperty_VRComponentProperty_IsVisible = ENUM_TYPE(2)
-EVRComponentProperty_VRComponentProperty_IsTouched = ENUM_TYPE(4)
-EVRComponentProperty_VRComponentProperty_IsPressed = ENUM_TYPE(8)
-EVRComponentProperty_VRComponentProperty_IsScrolled = ENUM_TYPE(16)
+VRComponentProperty_IsStatic = ENUM_TYPE(1)
+VRComponentProperty_IsVisible = ENUM_TYPE(2)
+VRComponentProperty_IsTouched = ENUM_TYPE(4)
+VRComponentProperty_IsPressed = ENUM_TYPE(8)
+VRComponentProperty_IsScrolled = ENUM_TYPE(16)
 
 EVRNotificationType = ENUM_TYPE
-EVRNotificationType_Transient = ENUM_TYPE(0)
-EVRNotificationType_Persistent = ENUM_TYPE(1)
+Transient = ENUM_TYPE(0)
+Persistent = ENUM_TYPE(1)
 
 EVRNotificationStyle = ENUM_TYPE
 EVRNotificationStyle_None = ENUM_TYPE(0)
@@ -564,17 +689,17 @@ EVRNotificationStyle_Contact_Enabled = ENUM_TYPE(201)
 EVRNotificationStyle_Contact_Active = ENUM_TYPE(202)
 
 EVRSettingsError = ENUM_TYPE
-EVRSettingsError_VRSettingsError_None = ENUM_TYPE(0)
-EVRSettingsError_VRSettingsError_IPCFailed = ENUM_TYPE(1)
-EVRSettingsError_VRSettingsError_WriteFailed = ENUM_TYPE(2)
-EVRSettingsError_VRSettingsError_ReadFailed = ENUM_TYPE(3)
+VRSettingsError_None = ENUM_TYPE(0)
+VRSettingsError_IPCFailed = ENUM_TYPE(1)
+VRSettingsError_WriteFailed = ENUM_TYPE(2)
+VRSettingsError_ReadFailed = ENUM_TYPE(3)
 
 
-################
-### Typedefs ###
-################
+#######################
+### Expose Typedefs ###
+#######################
 
-openvr_bool = c_uint8 # c_char
+openvr_bool = c_char
 TrackedDeviceIndex_t = c_uint32
 VRNotificationId = c_uint32
 VROverlayHandle_t = c_uint64
@@ -602,7 +727,6 @@ VROverlayError = EVROverlayError
 VRFirmwareError = EVRFirmwareError
 VRCompositorError = EVRCompositorError
 
-
 ######################
 ### Expose classes ###
 ######################
@@ -619,15 +743,6 @@ class HmdMatrix34_t(Structure):
     _fields_ = [
         ("m", (c_float * 4) * 3),
     ]
-
-    def __str__(self):
-        result = "["
-        for i in range(3):
-            result += "["
-            result += ",".join(str(e) for e in self.m[i])
-            result += "]\n"
-        result += "]"
-        return result;
 
 
 class HmdMatrix44_t(Structure):
@@ -1060,12 +1175,308 @@ class IVRSystem_FnTable(Structure):
     ]
 
 
+class IVRSystem:
+    def __init__(self):
+        version_key = IVRSystem_Version
+        if not isInterfaceVersionValid(version_key):
+            _checkInitError(VRInitError_Init_InterfaceNotFound)
+        # Thank you lukexi https://github.com/lukexi/openvr-hs/blob/master/cbits/openvr_capi_helper.c#L9
+        fn_key = "FnTable:" + version_key
+        fn_type = IVRSystem_FnTable
+        fn_table_ptr = cast(getGenericInterface(fn_key), POINTER(fn_type))
+        if fn_table_ptr is None:
+            raise OpenVRError("Error retrieving VR API for IVRSystem")
+        self.function_table = fn_table_ptr.contents
+
+    def getRecommendedRenderTargetSize(self):
+        fn = self.function_table.getRecommendedRenderTargetSize
+        pnWidth = c_uint32()
+        pnHeight = c_uint32()
+        result = fn(byref(pnWidth), byref(pnHeight))
+        return pnWidth, pnHeight
+
+    def getProjectionMatrix(self, eEye, fNearZ, fFarZ, eProjType):
+        fn = self.function_table.getProjectionMatrix
+        result = fn(eEye, fNearZ, fFarZ, eProjType)
+        return result
+
+    def getProjectionRaw(self, eEye):
+        fn = self.function_table.getProjectionRaw
+        pfLeft = c_float()
+        pfRight = c_float()
+        pfTop = c_float()
+        pfBottom = c_float()
+        result = fn(eEye, byref(pfLeft), byref(pfRight), byref(pfTop), byref(pfBottom))
+        return pfLeft, pfRight, pfTop, pfBottom
+
+    def computeDistortion(self, eEye, fU, fV):
+        fn = self.function_table.computeDistortion
+        result = fn(eEye, fU, fV)
+        return result
+
+    def getEyeToHeadTransform(self, eEye):
+        fn = self.function_table.getEyeToHeadTransform
+        result = fn(eEye)
+        return result
+
+    def getTimeSinceLastVsync(self):
+        fn = self.function_table.getTimeSinceLastVsync
+        pfSecondsSinceLastVsync = c_float()
+        pulFrameCounter = c_uint64()
+        result = fn(byref(pfSecondsSinceLastVsync), byref(pulFrameCounter))
+        return result, pfSecondsSinceLastVsync, pulFrameCounter
+
+    def getD3D9AdapterIndex(self):
+        fn = self.function_table.getD3D9AdapterIndex
+        result = fn()
+        return result
+
+    def getDXGIOutputInfo(self):
+        fn = self.function_table.getDXGIOutputInfo
+        pnAdapterIndex = c_int32()
+        result = fn(byref(pnAdapterIndex))
+        return pnAdapterIndex
+
+    def isDisplayOnDesktop(self):
+        fn = self.function_table.isDisplayOnDesktop
+        result = fn()
+        return result
+
+    def setDisplayVisibility(self, bIsVisibleOnDesktop):
+        fn = self.function_table.setDisplayVisibility
+        result = fn(bIsVisibleOnDesktop)
+        return result
+
+    def getDeviceToAbsoluteTrackingPose(self, eOrigin, fPredictedSecondsToPhotonsFromNow, unTrackedDevicePoseArrayCount):
+        fn = self.function_table.getDeviceToAbsoluteTrackingPose
+        pTrackedDevicePoseArray = TrackedDevicePose_t()
+        result = fn(eOrigin, fPredictedSecondsToPhotonsFromNow, byref(pTrackedDevicePoseArray), unTrackedDevicePoseArrayCount)
+        return pTrackedDevicePoseArray
+
+    def resetSeatedZeroPose(self):
+        fn = self.function_table.resetSeatedZeroPose
+        result = fn()
+
+    def getSeatedZeroPoseToStandingAbsoluteTrackingPose(self):
+        fn = self.function_table.getSeatedZeroPoseToStandingAbsoluteTrackingPose
+        result = fn()
+        return result
+
+    def getRawZeroPoseToStandingAbsoluteTrackingPose(self):
+        fn = self.function_table.getRawZeroPoseToStandingAbsoluteTrackingPose
+        result = fn()
+        return result
+
+    def getSortedTrackedDeviceIndicesOfClass(self, eTrackedDeviceClass, unTrackedDeviceIndexArrayCount, unRelativeToTrackedDeviceIndex):
+        fn = self.function_table.getSortedTrackedDeviceIndicesOfClass
+        punTrackedDeviceIndexArray = TrackedDeviceIndex_t()
+        result = fn(eTrackedDeviceClass, byref(punTrackedDeviceIndexArray), unTrackedDeviceIndexArrayCount, unRelativeToTrackedDeviceIndex)
+        return result, punTrackedDeviceIndexArray
+
+    def getTrackedDeviceActivityLevel(self, unDeviceId):
+        fn = self.function_table.getTrackedDeviceActivityLevel
+        result = fn(unDeviceId)
+        return result
+
+    def applyTransform(self):
+        fn = self.function_table.applyTransform
+        pOutputPose = TrackedDevicePose_t()
+        pTrackedDevicePose = TrackedDevicePose_t()
+        pTransform = HmdMatrix34_t()
+        result = fn(byref(pOutputPose), byref(pTrackedDevicePose), byref(pTransform))
+        return pOutputPose, pTrackedDevicePose, pTransform
+
+    def getTrackedDeviceIndexForControllerRole(self, unDeviceType):
+        fn = self.function_table.getTrackedDeviceIndexForControllerRole
+        result = fn(unDeviceType)
+        return result
+
+    def getControllerRoleForTrackedDeviceIndex(self, unDeviceIndex):
+        fn = self.function_table.getControllerRoleForTrackedDeviceIndex
+        result = fn(unDeviceIndex)
+        return result
+
+    def getTrackedDeviceClass(self, unDeviceIndex):
+        fn = self.function_table.getTrackedDeviceClass
+        result = fn(unDeviceIndex)
+        return result
+
+    def isTrackedDeviceConnected(self, unDeviceIndex):
+        fn = self.function_table.isTrackedDeviceConnected
+        result = fn(unDeviceIndex)
+        return result
+
+    def getBoolTrackedDeviceProperty(self, unDeviceIndex, prop):
+        fn = self.function_table.getBoolTrackedDeviceProperty
+        pError = ETrackedPropertyError()
+        result = fn(unDeviceIndex, prop, byref(pError))
+        return result, pError
+
+    def getFloatTrackedDeviceProperty(self, unDeviceIndex, prop):
+        fn = self.function_table.getFloatTrackedDeviceProperty
+        pError = ETrackedPropertyError()
+        result = fn(unDeviceIndex, prop, byref(pError))
+        return result, pError
+
+    def getInt32TrackedDeviceProperty(self, unDeviceIndex, prop):
+        fn = self.function_table.getInt32TrackedDeviceProperty
+        pError = ETrackedPropertyError()
+        result = fn(unDeviceIndex, prop, byref(pError))
+        return result, pError
+
+    def getUint64TrackedDeviceProperty(self, unDeviceIndex, prop):
+        fn = self.function_table.getUint64TrackedDeviceProperty
+        pError = ETrackedPropertyError()
+        result = fn(unDeviceIndex, prop, byref(pError))
+        return result, pError
+
+    def getMatrix34TrackedDeviceProperty(self, unDeviceIndex, prop):
+        fn = self.function_table.getMatrix34TrackedDeviceProperty
+        pError = ETrackedPropertyError()
+        result = fn(unDeviceIndex, prop, byref(pError))
+        return result, pError
+
+    def getStringTrackedDeviceProperty(self, unDeviceIndex, prop, pchValue, unBufferSize):
+        fn = self.function_table.getStringTrackedDeviceProperty
+        pError = ETrackedPropertyError()
+        result = fn(unDeviceIndex, prop, pchValue, unBufferSize, byref(pError))
+        return result, pError
+
+    def getPropErrorNameFromEnum(self, error):
+        fn = self.function_table.getPropErrorNameFromEnum
+        result = fn(error)
+        return result
+
+    def pollNextEvent(self, uncbVREvent):
+        fn = self.function_table.pollNextEvent
+        pEvent = VREvent_t()
+        result = fn(byref(pEvent), uncbVREvent)
+        return result, pEvent
+
+    def pollNextEventWithPose(self, eOrigin, uncbVREvent):
+        fn = self.function_table.pollNextEventWithPose
+        pEvent = VREvent_t()
+        pTrackedDevicePose = TrackedDevicePose_t()
+        result = fn(eOrigin, byref(pEvent), uncbVREvent, byref(pTrackedDevicePose))
+        return result, pEvent, pTrackedDevicePose
+
+    def getEventTypeNameFromEnum(self, eType):
+        fn = self.function_table.getEventTypeNameFromEnum
+        result = fn(eType)
+        return result
+
+    def getHiddenAreaMesh(self, eEye):
+        fn = self.function_table.getHiddenAreaMesh
+        result = fn(eEye)
+        return result
+
+    def getControllerState(self, unControllerDeviceIndex):
+        fn = self.function_table.getControllerState
+        pControllerState = VRControllerState_t()
+        result = fn(unControllerDeviceIndex, byref(pControllerState))
+        return result, pControllerState
+
+    def getControllerStateWithPose(self, eOrigin, unControllerDeviceIndex):
+        fn = self.function_table.getControllerStateWithPose
+        pControllerState = VRControllerState_t()
+        pTrackedDevicePose = TrackedDevicePose_t()
+        result = fn(eOrigin, unControllerDeviceIndex, byref(pControllerState), byref(pTrackedDevicePose))
+        return result, pControllerState, pTrackedDevicePose
+
+    def triggerHapticPulse(self, unControllerDeviceIndex, unAxisId, usDurationMicroSec):
+        fn = self.function_table.triggerHapticPulse
+        result = fn(unControllerDeviceIndex, unAxisId, usDurationMicroSec)
+
+    def getButtonIdNameFromEnum(self, eButtonId):
+        fn = self.function_table.getButtonIdNameFromEnum
+        result = fn(eButtonId)
+        return result
+
+    def getControllerAxisTypeNameFromEnum(self, eAxisType):
+        fn = self.function_table.getControllerAxisTypeNameFromEnum
+        result = fn(eAxisType)
+        return result
+
+    def captureInputFocus(self):
+        fn = self.function_table.captureInputFocus
+        result = fn()
+        return result
+
+    def releaseInputFocus(self):
+        fn = self.function_table.releaseInputFocus
+        result = fn()
+
+    def isInputFocusCapturedByAnotherProcess(self):
+        fn = self.function_table.isInputFocusCapturedByAnotherProcess
+        result = fn()
+        return result
+
+    def driverDebugRequest(self, unDeviceIndex, pchRequest, pchResponseBuffer, unResponseBufferSize):
+        fn = self.function_table.driverDebugRequest
+        result = fn(unDeviceIndex, pchRequest, pchResponseBuffer, unResponseBufferSize)
+        return result
+
+    def performFirmwareUpdate(self, unDeviceIndex):
+        fn = self.function_table.performFirmwareUpdate
+        result = fn(unDeviceIndex)
+        return result
+
+    def acknowledgeQuit_Exiting(self):
+        fn = self.function_table.acknowledgeQuit_Exiting
+        result = fn()
+
+    def acknowledgeQuit_UserPrompt(self):
+        fn = self.function_table.acknowledgeQuit_UserPrompt
+        result = fn()
+
+
+
 class IVRExtendedDisplay_FnTable(Structure):
     _fields_ = [
         ("getWindowBounds", WINFUNCTYPE(None, POINTER(c_int32), POINTER(c_int32), POINTER(c_uint32), POINTER(c_uint32))),
         ("getEyeOutputViewport", WINFUNCTYPE(None, EVREye, POINTER(c_uint32), POINTER(c_uint32), POINTER(c_uint32), POINTER(c_uint32))),
         ("getDXGIOutputInfo", WINFUNCTYPE(None, POINTER(c_int32), POINTER(c_int32))),
     ]
+
+
+class IVRExtendedDisplay:
+    def __init__(self):
+        version_key = IVRExtendedDisplay_Version
+        if not isInterfaceVersionValid(version_key):
+            _checkInitError(VRInitError_Init_InterfaceNotFound)
+        # Thank you lukexi https://github.com/lukexi/openvr-hs/blob/master/cbits/openvr_capi_helper.c#L9
+        fn_key = "FnTable:" + version_key
+        fn_type = IVRExtendedDisplay_FnTable
+        fn_table_ptr = cast(getGenericInterface(fn_key), POINTER(fn_type))
+        if fn_table_ptr is None:
+            raise OpenVRError("Error retrieving VR API for IVRExtendedDisplay")
+        self.function_table = fn_table_ptr.contents
+
+    def getWindowBounds(self):
+        fn = self.function_table.getWindowBounds
+        pnX = c_int32()
+        pnY = c_int32()
+        pnWidth = c_uint32()
+        pnHeight = c_uint32()
+        result = fn(byref(pnX), byref(pnY), byref(pnWidth), byref(pnHeight))
+        return pnX, pnY, pnWidth, pnHeight
+
+    def getEyeOutputViewport(self, eEye):
+        fn = self.function_table.getEyeOutputViewport
+        pnX = c_uint32()
+        pnY = c_uint32()
+        pnWidth = c_uint32()
+        pnHeight = c_uint32()
+        result = fn(eEye, byref(pnX), byref(pnY), byref(pnWidth), byref(pnHeight))
+        return pnX, pnY, pnWidth, pnHeight
+
+    def getDXGIOutputInfo(self):
+        fn = self.function_table.getDXGIOutputInfo
+        pnAdapterIndex = c_int32()
+        pnAdapterOutputIndex = c_int32()
+        result = fn(byref(pnAdapterIndex), byref(pnAdapterOutputIndex))
+        return pnAdapterIndex, pnAdapterOutputIndex
+
 
 
 class IVRApplications_FnTable(Structure):
@@ -1097,6 +1508,145 @@ class IVRApplications_FnTable(Structure):
     ]
 
 
+class IVRApplications:
+    def __init__(self):
+        version_key = IVRApplications_Version
+        if not isInterfaceVersionValid(version_key):
+            _checkInitError(VRInitError_Init_InterfaceNotFound)
+        # Thank you lukexi https://github.com/lukexi/openvr-hs/blob/master/cbits/openvr_capi_helper.c#L9
+        fn_key = "FnTable:" + version_key
+        fn_type = IVRApplications_FnTable
+        fn_table_ptr = cast(getGenericInterface(fn_key), POINTER(fn_type))
+        if fn_table_ptr is None:
+            raise OpenVRError("Error retrieving VR API for IVRApplications")
+        self.function_table = fn_table_ptr.contents
+
+    def addApplicationManifest(self, pchApplicationManifestFullPath, bTemporary):
+        fn = self.function_table.addApplicationManifest
+        result = fn(pchApplicationManifestFullPath, bTemporary)
+        return result
+
+    def removeApplicationManifest(self, pchApplicationManifestFullPath):
+        fn = self.function_table.removeApplicationManifest
+        result = fn(pchApplicationManifestFullPath)
+        return result
+
+    def isApplicationInstalled(self, pchAppKey):
+        fn = self.function_table.isApplicationInstalled
+        result = fn(pchAppKey)
+        return result
+
+    def getApplicationCount(self):
+        fn = self.function_table.getApplicationCount
+        result = fn()
+        return result
+
+    def getApplicationKeyByIndex(self, unApplicationIndex, pchAppKeyBuffer, unAppKeyBufferLen):
+        fn = self.function_table.getApplicationKeyByIndex
+        result = fn(unApplicationIndex, pchAppKeyBuffer, unAppKeyBufferLen)
+        return result
+
+    def getApplicationKeyByProcessId(self, unProcessId, pchAppKeyBuffer, unAppKeyBufferLen):
+        fn = self.function_table.getApplicationKeyByProcessId
+        result = fn(unProcessId, pchAppKeyBuffer, unAppKeyBufferLen)
+        return result
+
+    def launchApplication(self, pchAppKey):
+        fn = self.function_table.launchApplication
+        result = fn(pchAppKey)
+        return result
+
+    def launchTemplateApplication(self, pchTemplateAppKey, pchNewAppKey, unKeys):
+        fn = self.function_table.launchTemplateApplication
+        pKeys = AppOverrideKeys_t()
+        result = fn(pchTemplateAppKey, pchNewAppKey, byref(pKeys), unKeys)
+        return result, pKeys
+
+    def launchDashboardOverlay(self, pchAppKey):
+        fn = self.function_table.launchDashboardOverlay
+        result = fn(pchAppKey)
+        return result
+
+    def cancelApplicationLaunch(self, pchAppKey):
+        fn = self.function_table.cancelApplicationLaunch
+        result = fn(pchAppKey)
+        return result
+
+    def identifyApplication(self, unProcessId, pchAppKey):
+        fn = self.function_table.identifyApplication
+        result = fn(unProcessId, pchAppKey)
+        return result
+
+    def getApplicationProcessId(self, pchAppKey):
+        fn = self.function_table.getApplicationProcessId
+        result = fn(pchAppKey)
+        return result
+
+    def getApplicationsErrorNameFromEnum(self, error):
+        fn = self.function_table.getApplicationsErrorNameFromEnum
+        result = fn(error)
+        return result
+
+    def getApplicationPropertyString(self, pchAppKey, eProperty, pchPropertyValueBuffer, unPropertyValueBufferLen):
+        fn = self.function_table.getApplicationPropertyString
+        peError = EVRApplicationError()
+        result = fn(pchAppKey, eProperty, pchPropertyValueBuffer, unPropertyValueBufferLen, byref(peError))
+        return result, peError
+
+    def getApplicationPropertyBool(self, pchAppKey, eProperty):
+        fn = self.function_table.getApplicationPropertyBool
+        peError = EVRApplicationError()
+        result = fn(pchAppKey, eProperty, byref(peError))
+        return result, peError
+
+    def getApplicationPropertyUint64(self, pchAppKey, eProperty):
+        fn = self.function_table.getApplicationPropertyUint64
+        peError = EVRApplicationError()
+        result = fn(pchAppKey, eProperty, byref(peError))
+        return result, peError
+
+    def setApplicationAutoLaunch(self, pchAppKey, bAutoLaunch):
+        fn = self.function_table.setApplicationAutoLaunch
+        result = fn(pchAppKey, bAutoLaunch)
+        return result
+
+    def getApplicationAutoLaunch(self, pchAppKey):
+        fn = self.function_table.getApplicationAutoLaunch
+        result = fn(pchAppKey)
+        return result
+
+    def getStartingApplication(self, pchAppKeyBuffer, unAppKeyBufferLen):
+        fn = self.function_table.getStartingApplication
+        result = fn(pchAppKeyBuffer, unAppKeyBufferLen)
+        return result
+
+    def getTransitionState(self):
+        fn = self.function_table.getTransitionState
+        result = fn()
+        return result
+
+    def performApplicationPrelaunchCheck(self, pchAppKey):
+        fn = self.function_table.performApplicationPrelaunchCheck
+        result = fn(pchAppKey)
+        return result
+
+    def getApplicationsTransitionStateNameFromEnum(self, state):
+        fn = self.function_table.getApplicationsTransitionStateNameFromEnum
+        result = fn(state)
+        return result
+
+    def isQuitUserPromptRequested(self):
+        fn = self.function_table.isQuitUserPromptRequested
+        result = fn()
+        return result
+
+    def launchInternalProcess(self, pchBinaryPath, pchArguments, pchWorkingDirectory):
+        fn = self.function_table.launchInternalProcess
+        result = fn(pchBinaryPath, pchArguments, pchWorkingDirectory)
+        return result
+
+
+
 class IVRChaperone_FnTable(Structure):
     _fields_ = [
         ("getCalibrationState", WINFUNCTYPE(ChaperoneCalibrationState)),
@@ -1108,6 +1658,63 @@ class IVRChaperone_FnTable(Structure):
         ("areBoundsVisible", WINFUNCTYPE(openvr_bool)),
         ("forceBoundsVisible", WINFUNCTYPE(None, openvr_bool)),
     ]
+
+
+class IVRChaperone:
+    def __init__(self):
+        version_key = IVRChaperone_Version
+        if not isInterfaceVersionValid(version_key):
+            _checkInitError(VRInitError_Init_InterfaceNotFound)
+        # Thank you lukexi https://github.com/lukexi/openvr-hs/blob/master/cbits/openvr_capi_helper.c#L9
+        fn_key = "FnTable:" + version_key
+        fn_type = IVRChaperone_FnTable
+        fn_table_ptr = cast(getGenericInterface(fn_key), POINTER(fn_type))
+        if fn_table_ptr is None:
+            raise OpenVRError("Error retrieving VR API for IVRChaperone")
+        self.function_table = fn_table_ptr.contents
+
+    def getCalibrationState(self):
+        fn = self.function_table.getCalibrationState
+        result = fn()
+        return result
+
+    def getPlayAreaSize(self):
+        fn = self.function_table.getPlayAreaSize
+        pSizeX = c_float()
+        pSizeZ = c_float()
+        result = fn(byref(pSizeX), byref(pSizeZ))
+        return result, pSizeX, pSizeZ
+
+    def getPlayAreaRect(self):
+        fn = self.function_table.getPlayAreaRect
+        rect = HmdQuad_t()
+        result = fn(byref(rect))
+        return result, rect
+
+    def reloadInfo(self):
+        fn = self.function_table.reloadInfo
+        result = fn()
+
+    def setSceneColor(self, color):
+        fn = self.function_table.setSceneColor
+        result = fn(color)
+
+    def getBoundsColor(self, nNumOutputColors, flCollisionBoundsFadeDistance):
+        fn = self.function_table.getBoundsColor
+        pOutputColorArray = HmdColor_t()
+        pOutputCameraColor = HmdColor_t()
+        result = fn(byref(pOutputColorArray), nNumOutputColors, flCollisionBoundsFadeDistance, byref(pOutputCameraColor))
+        return pOutputColorArray, pOutputCameraColor
+
+    def areBoundsVisible(self):
+        fn = self.function_table.areBoundsVisible
+        result = fn()
+        return result
+
+    def forceBoundsVisible(self, bForce):
+        fn = self.function_table.forceBoundsVisible
+        result = fn(bForce)
+
 
 
 class IVRChaperoneSetup_FnTable(Structure):
@@ -1133,6 +1740,138 @@ class IVRChaperoneSetup_FnTable(Structure):
         ("exportLiveToBuffer", WINFUNCTYPE(openvr_bool, c_char_p, POINTER(c_uint32))),
         ("importFromBufferToWorking", WINFUNCTYPE(openvr_bool, c_char_p, c_uint32)),
     ]
+
+
+class IVRChaperoneSetup:
+    def __init__(self):
+        version_key = IVRChaperoneSetup_Version
+        if not isInterfaceVersionValid(version_key):
+            _checkInitError(VRInitError_Init_InterfaceNotFound)
+        # Thank you lukexi https://github.com/lukexi/openvr-hs/blob/master/cbits/openvr_capi_helper.c#L9
+        fn_key = "FnTable:" + version_key
+        fn_type = IVRChaperoneSetup_FnTable
+        fn_table_ptr = cast(getGenericInterface(fn_key), POINTER(fn_type))
+        if fn_table_ptr is None:
+            raise OpenVRError("Error retrieving VR API for IVRChaperoneSetup")
+        self.function_table = fn_table_ptr.contents
+
+    def commitWorkingCopy(self, configFile):
+        fn = self.function_table.commitWorkingCopy
+        result = fn(configFile)
+        return result
+
+    def revertWorkingCopy(self):
+        fn = self.function_table.revertWorkingCopy
+        result = fn()
+
+    def getWorkingPlayAreaSize(self):
+        fn = self.function_table.getWorkingPlayAreaSize
+        pSizeX = c_float()
+        pSizeZ = c_float()
+        result = fn(byref(pSizeX), byref(pSizeZ))
+        return result, pSizeX, pSizeZ
+
+    def getWorkingPlayAreaRect(self):
+        fn = self.function_table.getWorkingPlayAreaRect
+        rect = HmdQuad_t()
+        result = fn(byref(rect))
+        return result, rect
+
+    def getWorkingCollisionBoundsInfo(self):
+        fn = self.function_table.getWorkingCollisionBoundsInfo
+        pQuadsBuffer = HmdQuad_t()
+        punQuadsCount = c_uint32()
+        result = fn(byref(pQuadsBuffer), byref(punQuadsCount))
+        return result, pQuadsBuffer, punQuadsCount
+
+    def getLiveCollisionBoundsInfo(self):
+        fn = self.function_table.getLiveCollisionBoundsInfo
+        pQuadsBuffer = HmdQuad_t()
+        punQuadsCount = c_uint32()
+        result = fn(byref(pQuadsBuffer), byref(punQuadsCount))
+        return result, pQuadsBuffer, punQuadsCount
+
+    def getWorkingSeatedZeroPoseToRawTrackingPose(self):
+        fn = self.function_table.getWorkingSeatedZeroPoseToRawTrackingPose
+        pmatSeatedZeroPoseToRawTrackingPose = HmdMatrix34_t()
+        result = fn(byref(pmatSeatedZeroPoseToRawTrackingPose))
+        return result, pmatSeatedZeroPoseToRawTrackingPose
+
+    def getWorkingStandingZeroPoseToRawTrackingPose(self):
+        fn = self.function_table.getWorkingStandingZeroPoseToRawTrackingPose
+        pmatStandingZeroPoseToRawTrackingPose = HmdMatrix34_t()
+        result = fn(byref(pmatStandingZeroPoseToRawTrackingPose))
+        return result, pmatStandingZeroPoseToRawTrackingPose
+
+    def setWorkingPlayAreaSize(self, sizeX, sizeZ):
+        fn = self.function_table.setWorkingPlayAreaSize
+        result = fn(sizeX, sizeZ)
+
+    def setWorkingCollisionBoundsInfo(self, unQuadsCount):
+        fn = self.function_table.setWorkingCollisionBoundsInfo
+        pQuadsBuffer = HmdQuad_t()
+        result = fn(byref(pQuadsBuffer), unQuadsCount)
+        return pQuadsBuffer
+
+    def setWorkingSeatedZeroPoseToRawTrackingPose(self):
+        fn = self.function_table.setWorkingSeatedZeroPoseToRawTrackingPose
+        pMatSeatedZeroPoseToRawTrackingPose = HmdMatrix34_t()
+        result = fn(byref(pMatSeatedZeroPoseToRawTrackingPose))
+        return pMatSeatedZeroPoseToRawTrackingPose
+
+    def setWorkingStandingZeroPoseToRawTrackingPose(self):
+        fn = self.function_table.setWorkingStandingZeroPoseToRawTrackingPose
+        pMatStandingZeroPoseToRawTrackingPose = HmdMatrix34_t()
+        result = fn(byref(pMatStandingZeroPoseToRawTrackingPose))
+        return pMatStandingZeroPoseToRawTrackingPose
+
+    def reloadFromDisk(self, configFile):
+        fn = self.function_table.reloadFromDisk
+        result = fn(configFile)
+
+    def getLiveSeatedZeroPoseToRawTrackingPose(self):
+        fn = self.function_table.getLiveSeatedZeroPoseToRawTrackingPose
+        pmatSeatedZeroPoseToRawTrackingPose = HmdMatrix34_t()
+        result = fn(byref(pmatSeatedZeroPoseToRawTrackingPose))
+        return result, pmatSeatedZeroPoseToRawTrackingPose
+
+    def setWorkingCollisionBoundsTagsInfo(self, unTagCount):
+        fn = self.function_table.setWorkingCollisionBoundsTagsInfo
+        pTagsBuffer = c_uint8()
+        result = fn(byref(pTagsBuffer), unTagCount)
+        return pTagsBuffer
+
+    def getLiveCollisionBoundsTagsInfo(self):
+        fn = self.function_table.getLiveCollisionBoundsTagsInfo
+        pTagsBuffer = c_uint8()
+        punTagCount = c_uint32()
+        result = fn(byref(pTagsBuffer), byref(punTagCount))
+        return result, pTagsBuffer, punTagCount
+
+    def setWorkingPhysicalBoundsInfo(self, unQuadsCount):
+        fn = self.function_table.setWorkingPhysicalBoundsInfo
+        pQuadsBuffer = HmdQuad_t()
+        result = fn(byref(pQuadsBuffer), unQuadsCount)
+        return result, pQuadsBuffer
+
+    def getLivePhysicalBoundsInfo(self):
+        fn = self.function_table.getLivePhysicalBoundsInfo
+        pQuadsBuffer = HmdQuad_t()
+        punQuadsCount = c_uint32()
+        result = fn(byref(pQuadsBuffer), byref(punQuadsCount))
+        return result, pQuadsBuffer, punQuadsCount
+
+    def exportLiveToBuffer(self, pBuffer):
+        fn = self.function_table.exportLiveToBuffer
+        pnBufferLength = c_uint32()
+        result = fn(pBuffer, byref(pnBufferLength))
+        return result, pnBufferLength
+
+    def importFromBufferToWorking(self, pBuffer, nImportFlags):
+        fn = self.function_table.importFromBufferToWorking
+        result = fn(pBuffer, nImportFlags)
+        return result
+
 
 
 class IVRCompositor_FnTable(Structure):
@@ -1167,6 +1906,161 @@ class IVRCompositor_FnTable(Structure):
         ("forceReconnectProcess", WINFUNCTYPE(None)),
         ("suspendRendering", WINFUNCTYPE(None, openvr_bool)),
     ]
+
+
+class IVRCompositor:
+    def __init__(self):
+        version_key = IVRCompositor_Version
+        if not isInterfaceVersionValid(version_key):
+            _checkInitError(VRInitError_Init_InterfaceNotFound)
+        # Thank you lukexi https://github.com/lukexi/openvr-hs/blob/master/cbits/openvr_capi_helper.c#L9
+        fn_key = "FnTable:" + version_key
+        fn_type = IVRCompositor_FnTable
+        fn_table_ptr = cast(getGenericInterface(fn_key), POINTER(fn_type))
+        if fn_table_ptr is None:
+            raise OpenVRError("Error retrieving VR API for IVRCompositor")
+        self.function_table = fn_table_ptr.contents
+
+    def setTrackingSpace(self, eOrigin):
+        fn = self.function_table.setTrackingSpace
+        result = fn(eOrigin)
+
+    def getTrackingSpace(self):
+        fn = self.function_table.getTrackingSpace
+        result = fn()
+        return result
+
+    def waitGetPoses(self, unRenderPoseArrayCount, unGamePoseArrayCount):
+        fn = self.function_table.waitGetPoses
+        pRenderPoseArray = TrackedDevicePose_t()
+        pGamePoseArray = TrackedDevicePose_t()
+        result = fn(byref(pRenderPoseArray), unRenderPoseArrayCount, byref(pGamePoseArray), unGamePoseArrayCount)
+        return result, pRenderPoseArray, pGamePoseArray
+
+    def getLastPoses(self, unRenderPoseArrayCount, unGamePoseArrayCount):
+        fn = self.function_table.getLastPoses
+        pRenderPoseArray = TrackedDevicePose_t()
+        pGamePoseArray = TrackedDevicePose_t()
+        result = fn(byref(pRenderPoseArray), unRenderPoseArrayCount, byref(pGamePoseArray), unGamePoseArrayCount)
+        return result, pRenderPoseArray, pGamePoseArray
+
+    def getLastPoseForTrackedDeviceIndex(self, unDeviceIndex):
+        fn = self.function_table.getLastPoseForTrackedDeviceIndex
+        pOutputPose = TrackedDevicePose_t()
+        pOutputGamePose = TrackedDevicePose_t()
+        result = fn(unDeviceIndex, byref(pOutputPose), byref(pOutputGamePose))
+        return result, pOutputPose, pOutputGamePose
+
+    def submit(self, eEye, nSubmitFlags):
+        fn = self.function_table.submit
+        pTexture = Texture_t()
+        pBounds = VRTextureBounds_t()
+        result = fn(eEye, byref(pTexture), byref(pBounds), nSubmitFlags)
+        return result, pTexture, pBounds
+
+    def clearLastSubmittedFrame(self):
+        fn = self.function_table.clearLastSubmittedFrame
+        result = fn()
+
+    def postPresentHandoff(self):
+        fn = self.function_table.postPresentHandoff
+        result = fn()
+
+    def getFrameTiming(self, unFramesAgo):
+        fn = self.function_table.getFrameTiming
+        pTiming = Compositor_FrameTiming()
+        result = fn(byref(pTiming), unFramesAgo)
+        return result, pTiming
+
+    def getFrameTimeRemaining(self):
+        fn = self.function_table.getFrameTimeRemaining
+        result = fn()
+        return result
+
+    def fadeToColor(self, fSeconds, fRed, fGreen, fBlue, fAlpha, bBackground):
+        fn = self.function_table.fadeToColor
+        result = fn(fSeconds, fRed, fGreen, fBlue, fAlpha, bBackground)
+
+    def fadeGrid(self, fSeconds, bFadeIn):
+        fn = self.function_table.fadeGrid
+        result = fn(fSeconds, bFadeIn)
+
+    def setSkyboxOverride(self, unTextureCount):
+        fn = self.function_table.setSkyboxOverride
+        pTextures = Texture_t()
+        result = fn(byref(pTextures), unTextureCount)
+        return result, pTextures
+
+    def clearSkyboxOverride(self):
+        fn = self.function_table.clearSkyboxOverride
+        result = fn()
+
+    def compositorBringToFront(self):
+        fn = self.function_table.compositorBringToFront
+        result = fn()
+
+    def compositorGoToBack(self):
+        fn = self.function_table.compositorGoToBack
+        result = fn()
+
+    def compositorQuit(self):
+        fn = self.function_table.compositorQuit
+        result = fn()
+
+    def isFullscreen(self):
+        fn = self.function_table.isFullscreen
+        result = fn()
+        return result
+
+    def getCurrentSceneFocusProcess(self):
+        fn = self.function_table.getCurrentSceneFocusProcess
+        result = fn()
+        return result
+
+    def getLastFrameRenderer(self):
+        fn = self.function_table.getLastFrameRenderer
+        result = fn()
+        return result
+
+    def canRenderScene(self):
+        fn = self.function_table.canRenderScene
+        result = fn()
+        return result
+
+    def showMirrorWindow(self):
+        fn = self.function_table.showMirrorWindow
+        result = fn()
+
+    def hideMirrorWindow(self):
+        fn = self.function_table.hideMirrorWindow
+        result = fn()
+
+    def isMirrorWindowVisible(self):
+        fn = self.function_table.isMirrorWindowVisible
+        result = fn()
+        return result
+
+    def compositorDumpImages(self):
+        fn = self.function_table.compositorDumpImages
+        result = fn()
+
+    def shouldAppRenderWithLowResources(self):
+        fn = self.function_table.shouldAppRenderWithLowResources
+        result = fn()
+        return result
+
+    def forceInterleavedReprojectionOn(self, bOverride):
+        fn = self.function_table.forceInterleavedReprojectionOn
+        result = fn(bOverride)
+
+    def forceReconnectProcess(self):
+        fn = self.function_table.forceReconnectProcess
+        result = fn()
+
+    def suspendRendering(self, bSuspend):
+        fn = self.function_table.suspendRendering
+        result = fn(bSuspend)
+
 
 
 class IVROverlay_FnTable(Structure):
@@ -1241,6 +2135,396 @@ class IVROverlay_FnTable(Structure):
     ]
 
 
+class IVROverlay:
+    def __init__(self):
+        version_key = IVROverlay_Version
+        if not isInterfaceVersionValid(version_key):
+            _checkInitError(VRInitError_Init_InterfaceNotFound)
+        # Thank you lukexi https://github.com/lukexi/openvr-hs/blob/master/cbits/openvr_capi_helper.c#L9
+        fn_key = "FnTable:" + version_key
+        fn_type = IVROverlay_FnTable
+        fn_table_ptr = cast(getGenericInterface(fn_key), POINTER(fn_type))
+        if fn_table_ptr is None:
+            raise OpenVRError("Error retrieving VR API for IVROverlay")
+        self.function_table = fn_table_ptr.contents
+
+    def findOverlay(self, pchOverlayKey):
+        fn = self.function_table.findOverlay
+        pOverlayHandle = VROverlayHandle_t()
+        result = fn(pchOverlayKey, byref(pOverlayHandle))
+        return result, pOverlayHandle
+
+    def createOverlay(self, pchOverlayKey, pchOverlayFriendlyName):
+        fn = self.function_table.createOverlay
+        pOverlayHandle = VROverlayHandle_t()
+        result = fn(pchOverlayKey, pchOverlayFriendlyName, byref(pOverlayHandle))
+        return result, pOverlayHandle
+
+    def destroyOverlay(self, ulOverlayHandle):
+        fn = self.function_table.destroyOverlay
+        result = fn(ulOverlayHandle)
+        return result
+
+    def setHighQualityOverlay(self, ulOverlayHandle):
+        fn = self.function_table.setHighQualityOverlay
+        result = fn(ulOverlayHandle)
+        return result
+
+    def getHighQualityOverlay(self):
+        fn = self.function_table.getHighQualityOverlay
+        result = fn()
+        return result
+
+    def getOverlayKey(self, ulOverlayHandle, pchValue, unBufferSize):
+        fn = self.function_table.getOverlayKey
+        pError = EVROverlayError()
+        result = fn(ulOverlayHandle, pchValue, unBufferSize, byref(pError))
+        return result, pError
+
+    def getOverlayName(self, ulOverlayHandle, pchValue, unBufferSize):
+        fn = self.function_table.getOverlayName
+        pError = EVROverlayError()
+        result = fn(ulOverlayHandle, pchValue, unBufferSize, byref(pError))
+        return result, pError
+
+    def getOverlayImageData(self, ulOverlayHandle, pvBuffer, unBufferSize):
+        fn = self.function_table.getOverlayImageData
+        punWidth = c_uint32()
+        punHeight = c_uint32()
+        result = fn(ulOverlayHandle, pvBuffer, unBufferSize, byref(punWidth), byref(punHeight))
+        return result, punWidth, punHeight
+
+    def getOverlayErrorNameFromEnum(self, error):
+        fn = self.function_table.getOverlayErrorNameFromEnum
+        result = fn(error)
+        return result
+
+    def setOverlayRenderingPid(self, ulOverlayHandle, unPID):
+        fn = self.function_table.setOverlayRenderingPid
+        result = fn(ulOverlayHandle, unPID)
+        return result
+
+    def getOverlayRenderingPid(self, ulOverlayHandle):
+        fn = self.function_table.getOverlayRenderingPid
+        result = fn(ulOverlayHandle)
+        return result
+
+    def setOverlayFlag(self, ulOverlayHandle, eOverlayFlag, bEnabled):
+        fn = self.function_table.setOverlayFlag
+        result = fn(ulOverlayHandle, eOverlayFlag, bEnabled)
+        return result
+
+    def getOverlayFlag(self, ulOverlayHandle, eOverlayFlag):
+        fn = self.function_table.getOverlayFlag
+        pbEnabled = openvr_bool()
+        result = fn(ulOverlayHandle, eOverlayFlag, byref(pbEnabled))
+        return result, pbEnabled
+
+    def setOverlayColor(self, ulOverlayHandle, fRed, fGreen, fBlue):
+        fn = self.function_table.setOverlayColor
+        result = fn(ulOverlayHandle, fRed, fGreen, fBlue)
+        return result
+
+    def getOverlayColor(self, ulOverlayHandle):
+        fn = self.function_table.getOverlayColor
+        pfRed = c_float()
+        pfGreen = c_float()
+        pfBlue = c_float()
+        result = fn(ulOverlayHandle, byref(pfRed), byref(pfGreen), byref(pfBlue))
+        return result, pfRed, pfGreen, pfBlue
+
+    def setOverlayAlpha(self, ulOverlayHandle, fAlpha):
+        fn = self.function_table.setOverlayAlpha
+        result = fn(ulOverlayHandle, fAlpha)
+        return result
+
+    def getOverlayAlpha(self, ulOverlayHandle):
+        fn = self.function_table.getOverlayAlpha
+        pfAlpha = c_float()
+        result = fn(ulOverlayHandle, byref(pfAlpha))
+        return result, pfAlpha
+
+    def setOverlayWidthInMeters(self, ulOverlayHandle, fWidthInMeters):
+        fn = self.function_table.setOverlayWidthInMeters
+        result = fn(ulOverlayHandle, fWidthInMeters)
+        return result
+
+    def getOverlayWidthInMeters(self, ulOverlayHandle):
+        fn = self.function_table.getOverlayWidthInMeters
+        pfWidthInMeters = c_float()
+        result = fn(ulOverlayHandle, byref(pfWidthInMeters))
+        return result, pfWidthInMeters
+
+    def setOverlayAutoCurveDistanceRangeInMeters(self, ulOverlayHandle, fMinDistanceInMeters, fMaxDistanceInMeters):
+        fn = self.function_table.setOverlayAutoCurveDistanceRangeInMeters
+        result = fn(ulOverlayHandle, fMinDistanceInMeters, fMaxDistanceInMeters)
+        return result
+
+    def getOverlayAutoCurveDistanceRangeInMeters(self, ulOverlayHandle):
+        fn = self.function_table.getOverlayAutoCurveDistanceRangeInMeters
+        pfMinDistanceInMeters = c_float()
+        pfMaxDistanceInMeters = c_float()
+        result = fn(ulOverlayHandle, byref(pfMinDistanceInMeters), byref(pfMaxDistanceInMeters))
+        return result, pfMinDistanceInMeters, pfMaxDistanceInMeters
+
+    def setOverlayTextureColorSpace(self, ulOverlayHandle, eTextureColorSpace):
+        fn = self.function_table.setOverlayTextureColorSpace
+        result = fn(ulOverlayHandle, eTextureColorSpace)
+        return result
+
+    def getOverlayTextureColorSpace(self, ulOverlayHandle):
+        fn = self.function_table.getOverlayTextureColorSpace
+        peTextureColorSpace = EColorSpace()
+        result = fn(ulOverlayHandle, byref(peTextureColorSpace))
+        return result, peTextureColorSpace
+
+    def setOverlayTextureBounds(self, ulOverlayHandle):
+        fn = self.function_table.setOverlayTextureBounds
+        pOverlayTextureBounds = VRTextureBounds_t()
+        result = fn(ulOverlayHandle, byref(pOverlayTextureBounds))
+        return result, pOverlayTextureBounds
+
+    def getOverlayTextureBounds(self, ulOverlayHandle):
+        fn = self.function_table.getOverlayTextureBounds
+        pOverlayTextureBounds = VRTextureBounds_t()
+        result = fn(ulOverlayHandle, byref(pOverlayTextureBounds))
+        return result, pOverlayTextureBounds
+
+    def getOverlayTransformType(self, ulOverlayHandle):
+        fn = self.function_table.getOverlayTransformType
+        peTransformType = VROverlayTransformType()
+        result = fn(ulOverlayHandle, byref(peTransformType))
+        return result, peTransformType
+
+    def setOverlayTransformAbsolute(self, ulOverlayHandle, eTrackingOrigin):
+        fn = self.function_table.setOverlayTransformAbsolute
+        pmatTrackingOriginToOverlayTransform = HmdMatrix34_t()
+        result = fn(ulOverlayHandle, eTrackingOrigin, byref(pmatTrackingOriginToOverlayTransform))
+        return result, pmatTrackingOriginToOverlayTransform
+
+    def getOverlayTransformAbsolute(self, ulOverlayHandle):
+        fn = self.function_table.getOverlayTransformAbsolute
+        peTrackingOrigin = ETrackingUniverseOrigin()
+        pmatTrackingOriginToOverlayTransform = HmdMatrix34_t()
+        result = fn(ulOverlayHandle, byref(peTrackingOrigin), byref(pmatTrackingOriginToOverlayTransform))
+        return result, peTrackingOrigin, pmatTrackingOriginToOverlayTransform
+
+    def setOverlayTransformTrackedDeviceRelative(self, ulOverlayHandle, unTrackedDevice):
+        fn = self.function_table.setOverlayTransformTrackedDeviceRelative
+        pmatTrackedDeviceToOverlayTransform = HmdMatrix34_t()
+        result = fn(ulOverlayHandle, unTrackedDevice, byref(pmatTrackedDeviceToOverlayTransform))
+        return result, pmatTrackedDeviceToOverlayTransform
+
+    def getOverlayTransformTrackedDeviceRelative(self, ulOverlayHandle):
+        fn = self.function_table.getOverlayTransformTrackedDeviceRelative
+        punTrackedDevice = TrackedDeviceIndex_t()
+        pmatTrackedDeviceToOverlayTransform = HmdMatrix34_t()
+        result = fn(ulOverlayHandle, byref(punTrackedDevice), byref(pmatTrackedDeviceToOverlayTransform))
+        return result, punTrackedDevice, pmatTrackedDeviceToOverlayTransform
+
+    def setOverlayTransformTrackedDeviceComponent(self, ulOverlayHandle, unDeviceIndex, pchComponentName):
+        fn = self.function_table.setOverlayTransformTrackedDeviceComponent
+        result = fn(ulOverlayHandle, unDeviceIndex, pchComponentName)
+        return result
+
+    def getOverlayTransformTrackedDeviceComponent(self, ulOverlayHandle, pchComponentName, unComponentNameSize):
+        fn = self.function_table.getOverlayTransformTrackedDeviceComponent
+        punDeviceIndex = TrackedDeviceIndex_t()
+        result = fn(ulOverlayHandle, byref(punDeviceIndex), pchComponentName, unComponentNameSize)
+        return result, punDeviceIndex
+
+    def showOverlay(self, ulOverlayHandle):
+        fn = self.function_table.showOverlay
+        result = fn(ulOverlayHandle)
+        return result
+
+    def hideOverlay(self, ulOverlayHandle):
+        fn = self.function_table.hideOverlay
+        result = fn(ulOverlayHandle)
+        return result
+
+    def isOverlayVisible(self, ulOverlayHandle):
+        fn = self.function_table.isOverlayVisible
+        result = fn(ulOverlayHandle)
+        return result
+
+    def getTransformForOverlayCoordinates(self, ulOverlayHandle, eTrackingOrigin, coordinatesInOverlay):
+        fn = self.function_table.getTransformForOverlayCoordinates
+        pmatTransform = HmdMatrix34_t()
+        result = fn(ulOverlayHandle, eTrackingOrigin, coordinatesInOverlay, byref(pmatTransform))
+        return result, pmatTransform
+
+    def pollNextOverlayEvent(self, ulOverlayHandle, uncbVREvent):
+        fn = self.function_table.pollNextOverlayEvent
+        pEvent = VREvent_t()
+        result = fn(ulOverlayHandle, byref(pEvent), uncbVREvent)
+        return result, pEvent
+
+    def getOverlayInputMethod(self, ulOverlayHandle):
+        fn = self.function_table.getOverlayInputMethod
+        peInputMethod = VROverlayInputMethod()
+        result = fn(ulOverlayHandle, byref(peInputMethod))
+        return result, peInputMethod
+
+    def setOverlayInputMethod(self, ulOverlayHandle, eInputMethod):
+        fn = self.function_table.setOverlayInputMethod
+        result = fn(ulOverlayHandle, eInputMethod)
+        return result
+
+    def getOverlayMouseScale(self, ulOverlayHandle):
+        fn = self.function_table.getOverlayMouseScale
+        pvecMouseScale = HmdVector2_t()
+        result = fn(ulOverlayHandle, byref(pvecMouseScale))
+        return result, pvecMouseScale
+
+    def setOverlayMouseScale(self, ulOverlayHandle):
+        fn = self.function_table.setOverlayMouseScale
+        pvecMouseScale = HmdVector2_t()
+        result = fn(ulOverlayHandle, byref(pvecMouseScale))
+        return result, pvecMouseScale
+
+    def computeOverlayIntersection(self, ulOverlayHandle):
+        fn = self.function_table.computeOverlayIntersection
+        pParams = VROverlayIntersectionParams_t()
+        pResults = VROverlayIntersectionResults_t()
+        result = fn(ulOverlayHandle, byref(pParams), byref(pResults))
+        return result, pParams, pResults
+
+    def handleControllerOverlayInteractionAsMouse(self, ulOverlayHandle, unControllerDeviceIndex):
+        fn = self.function_table.handleControllerOverlayInteractionAsMouse
+        result = fn(ulOverlayHandle, unControllerDeviceIndex)
+        return result
+
+    def isHoverTargetOverlay(self, ulOverlayHandle):
+        fn = self.function_table.isHoverTargetOverlay
+        result = fn(ulOverlayHandle)
+        return result
+
+    def getGamepadFocusOverlay(self):
+        fn = self.function_table.getGamepadFocusOverlay
+        result = fn()
+        return result
+
+    def setGamepadFocusOverlay(self, ulNewFocusOverlay):
+        fn = self.function_table.setGamepadFocusOverlay
+        result = fn(ulNewFocusOverlay)
+        return result
+
+    def setOverlayNeighbor(self, eDirection, ulFrom, ulTo):
+        fn = self.function_table.setOverlayNeighbor
+        result = fn(eDirection, ulFrom, ulTo)
+        return result
+
+    def moveGamepadFocusToNeighbor(self, eDirection, ulFrom):
+        fn = self.function_table.moveGamepadFocusToNeighbor
+        result = fn(eDirection, ulFrom)
+        return result
+
+    def setOverlayTexture(self, ulOverlayHandle):
+        fn = self.function_table.setOverlayTexture
+        pTexture = Texture_t()
+        result = fn(ulOverlayHandle, byref(pTexture))
+        return result, pTexture
+
+    def clearOverlayTexture(self, ulOverlayHandle):
+        fn = self.function_table.clearOverlayTexture
+        result = fn(ulOverlayHandle)
+        return result
+
+    def setOverlayRaw(self, ulOverlayHandle, pvBuffer, unWidth, unHeight, unDepth):
+        fn = self.function_table.setOverlayRaw
+        result = fn(ulOverlayHandle, pvBuffer, unWidth, unHeight, unDepth)
+        return result
+
+    def setOverlayFromFile(self, ulOverlayHandle, pchFilePath):
+        fn = self.function_table.setOverlayFromFile
+        result = fn(ulOverlayHandle, pchFilePath)
+        return result
+
+    def getOverlayTexture(self, ulOverlayHandle, pNativeTextureRef):
+        fn = self.function_table.getOverlayTexture
+        pNativeTextureHandle = c_void_p()
+        pWidth = c_uint32()
+        pHeight = c_uint32()
+        pNativeFormat = c_uint32()
+        pAPI = EGraphicsAPIConvention()
+        pColorSpace = EColorSpace()
+        result = fn(ulOverlayHandle, byref(pNativeTextureHandle), pNativeTextureRef, byref(pWidth), byref(pHeight), byref(pNativeFormat), byref(pAPI), byref(pColorSpace))
+        return result, pNativeTextureHandle, pWidth, pHeight, pNativeFormat, pAPI, pColorSpace
+
+    def releaseNativeOverlayHandle(self, ulOverlayHandle, pNativeTextureHandle):
+        fn = self.function_table.releaseNativeOverlayHandle
+        result = fn(ulOverlayHandle, pNativeTextureHandle)
+        return result
+
+    def createDashboardOverlay(self, pchOverlayKey, pchOverlayFriendlyName):
+        fn = self.function_table.createDashboardOverlay
+        pMainHandle = VROverlayHandle_t()
+        pThumbnailHandle = VROverlayHandle_t()
+        result = fn(pchOverlayKey, pchOverlayFriendlyName, byref(pMainHandle), byref(pThumbnailHandle))
+        return result, pMainHandle, pThumbnailHandle
+
+    def isDashboardVisible(self):
+        fn = self.function_table.isDashboardVisible
+        result = fn()
+        return result
+
+    def isActiveDashboardOverlay(self, ulOverlayHandle):
+        fn = self.function_table.isActiveDashboardOverlay
+        result = fn(ulOverlayHandle)
+        return result
+
+    def setDashboardOverlaySceneProcess(self, ulOverlayHandle, unProcessId):
+        fn = self.function_table.setDashboardOverlaySceneProcess
+        result = fn(ulOverlayHandle, unProcessId)
+        return result
+
+    def getDashboardOverlaySceneProcess(self, ulOverlayHandle):
+        fn = self.function_table.getDashboardOverlaySceneProcess
+        punProcessId = c_uint32()
+        result = fn(ulOverlayHandle, byref(punProcessId))
+        return result, punProcessId
+
+    def showDashboard(self, pchOverlayToShow):
+        fn = self.function_table.showDashboard
+        result = fn(pchOverlayToShow)
+
+    def getPrimaryDashboardDevice(self):
+        fn = self.function_table.getPrimaryDashboardDevice
+        result = fn()
+        return result
+
+    def showKeyboard(self, eInputMode, eLineInputMode, pchDescription, unCharMax, pchExistingText, bUseMinimalMode, uUserValue):
+        fn = self.function_table.showKeyboard
+        result = fn(eInputMode, eLineInputMode, pchDescription, unCharMax, pchExistingText, bUseMinimalMode, uUserValue)
+        return result
+
+    def showKeyboardForOverlay(self, ulOverlayHandle, eInputMode, eLineInputMode, pchDescription, unCharMax, pchExistingText, bUseMinimalMode, uUserValue):
+        fn = self.function_table.showKeyboardForOverlay
+        result = fn(ulOverlayHandle, eInputMode, eLineInputMode, pchDescription, unCharMax, pchExistingText, bUseMinimalMode, uUserValue)
+        return result
+
+    def getKeyboardText(self, pchText, cchText):
+        fn = self.function_table.getKeyboardText
+        result = fn(pchText, cchText)
+        return result
+
+    def hideKeyboard(self):
+        fn = self.function_table.hideKeyboard
+        result = fn()
+
+    def setKeyboardTransformAbsolute(self, eTrackingOrigin):
+        fn = self.function_table.setKeyboardTransformAbsolute
+        pmatTrackingOriginToKeyboardTransform = HmdMatrix34_t()
+        result = fn(eTrackingOrigin, byref(pmatTrackingOriginToKeyboardTransform))
+        return pmatTrackingOriginToKeyboardTransform
+
+    def setKeyboardPositionForOverlay(self, ulOverlayHandle, avoidRect):
+        fn = self.function_table.setKeyboardPositionForOverlay
+        result = fn(ulOverlayHandle, avoidRect)
+
+
+
 class IVRRenderModels_FnTable(Structure):
     _fields_ = [
         ("loadRenderModel_Async", WINFUNCTYPE(EVRRenderModelError, c_char_p, POINTER(POINTER(RenderModel_t)))),
@@ -1261,11 +2545,135 @@ class IVRRenderModels_FnTable(Structure):
     ]
 
 
+class IVRRenderModels:
+    def __init__(self):
+        version_key = IVRRenderModels_Version
+        if not isInterfaceVersionValid(version_key):
+            _checkInitError(VRInitError_Init_InterfaceNotFound)
+        # Thank you lukexi https://github.com/lukexi/openvr-hs/blob/master/cbits/openvr_capi_helper.c#L9
+        fn_key = "FnTable:" + version_key
+        fn_type = IVRRenderModels_FnTable
+        fn_table_ptr = cast(getGenericInterface(fn_key), POINTER(fn_type))
+        if fn_table_ptr is None:
+            raise OpenVRError("Error retrieving VR API for IVRRenderModels")
+        self.function_table = fn_table_ptr.contents
+
+    def loadRenderModel_Async(self, pchRenderModelName):
+        fn = self.function_table.loadRenderModel_Async
+        ppRenderModel = POINTER(RenderModel_t)()
+        result = fn(pchRenderModelName, byref(ppRenderModel))
+        return result, ppRenderModel
+
+    def freeRenderModel(self):
+        fn = self.function_table.freeRenderModel
+        pRenderModel = RenderModel_t()
+        result = fn(byref(pRenderModel))
+        return pRenderModel
+
+    def loadTexture_Async(self, textureId):
+        fn = self.function_table.loadTexture_Async
+        ppTexture = POINTER(RenderModel_TextureMap_t)()
+        result = fn(textureId, byref(ppTexture))
+        return result, ppTexture
+
+    def freeTexture(self):
+        fn = self.function_table.freeTexture
+        pTexture = RenderModel_TextureMap_t()
+        result = fn(byref(pTexture))
+        return pTexture
+
+    def loadTextureD3D11_Async(self, textureId, pD3D11Device):
+        fn = self.function_table.loadTextureD3D11_Async
+        ppD3D11Texture2D = c_void_p()
+        result = fn(textureId, pD3D11Device, byref(ppD3D11Texture2D))
+        return result, ppD3D11Texture2D
+
+    def loadIntoTextureD3D11_Async(self, textureId, pDstTexture):
+        fn = self.function_table.loadIntoTextureD3D11_Async
+        result = fn(textureId, pDstTexture)
+        return result
+
+    def freeTextureD3D11(self, pD3D11Texture2D):
+        fn = self.function_table.freeTextureD3D11
+        result = fn(pD3D11Texture2D)
+
+    def getRenderModelName(self, unRenderModelIndex, pchRenderModelName, unRenderModelNameLen):
+        fn = self.function_table.getRenderModelName
+        result = fn(unRenderModelIndex, pchRenderModelName, unRenderModelNameLen)
+        return result
+
+    def getRenderModelCount(self):
+        fn = self.function_table.getRenderModelCount
+        result = fn()
+        return result
+
+    def getComponentCount(self, pchRenderModelName):
+        fn = self.function_table.getComponentCount
+        result = fn(pchRenderModelName)
+        return result
+
+    def getComponentName(self, pchRenderModelName, unComponentIndex, pchComponentName, unComponentNameLen):
+        fn = self.function_table.getComponentName
+        result = fn(pchRenderModelName, unComponentIndex, pchComponentName, unComponentNameLen)
+        return result
+
+    def getComponentButtonMask(self, pchRenderModelName, pchComponentName):
+        fn = self.function_table.getComponentButtonMask
+        result = fn(pchRenderModelName, pchComponentName)
+        return result
+
+    def getComponentRenderModelName(self, pchRenderModelName, pchComponentName, pchComponentRenderModelName, unComponentRenderModelNameLen):
+        fn = self.function_table.getComponentRenderModelName
+        result = fn(pchRenderModelName, pchComponentName, pchComponentRenderModelName, unComponentRenderModelNameLen)
+        return result
+
+    def getComponentState(self, pchRenderModelName, pchComponentName):
+        fn = self.function_table.getComponentState
+        pControllerState = VRControllerState_t()
+        pState = RenderModel_ControllerMode_State_t()
+        pComponentState = RenderModel_ComponentState_t()
+        result = fn(pchRenderModelName, pchComponentName, byref(pControllerState), byref(pState), byref(pComponentState))
+        return result, pControllerState, pState, pComponentState
+
+    def renderModelHasComponent(self, pchRenderModelName, pchComponentName):
+        fn = self.function_table.renderModelHasComponent
+        result = fn(pchRenderModelName, pchComponentName)
+        return result
+
+
+
 class IVRNotifications_FnTable(Structure):
     _fields_ = [
         ("createNotification", WINFUNCTYPE(EVRNotificationError, VROverlayHandle_t, c_uint64, EVRNotificationType, c_char_p, EVRNotificationStyle, POINTER(NotificationBitmap_t), POINTER(VRNotificationId))),
         ("removeNotification", WINFUNCTYPE(EVRNotificationError, VRNotificationId)),
     ]
+
+
+class IVRNotifications:
+    def __init__(self):
+        version_key = IVRNotifications_Version
+        if not isInterfaceVersionValid(version_key):
+            _checkInitError(VRInitError_Init_InterfaceNotFound)
+        # Thank you lukexi https://github.com/lukexi/openvr-hs/blob/master/cbits/openvr_capi_helper.c#L9
+        fn_key = "FnTable:" + version_key
+        fn_type = IVRNotifications_FnTable
+        fn_table_ptr = cast(getGenericInterface(fn_key), POINTER(fn_type))
+        if fn_table_ptr is None:
+            raise OpenVRError("Error retrieving VR API for IVRNotifications")
+        self.function_table = fn_table_ptr.contents
+
+    def createNotification(self, ulOverlayHandle, ulUserValue, type, pchText, style):
+        fn = self.function_table.createNotification
+        pImage = NotificationBitmap_t()
+        pNotificationId = VRNotificationId()
+        result = fn(ulOverlayHandle, ulUserValue, type, pchText, style, byref(pImage), byref(pNotificationId))
+        return result, pImage, pNotificationId
+
+    def removeNotification(self, notificationId):
+        fn = self.function_table.removeNotification
+        result = fn(notificationId)
+        return result
+
 
 
 class IVRSettings_FnTable(Structure):
@@ -1285,14 +2693,102 @@ class IVRSettings_FnTable(Structure):
     ]
 
 
+class IVRSettings:
+    def __init__(self):
+        version_key = IVRSettings_Version
+        if not isInterfaceVersionValid(version_key):
+            _checkInitError(VRInitError_Init_InterfaceNotFound)
+        # Thank you lukexi https://github.com/lukexi/openvr-hs/blob/master/cbits/openvr_capi_helper.c#L9
+        fn_key = "FnTable:" + version_key
+        fn_type = IVRSettings_FnTable
+        fn_table_ptr = cast(getGenericInterface(fn_key), POINTER(fn_type))
+        if fn_table_ptr is None:
+            raise OpenVRError("Error retrieving VR API for IVRSettings")
+        self.function_table = fn_table_ptr.contents
+
+    def getSettingsErrorNameFromEnum(self, eError):
+        fn = self.function_table.getSettingsErrorNameFromEnum
+        result = fn(eError)
+        return result
+
+    def sync(self, bForce):
+        fn = self.function_table.sync
+        peError = EVRSettingsError()
+        result = fn(bForce, byref(peError))
+        return result, peError
+
+    def getBool(self, pchSection, pchSettingsKey, bDefaultValue):
+        fn = self.function_table.getBool
+        peError = EVRSettingsError()
+        result = fn(pchSection, pchSettingsKey, bDefaultValue, byref(peError))
+        return result, peError
+
+    def setBool(self, pchSection, pchSettingsKey, bValue):
+        fn = self.function_table.setBool
+        peError = EVRSettingsError()
+        result = fn(pchSection, pchSettingsKey, bValue, byref(peError))
+        return peError
+
+    def getInt32(self, pchSection, pchSettingsKey, nDefaultValue):
+        fn = self.function_table.getInt32
+        peError = EVRSettingsError()
+        result = fn(pchSection, pchSettingsKey, nDefaultValue, byref(peError))
+        return result, peError
+
+    def setInt32(self, pchSection, pchSettingsKey, nValue):
+        fn = self.function_table.setInt32
+        peError = EVRSettingsError()
+        result = fn(pchSection, pchSettingsKey, nValue, byref(peError))
+        return peError
+
+    def getFloat(self, pchSection, pchSettingsKey, flDefaultValue):
+        fn = self.function_table.getFloat
+        peError = EVRSettingsError()
+        result = fn(pchSection, pchSettingsKey, flDefaultValue, byref(peError))
+        return result, peError
+
+    def setFloat(self, pchSection, pchSettingsKey, flValue):
+        fn = self.function_table.setFloat
+        peError = EVRSettingsError()
+        result = fn(pchSection, pchSettingsKey, flValue, byref(peError))
+        return peError
+
+    def getString(self, pchSection, pchSettingsKey, pchValue, unValueLen, pchDefaultValue):
+        fn = self.function_table.getString
+        peError = EVRSettingsError()
+        result = fn(pchSection, pchSettingsKey, pchValue, unValueLen, pchDefaultValue, byref(peError))
+        return peError
+
+    def setString(self, pchSection, pchSettingsKey, pchValue):
+        fn = self.function_table.setString
+        peError = EVRSettingsError()
+        result = fn(pchSection, pchSettingsKey, pchValue, byref(peError))
+        return peError
+
+    def removeSection(self, pchSection):
+        fn = self.function_table.removeSection
+        peError = EVRSettingsError()
+        result = fn(pchSection, byref(peError))
+        return peError
+
+    def removeKeyInSection(self, pchSection, pchSettingsKey):
+        fn = self.function_table.removeKeyInSection
+        peError = EVRSettingsError()
+        result = fn(pchSection, pchSettingsKey, byref(peError))
+        return peError
+
+
+
+
 ########################
 ### Expose functions ###
 ########################
 
 def _checkInitError(error):
-    if error.value != EVRInitError_VRInitError_None.value:
+    if error.value != VRInitError_None.value:
         shutdown()
         raise OpenVRError(getInitErrorAsSymbol(error) + str(error))    
+
 
 _openvr.VR_GetGenericInterface.restype = c_void_p
 _openvr.VR_GetGenericInterface.argtypes = [c_char_p, POINTER(EVRInitError)]
@@ -1302,10 +2798,12 @@ def getGenericInterface(interfaceVersion):
     _checkInitError(error)
     return ptr
 
+
 _openvr.VR_GetVRInitErrorAsSymbol.restype = c_char_p
 _openvr.VR_GetVRInitErrorAsSymbol.argtypes = [EVRInitError]
 def getInitErrorAsSymbol(error):
     return _openvr.VR_GetVRInitErrorAsSymbol(error)
+
 
 _openvr.VR_InitInternal.restype = c_uint32
 _openvr.VR_InitInternal.argtypes = [POINTER(EVRInitError), EVRApplicationType]
@@ -1324,16 +2822,7 @@ def init(applicationType):
     _vr_token = _openvr.VR_InitInternal(byref(eError), applicationType)
     _checkInitError(eError)
     # Retrieve "System" API
-    if not isInterfaceVersionValid(IVRSystem_Version):
-        _checkInitError(EVRInitError_VRInitError_Init_InterfaceNotFound)
-    # Thank you lukexi https://github.com/lukexi/openvr-hs/blob/master/cbits/openvr_capi_helper.c#L9
-    system_fn_key = "FnTable:" + IVRSystem_Version
-    systemFunctionsPtr = cast(getGenericInterface(system_fn_key), 
-        POINTER(IVRSystem_FnTable))
-    systemFunctions = systemFunctionsPtr.contents
-    if systemFunctions is None:
-        raise OpenVRError("Error retrieving VR API")
-    return IVRSystem(system_functions=systemFunctions)
+    return IVRSystem()
 
 
 _openvr.VR_IsHmdPresent.restype = openvr_bool
@@ -1381,41 +2870,5 @@ def shutdown():
     _openvr.VR_ShutdownInternal() # OK, this is just like inline definition in openvr.h
 
 
-#################################################
-### Wrap OpenVR API in Object Oriented python ###
-#################################################
-
-class IVRSystem:
-    def __init__(self, system_functions):
-        self.system_functions = system_functions
-
-    def shutdown(self):
-        if self.system_functions is None:
-            return
-        shutdown()
-        self.system_functions = None
-
-    def getEyeToHeadTransform(self, eye):
-        fn = self.system_functions.getEyeToHeadTransform
-        return fn(eye)
-
-    def getRecommendedRenderTargetSize(self):
-        fn = self.system_functions.getRecommendedRenderTargetSize
-        w = c_uint32()
-        h = c_uint32()
-        fn(byref(w), byref(h))
-        return w, h
-
-    def isDisplayOnDesktop(self):
-        fn = self.system_functions.isDisplayOnDesktop
-        return fn()
-
-
-class COpenVRContext():
-    def __init__(self):
-        self.clear()
-
-    def clear(self):
-        pass
-
 _vr_token = c_uint32()
+
