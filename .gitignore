@@ -1,3 +1,2 @@
-/openvr/*.pyc
-/src/openvr/*.pyc
+*.pyc
 /src/c_tests/build_cmake_vs2015

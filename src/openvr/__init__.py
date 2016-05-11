@@ -699,7 +699,7 @@ VRSettingsError_ReadFailed = ENUM_TYPE(3)
 ### Expose Typedefs ###
 #######################
 
-openvr_bool = c_char
+openvr_bool = c_ubyte
 TrackedDeviceIndex_t = c_uint32
 VRNotificationId = c_uint32
 VROverlayHandle_t = c_uint64
