@@ -8,6 +8,8 @@ import os
 import ctypes
 from ctypes import *
 
+from .version import __version__
+
 ####################################################################
 ### Load OpenVR shared library, so we can access it using ctypes ###
 ####################################################################
