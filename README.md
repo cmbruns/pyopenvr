@@ -3,7 +3,7 @@
 
 ## Installation
 - [ ] Install Python 2.7 https://www.python.org/download/releases/2.7/ (32-bit version)
-- [ ] Install Oculus Rift Runtime or HTC Vive SteamVR
+- [ ] Install HTC Vive SteamVR or Oculus Rift Runtime
 - [ ] ``pip install openvr``
 
 ## Use
