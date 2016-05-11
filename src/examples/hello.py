@@ -12,7 +12,7 @@ if openvr.isHmdPresent():
 if openvr.isRuntimeInstalled():
     print "Runtime is installed"
 
-vr_system = openvr.init(openvr.EVRApplicationType_VRApplication_Scene)
+vr_system = openvr.init(openvr.VRApplication_Scene)
 
 print openvr.runtimePath()
 
@@ -21,7 +21,7 @@ print vr_system.getRecommendedRenderTargetSize()
 print vr_system.isDisplayOnDesktop()
 
 for i in range(100):
-    xform = vr_system.getEyeToHeadTransform(openvr.EVREye_Eye_Left)
+    xform = vr_system.getEyeToHeadTransform(openvr.Eye_Left)
     print xform
     sys.stdout.flush()
     time.sleep(0.2)

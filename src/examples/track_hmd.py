@@ -4,7 +4,7 @@ import sys
 import time
 import openvr
 
-vr_system = openvr.init(openvr.EVRApplicationType_VRApplication_Scene)
+vr_system = openvr.init(openvr.VRApplication_Scene)
 
 for i in range(100):
     pose = vr_system.getDeviceToAbsoluteTrackingPose(
