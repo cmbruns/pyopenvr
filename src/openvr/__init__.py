@@ -738,6 +738,29 @@ class OpenVRError(RuntimeError):
     """
     pass
 
+# Methods to include in all openvr vector classes
+class _VectorMixin():
+    def __init__(self, *args):
+        self._setArray(self._getArray().__class__(*args))
+
+    def _getArray(self):
+        return self.v
+
+    def _setArray(self, array):
+        self.v[:] = array[:]
+
+    def __getitem__(self, key):
+        return self._getArray()[key]
+
+    def __len__(self):
+        return len(self._getArray())
+
+    def __setitem__(self, key, value):
+        self._getArray()[key] = value
+
+    def __str__(self):
+        return str(list(self))
+
 
 class HmdMatrix34_t(Structure):
     _fields_ = [
@@ -769,58 +792,31 @@ class HmdMatrix44_t(Structure):
         return str(list(list(e) for e in self))
 
 
-class HmdVector3_t(Structure):
+class HmdVector3_t(_VectorMixin, Structure):
     _fields_ = [
         ("v", c_float * 3),
     ]
 
-    def __getitem__(self, key):
-        return self.v[key]
 
-    def __len__(self):
-        return len(self.v)
-
-    def __str__(self):
-        return str(list(e) for e in self)
-
-
-class HmdVector4_t(Structure):
+class HmdVector4_t(_VectorMixin, Structure):
     _fields_ = [
         ("v", c_float * 4),
     ]
 
 
-class HmdVector3d_t(Structure):
+class HmdVector3d_t(_VectorMixin, Structure):
     _fields_ = [
         ("v", c_double * 3),
     ]
 
-    def __getitem__(self, key):
-        return self.v[key]
 
-    def __len__(self):
-        return len(self.v)
-
-    def __str__(self):
-        return str(list(e) for e in self)
-
-
-class HmdVector2_t(Structure):
+class HmdVector2_t(_VectorMixin, Structure):
     _fields_ = [
         ("v", c_float * 2),
     ]
 
-    def __getitem__(self, key):
-        return self.v[key]
 
-    def __len__(self):
-        return len(self.v)
-
-    def __str__(self):
-        return str(list(e) for e in self)
-
-
-class HmdQuaternion_t(Structure):
+class HmdQuaternion_t(_VectorMixin, Structure):
     _fields_ = [
         ("w", c_double),
         ("x", c_double),
@@ -828,14 +824,26 @@ class HmdQuaternion_t(Structure):
         ("z", c_double),
     ]
 
+    def _getArray(self):
+        return [self.w, self.x, self.y, self.z]
 
-class HmdColor_t(Structure):
+    def _setArray(self, array):
+        self.w, self.x, self.y, self.z = array[:]
+
+
+class HmdColor_t(_VectorMixin, Structure):
     _fields_ = [
         ("r", c_float),
         ("g", c_float),
         ("b", c_float),
         ("a", c_float),
     ]
+
+    def _getArray(self):
+        return [self.r, self.g, self.b, self.a]
+
+    def _setArray(self, array):
+        self.r, self.g, self.b, self.a = array[:]
 
 
 class HmdQuad_t(Structure):
