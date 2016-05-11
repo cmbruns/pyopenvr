@@ -26,4 +26,4 @@ for i in range(100):
     sys.stdout.flush()
     time.sleep(0.2)
 
-vr_system.shutdown()
+openvr.shutdown()

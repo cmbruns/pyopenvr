@@ -744,17 +744,44 @@ class HmdMatrix34_t(Structure):
         ("m", (c_float * 4) * 3),
     ]
 
+    def __getitem__(self, key):
+        return self.m[key]
+
+    def __len__(self):
+        return len(self.m)
+
+    def __str__(self):
+        return str(list(list(e) for e in self))
+
 
 class HmdMatrix44_t(Structure):
     _fields_ = [
         ("m", (c_float * 4) * 4),
     ]
 
+    def __getitem__(self, key):
+        return self.m[key]
+
+    def __len__(self):
+        return len(self.m)
+
+    def __str__(self):
+        return str(list(list(e) for e in self))
+
 
 class HmdVector3_t(Structure):
     _fields_ = [
         ("v", c_float * 3),
     ]
+
+    def __getitem__(self, key):
+        return self.v[key]
+
+    def __len__(self):
+        return len(self.v)
+
+    def __str__(self):
+        return str(list(e) for e in self)
 
 
 class HmdVector4_t(Structure):
@@ -768,11 +795,29 @@ class HmdVector3d_t(Structure):
         ("v", c_double * 3),
     ]
 
+    def __getitem__(self, key):
+        return self.v[key]
+
+    def __len__(self):
+        return len(self.v)
+
+    def __str__(self):
+        return str(list(e) for e in self)
+
 
 class HmdVector2_t(Structure):
     _fields_ = [
         ("v", c_float * 2),
     ]
+
+    def __getitem__(self, key):
+        return self.v[key]
+
+    def __len__(self):
+        return len(self.v)
+
+    def __str__(self):
+        return str(list(e) for e in self)
 
 
 class HmdQuaternion_t(Structure):
@@ -1249,8 +1294,9 @@ class IVRSystem:
 
     def getDeviceToAbsoluteTrackingPose(self, eOrigin, fPredictedSecondsToPhotonsFromNow, unTrackedDevicePoseArrayCount):
         fn = self.function_table.getDeviceToAbsoluteTrackingPose
-        pTrackedDevicePoseArray = TrackedDevicePose_t()
-        result = fn(eOrigin, fPredictedSecondsToPhotonsFromNow, byref(pTrackedDevicePoseArray), unTrackedDevicePoseArrayCount)
+        trackedDevicePoseArray = (TrackedDevicePose_t * unTrackedDevicePoseArrayCount)()
+        pTrackedDevicePoseArray = cast(trackedDevicePoseArray, POINTER(TrackedDevicePose_t))
+        result = fn(eOrigin, fPredictedSecondsToPhotonsFromNow, pTrackedDevicePoseArray, unTrackedDevicePoseArrayCount)
         return pTrackedDevicePoseArray
 
     def resetSeatedZeroPose(self):

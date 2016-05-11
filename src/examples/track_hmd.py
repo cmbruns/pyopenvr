@@ -7,12 +7,13 @@ import openvr
 vr_system = openvr.init(openvr.VRApplication_Scene)
 
 for i in range(100):
-    pose = vr_system.getDeviceToAbsoluteTrackingPose(
+    poses = vr_system.getDeviceToAbsoluteTrackingPose(
         openvr.TrackingUniverseStanding,
         0,
-        1)
-    print pose
+        openvr.k_unMaxTrackedDeviceCount)
+    pose = poses[openvr.k_unTrackedDeviceIndex_Hmd]
+    print pose.mDeviceToAbsoluteTracking
     sys.stdout.flush()
     time.sleep(0.2)
 
-vr_system.shutdown()
+openvr.shutdown()
