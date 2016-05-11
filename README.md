@@ -1,6 +1,30 @@
 # pyopenvr
-Python bindings for Valve's OpenVR virtual reality SDK
+### Python bindings for Valve's OpenVR virtual reality SDK
 
-See https://github.com/ValveSoftware/openvr for more information.
+## Installation
+- [ ] Install Python 2.7 https://www.python.org/download/releases/2.7/ (32-bit version)
+- [ ] Install Oculus Rift Runtime or HTC Vive SteamVR
+- [ ] ``pip install openvr``
 
-This is a work in progress.
+## Use
+
+```python
+import sys
+import time
+import openvr
+
+vr_system = openvr.init(openvr.VRApplication_Scene)
+
+for i in range(100):
+    poses = vr_system.getDeviceToAbsoluteTrackingPose(
+        openvr.TrackingUniverseStanding,
+        0,
+        openvr.k_unMaxTrackedDeviceCount)
+    pose = poses[openvr.k_unTrackedDeviceIndex_Hmd]
+    print pose.mDeviceToAbsoluteTracking
+    sys.stdout.flush()
+    time.sleep(0.2)
+
+openvr.shutdown()
+```
+
