@@ -2,8 +2,8 @@
 ### Python bindings for Valve's OpenVR virtual reality SDK
 
 ## Installation
-- [ ] Install Python 2.7 https://www.python.org/download/releases/2.7/ (32-bit version)
-- [ ] Install HTC Vive SteamVR or Oculus Rift Runtime
+- [ ] Install Python https://www.python.org/download/
+- [ ] Install HTC Vive SteamVR
 - [ ] ``pip install openvr``
 
 ## Use
