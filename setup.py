@@ -15,7 +15,7 @@ setup(
     download_url = "https://github.com/cmbruns/pyopenvr/tarball/" + __version__,
     package_dir = {'': 'src'},
     packages = ['openvr'],
-    package_data = {'openvr': ['openvr_api.dll']},
+    package_data = {'openvr': ['*.dll', '*.so', '*.dylib']},
     keywords = "openvr valve htc vive vr virtual reality",
     classifiers = [],
 )
