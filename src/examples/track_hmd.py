@@ -12,7 +12,7 @@ for i in range(100):
         0,
         openvr.k_unMaxTrackedDeviceCount)
     pose = poses[openvr.k_unTrackedDeviceIndex_Hmd]
-    print pose.mDeviceToAbsoluteTracking
+    print(pose.mDeviceToAbsoluteTracking)
     sys.stdout.flush()
     time.sleep(0.2)
 

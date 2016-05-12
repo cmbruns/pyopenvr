@@ -33,125 +33,125 @@ k_unTrackedDeviceIndexInvalid = 4294967295
 k_unMaxPropertyStringSize = 32768
 k_unControllerStateAxisCount = 5
 k_ulOverlayHandleInvalid = 0
-IVRSystem_Version = "IVRSystem_012"
-IVRExtendedDisplay_Version = "IVRExtendedDisplay_001"
+IVRSystem_Version = b"IVRSystem_012"
+IVRExtendedDisplay_Version = b"IVRExtendedDisplay_001"
 k_unMaxApplicationKeyLength = 128
-IVRApplications_Version = "IVRApplications_005"
-IVRChaperone_Version = "IVRChaperone_003"
-IVRChaperoneSetup_Version = "IVRChaperoneSetup_005"
-IVRCompositor_Version = "IVRCompositor_014"
+IVRApplications_Version = b"IVRApplications_005"
+IVRChaperone_Version = b"IVRChaperone_003"
+IVRChaperoneSetup_Version = b"IVRChaperoneSetup_005"
+IVRCompositor_Version = b"IVRCompositor_014"
 k_unVROverlayMaxKeyLength = 128
 k_unVROverlayMaxNameLength = 128
 k_unMaxOverlayCount = 32
-IVROverlay_Version = "IVROverlay_011"
-k_pch_Controller_Component_GDC2015 = "gdc2015"
-k_pch_Controller_Component_Base = "base"
-k_pch_Controller_Component_Tip = "tip"
-k_pch_Controller_Component_HandGrip = "handgrip"
-k_pch_Controller_Component_Status = "status"
-IVRRenderModels_Version = "IVRRenderModels_005"
+IVROverlay_Version = b"IVROverlay_011"
+k_pch_Controller_Component_GDC2015 = b"gdc2015"
+k_pch_Controller_Component_Base = b"base"
+k_pch_Controller_Component_Tip = b"tip"
+k_pch_Controller_Component_HandGrip = b"handgrip"
+k_pch_Controller_Component_Status = b"status"
+IVRRenderModels_Version = b"IVRRenderModels_005"
 k_unNotificationTextMaxSize = 256
-IVRNotifications_Version = "IVRNotifications_002"
+IVRNotifications_Version = b"IVRNotifications_002"
 k_unMaxSettingsKeyLength = 128
-IVRSettings_Version = "IVRSettings_001"
-k_pch_SteamVR_Section = "steamvr"
-k_pch_SteamVR_RequireHmd_String = "requireHmd"
-k_pch_SteamVR_ForcedDriverKey_String = "forcedDriver"
-k_pch_SteamVR_ForcedHmdKey_String = "forcedHmd"
-k_pch_SteamVR_DisplayDebug_Bool = "displayDebug"
-k_pch_SteamVR_DebugProcessPipe_String = "debugProcessPipe"
-k_pch_SteamVR_EnableDistortion_Bool = "enableDistortion"
-k_pch_SteamVR_DisplayDebugX_Int32 = "displayDebugX"
-k_pch_SteamVR_DisplayDebugY_Int32 = "displayDebugY"
-k_pch_SteamVR_SendSystemButtonToAllApps_Bool = "sendSystemButtonToAllApps"
-k_pch_SteamVR_LogLevel_Int32 = "loglevel"
-k_pch_SteamVR_IPD_Float = "ipd"
-k_pch_SteamVR_Background_String = "background"
-k_pch_SteamVR_GridColor_String = "gridColor"
-k_pch_SteamVR_PlayAreaColor_String = "playAreaColor"
-k_pch_SteamVR_ActivateMultipleDrivers_Bool = "activateMultipleDrivers"
-k_pch_SteamVR_PowerOffOnExit_Bool = "powerOffOnExit"
-k_pch_SteamVR_StandbyAppRunningTimeout_Float = "standbyAppRunningTimeout"
-k_pch_SteamVR_StandbyNoAppTimeout_Float = "standbyNoAppTimeout"
-k_pch_SteamVR_DirectMode_Bool = "directMode"
-k_pch_SteamVR_DirectModeEdidVid_Int32 = "directModeEdidVid"
-k_pch_SteamVR_DirectModeEdidPid_Int32 = "directModeEdidPid"
-k_pch_SteamVR_UsingSpeakers_Bool = "usingSpeakers"
-k_pch_SteamVR_SpeakersForwardYawOffsetDegrees_Float = "speakersForwardYawOffsetDegrees"
-k_pch_SteamVR_BaseStationPowerManagement_Bool = "basestationPowerManagement"
-k_pch_SteamVR_NeverKillProcesses_Bool = "neverKillProcesses"
-k_pch_SteamVR_RenderTargetMultiplier_Float = "renderTargetMultiplier"
-k_pch_SteamVR_AllowReprojection_Bool = "allowReprojection"
-k_pch_Lighthouse_Section = "driver_lighthouse"
-k_pch_Lighthouse_DisableIMU_Bool = "disableimu"
-k_pch_Lighthouse_UseDisambiguation_String = "usedisambiguation"
-k_pch_Lighthouse_DisambiguationDebug_Int32 = "disambiguationdebug"
-k_pch_Lighthouse_PrimaryBasestation_Int32 = "primarybasestation"
-k_pch_Lighthouse_LighthouseName_String = "lighthousename"
-k_pch_Lighthouse_MaxIncidenceAngleDegrees_Float = "maxincidenceangledegrees"
-k_pch_Lighthouse_UseLighthouseDirect_Bool = "uselighthousedirect"
-k_pch_Lighthouse_DBHistory_Bool = "dbhistory"
-k_pch_Lighthouse_OriginOffsetX_Float = "originoffsetx"
-k_pch_Lighthouse_OriginOffsetY_Float = "originoffsety"
-k_pch_Lighthouse_OriginOffsetZ_Float = "originoffsetz"
-k_pch_Lighthouse_HeadingOffset_Float = "headingoffset"
-k_pch_Null_Section = "driver_null"
-k_pch_Null_EnableNullDriver_Bool = "enable"
-k_pch_Null_SerialNumber_String = "serialNumber"
-k_pch_Null_ModelNumber_String = "modelNumber"
-k_pch_Null_WindowX_Int32 = "windowX"
-k_pch_Null_WindowY_Int32 = "windowY"
-k_pch_Null_WindowWidth_Int32 = "windowWidth"
-k_pch_Null_WindowHeight_Int32 = "windowHeight"
-k_pch_Null_RenderWidth_Int32 = "renderWidth"
-k_pch_Null_RenderHeight_Int32 = "renderHeight"
-k_pch_Null_SecondsFromVsyncToPhotons_Float = "secondsFromVsyncToPhotons"
-k_pch_Null_DisplayFrequency_Float = "displayFrequency"
-k_pch_UserInterface_Section = "userinterface"
-k_pch_UserInterface_StatusAlwaysOnTop_Bool = "StatusAlwaysOnTop"
-k_pch_Notifications_Section = "notifications"
-k_pch_Notifications_DoNotDisturb_Bool = "DoNotDisturb"
-k_pch_Keyboard_Section = "keyboard"
-k_pch_Keyboard_TutorialCompletions = "TutorialCompletions"
-k_pch_Keyboard_ScaleX = "ScaleX"
-k_pch_Keyboard_ScaleY = "ScaleY"
-k_pch_Keyboard_OffsetLeftX = "OffsetLeftX"
-k_pch_Keyboard_OffsetRightX = "OffsetRightX"
-k_pch_Keyboard_OffsetY = "OffsetY"
-k_pch_Keyboard_Smoothing = "Smoothing"
-k_pch_Perf_Section = "perfcheck"
-k_pch_Perf_HeuristicActive_Bool = "heuristicActive"
-k_pch_Perf_NotifyInHMD_Bool = "warnInHMD"
-k_pch_Perf_NotifyOnlyOnce_Bool = "warnOnlyOnce"
-k_pch_Perf_AllowTimingStore_Bool = "allowTimingStore"
-k_pch_Perf_SaveTimingsOnExit_Bool = "saveTimingsOnExit"
-k_pch_Perf_TestData_Float = "perfTestData"
-k_pch_CollisionBounds_Section = "collisionBounds"
-k_pch_CollisionBounds_Style_Int32 = "CollisionBoundsStyle"
-k_pch_CollisionBounds_GroundPerimeterOn_Bool = "CollisionBoundsGroundPerimeterOn"
-k_pch_CollisionBounds_CenterMarkerOn_Bool = "CollisionBoundsCenterMarkerOn"
-k_pch_CollisionBounds_PlaySpaceOn_Bool = "CollisionBoundsPlaySpaceOn"
-k_pch_CollisionBounds_FadeDistance_Float = "CollisionBoundsFadeDistance"
-k_pch_CollisionBounds_ColorGammaR_Int32 = "CollisionBoundsColorGammaR"
-k_pch_CollisionBounds_ColorGammaG_Int32 = "CollisionBoundsColorGammaG"
-k_pch_CollisionBounds_ColorGammaB_Int32 = "CollisionBoundsColorGammaB"
-k_pch_CollisionBounds_ColorGammaA_Int32 = "CollisionBoundsColorGammaA"
-k_pch_Camera_Section = "camera"
-k_pch_Camera_EnableCamera_Bool = "enableCamera"
-k_pch_Camera_EnableCameraInDashboard_Bool = "enableCameraInDashboard"
-k_pch_Camera_EnableCameraForCollisionBounds_Bool = "enableCameraForCollisionBounds"
-k_pch_Camera_EnableCameraForRoomView_Bool = "enableCameraForRoomView"
-k_pch_Camera_BoundsColorGammaR_Int32 = "cameraBoundsColorGammaR"
-k_pch_Camera_BoundsColorGammaG_Int32 = "cameraBoundsColorGammaG"
-k_pch_Camera_BoundsColorGammaB_Int32 = "cameraBoundsColorGammaB"
-k_pch_Camera_BoundsColorGammaA_Int32 = "cameraBoundsColorGammaA"
-k_pch_audio_Section = "audio"
-k_pch_audio_OnPlaybackDevice_String = "onPlaybackDevice"
-k_pch_audio_OnRecordDevice_String = "onRecordDevice"
-k_pch_audio_OnPlaybackMirrorDevice_String = "onPlaybackMirrorDevice"
-k_pch_audio_OffPlaybackDevice_String = "offPlaybackDevice"
-k_pch_audio_OffRecordDevice_String = "offRecordDevice"
-k_pch_audio_VIVEHDMIGain = "viveHDMIGain"
+IVRSettings_Version = b"IVRSettings_001"
+k_pch_SteamVR_Section = b"steamvr"
+k_pch_SteamVR_RequireHmd_String = b"requireHmd"
+k_pch_SteamVR_ForcedDriverKey_String = b"forcedDriver"
+k_pch_SteamVR_ForcedHmdKey_String = b"forcedHmd"
+k_pch_SteamVR_DisplayDebug_Bool = b"displayDebug"
+k_pch_SteamVR_DebugProcessPipe_String = b"debugProcessPipe"
+k_pch_SteamVR_EnableDistortion_Bool = b"enableDistortion"
+k_pch_SteamVR_DisplayDebugX_Int32 = b"displayDebugX"
+k_pch_SteamVR_DisplayDebugY_Int32 = b"displayDebugY"
+k_pch_SteamVR_SendSystemButtonToAllApps_Bool = b"sendSystemButtonToAllApps"
+k_pch_SteamVR_LogLevel_Int32 = b"loglevel"
+k_pch_SteamVR_IPD_Float = b"ipd"
+k_pch_SteamVR_Background_String = b"background"
+k_pch_SteamVR_GridColor_String = b"gridColor"
+k_pch_SteamVR_PlayAreaColor_String = b"playAreaColor"
+k_pch_SteamVR_ActivateMultipleDrivers_Bool = b"activateMultipleDrivers"
+k_pch_SteamVR_PowerOffOnExit_Bool = b"powerOffOnExit"
+k_pch_SteamVR_StandbyAppRunningTimeout_Float = b"standbyAppRunningTimeout"
+k_pch_SteamVR_StandbyNoAppTimeout_Float = b"standbyNoAppTimeout"
+k_pch_SteamVR_DirectMode_Bool = b"directMode"
+k_pch_SteamVR_DirectModeEdidVid_Int32 = b"directModeEdidVid"
+k_pch_SteamVR_DirectModeEdidPid_Int32 = b"directModeEdidPid"
+k_pch_SteamVR_UsingSpeakers_Bool = b"usingSpeakers"
+k_pch_SteamVR_SpeakersForwardYawOffsetDegrees_Float = b"speakersForwardYawOffsetDegrees"
+k_pch_SteamVR_BaseStationPowerManagement_Bool = b"basestationPowerManagement"
+k_pch_SteamVR_NeverKillProcesses_Bool = b"neverKillProcesses"
+k_pch_SteamVR_RenderTargetMultiplier_Float = b"renderTargetMultiplier"
+k_pch_SteamVR_AllowReprojection_Bool = b"allowReprojection"
+k_pch_Lighthouse_Section = b"driver_lighthouse"
+k_pch_Lighthouse_DisableIMU_Bool = b"disableimu"
+k_pch_Lighthouse_UseDisambiguation_String = b"usedisambiguation"
+k_pch_Lighthouse_DisambiguationDebug_Int32 = b"disambiguationdebug"
+k_pch_Lighthouse_PrimaryBasestation_Int32 = b"primarybasestation"
+k_pch_Lighthouse_LighthouseName_String = b"lighthousename"
+k_pch_Lighthouse_MaxIncidenceAngleDegrees_Float = b"maxincidenceangledegrees"
+k_pch_Lighthouse_UseLighthouseDirect_Bool = b"uselighthousedirect"
+k_pch_Lighthouse_DBHistory_Bool = b"dbhistory"
+k_pch_Lighthouse_OriginOffsetX_Float = b"originoffsetx"
+k_pch_Lighthouse_OriginOffsetY_Float = b"originoffsety"
+k_pch_Lighthouse_OriginOffsetZ_Float = b"originoffsetz"
+k_pch_Lighthouse_HeadingOffset_Float = b"headingoffset"
+k_pch_Null_Section = b"driver_null"
+k_pch_Null_EnableNullDriver_Bool = b"enable"
+k_pch_Null_SerialNumber_String = b"serialNumber"
+k_pch_Null_ModelNumber_String = b"modelNumber"
+k_pch_Null_WindowX_Int32 = b"windowX"
+k_pch_Null_WindowY_Int32 = b"windowY"
+k_pch_Null_WindowWidth_Int32 = b"windowWidth"
+k_pch_Null_WindowHeight_Int32 = b"windowHeight"
+k_pch_Null_RenderWidth_Int32 = b"renderWidth"
+k_pch_Null_RenderHeight_Int32 = b"renderHeight"
+k_pch_Null_SecondsFromVsyncToPhotons_Float = b"secondsFromVsyncToPhotons"
+k_pch_Null_DisplayFrequency_Float = b"displayFrequency"
+k_pch_UserInterface_Section = b"userinterface"
+k_pch_UserInterface_StatusAlwaysOnTop_Bool = b"StatusAlwaysOnTop"
+k_pch_Notifications_Section = b"notifications"
+k_pch_Notifications_DoNotDisturb_Bool = b"DoNotDisturb"
+k_pch_Keyboard_Section = b"keyboard"
+k_pch_Keyboard_TutorialCompletions = b"TutorialCompletions"
+k_pch_Keyboard_ScaleX = b"ScaleX"
+k_pch_Keyboard_ScaleY = b"ScaleY"
+k_pch_Keyboard_OffsetLeftX = b"OffsetLeftX"
+k_pch_Keyboard_OffsetRightX = b"OffsetRightX"
+k_pch_Keyboard_OffsetY = b"OffsetY"
+k_pch_Keyboard_Smoothing = b"Smoothing"
+k_pch_Perf_Section = b"perfcheck"
+k_pch_Perf_HeuristicActive_Bool = b"heuristicActive"
+k_pch_Perf_NotifyInHMD_Bool = b"warnInHMD"
+k_pch_Perf_NotifyOnlyOnce_Bool = b"warnOnlyOnce"
+k_pch_Perf_AllowTimingStore_Bool = b"allowTimingStore"
+k_pch_Perf_SaveTimingsOnExit_Bool = b"saveTimingsOnExit"
+k_pch_Perf_TestData_Float = b"perfTestData"
+k_pch_CollisionBounds_Section = b"collisionBounds"
+k_pch_CollisionBounds_Style_Int32 = b"CollisionBoundsStyle"
+k_pch_CollisionBounds_GroundPerimeterOn_Bool = b"CollisionBoundsGroundPerimeterOn"
+k_pch_CollisionBounds_CenterMarkerOn_Bool = b"CollisionBoundsCenterMarkerOn"
+k_pch_CollisionBounds_PlaySpaceOn_Bool = b"CollisionBoundsPlaySpaceOn"
+k_pch_CollisionBounds_FadeDistance_Float = b"CollisionBoundsFadeDistance"
+k_pch_CollisionBounds_ColorGammaR_Int32 = b"CollisionBoundsColorGammaR"
+k_pch_CollisionBounds_ColorGammaG_Int32 = b"CollisionBoundsColorGammaG"
+k_pch_CollisionBounds_ColorGammaB_Int32 = b"CollisionBoundsColorGammaB"
+k_pch_CollisionBounds_ColorGammaA_Int32 = b"CollisionBoundsColorGammaA"
+k_pch_Camera_Section = b"camera"
+k_pch_Camera_EnableCamera_Bool = b"enableCamera"
+k_pch_Camera_EnableCameraInDashboard_Bool = b"enableCameraInDashboard"
+k_pch_Camera_EnableCameraForCollisionBounds_Bool = b"enableCameraForCollisionBounds"
+k_pch_Camera_EnableCameraForRoomView_Bool = b"enableCameraForRoomView"
+k_pch_Camera_BoundsColorGammaR_Int32 = b"cameraBoundsColorGammaR"
+k_pch_Camera_BoundsColorGammaG_Int32 = b"cameraBoundsColorGammaG"
+k_pch_Camera_BoundsColorGammaB_Int32 = b"cameraBoundsColorGammaB"
+k_pch_Camera_BoundsColorGammaA_Int32 = b"cameraBoundsColorGammaA"
+k_pch_audio_Section = b"audio"
+k_pch_audio_OnPlaybackDevice_String = b"onPlaybackDevice"
+k_pch_audio_OnRecordDevice_String = b"onRecordDevice"
+k_pch_audio_OnPlaybackMirrorDevice_String = b"onPlaybackMirrorDevice"
+k_pch_audio_OffPlaybackDevice_String = b"offPlaybackDevice"
+k_pch_audio_OffRecordDevice_String = b"offRecordDevice"
+k_pch_audio_VIVEHDMIGain = b"viveHDMIGain"
 
 #############################
 ### Expose enum constants ###
@@ -1236,7 +1236,7 @@ class IVRSystem:
         if not isInterfaceVersionValid(version_key):
             _checkInitError(VRInitError_Init_InterfaceNotFound)
         # Thank you lukexi https://github.com/lukexi/openvr-hs/blob/master/cbits/openvr_capi_helper.c#L9
-        fn_key = "FnTable:" + version_key
+        fn_key = b"FnTable:" + version_key
         fn_type = IVRSystem_FnTable
         fn_table_ptr = cast(getGenericInterface(fn_key), POINTER(fn_type))
         if fn_table_ptr is None:
@@ -1501,7 +1501,7 @@ class IVRExtendedDisplay:
         if not isInterfaceVersionValid(version_key):
             _checkInitError(VRInitError_Init_InterfaceNotFound)
         # Thank you lukexi https://github.com/lukexi/openvr-hs/blob/master/cbits/openvr_capi_helper.c#L9
-        fn_key = "FnTable:" + version_key
+        fn_key = b"FnTable:" + version_key
         fn_type = IVRExtendedDisplay_FnTable
         fn_table_ptr = cast(getGenericInterface(fn_key), POINTER(fn_type))
         if fn_table_ptr is None:
@@ -1570,7 +1570,7 @@ class IVRApplications:
         if not isInterfaceVersionValid(version_key):
             _checkInitError(VRInitError_Init_InterfaceNotFound)
         # Thank you lukexi https://github.com/lukexi/openvr-hs/blob/master/cbits/openvr_capi_helper.c#L9
-        fn_key = "FnTable:" + version_key
+        fn_key = b"FnTable:" + version_key
         fn_type = IVRApplications_FnTable
         fn_table_ptr = cast(getGenericInterface(fn_key), POINTER(fn_type))
         if fn_table_ptr is None:
@@ -1722,7 +1722,7 @@ class IVRChaperone:
         if not isInterfaceVersionValid(version_key):
             _checkInitError(VRInitError_Init_InterfaceNotFound)
         # Thank you lukexi https://github.com/lukexi/openvr-hs/blob/master/cbits/openvr_capi_helper.c#L9
-        fn_key = "FnTable:" + version_key
+        fn_key = b"FnTable:" + version_key
         fn_type = IVRChaperone_FnTable
         fn_table_ptr = cast(getGenericInterface(fn_key), POINTER(fn_type))
         if fn_table_ptr is None:
@@ -1804,7 +1804,7 @@ class IVRChaperoneSetup:
         if not isInterfaceVersionValid(version_key):
             _checkInitError(VRInitError_Init_InterfaceNotFound)
         # Thank you lukexi https://github.com/lukexi/openvr-hs/blob/master/cbits/openvr_capi_helper.c#L9
-        fn_key = "FnTable:" + version_key
+        fn_key = b"FnTable:" + version_key
         fn_type = IVRChaperoneSetup_FnTable
         fn_table_ptr = cast(getGenericInterface(fn_key), POINTER(fn_type))
         if fn_table_ptr is None:
@@ -1970,7 +1970,7 @@ class IVRCompositor:
         if not isInterfaceVersionValid(version_key):
             _checkInitError(VRInitError_Init_InterfaceNotFound)
         # Thank you lukexi https://github.com/lukexi/openvr-hs/blob/master/cbits/openvr_capi_helper.c#L9
-        fn_key = "FnTable:" + version_key
+        fn_key = b"FnTable:" + version_key
         fn_type = IVRCompositor_FnTable
         fn_table_ptr = cast(getGenericInterface(fn_key), POINTER(fn_type))
         if fn_table_ptr is None:
@@ -2197,7 +2197,7 @@ class IVROverlay:
         if not isInterfaceVersionValid(version_key):
             _checkInitError(VRInitError_Init_InterfaceNotFound)
         # Thank you lukexi https://github.com/lukexi/openvr-hs/blob/master/cbits/openvr_capi_helper.c#L9
-        fn_key = "FnTable:" + version_key
+        fn_key = b"FnTable:" + version_key
         fn_type = IVROverlay_FnTable
         fn_table_ptr = cast(getGenericInterface(fn_key), POINTER(fn_type))
         if fn_table_ptr is None:
@@ -2607,7 +2607,7 @@ class IVRRenderModels:
         if not isInterfaceVersionValid(version_key):
             _checkInitError(VRInitError_Init_InterfaceNotFound)
         # Thank you lukexi https://github.com/lukexi/openvr-hs/blob/master/cbits/openvr_capi_helper.c#L9
-        fn_key = "FnTable:" + version_key
+        fn_key = b"FnTable:" + version_key
         fn_type = IVRRenderModels_FnTable
         fn_table_ptr = cast(getGenericInterface(fn_key), POINTER(fn_type))
         if fn_table_ptr is None:
@@ -2711,7 +2711,7 @@ class IVRNotifications:
         if not isInterfaceVersionValid(version_key):
             _checkInitError(VRInitError_Init_InterfaceNotFound)
         # Thank you lukexi https://github.com/lukexi/openvr-hs/blob/master/cbits/openvr_capi_helper.c#L9
-        fn_key = "FnTable:" + version_key
+        fn_key = b"FnTable:" + version_key
         fn_type = IVRNotifications_FnTable
         fn_table_ptr = cast(getGenericInterface(fn_key), POINTER(fn_type))
         if fn_table_ptr is None:
@@ -2755,7 +2755,7 @@ class IVRSettings:
         if not isInterfaceVersionValid(version_key):
             _checkInitError(VRInitError_Init_InterfaceNotFound)
         # Thank you lukexi https://github.com/lukexi/openvr-hs/blob/master/cbits/openvr_capi_helper.c#L9
-        fn_key = "FnTable:" + version_key
+        fn_key = b"FnTable:" + version_key
         fn_type = IVRSettings_FnTable
         fn_table_ptr = cast(getGenericInterface(fn_key), POINTER(fn_type))
         if fn_table_ptr is None:
