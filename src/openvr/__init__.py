@@ -751,7 +751,7 @@ class OpenVRError(RuntimeError):
     pass
 
 # Methods to include in all openvr vector classes
-class _VectorMixin():
+class _VectorMixin(object):
     def __init__(self, *args):
         self._setArray(self._getArray().__class__(*args))
 
@@ -1240,7 +1240,7 @@ class IVRSystem_FnTable(Structure):
     ]
 
 
-class IVRSystem:
+class IVRSystem(object):
     def __init__(self):
         version_key = IVRSystem_Version
         if not isInterfaceVersionValid(version_key):
@@ -1505,7 +1505,7 @@ class IVRExtendedDisplay_FnTable(Structure):
     ]
 
 
-class IVRExtendedDisplay:
+class IVRExtendedDisplay(object):
     def __init__(self):
         version_key = IVRExtendedDisplay_Version
         if not isInterfaceVersionValid(version_key):
@@ -1574,7 +1574,7 @@ class IVRApplications_FnTable(Structure):
     ]
 
 
-class IVRApplications:
+class IVRApplications(object):
     def __init__(self):
         version_key = IVRApplications_Version
         if not isInterfaceVersionValid(version_key):
@@ -1726,7 +1726,7 @@ class IVRChaperone_FnTable(Structure):
     ]
 
 
-class IVRChaperone:
+class IVRChaperone(object):
     def __init__(self):
         version_key = IVRChaperone_Version
         if not isInterfaceVersionValid(version_key):
@@ -1808,7 +1808,7 @@ class IVRChaperoneSetup_FnTable(Structure):
     ]
 
 
-class IVRChaperoneSetup:
+class IVRChaperoneSetup(object):
     def __init__(self):
         version_key = IVRChaperoneSetup_Version
         if not isInterfaceVersionValid(version_key):
@@ -1974,7 +1974,7 @@ class IVRCompositor_FnTable(Structure):
     ]
 
 
-class IVRCompositor:
+class IVRCompositor(object):
     def __init__(self):
         version_key = IVRCompositor_Version
         if not isInterfaceVersionValid(version_key):
@@ -2201,7 +2201,7 @@ class IVROverlay_FnTable(Structure):
     ]
 
 
-class IVROverlay:
+class IVROverlay(object):
     def __init__(self):
         version_key = IVROverlay_Version
         if not isInterfaceVersionValid(version_key):
@@ -2611,7 +2611,7 @@ class IVRRenderModels_FnTable(Structure):
     ]
 
 
-class IVRRenderModels:
+class IVRRenderModels(object):
     def __init__(self):
         version_key = IVRRenderModels_Version
         if not isInterfaceVersionValid(version_key):
@@ -2715,7 +2715,7 @@ class IVRNotifications_FnTable(Structure):
     ]
 
 
-class IVRNotifications:
+class IVRNotifications(object):
     def __init__(self):
         version_key = IVRNotifications_Version
         if not isInterfaceVersionValid(version_key):
@@ -2759,7 +2759,7 @@ class IVRSettings_FnTable(Structure):
     ]
 
 
-class IVRSettings:
+class IVRSettings(object):
     def __init__(self):
         version_key = IVRSettings_Version
         if not isInterfaceVersionValid(version_key):
