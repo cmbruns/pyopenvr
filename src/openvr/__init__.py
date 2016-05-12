@@ -31,6 +31,7 @@ if platform.system() == 'Windows':
 else:
     OPENVR_FNTABLE_CALLTYPE = CFUNCTYPE # __cdecl
 
+
 ########################
 ### Expose constants ###
 ########################
@@ -711,7 +712,9 @@ VRSettingsError_ReadFailed = ENUM_TYPE(3)
 ### Expose Typedefs ###
 #######################
 
+# Use c_ubyte instead of c_char, for better compatibility with Python True/False
 openvr_bool = c_ubyte
+
 TrackedDeviceIndex_t = c_uint32
 VRNotificationId = c_uint32
 VROverlayHandle_t = c_uint64
@@ -750,6 +753,7 @@ class OpenVRError(RuntimeError):
     """
     pass
 
+
 # Methods to include in all openvr vector classes
 class _VectorMixin(object):
     def __init__(self, *args):
@@ -774,34 +778,27 @@ class _VectorMixin(object):
         return str(list(self))
 
 
-class HmdMatrix34_t(Structure):
+class _MatrixMixin(_VectorMixin):
+    def _getArray(self):
+        return self.m
+
+    def _setArray(self, array):
+        self.m[:] = array[:]
+
+    def __str__(self):
+        return str(list(list(e) for e in self))
+
+
+class HmdMatrix34_t(_MatrixMixin, Structure):
     _fields_ = [
         ("m", (c_float * 4) * 3),
     ]
 
-    def __getitem__(self, key):
-        return self.m[key]
 
-    def __len__(self):
-        return len(self.m)
-
-    def __str__(self):
-        return str(list(list(e) for e in self))
-
-
-class HmdMatrix44_t(Structure):
+class HmdMatrix44_t(_MatrixMixin, Structure):
     _fields_ = [
         ("m", (c_float * 4) * 4),
     ]
-
-    def __getitem__(self, key):
-        return self.m[key]
-
-    def __len__(self):
-        return len(self.m)
-
-    def __str__(self):
-        return str(list(list(e) for e in self))
 
 
 class HmdVector3_t(_VectorMixin, Structure):
@@ -828,7 +825,7 @@ class HmdVector2_t(_VectorMixin, Structure):
     ]
 
 
-class HmdQuaternion_t(_VectorMixin, Structure):
+class HmdQuaternion_t(Structure):
     _fields_ = [
         ("w", c_double),
         ("x", c_double),
@@ -836,26 +833,14 @@ class HmdQuaternion_t(_VectorMixin, Structure):
         ("z", c_double),
     ]
 
-    def _getArray(self):
-        return [self.w, self.x, self.y, self.z]
 
-    def _setArray(self, array):
-        self.w, self.x, self.y, self.z = array[:]
-
-
-class HmdColor_t(_VectorMixin, Structure):
+class HmdColor_t(Structure):
     _fields_ = [
         ("r", c_float),
         ("g", c_float),
         ("b", c_float),
         ("a", c_float),
     ]
-
-    def _getArray(self):
-        return [self.r, self.g, self.b, self.a]
-
-    def _setArray(self, array):
-        self.r, self.g, self.b, self.a = array[:]
 
 
 class HmdQuad_t(Structure):

@@ -147,6 +147,10 @@ EOF
     {
         my $var = $1;
         my $val = $2;
+
+        # explicit byte strings, for compatibility with python 3
+        $val =~ s/^"/b"/;
+
         print "$var = $val\n";
     }
 }
@@ -161,18 +165,31 @@ sub write_preamble
 # Created May 7, 2016 Christopher Bruns
 
 import os
+import platform
 import ctypes
 from ctypes import *
+
+from .version import __version__
 
 ####################################################################
 ### Load OpenVR shared library, so we can access it using ctypes ###
 ####################################################################
 
+# Detect 32-bit vs 64-bit python
+if sizeof(c_void_p) == 4:
+    _openvr_lib_name = "openvr_api_32"
+else:
+    _openvr_lib_name = "openvr_api_64"
+
 # Add current directory to PATH, so we can load the DLL from right here.
-os.environ['PATH'] = os.path.dirname(__file__) + ';' + os.environ['PATH']
-_openvr_windll = windll.openvr_api
-_openvr_cdll = cdll.openvr_api
-_openvr = _openvr_cdll
+os.environ['PATH'] += os.pathsep + os.path.dirname(__file__)
+_openvr = cdll.LoadLibrary(_openvr_lib_name)
+
+# Function pointer table calling convention
+if platform.system() == 'Windows':
+    OPENVR_FNTABLE_CALLTYPE = WINFUNCTYPE # __stdcall in openvr_capi.h
+else:
+    OPENVR_FNTABLE_CALLTYPE = CFUNCTYPE # __cdecl
 
 EOF
 }
@@ -185,6 +202,9 @@ sub translate_typedefs {
 ### Expose Typedefs ###
 #######################
 
+# Use c_ubyte instead of c_char, for better compatibility with Python True/False
+openvr_bool = c_ubyte
+
 EOF
     while ($header_string =~ m/
         typedef\s+ # typedef keyword
@@ -196,7 +216,9 @@ EOF
         my $original_type = $1;
         my $new_type = $2;
 
-        $new_type =~ s/^bool$/openvr_bool/;
+        if ($new_type =~ m/^bool$/) {
+            next; # skip bool definition, in favor of hard-coded version above
+        }
 
         $original_type = translate_type($original_type);
         print "$new_type = $original_type\n";
@@ -281,6 +303,41 @@ class OpenVRError(RuntimeError):
     pass
 
 
+# Methods to include in all openvr vector classes
+class _VectorMixin(object):
+    def __init__(self, *args):
+        self._setArray(self._getArray().__class__(*args))
+
+    def _getArray(self):
+        return self.v
+
+    def _setArray(self, array):
+        self.v[:] = array[:]
+
+    def __getitem__(self, key):
+        return self._getArray()[key]
+
+    def __len__(self):
+        return len(self._getArray())
+
+    def __setitem__(self, key, value):
+        self._getArray()[key] = value
+
+    def __str__(self):
+        return str(list(self))
+
+
+class _MatrixMixin(_VectorMixin):
+    def _getArray(self):
+        return self.m
+
+    def _setArray(self, array):
+        self.m[:] = array[:]
+
+    def __str__(self):
+        return str(list(list(e) for e in self))
+
+
 EOF
     # sanity check total struct count
     my $struct_count = 0;
@@ -313,14 +370,24 @@ EOF
 
         $struct_name = $4 unless defined $struct_name;
 
-        $struct_or_union = ucfirst($struct_or_union);
-        if ($struct_or_union eq "Struct") {
-            $struct_or_union = "Structure";
+        my $base = $struct_or_union;
+
+        $base = ucfirst($base);
+        if ($base eq "Struct") {
+            $base = "Structure";
         }
 
         $struct_name = translate_type($struct_name);
 
-        print "class $struct_name($struct_or_union):\n";
+        # Add special methods to vector classes
+        if ($struct_name =~ m/^HmdVector/) {
+            $base = "_VectorMixin, $base";
+        }
+        if ($struct_name =~ m/^HmdMatrix/) {
+            $base = "_MatrixMixin, $base";
+        }
+
+        print "class $struct_name($base):\n";
         print "    _fields_ = [\n";
         my @fields = split('\n', $struct_contents);
         # print $#fields, "\n";
@@ -351,7 +418,7 @@ EOF
                 }
 
                 $fn_name = lcfirst($fn_name); # first character lower case for python functions
-                print "        (\"$fn_name\", WINFUNCTYPE(";
+                print "        (\"$fn_name\", OPENVR_FNTABLE_CALLTYPE(";
                 print join ", ", @fn_args;
                 print ")),\n";
             }
@@ -402,13 +469,13 @@ EOF
 
             # Create special interface class, e.g. IVRSystem, based on IVRSystem_FnTable
             print <<EOF;
-class $interface_name:
+class $interface_name(object):
     def __init__(self):
         version_key = ${interface_name}_Version
         if not isInterfaceVersionValid(version_key):
             _checkInitError(VRInitError_Init_InterfaceNotFound)
         # Thank you lukexi https://github.com/lukexi/openvr-hs/blob/master/cbits/openvr_capi_helper.c#L9
-        fn_key = "FnTable:" + version_key
+        fn_key = b"FnTable:" + version_key
         fn_type = $struct_name
         fn_table_ptr = cast(getGenericInterface(fn_key), POINTER(fn_type))
         if fn_table_ptr is None:
