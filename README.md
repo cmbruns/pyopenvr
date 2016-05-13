@@ -4,7 +4,7 @@
 ## Installation
 - [ ] Install Python https://www.python.org/download/
 - [ ] Install HTC Vive SteamVR
-- [ ] ``pip install openvr``
+- [ ] ``pip install openvr`` OR download the installer at https://github.com/cmbruns/pyopenvr/releases
 
 ## Use
 
