@@ -4,17 +4,26 @@ use warnings;
 use strict;
 
 my $header_file = "openvr_capi.h";
-
 open my $header_fh, "<", $header_file or die;
+my $header_string = do {
+    local $/ = undef;
+    <$header_fh>;
+};
+close $header_fh;
+
+my $cppheader_file = "openvr.h";
+open my $cppheader_fh, "<", $cppheader_file or die;
+my $cppheader_string = do {
+    local $/ = undef;
+    <$cppheader_fh>;
+};
+close $cppheader_fh;
+
 open my $translated, ">", "translated.py" or die;
 
 translate_all();
 
 sub translate_all {
-    my $header_string = do {
-        local $/ = undef;
-        <$header_fh>;
-    };
 
     write_preamble();
 
