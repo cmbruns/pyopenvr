@@ -4,5 +4,5 @@
 # 3) we can import it into your module module
 # http://stackoverflow.com/questions/458550/standard-way-to-embed-version-into-python-package
 
-__version__ = '0.9.2002'
+__version__ = '0.9.2003pre'
 
