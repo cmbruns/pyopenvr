@@ -25,22 +25,22 @@ translate_all();
 
 sub translate_all {
 
-    write_preamble();
+    # write_preamble();
 
-    translate_constants($header_string);
+    # translate_constants($header_string);
 
-    translate_enums($header_string);
+    # translate_enums($header_string);
 
-    translate_typedefs($header_string);
+    # translate_typedefs($header_string);
 
-    translate_structs($header_string);
+    # translate_structs($header_string);
 
-    translate_functions($header_string);
+    translate_functions($cppheader_string);
 
 }
 
 sub translate_functions {
-    my $header_string = shift;
+    my $cppheader_string = shift;
 
     print <<EOF;
 
@@ -51,7 +51,7 @@ sub translate_functions {
 def _checkInitError(error):
     if error.value != VRInitError_None.value:
         shutdown()
-        raise OpenVRError(getInitErrorAsSymbol(error) + str(error))    
+        raise OpenVRError(getVRInitErrorAsSymbol(error) + str(error))    
 
 
 _openvr.VR_GetGenericInterface.restype = c_void_p
@@ -65,7 +65,7 @@ def getGenericInterface(interfaceVersion):
 
 _openvr.VR_GetVRInitErrorAsSymbol.restype = c_char_p
 _openvr.VR_GetVRInitErrorAsSymbol.argtypes = [EVRInitError]
-def getInitErrorAsSymbol(error):
+def getVRInitErrorAsSymbol(error):
     return _openvr.VR_GetVRInitErrorAsSymbol(error)
 
 
@@ -137,6 +137,133 @@ def shutdown():
 _vr_token = c_uint32()
 
 EOF
+
+    while ($cppheader_string =~ m!
+        # (\n\s*/\*[^\n]* # initial comment line
+        # ((?:\n\s*\*[^\n]*\n\s*)* # middle comment lines
+        # [^\n]*\*/)?\s* # final comment line
+        (\/\*(?:\*[^/]|[^*])*\*\/)?\s*
+        \n[\t\ ]*VR_INTERFACE
+        ([^;]+)
+        ;
+        !gx) 
+    {
+        my $comment = $1;
+        my $method_signature = $2;
+
+        # print $method_signature, "\n";
+        die $method_signature unless $method_signature =~ m!
+        ^\s* # begin with any number of spaces
+        (\S.*\S) # return type
+        \s* # any number of spaces
+        VR_CALLTYPE
+        \s+ # one or more spaces
+        (\S[^(]+) # function name
+        \(\s* # open paren
+        (\S[^)]*\S)?
+        \s*\) # close paren
+        !x;
+
+        my $return_type = $1;
+        my $fn_name = $2;
+        my $fn_args = $3;
+
+        $fn_args = "" unless defined $fn_args;
+
+        $return_type = translate_type($return_type);
+        print "_openvr.$fn_name.restype = $return_type\n";
+        print "_openvr.$fn_name.argtypes = [";
+        my @arg_types = ();
+        my @py_arg_names = ();
+        my @arg_names = ();
+        my @py_return_val_names = ();
+        if ($return_type ne "None") {
+            push @py_return_val_names, "result";
+        }
+        my $error_arg_name = undef;
+        foreach my $arg (split ",", $fn_args) {
+            die $arg unless $arg =~ m/^\s*(\S.*\S)\s(\S+)\s*$/;
+            my $arg_type = $1;
+            my $arg_name = $2;
+
+            # Check for pointer * at start of function name
+            if ($arg_name =~ m/\*(.*)/) {
+                $arg_name = $1;
+                $arg_type = "$arg_type *";
+            }
+
+            $arg_type = translate_type($arg_type);
+
+            # remove annoying initial "pch", e.g. "pchInterfaceVersion"
+            if ($arg_name =~ /^(?:pch|pe)(.*)/) {
+                $arg_name = $1;
+                $arg_name = lcfirst($arg_name);
+            }
+
+            if ($arg_type eq "POINTER\(EVRInitError\)") {
+                # Handle error argument specially
+                $error_arg_name = $arg_name;
+                $arg_name = "byref($arg_name)";
+            }
+            elsif ($arg_type =~ /^POINTER\(.*\)$/) {
+                # Treat pointer arguments as return types
+                # TODO: need even more code if this ever happens...
+                push @py_return_val_names, $arg_name;
+                $arg_name = "byref($arg_name)";
+            }
+            else {
+                push @py_arg_names, $arg_name;
+            }
+
+            push @arg_types, $arg_type;
+            push @arg_names, $arg_name;
+        }
+        print join ", ", @arg_types;
+        print "]\n";
+
+        my $py_fn_name = $fn_name;
+        $py_fn_name =~ s/^VR_//;
+        $py_fn_name = lcfirst($py_fn_name);
+        print "def $py_fn_name(";
+        print join ", ", @py_arg_names;
+        print "):\n";
+
+        # Turn the comment into a docstring
+        if (defined $comment) {
+            $comment =~ s/^\s*\/\**\s*//; # comment open
+            $comment =~ s/\s*\*\/\s*//; # comment close
+            $comment =~ s/\n\s*\*\s*/\n/g; # comment middle line start
+            # print $comment, "\n";
+            print "    \"\"\"\n"; # open docstring
+            foreach my $comment_line (split "\n", $comment) {
+                print "    $comment_line\n";
+            }
+            print "    \"\"\"\n"; # close docstring
+        }
+
+        # Create error object for this function call
+        if (defined $error_arg_name) {
+            print "    $error_arg_name = EVRInitError()\n";
+        }
+
+        print "    result = _openvr.$fn_name(";
+        print join ", ", @arg_names;
+        print ")\n";
+
+        # Raise exception if error state returned
+        if (defined $error_arg_name) {
+            print "    _checkInitError($error_arg_name)\n";
+        }
+        if ($#py_return_val_names >= 0) {
+            print "    return ";
+            print join ", ", @py_return_val_names;
+            print "\n";
+        }
+
+        print "\n\n";
+
+        # print $1, $2, $3, "\n\n";
+    }
 
 }
 
