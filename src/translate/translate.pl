@@ -49,28 +49,14 @@ sub translate_functions {
 ########################
 
 def _checkInitError(error):
+    """
+    Replace openvr error return code with a python exception
+    """
     if error.value != VRInitError_None.value:
         shutdown()
         raise OpenVRError(getVRInitErrorAsSymbol(error) + str(error))    
 
 
-_openvr.VR_GetGenericInterface.restype = c_void_p
-_openvr.VR_GetGenericInterface.argtypes = [c_char_p, POINTER(EVRInitError)]
-def getGenericInterface(interfaceVersion):
-    error = EVRInitError()
-    ptr = _openvr.VR_GetGenericInterface(interfaceVersion, byref(error))
-    _checkInitError(error)
-    return ptr
-
-
-_openvr.VR_GetVRInitErrorAsSymbol.restype = c_char_p
-_openvr.VR_GetVRInitErrorAsSymbol.argtypes = [EVRInitError]
-def getVRInitErrorAsSymbol(error):
-    return _openvr.VR_GetVRInitErrorAsSymbol(error)
-
-
-_openvr.VR_InitInternal.restype = c_uint32
-_openvr.VR_InitInternal.argtypes = [POINTER(EVRInitError), EVRApplicationType]
 # Copying VR_Init inline implementation from https://github.com/ValveSoftware/openvr/blob/master/headers/openvr.h
 # and from https://github.com/phr00t/jMonkeyVR/blob/master/src/jmevr/input/OpenVR.java
 def init(applicationType):
@@ -82,59 +68,18 @@ def init(applicationType):
     This path is to the "root" of the VR API install. That's the directory with
     the "drivers" directory and a platform (i.e. "win32") directory in it, not the directory with the DLL itself.
     """
-    eError = EVRInitError()
-    _vr_token = _openvr.VR_InitInternal(byref(eError), applicationType)
-    _checkInitError(eError)
+    initInternal(applicationType)
     # Retrieve "System" API
     return IVRSystem()
 
 
-_openvr.VR_IsHmdPresent.restype = openvr_bool
-_openvr.VR_IsHmdPresent.argtypes = []
-def isHmdPresent():
-    """
-    Returns true if there is an HMD attached. This check is as lightweight as possible and
-    can be called outside of VR_Init/VR_Shutdown. It should be used when an application wants
-    to know if initializing VR is a possibility but isn't ready to take that step yet.   
-    """
-    return _openvr.VR_IsHmdPresent()
-
-
-_openvr.VR_IsInterfaceVersionValid.restype = openvr_bool
-_openvr.VR_IsInterfaceVersionValid.argtypes = [c_char_p]
-def isInterfaceVersionValid(version):
-    return _openvr.VR_IsInterfaceVersionValid(version)
-
-
-_openvr.VR_IsRuntimeInstalled.restype = openvr_bool
-_openvr.VR_IsRuntimeInstalled.argtypes = []
-def isRuntimeInstalled():
-    """
-    Returns true if the OpenVR runtime is installed.
-    """
-    return _openvr.VR_IsRuntimeInstalled()
-
-
-_openvr.VR_RuntimePath.restype = c_char_p
-_openvr.VR_RuntimePath.argtypes = []
-def runtimePath():
-    """
-    Returns where the OpenVR runtime is installed.
-    """
-    return _openvr.VR_RuntimePath()
-
-
-_openvr.VR_ShutdownInternal.restype = None
-_openvr.VR_ShutdownInternal.argtypes = []
 def shutdown():
     """
     unloads vrclient.dll. Any interface pointers from the interface are
     invalid after this point
     """
-    _openvr.VR_ShutdownInternal() # OK, this is just like inline definition in openvr.h
+    shutdownInternal() # OK, this is just like inline definition in openvr.h
 
-
-_vr_token = c_uint32()
 
 EOF
 
