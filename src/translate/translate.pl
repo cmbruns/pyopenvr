@@ -35,17 +35,17 @@ sub translate_all {
 
     parse_docstrings($cppheader_string);
 
-    # write_preamble();
+    write_preamble();
 
-    # translate_constants($header_string);
+    translate_constants($header_string);
 
-    # translate_enums($header_string);
+    translate_enums($header_string);
 
-    # translate_typedefs($header_string);
+    translate_typedefs($header_string);
 
     translate_structs($header_string);
 
-    # translate_functions($cppheader_string);
+    translate_functions($cppheader_string);
 
 }
 
@@ -63,7 +63,7 @@ sub parse_docstrings {
     while ($cpp_header_string =~ m!
         (${doc_comment_regex})
         [\n\r]{1,2}[\ \t]*
-        (?:class|struct)\s+(\S+)
+        (?:class|struct)\s+(\S+) #
         # ( # capture 1
         # (?: # begin multiple comments
         # [\n\r]{1,2}[\ \t]*(?: # comment is first thing on the first line
@@ -87,10 +87,19 @@ sub parse_docstrings {
     while ($cpp_header_string =~ m!
         (${doc_comment_regex})
         [\n\r]{1,2}[\ \t]*
-        class\s+(\S+) # 
+        virtual\s+[^(]+\s(\S+)\( # 
         !xg) 
     {
-        # TODO: function/method docstrings?
+        my $comment = $1;
+        my $method_name = $2;
+
+        $comment = trim_comment($comment);
+        $method_name =~ s/^\*//;
+        $method_name = lcfirst($method_name);
+
+        # print "$comment\n method $method_name\n\n\n";
+
+        $docstrings{$method_name} = $comment;
     }
 
 }
@@ -128,10 +137,10 @@ sub print_docstring
     if ($#lines > 0) {
         print $indent, '"""', "\n$indent";
         print join "\n$indent", @lines;
-        print "\n", $indent, '"""', "\n";
+        print "\n", $indent, '"""', "\n\n";
     }
     else {
-        print $indent, "\"$lines[0]\"\n";
+        print $indent, "\"$lines[0]\"\n\n";
     }
 
 }
@@ -754,6 +763,9 @@ EOF
                     print "    def $fn_name(";
                     print join ", ", @call_arg_names;
                     print "):\n";
+
+                    print_docstring($fn_name, "        ");
+
                     print "        fn = self.function_table.$fn_name\n";
                     foreach my $ret_name (@return_arg_names) {
                         next if $ret_name =~ m/^result$/;

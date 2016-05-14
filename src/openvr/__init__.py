@@ -790,6 +790,14 @@ class _MatrixMixin(_VectorMixin):
 
 
 class HmdMatrix34_t(_MatrixMixin, Structure):
+    """
+    right-handed system
+    +y is up
+    +x is to the right
+    -z is going away from you
+    Distance unit is  meters
+    """
+
     _fields_ = [
         ("m", (c_float * 4) * 3),
     ]
@@ -857,6 +865,12 @@ class HmdRect2_t(Structure):
 
 
 class DistortionCoordinates_t(Structure):
+    """
+    Used to return the post-distortion UVs for each color channel. 
+    UVs range from 0 to 1 with 0,0 in the upper left corner of the 
+    source render target. The 0,0 to 1,1 range covers a single eye.
+    """
+
     _fields_ = [
         ("rfRed", c_float * 2),
         ("rfGreen", c_float * 2),
@@ -873,6 +887,8 @@ class Texture_t(Structure):
 
 
 class TrackedDevicePose_t(Structure):
+    "describes a single pose for a tracked object"
+
     _fields_ = [
         ("mDeviceToAbsoluteTracking", HmdMatrix34_t),
         ("vVelocity", HmdVector3_t),
@@ -884,6 +900,11 @@ class TrackedDevicePose_t(Structure):
 
 
 class VRTextureBounds_t(Structure):
+    """
+    Allows the application to control what part of the provided texture will be used in the
+    frame buffer.
+    """
+
     _fields_ = [
         ("uMin", c_float),
         ("vMin", c_float),
@@ -893,12 +914,16 @@ class VRTextureBounds_t(Structure):
 
 
 class VREvent_Controller_t(Structure):
+    "used for controller button events"
+
     _fields_ = [
         ("button", c_uint32),
     ]
 
 
 class VREvent_Mouse_t(Structure):
+    "used for simulated mouse events in overlay space"
+
     _fields_ = [
         ("x", c_float),
         ("y", c_float),
@@ -907,6 +932,8 @@ class VREvent_Mouse_t(Structure):
 
 
 class VREvent_Scroll_t(Structure):
+    "used for simulated mouse wheel scroll in overlay space"
+
     _fields_ = [
         ("xdelta", c_float),
         ("ydelta", c_float),
@@ -915,6 +942,11 @@ class VREvent_Scroll_t(Structure):
 
 
 class VREvent_TouchPadMove_t(Structure):
+    """
+    when in mouse input mode you can receive data from the touchpad, these events are only sent if the users finger
+    is on the touchpad (or just released from it)
+    """
+
     _fields_ = [
         ("bFingerDown", openvr_bool),
         ("flSecondsFingerDown", c_float),
@@ -926,6 +958,8 @@ class VREvent_TouchPadMove_t(Structure):
 
 
 class VREvent_Notification_t(Structure):
+    "notification related events. Details will still change at this point"
+
     _fields_ = [
         ("ulUserValue", c_uint64),
         ("notificationId", c_uint32),
@@ -933,6 +967,8 @@ class VREvent_Notification_t(Structure):
 
 
 class VREvent_Process_t(Structure):
+    "Used for events about processes"
+
     _fields_ = [
         ("pid", c_uint32),
         ("oldPid", c_uint32),
@@ -941,18 +977,24 @@ class VREvent_Process_t(Structure):
 
 
 class VREvent_Overlay_t(Structure):
+    "Used for a few events about overlays"
+
     _fields_ = [
         ("overlayHandle", c_uint64),
     ]
 
 
 class VREvent_Status_t(Structure):
+    "Used for a few events about overlays"
+
     _fields_ = [
         ("statusState", c_uint32),
     ]
 
 
 class VREvent_Keyboard_t(Structure):
+    "Used for keyboard events"
+
     _fields_ = [
         ("cNewInput", c_char_p * 8),
         ("uUserValue", c_uint64),
@@ -973,6 +1015,8 @@ class VREvent_Chaperone_t(Structure):
 
 
 class VREvent_Reserved_t(Structure):
+    "Not actually used for any events"
+
     _fields_ = [
         ("reserved0", c_uint64),
         ("reserved1", c_uint64),
@@ -992,6 +1036,14 @@ class VREvent_SeatedZeroPoseReset_t(Structure):
 
 
 class HiddenAreaMesh_t(Structure):
+    """
+    The mesh to draw into the stencil (or depth) buffer to perform 
+    early stencil (or depth) kills of pixels that will never appear on the HMD.
+    This mesh draws on all the pixels that will be hidden after distortion. 
+    * If the HMD does not provide a visible area mesh pVertexData will be
+    NULL and unTriangleCount will be 0.
+    """
+
     _fields_ = [
         ("pVertexData", POINTER(HmdVector2_t)),
         ("unTriangleCount", c_uint32),
@@ -999,6 +1051,8 @@ class HiddenAreaMesh_t(Structure):
 
 
 class VRControllerAxis_t(Structure):
+    "contains information about one axis on the controller"
+
     _fields_ = [
         ("x", c_float),
         ("y", c_float),
@@ -1015,6 +1069,8 @@ class VRControllerState_t(Structure):
 
 
 class Compositor_OverlaySettings(Structure):
+    "Allows the application to customize how the overlay appears in the compositor"
+
     _fields_ = [
         ("size", c_uint32),
         ("curved", openvr_bool),
@@ -1041,6 +1097,8 @@ class AppOverrideKeys_t(Structure):
 
 
 class Compositor_FrameTiming(Structure):
+    "Provides a single frame's timing information to the app"
+
     _fields_ = [
         ("m_nSize", c_uint32),
         ("m_nFrameIndex", c_uint32),
@@ -1086,6 +1144,8 @@ class VROverlayIntersectionResults_t(Structure):
 
 
 class RenderModel_ComponentState_t(Structure):
+    "Describes state information about a render-model component, including transforms and other dynamic properties"
+
     _fields_ = [
         ("mTrackingToComponentRenderModel", HmdMatrix34_t),
         ("mTrackingToComponentLocal", HmdMatrix34_t),
@@ -1094,6 +1154,8 @@ class RenderModel_ComponentState_t(Structure):
 
 
 class RenderModel_Vertex_t(Structure):
+    "A single vertex in a render model"
+
     _fields_ = [
         ("vPosition", HmdVector3_t),
         ("vNormal", HmdVector3_t),
@@ -1102,6 +1164,8 @@ class RenderModel_Vertex_t(Structure):
 
 
 class RenderModel_TextureMap_t(Structure):
+    "A texture map for use on a render model"
+
     _fields_ = [
         ("unWidth", c_uint16),
         ("unHeight", c_uint16),
@@ -1126,6 +1190,8 @@ class RenderModel_ControllerMode_State_t(Structure):
 
 
 class NotificationBitmap_t(Structure):
+    "Used for passing graphic data"
+
     _fields_ = [
         ("bytes", c_void_p),
         ("width", c_int32),
@@ -1168,6 +1234,8 @@ class VREvent_Data_t(Union):
 
 
 class VREvent_t(Structure):
+    "An event posted by the server to all running applications"
+
     _fields_ = [
         ("eventType", c_uint32),
         ("trackedDeviceIndex", TrackedDeviceIndex_t),
@@ -1239,6 +1307,8 @@ class IVRSystem(object):
         self.function_table = fn_table_ptr.contents
 
     def getRecommendedRenderTargetSize(self):
+        "Suggested size for the intermediate render target that the distortion pulls from."
+
         fn = self.function_table.getRecommendedRenderTargetSize
         pnWidth = c_uint32()
         pnHeight = c_uint32()
@@ -1246,11 +1316,18 @@ class IVRSystem(object):
         return pnWidth, pnHeight
 
     def getProjectionMatrix(self, eEye, fNearZ, fFarZ, eProjType):
+        "The projection matrix for the specified eye"
+
         fn = self.function_table.getProjectionMatrix
         result = fn(eEye, fNearZ, fFarZ, eProjType)
         return result
 
     def getProjectionRaw(self, eEye):
+        """
+        The components necessary to build your own projection matrix in case your
+        application is doing something fancy like infinite Z
+        """
+
         fn = self.function_table.getProjectionRaw
         pfLeft = c_float()
         pfRight = c_float()
@@ -1260,16 +1337,34 @@ class IVRSystem(object):
         return pfLeft, pfRight, pfTop, pfBottom
 
     def computeDistortion(self, eEye, fU, fV):
+        """
+        Returns the result of the distortion function for the specified eye and input UVs. UVs go from 0,0 in 
+        the upper left of that eye's viewport and 1,1 in the lower right of that eye's viewport.
+        """
+
         fn = self.function_table.computeDistortion
         result = fn(eEye, fU, fV)
         return result
 
     def getEyeToHeadTransform(self, eEye):
+        """
+        Returns the transform from eye space to the head space. Eye space is the per-eye flavor of head
+        space that provides stereo disparity. Instead of Model * View * Projection the sequence is Model * View * Eye^-1 * Projection. 
+        Normally View and Eye^-1 will be multiplied together and treated as View in your application.
+        """
+
         fn = self.function_table.getEyeToHeadTransform
         result = fn(eEye)
         return result
 
     def getTimeSinceLastVsync(self):
+        """
+        Returns the number of elapsed seconds since the last recorded vsync event. This 
+        will come from a vsync timer event in the timer if possible or from the application-reported
+          time if that is not available. If no vsync times are available the function will 
+          return zero for vsync time and frame counter and return false from the method.
+        """
+
         fn = self.function_table.getTimeSinceLastVsync
         pfSecondsSinceLastVsync = c_float()
         pulFrameCounter = c_uint64()
@@ -1277,27 +1372,59 @@ class IVRSystem(object):
         return result, pfSecondsSinceLastVsync, pulFrameCounter
 
     def getD3D9AdapterIndex(self):
+        """
+        [D3D9 Only]
+        Returns the adapter index that the user should pass into CreateDevice to set up D3D9 in such
+        a way that it can go full screen exclusive on the HMD. Returns -1 if there was an error.
+        """
+
         fn = self.function_table.getD3D9AdapterIndex
         result = fn()
         return result
 
     def getDXGIOutputInfo(self):
+        """
+        [D3D10/11 Only]
+        Returns the adapter index and output index that the user should pass into EnumAdapters and EnumOutputs
+        to create the device and swap chain in DX10 and DX11. If an error occurs both indices will be set to -1.
+        """
+
         fn = self.function_table.getDXGIOutputInfo
         pnAdapterIndex = c_int32()
         result = fn(byref(pnAdapterIndex))
         return pnAdapterIndex
 
     def isDisplayOnDesktop(self):
+        "Use to determine if the headset display is part of the desktop (i.e. extended) or hidden (i.e. direct mode)."
+
         fn = self.function_table.isDisplayOnDesktop
         result = fn()
         return result
 
     def setDisplayVisibility(self, bIsVisibleOnDesktop):
+        "Set the display visibility (true = extended, false = direct mode).  Return value of true indicates that the change was successful."
+
         fn = self.function_table.setDisplayVisibility
         result = fn(bIsVisibleOnDesktop)
         return result
 
     def getDeviceToAbsoluteTrackingPose(self, eOrigin, fPredictedSecondsToPhotonsFromNow, unTrackedDevicePoseArrayCount, pTrackedDevicePoseArray=None):
+        """
+        The pose that the tracker thinks that the HMD will be in at the specified number of seconds into the 
+        future. Pass 0 to get the state at the instant the method is called. Most of the time the application should
+        calculate the time until the photons will be emitted from the display and pass that time into the method.
+        * This is roughly analogous to the inverse of the view matrix in most applications, though 
+        many games will need to do some additional rotation or translation on top of the rotation
+        and translation provided by the head pose.
+        * For devices where bPoseIsValid is true the application can use the pose to position the device
+        in question. The provided array can be any size up to k_unMaxTrackedDeviceCount. 
+        * Seated experiences should call this method with TrackingUniverseSeated and receive poses relative
+        to the seated zero pose. Standing experiences should call this method with TrackingUniverseStanding 
+        and receive poses relative to the Chaperone Play Area. TrackingUniverseRawAndUncalibrated should 
+        probably not be used unless the application is the Chaperone calibration tool itself, but will provide
+        poses relative to the hardware-specific coordinate system in the driver.
+        """
+
         fn = self.function_table.getDeviceToAbsoluteTrackingPose
         if pTrackedDevicePoseArray is None:
             pTrackedDevicePoseArray = (TrackedDevicePose_t * unTrackedDevicePoseArrayCount)()
@@ -1306,31 +1433,67 @@ class IVRSystem(object):
         return pTrackedDevicePoseArray
 
     def resetSeatedZeroPose(self):
+        """
+        Sets the zero pose for the seated tracker coordinate system to the current position and yaw of the HMD. After 
+        ResetSeatedZeroPose all GetDeviceToAbsoluteTrackingPose calls that pass TrackingUniverseSeated as the origin 
+        will be relative to this new zero pose. The new zero coordinate system will not change the fact that the Y axis 
+        is up in the real world, so the next pose returned from GetDeviceToAbsoluteTrackingPose after a call to 
+        ResetSeatedZeroPose may not be exactly an identity matrix.
+        * NOTE: This function overrides the user's previously saved seated zero pose and should only be called as the result of a user action. 
+        Users are also able to set their seated zero pose via the OpenVR Dashboard.
+        """
+
         fn = self.function_table.resetSeatedZeroPose
         result = fn()
 
     def getSeatedZeroPoseToStandingAbsoluteTrackingPose(self):
+        """
+        Returns the transform from the seated zero pose to the standing absolute tracking system. This allows 
+        applications to represent the seated origin to used or transform object positions from one coordinate
+        system to the other. 
+        * The seated origin may or may not be inside the Play Area or Collision Bounds returned by IVRChaperone. Its position 
+        depends on what the user has set from the Dashboard settings and previous calls to ResetSeatedZeroPose.
+        """
+
         fn = self.function_table.getSeatedZeroPoseToStandingAbsoluteTrackingPose
         result = fn()
         return result
 
     def getRawZeroPoseToStandingAbsoluteTrackingPose(self):
+        """
+        Returns the transform from the tracking origin to the standing absolute tracking system. This allows
+        applications to convert from raw tracking space to the calibrated standing coordinate system.
+        """
+
         fn = self.function_table.getRawZeroPoseToStandingAbsoluteTrackingPose
         result = fn()
         return result
 
     def getSortedTrackedDeviceIndicesOfClass(self, eTrackedDeviceClass, unTrackedDeviceIndexArrayCount, unRelativeToTrackedDeviceIndex):
+        """
+        Get a sorted array of device indices of a given class of tracked devices (e.g. controllers).  Devices are sorted right to left
+        relative to the specified tracked device (default: hmd -- pass in -1 for absolute tracking space).  Returns the number of devices
+        in the list, or the size of the array needed if not large enough.
+        """
+
         fn = self.function_table.getSortedTrackedDeviceIndicesOfClass
         punTrackedDeviceIndexArray = TrackedDeviceIndex_t()
         result = fn(eTrackedDeviceClass, byref(punTrackedDeviceIndexArray), unTrackedDeviceIndexArrayCount, unRelativeToTrackedDeviceIndex)
         return result, punTrackedDeviceIndexArray
 
     def getTrackedDeviceActivityLevel(self, unDeviceId):
+        "Returns the level of activity on the device."
+
         fn = self.function_table.getTrackedDeviceActivityLevel
         result = fn(unDeviceId)
         return result
 
     def applyTransform(self):
+        """
+        Convenience utility to apply the specified transform to the specified pose.
+          This properly transforms all pose components, including velocity and angular velocity
+        """
+
         fn = self.function_table.applyTransform
         pOutputPose = TrackedDevicePose_t()
         pTrackedDevicePose = TrackedDevicePose_t()
@@ -1339,73 +1502,121 @@ class IVRSystem(object):
         return pOutputPose, pTrackedDevicePose, pTransform
 
     def getTrackedDeviceIndexForControllerRole(self, unDeviceType):
+        "Returns the device index associated with a specific role, for example the left hand or the right hand."
+
         fn = self.function_table.getTrackedDeviceIndexForControllerRole
         result = fn(unDeviceType)
         return result
 
     def getControllerRoleForTrackedDeviceIndex(self, unDeviceIndex):
+        "Returns the controller type associated with a device index."
+
         fn = self.function_table.getControllerRoleForTrackedDeviceIndex
         result = fn(unDeviceIndex)
         return result
 
     def getTrackedDeviceClass(self, unDeviceIndex):
+        """
+        Returns the device class of a tracked device. If there has not been a device connected in this slot
+        since the application started this function will return TrackedDevice_Invalid. For previous detected
+        devices the function will return the previously observed device class. 
+        * To determine which devices exist on the system, just loop from 0 to k_unMaxTrackedDeviceCount and check
+        the device class. Every device with something other than TrackedDevice_Invalid is associated with an 
+        actual tracked device.
+        """
+
         fn = self.function_table.getTrackedDeviceClass
         result = fn(unDeviceIndex)
         return result
 
     def isTrackedDeviceConnected(self, unDeviceIndex):
+        "Returns true if there is a device connected in this slot."
+
         fn = self.function_table.isTrackedDeviceConnected
         result = fn(unDeviceIndex)
         return result
 
     def getBoolTrackedDeviceProperty(self, unDeviceIndex, prop):
+        "Returns a bool property. If the device index is not valid or the property is not a bool type this function will return false."
+
         fn = self.function_table.getBoolTrackedDeviceProperty
         pError = ETrackedPropertyError()
         result = fn(unDeviceIndex, prop, byref(pError))
         return result, pError
 
     def getFloatTrackedDeviceProperty(self, unDeviceIndex, prop):
+        "Returns a float property. If the device index is not valid or the property is not a float type this function will return 0."
+
         fn = self.function_table.getFloatTrackedDeviceProperty
         pError = ETrackedPropertyError()
         result = fn(unDeviceIndex, prop, byref(pError))
         return result, pError
 
     def getInt32TrackedDeviceProperty(self, unDeviceIndex, prop):
+        "Returns an int property. If the device index is not valid or the property is not a int type this function will return 0."
+
         fn = self.function_table.getInt32TrackedDeviceProperty
         pError = ETrackedPropertyError()
         result = fn(unDeviceIndex, prop, byref(pError))
         return result, pError
 
     def getUint64TrackedDeviceProperty(self, unDeviceIndex, prop):
+        "Returns a uint64 property. If the device index is not valid or the property is not a uint64 type this function will return 0."
+
         fn = self.function_table.getUint64TrackedDeviceProperty
         pError = ETrackedPropertyError()
         result = fn(unDeviceIndex, prop, byref(pError))
         return result, pError
 
     def getMatrix34TrackedDeviceProperty(self, unDeviceIndex, prop):
+        "Returns a matrix property. If the device index is not valid or the property is not a matrix type, this function will return identity."
+
         fn = self.function_table.getMatrix34TrackedDeviceProperty
         pError = ETrackedPropertyError()
         result = fn(unDeviceIndex, prop, byref(pError))
         return result, pError
 
     def getStringTrackedDeviceProperty(self, unDeviceIndex, prop, pchValue, unBufferSize):
+        """
+        Returns a string property. If the device index is not valid or the property is not a string type this function will 
+        return 0. Otherwise it returns the length of the number of bytes necessary to hold this string including the trailing
+        null. Strings will generally fit in buffers of k_unTrackingStringSize characters.
+        """
+
         fn = self.function_table.getStringTrackedDeviceProperty
         pError = ETrackedPropertyError()
         result = fn(unDeviceIndex, prop, pchValue, unBufferSize, byref(pError))
         return result, pError
 
     def getPropErrorNameFromEnum(self, error):
+        """
+        returns a string that corresponds with the specified property error. The string will be the name 
+        of the error enum value for all valid error codes
+        """
+
         fn = self.function_table.getPropErrorNameFromEnum
         result = fn(error)
         return result
 
     def pollNextEvent(self, uncbVREvent):
+        """
+        Returns true and fills the event with the next event on the queue if there is one. If there are no events
+        this method returns false. uncbVREvent should be the size in bytes of the VREvent_t struct
+        """
+
         fn = self.function_table.pollNextEvent
         pEvent = VREvent_t()
         result = fn(byref(pEvent), uncbVREvent)
         return result, pEvent
 
     def pollNextEventWithPose(self, eOrigin, uncbVREvent):
+        """
+        Returns true and fills the event with the next event on the queue if there is one. If there are no events
+        this method returns false. Fills in the pose of the associated tracked device in the provided pose struct. 
+        This pose will always be older than the call to this function and should not be used to render the device. 
+        uncbVREvent should be the size in bytes of the VREvent_t struct
+        """
+
         fn = self.function_table.pollNextEventWithPose
         pEvent = VREvent_t()
         pTrackedDevicePose = TrackedDevicePose_t()
@@ -1413,22 +1624,43 @@ class IVRSystem(object):
         return result, pEvent, pTrackedDevicePose
 
     def getEventTypeNameFromEnum(self, eType):
+        "returns the name of an EVREvent enum value"
+
         fn = self.function_table.getEventTypeNameFromEnum
         result = fn(eType)
         return result
 
     def getHiddenAreaMesh(self, eEye):
+        """
+        Returns the stencil mesh information for the current HMD. If this HMD does not have a stencil mesh the vertex data and count will be
+        NULL and 0 respectively. This mesh is meant to be rendered into the stencil buffer (or into the depth buffer setting nearz) before rendering
+        each eye's view. The pixels covered by this mesh will never be seen by the user after the lens distortion is applied and based on visibility to the panels.
+        This will improve perf by letting the GPU early-reject pixels the user will never see before running the pixel shader.
+        NOTE: Render this mesh with backface culling disabled since the winding order of the vertices can be different per-HMD or per-eye.
+        """
+
         fn = self.function_table.getHiddenAreaMesh
         result = fn(eEye)
         return result
 
     def getControllerState(self, unControllerDeviceIndex):
+        """
+        Fills the supplied struct with the current state of the controller. Returns false if the controller index
+        is invalid.
+        """
+
         fn = self.function_table.getControllerState
         pControllerState = VRControllerState_t()
         result = fn(unControllerDeviceIndex, byref(pControllerState))
         return result, pControllerState
 
     def getControllerStateWithPose(self, eOrigin, unControllerDeviceIndex):
+        """
+        fills the supplied struct with the current state of the controller and the provided pose with the pose of 
+        the controller when the controller state was updated most recently. Use this form if you need a precise controller
+        pose as input to your application when the user presses or releases a button.
+        """
+
         fn = self.function_table.getControllerStateWithPose
         pControllerState = VRControllerState_t()
         pTrackedDevicePose = TrackedDevicePose_t()
@@ -1436,48 +1668,95 @@ class IVRSystem(object):
         return result, pControllerState, pTrackedDevicePose
 
     def triggerHapticPulse(self, unControllerDeviceIndex, unAxisId, usDurationMicroSec):
+        """
+        Trigger a single haptic pulse on a controller. After this call the application may not trigger another haptic pulse on this controller
+        and axis combination for 5ms.
+        """
+
         fn = self.function_table.triggerHapticPulse
         result = fn(unControllerDeviceIndex, unAxisId, usDurationMicroSec)
 
     def getButtonIdNameFromEnum(self, eButtonId):
+        "returns the name of an EVRButtonId enum value"
+
         fn = self.function_table.getButtonIdNameFromEnum
         result = fn(eButtonId)
         return result
 
     def getControllerAxisTypeNameFromEnum(self, eAxisType):
+        "returns the name of an EVRControllerAxisType enum value"
+
         fn = self.function_table.getControllerAxisTypeNameFromEnum
         result = fn(eAxisType)
         return result
 
     def captureInputFocus(self):
+        """
+        Tells OpenVR that this process wants exclusive access to controller button states and button events. Other apps will be notified that 
+        they have lost input focus with a VREvent_InputFocusCaptured event. Returns false if input focus could not be captured for
+        some reason.
+        """
+
         fn = self.function_table.captureInputFocus
         result = fn()
         return result
 
     def releaseInputFocus(self):
+        """
+        Tells OpenVR that this process no longer wants exclusive access to button states and button events. Other apps will be notified 
+        that input focus has been released with a VREvent_InputFocusReleased event.
+        """
+
         fn = self.function_table.releaseInputFocus
         result = fn()
 
     def isInputFocusCapturedByAnotherProcess(self):
+        "Returns true if input focus is captured by another process."
+
         fn = self.function_table.isInputFocusCapturedByAnotherProcess
         result = fn()
         return result
 
     def driverDebugRequest(self, unDeviceIndex, pchRequest, pchResponseBuffer, unResponseBufferSize):
+        """
+        Sends a request to the driver for the specified device and returns the response. The maximum response size is 32k,
+        but this method can be called with a smaller buffer. If the response exceeds the size of the buffer, it is truncated. 
+        The size of the response including its terminating null is returned.
+        """
+
         fn = self.function_table.driverDebugRequest
         result = fn(unDeviceIndex, pchRequest, pchResponseBuffer, unResponseBufferSize)
         return result
 
     def performFirmwareUpdate(self, unDeviceIndex):
+        """
+        Performs the actual firmware update if applicable. 
+        The following events will be sent, if VRFirmwareError_None was returned: VREvent_FirmwareUpdateStarted, VREvent_FirmwareUpdateFinished 
+        Use the properties Prop_Firmware_UpdateAvailable_Bool, Prop_Firmware_ManualUpdate_Bool, and Prop_Firmware_ManualUpdateURL_String
+        to figure our whether a firmware update is available, and to figure out whether its a manual update 
+        Prop_Firmware_ManualUpdateURL_String should point to an URL describing the manual update process
+        """
+
         fn = self.function_table.performFirmwareUpdate
         result = fn(unDeviceIndex)
         return result
 
     def acknowledgeQuit_Exiting(self):
+        """
+        Call this to acknowledge to the system that VREvent_Quit has been received and that the process is exiting.
+        This extends the timeout until the process is killed.
+        """
+
         fn = self.function_table.acknowledgeQuit_Exiting
         result = fn()
 
     def acknowledgeQuit_UserPrompt(self):
+        """
+        Call this to tell the system that the user is being prompted to save data. This
+        halts the timeout and dismisses the dashboard (if it was up). Applications should be sure to actually 
+        prompt the user to save and then exit afterward, otherwise the user will be left in a confusing state.
+        """
+
         fn = self.function_table.acknowledgeQuit_UserPrompt
         result = fn()
 
@@ -1492,6 +1771,11 @@ class IVRExtendedDisplay_FnTable(Structure):
 
 
 class IVRExtendedDisplay(object):
+    """
+    NOTE: Use of this interface is not recommended in production applications. It will not work for displays which use
+    direct-to-display mode. It is also incompatible with the VR compositor and is not available when the compositor is running.
+    """
+
     def __init__(self):
         version_key = IVRExtendedDisplay_Version
         if not isInterfaceVersionValid(version_key):
@@ -1505,6 +1789,8 @@ class IVRExtendedDisplay(object):
         self.function_table = fn_table_ptr.contents
 
     def getWindowBounds(self):
+        "Size and position that the window needs to be on the VR display."
+
         fn = self.function_table.getWindowBounds
         pnX = c_int32()
         pnY = c_int32()
@@ -1514,6 +1800,8 @@ class IVRExtendedDisplay(object):
         return pnX, pnY, pnWidth, pnHeight
 
     def getEyeOutputViewport(self, eEye):
+        "Gets the viewport in the frame buffer to draw the output of the distortion into"
+
         fn = self.function_table.getEyeOutputViewport
         pnX = c_uint32()
         pnY = c_uint32()
@@ -1523,6 +1811,12 @@ class IVRExtendedDisplay(object):
         return pnX, pnY, pnWidth, pnHeight
 
     def getDXGIOutputInfo(self):
+        """
+        [D3D10/11 Only]
+        Returns the adapter index and output index that the user should pass into EnumAdapters and EnumOutputs
+        to create the device and swap chain in DX10 and DX11. If an error occurs both indices will be set to -1.
+        """
+
         fn = self.function_table.getDXGIOutputInfo
         pnAdapterIndex = c_int32()
         pnAdapterOutputIndex = c_int32()
@@ -1574,125 +1868,212 @@ class IVRApplications(object):
         self.function_table = fn_table_ptr.contents
 
     def addApplicationManifest(self, pchApplicationManifestFullPath, bTemporary):
+        """
+        Adds an application manifest to the list to load when building the list of installed applications. 
+        Temporary manifests are not automatically loaded
+        """
+
         fn = self.function_table.addApplicationManifest
         result = fn(pchApplicationManifestFullPath, bTemporary)
         return result
 
     def removeApplicationManifest(self, pchApplicationManifestFullPath):
+        "Removes an application manifest from the list to load when building the list of installed applications."
+
         fn = self.function_table.removeApplicationManifest
         result = fn(pchApplicationManifestFullPath)
         return result
 
     def isApplicationInstalled(self, pchAppKey):
+        "Returns true if an application is installed"
+
         fn = self.function_table.isApplicationInstalled
         result = fn(pchAppKey)
         return result
 
     def getApplicationCount(self):
+        "Returns the number of applications available in the list"
+
         fn = self.function_table.getApplicationCount
         result = fn()
         return result
 
     def getApplicationKeyByIndex(self, unApplicationIndex, pchAppKeyBuffer, unAppKeyBufferLen):
+        """
+        Returns the key of the specified application. The index is at least 0 and is less than the return 
+        value of GetApplicationCount(). The buffer should be at least k_unMaxApplicationKeyLength in order to 
+        fit the key.
+        """
+
         fn = self.function_table.getApplicationKeyByIndex
         result = fn(unApplicationIndex, pchAppKeyBuffer, unAppKeyBufferLen)
         return result
 
     def getApplicationKeyByProcessId(self, unProcessId, pchAppKeyBuffer, unAppKeyBufferLen):
+        """
+        Returns the key of the application for the specified Process Id. The buffer should be at least 
+        k_unMaxApplicationKeyLength in order to fit the key.
+        """
+
         fn = self.function_table.getApplicationKeyByProcessId
         result = fn(unProcessId, pchAppKeyBuffer, unAppKeyBufferLen)
         return result
 
     def launchApplication(self, pchAppKey):
+        """
+        Launches the application. The existing scene application will exit and then the new application will start.
+        This call is not valid for dashboard overlay applications.
+        """
+
         fn = self.function_table.launchApplication
         result = fn(pchAppKey)
         return result
 
     def launchTemplateApplication(self, pchTemplateAppKey, pchNewAppKey, unKeys):
+        """
+        Launches an instance of an application of type template, with its app key being pchNewAppKey (which must be unique) and optionally override sections
+        from the manifest file via AppOverrideKeys_t
+        """
+
         fn = self.function_table.launchTemplateApplication
         pKeys = AppOverrideKeys_t()
         result = fn(pchTemplateAppKey, pchNewAppKey, byref(pKeys), unKeys)
         return result, pKeys
 
     def launchDashboardOverlay(self, pchAppKey):
+        """
+        Launches the dashboard overlay application if it is not already running. This call is only valid for 
+        dashboard overlay applications.
+        """
+
         fn = self.function_table.launchDashboardOverlay
         result = fn(pchAppKey)
         return result
 
     def cancelApplicationLaunch(self, pchAppKey):
+        "Cancel a pending launch for an application"
+
         fn = self.function_table.cancelApplicationLaunch
         result = fn(pchAppKey)
         return result
 
     def identifyApplication(self, unProcessId, pchAppKey):
+        """
+        Identifies a running application. OpenVR can't always tell which process started in response
+        to a URL. This function allows a URL handler (or the process itself) to identify the app key 
+        for the now running application. Passing a process ID of 0 identifies the calling process. 
+        The application must be one that's known to the system via a call to AddApplicationManifest.
+        """
+
         fn = self.function_table.identifyApplication
         result = fn(unProcessId, pchAppKey)
         return result
 
     def getApplicationProcessId(self, pchAppKey):
+        "Returns the process ID for an application. Return 0 if the application was not found or is not running."
+
         fn = self.function_table.getApplicationProcessId
         result = fn(pchAppKey)
         return result
 
     def getApplicationsErrorNameFromEnum(self, error):
+        "Returns a string for an applications error"
+
         fn = self.function_table.getApplicationsErrorNameFromEnum
         result = fn(error)
         return result
 
     def getApplicationPropertyString(self, pchAppKey, eProperty, pchPropertyValueBuffer, unPropertyValueBufferLen):
+        "Returns a value for an application property. The required buffer size to fit this value will be returned."
+
         fn = self.function_table.getApplicationPropertyString
         peError = EVRApplicationError()
         result = fn(pchAppKey, eProperty, pchPropertyValueBuffer, unPropertyValueBufferLen, byref(peError))
         return result, peError
 
     def getApplicationPropertyBool(self, pchAppKey, eProperty):
+        "Returns a bool value for an application property. Returns false in all error cases."
+
         fn = self.function_table.getApplicationPropertyBool
         peError = EVRApplicationError()
         result = fn(pchAppKey, eProperty, byref(peError))
         return result, peError
 
     def getApplicationPropertyUint64(self, pchAppKey, eProperty):
+        "Returns a uint64 value for an application property. Returns 0 in all error cases."
+
         fn = self.function_table.getApplicationPropertyUint64
         peError = EVRApplicationError()
         result = fn(pchAppKey, eProperty, byref(peError))
         return result, peError
 
     def setApplicationAutoLaunch(self, pchAppKey, bAutoLaunch):
+        "Sets the application auto-launch flag. This is only valid for applications which return true for VRApplicationProperty_IsDashboardOverlay_Bool."
+
         fn = self.function_table.setApplicationAutoLaunch
         result = fn(pchAppKey, bAutoLaunch)
         return result
 
     def getApplicationAutoLaunch(self, pchAppKey):
+        "Gets the application auto-launch flag. This is only valid for applications which return true for VRApplicationProperty_IsDashboardOverlay_Bool."
+
         fn = self.function_table.getApplicationAutoLaunch
         result = fn(pchAppKey)
         return result
 
     def getStartingApplication(self, pchAppKeyBuffer, unAppKeyBufferLen):
+        "Returns the app key for the application that is starting up"
+
         fn = self.function_table.getStartingApplication
         result = fn(pchAppKeyBuffer, unAppKeyBufferLen)
         return result
 
     def getTransitionState(self):
+        "Returns the application transition state"
+
         fn = self.function_table.getTransitionState
         result = fn()
         return result
 
     def performApplicationPrelaunchCheck(self, pchAppKey):
+        """
+        Returns errors that would prevent the specified application from launching immediately. Calling this function will
+        cause the current scene application to quit, so only call it when you are actually about to launch something else.
+        What the caller should do about these failures depends on the failure:
+          VRApplicationError_OldApplicationQuitting - An existing application has been told to quit. Wait for a VREvent_ProcessQuit
+                                                      and try again.
+          VRApplicationError_ApplicationAlreadyStarting - This application is already starting. This is a permanent failure.
+          VRApplicationError_LaunchInProgress	      - A different application is already starting. This is a permanent failure.
+          VRApplicationError_None                   - Go ahead and launch. Everything is clear.
+        """
+
         fn = self.function_table.performApplicationPrelaunchCheck
         result = fn(pchAppKey)
         return result
 
     def getApplicationsTransitionStateNameFromEnum(self, state):
+        "Returns a string for an application transition state"
+
         fn = self.function_table.getApplicationsTransitionStateNameFromEnum
         result = fn(state)
         return result
 
     def isQuitUserPromptRequested(self):
+        "Returns true if the outgoing scene app has requested a save prompt before exiting"
+
         fn = self.function_table.isQuitUserPromptRequested
         result = fn()
         return result
 
     def launchInternalProcess(self, pchBinaryPath, pchArguments, pchWorkingDirectory):
+        """
+        Starts a subprocess within the calling application. This
+        suppresses all application transition UI and automatically identifies the new executable 
+        as part of the same application. On success the calling process should exit immediately. 
+        If working directory is NULL or "" the directory portion of the binary path will be 
+        the working directory.
+        """
+
         fn = self.function_table.launchInternalProcess
         result = fn(pchBinaryPath, pchArguments, pchWorkingDirectory)
         return result
@@ -1713,6 +2094,13 @@ class IVRChaperone_FnTable(Structure):
 
 
 class IVRChaperone(object):
+    """
+    HIGH LEVEL TRACKING SPACE ASSUMPTIONS:
+    0,0,0 is the preferred standing area center.
+    0Y is the floor height.
+    -Z is the preferred forward facing direction.
+    """
+
     def __init__(self):
         version_key = IVRChaperone_Version
         if not isInterfaceVersionValid(version_key):
@@ -1726,11 +2114,18 @@ class IVRChaperone(object):
         self.function_table = fn_table_ptr.contents
 
     def getCalibrationState(self):
+        "Get the current state of Chaperone calibration. This state can change at any time during a session due to physical base station changes."
+
         fn = self.function_table.getCalibrationState
         result = fn()
         return result
 
     def getPlayAreaSize(self):
+        """
+        Returns the width and depth of the Play Area (formerly named Soft Bounds) in X and Z. 
+        Tracking space center (0,0,0) is the center of the Play Area.
+        """
+
         fn = self.function_table.getPlayAreaSize
         pSizeX = c_float()
         pSizeZ = c_float()
@@ -1738,20 +2133,35 @@ class IVRChaperone(object):
         return result, pSizeX, pSizeZ
 
     def getPlayAreaRect(self):
+        """
+        Returns the 4 corner positions of the Play Area (formerly named Soft Bounds).
+        Corners are in counter-clockwise order.
+        Standing center (0,0,0) is the center of the Play Area.
+        It's a rectangle.
+        2 sides are parallel to the X axis and 2 sides are parallel to the Z axis.
+        Height of every corner is 0Y (on the floor).
+        """
+
         fn = self.function_table.getPlayAreaRect
         rect = HmdQuad_t()
         result = fn(byref(rect))
         return result, rect
 
     def reloadInfo(self):
+        "Reload Chaperone data from the .vrchap file on disk."
+
         fn = self.function_table.reloadInfo
         result = fn()
 
     def setSceneColor(self, color):
+        "Optionally give the chaperone system a hit about the color and brightness in the scene"
+
         fn = self.function_table.setSceneColor
         result = fn(color)
 
     def getBoundsColor(self, nNumOutputColors, flCollisionBoundsFadeDistance):
+        "Get the current chaperone bounds draw color and brightness"
+
         fn = self.function_table.getBoundsColor
         pOutputColorArray = HmdColor_t()
         pOutputCameraColor = HmdColor_t()
@@ -1759,11 +2169,15 @@ class IVRChaperone(object):
         return pOutputColorArray, pOutputCameraColor
 
     def areBoundsVisible(self):
+        "Determine whether the bounds are showing right now"
+
         fn = self.function_table.areBoundsVisible
         result = fn()
         return result
 
     def forceBoundsVisible(self, bForce):
+        "Force the bounds to show, mostly for utilities"
+
         fn = self.function_table.forceBoundsVisible
         result = fn(bForce)
 
@@ -1795,6 +2209,13 @@ class IVRChaperoneSetup_FnTable(Structure):
 
 
 class IVRChaperoneSetup(object):
+    """
+    Manages the working copy of the chaperone info. By default this will be the same as the 
+    live copy. Any changes made with this interface will stay in the working copy until 
+    CommitWorkingCopy() is called, at which point the working copy and the live copy will be 
+    the same again.
+    """
+
     def __init__(self):
         version_key = IVRChaperoneSetup_Version
         if not isInterfaceVersionValid(version_key):
@@ -1808,15 +2229,28 @@ class IVRChaperoneSetup(object):
         self.function_table = fn_table_ptr.contents
 
     def commitWorkingCopy(self, configFile):
+        "Saves the current working copy to disk"
+
         fn = self.function_table.commitWorkingCopy
         result = fn(configFile)
         return result
 
     def revertWorkingCopy(self):
+        """
+        Reverts the working copy to match the live chaperone calibration.
+        To modify existing data this MUST be do WHILE getting a non-error ChaperoneCalibrationStatus.
+        Only after this should you do gets and sets on the existing data.
+        """
+
         fn = self.function_table.revertWorkingCopy
         result = fn()
 
     def getWorkingPlayAreaSize(self):
+        """
+        Returns the width and depth of the Play Area (formerly named Soft Bounds) in X and Z from the working copy.
+        Tracking space center (0,0,0) is the center of the Play Area.
+        """
+
         fn = self.function_table.getWorkingPlayAreaSize
         pSizeX = c_float()
         pSizeZ = c_float()
@@ -1824,12 +2258,26 @@ class IVRChaperoneSetup(object):
         return result, pSizeX, pSizeZ
 
     def getWorkingPlayAreaRect(self):
+        """
+        Returns the 4 corner positions of the Play Area (formerly named Soft Bounds) from the working copy.
+        Corners are in clockwise order.
+        Tracking space center (0,0,0) is the center of the Play Area.
+        It's a rectangle.
+        2 sides are parallel to the X axis and 2 sides are parallel to the Z axis.
+        Height of every corner is 0Y (on the floor).
+        """
+
         fn = self.function_table.getWorkingPlayAreaRect
         rect = HmdQuad_t()
         result = fn(byref(rect))
         return result, rect
 
     def getWorkingCollisionBoundsInfo(self):
+        """
+        Returns the number of Quads if the buffer points to null. Otherwise it returns Quads 
+        into the buffer up to the max specified from the working copy.
+        """
+
         fn = self.function_table.getWorkingCollisionBoundsInfo
         pQuadsBuffer = HmdQuad_t()
         punQuadsCount = c_uint32()
@@ -1837,6 +2285,11 @@ class IVRChaperoneSetup(object):
         return result, pQuadsBuffer, punQuadsCount
 
     def getLiveCollisionBoundsInfo(self):
+        """
+        Returns the number of Quads if the buffer points to null. Otherwise it returns Quads 
+        into the buffer up to the max specified.
+        """
+
         fn = self.function_table.getLiveCollisionBoundsInfo
         pQuadsBuffer = HmdQuad_t()
         punQuadsCount = c_uint32()
@@ -1844,44 +2297,60 @@ class IVRChaperoneSetup(object):
         return result, pQuadsBuffer, punQuadsCount
 
     def getWorkingSeatedZeroPoseToRawTrackingPose(self):
+        "Returns the preferred seated position from the working copy."
+
         fn = self.function_table.getWorkingSeatedZeroPoseToRawTrackingPose
         pmatSeatedZeroPoseToRawTrackingPose = HmdMatrix34_t()
         result = fn(byref(pmatSeatedZeroPoseToRawTrackingPose))
         return result, pmatSeatedZeroPoseToRawTrackingPose
 
     def getWorkingStandingZeroPoseToRawTrackingPose(self):
+        "Returns the standing origin from the working copy."
+
         fn = self.function_table.getWorkingStandingZeroPoseToRawTrackingPose
         pmatStandingZeroPoseToRawTrackingPose = HmdMatrix34_t()
         result = fn(byref(pmatStandingZeroPoseToRawTrackingPose))
         return result, pmatStandingZeroPoseToRawTrackingPose
 
     def setWorkingPlayAreaSize(self, sizeX, sizeZ):
+        "Sets the Play Area in the working copy."
+
         fn = self.function_table.setWorkingPlayAreaSize
         result = fn(sizeX, sizeZ)
 
     def setWorkingCollisionBoundsInfo(self, unQuadsCount):
+        "Sets the Collision Bounds in the working copy."
+
         fn = self.function_table.setWorkingCollisionBoundsInfo
         pQuadsBuffer = HmdQuad_t()
         result = fn(byref(pQuadsBuffer), unQuadsCount)
         return pQuadsBuffer
 
     def setWorkingSeatedZeroPoseToRawTrackingPose(self):
+        "Sets the preferred seated position in the working copy."
+
         fn = self.function_table.setWorkingSeatedZeroPoseToRawTrackingPose
         pMatSeatedZeroPoseToRawTrackingPose = HmdMatrix34_t()
         result = fn(byref(pMatSeatedZeroPoseToRawTrackingPose))
         return pMatSeatedZeroPoseToRawTrackingPose
 
     def setWorkingStandingZeroPoseToRawTrackingPose(self):
+        "Sets the preferred standing position in the working copy."
+
         fn = self.function_table.setWorkingStandingZeroPoseToRawTrackingPose
         pMatStandingZeroPoseToRawTrackingPose = HmdMatrix34_t()
         result = fn(byref(pMatStandingZeroPoseToRawTrackingPose))
         return pMatStandingZeroPoseToRawTrackingPose
 
     def reloadFromDisk(self, configFile):
+        "Tear everything down and reload it from the file on disk"
+
         fn = self.function_table.reloadFromDisk
         result = fn(configFile)
 
     def getLiveSeatedZeroPoseToRawTrackingPose(self):
+        "Returns the preferred seated position."
+
         fn = self.function_table.getLiveSeatedZeroPoseToRawTrackingPose
         pmatSeatedZeroPoseToRawTrackingPose = HmdMatrix34_t()
         result = fn(byref(pmatSeatedZeroPoseToRawTrackingPose))
@@ -1961,6 +2430,8 @@ class IVRCompositor_FnTable(Structure):
 
 
 class IVRCompositor(object):
+    "Allows the application to interact with the compositor"
+
     def __init__(self):
         version_key = IVRCompositor_Version
         if not isInterfaceVersionValid(version_key):
@@ -1974,15 +2445,21 @@ class IVRCompositor(object):
         self.function_table = fn_table_ptr.contents
 
     def setTrackingSpace(self, eOrigin):
+        "Sets tracking space returned by WaitGetPoses"
+
         fn = self.function_table.setTrackingSpace
         result = fn(eOrigin)
 
     def getTrackingSpace(self):
+        "Gets current tracking space returned by WaitGetPoses"
+
         fn = self.function_table.getTrackingSpace
         result = fn()
         return result
 
     def waitGetPoses(self, unRenderPoseArrayCount, unGamePoseArrayCount):
+        "Returns pose(s) to use to render scene (and optionally poses predicted two frames out for gameplay)."
+
         fn = self.function_table.waitGetPoses
         pRenderPoseArray = TrackedDevicePose_t()
         pGamePoseArray = TrackedDevicePose_t()
@@ -1990,6 +2467,8 @@ class IVRCompositor(object):
         return result, pRenderPoseArray, pGamePoseArray
 
     def getLastPoses(self, unRenderPoseArrayCount, unGamePoseArrayCount):
+        "Get the last set of poses returned by WaitGetPoses."
+
         fn = self.function_table.getLastPoses
         pRenderPoseArray = TrackedDevicePose_t()
         pGamePoseArray = TrackedDevicePose_t()
@@ -1997,6 +2476,12 @@ class IVRCompositor(object):
         return result, pRenderPoseArray, pGamePoseArray
 
     def getLastPoseForTrackedDeviceIndex(self, unDeviceIndex):
+        """
+        Interface for accessing last set of poses returned by WaitGetPoses one at a time.
+        Returns VRCompositorError_IndexOutOfRange if unDeviceIndex not less than k_unMaxTrackedDeviceCount otherwise VRCompositorError_None.
+        It is okay to pass NULL for either pose if you only want one of the values.
+        """
+
         fn = self.function_table.getLastPoseForTrackedDeviceIndex
         pOutputPose = TrackedDevicePose_t()
         pOutputGamePose = TrackedDevicePose_t()
@@ -2004,6 +2489,13 @@ class IVRCompositor(object):
         return result, pOutputPose, pOutputGamePose
 
     def submit(self, eEye, nSubmitFlags):
+        """
+        Updated scene texture to display. If pBounds is NULL the entire texture will be used.  If called from an OpenGL app, consider adding a glFlush after
+        Submitting both frames to signal the driver to start processing, otherwise it may wait until the command buffer fills up, causing the app to miss frames.
+        * OpenGL dirty state:
+        glBindTexture
+        """
+
         fn = self.function_table.submit
         pTexture = Texture_t()
         pBounds = VRTextureBounds_t()
@@ -2011,105 +2503,183 @@ class IVRCompositor(object):
         return result, pTexture, pBounds
 
     def clearLastSubmittedFrame(self):
+        """
+        Clears the frame that was sent with the last call to Submit. This will cause the 
+        compositor to show the grid until Submit is called again.
+        """
+
         fn = self.function_table.clearLastSubmittedFrame
         result = fn()
 
     def postPresentHandoff(self):
+        """
+        Call immediately after presenting your app's window (i.e. companion window) to unblock the compositor.
+        This is an optional call, which only needs to be used if you can't instead call WaitGetPoses immediately after Present.
+        For example, if your engine's render and game loop are not on separate threads, or blocking the render thread until 3ms before the next vsync would
+        introduce a deadlock of some sort.  This function tells the compositor that you have finished all rendering after having Submitted buffers for both
+        eyes, and it is free to start its rendering work.  This should only be called from the same thread you are rendering on.
+        """
+
         fn = self.function_table.postPresentHandoff
         result = fn()
 
     def getFrameTiming(self, unFramesAgo):
+        """
+        Returns true if timing data is filled it.  Sets oldest timing info if nFramesAgo is larger than the stored history.
+        Be sure to set timing.size = sizeof(Compositor_FrameTiming) on struct passed in before calling this function.
+        """
+
         fn = self.function_table.getFrameTiming
         pTiming = Compositor_FrameTiming()
         result = fn(byref(pTiming), unFramesAgo)
         return result, pTiming
 
     def getFrameTimeRemaining(self):
+        """
+        Returns the time in seconds left in the current (as identified by FrameTiming's frameIndex) frame.
+        Due to "running start", this value may roll over to the next frame before ever reaching 0.0.
+        """
+
         fn = self.function_table.getFrameTimeRemaining
         result = fn()
         return result
 
     def fadeToColor(self, fSeconds, fRed, fGreen, fBlue, fAlpha, bBackground):
+        """
+        Fades the view on the HMD to the specified color. The fade will take fSeconds, and the color values are between
+        0.0 and 1.0. This color is faded on top of the scene based on the alpha parameter. Removing the fade color instantly 
+        would be FadeToColor( 0.0, 0.0, 0.0, 0.0, 0.0 ).  Values are in un-premultiplied alpha space.
+        """
+
         fn = self.function_table.fadeToColor
         result = fn(fSeconds, fRed, fGreen, fBlue, fAlpha, bBackground)
 
     def fadeGrid(self, fSeconds, bFadeIn):
+        "Fading the Grid in or out in fSeconds"
+
         fn = self.function_table.fadeGrid
         result = fn(fSeconds, bFadeIn)
 
     def setSkyboxOverride(self, unTextureCount):
+        """
+        Override the skybox used in the compositor (e.g. for during level loads when the app can't feed scene images fast enough)
+        Order is Front, Back, Left, Right, Top, Bottom.  If only a single texture is passed, it is assumed in lat-long format.
+        If two are passed, it is assumed a lat-long stereo pair.
+        """
+
         fn = self.function_table.setSkyboxOverride
         pTextures = Texture_t()
         result = fn(byref(pTextures), unTextureCount)
         return result, pTextures
 
     def clearSkyboxOverride(self):
+        "Resets compositor skybox back to defaults."
+
         fn = self.function_table.clearSkyboxOverride
         result = fn()
 
     def compositorBringToFront(self):
+        """
+        Brings the compositor window to the front. This is useful for covering any other window that may be on the HMD
+        and is obscuring the compositor window.
+        """
+
         fn = self.function_table.compositorBringToFront
         result = fn()
 
     def compositorGoToBack(self):
+        "Pushes the compositor window to the back. This is useful for allowing other applications to draw directly to the HMD."
+
         fn = self.function_table.compositorGoToBack
         result = fn()
 
     def compositorQuit(self):
+        """
+        Tells the compositor process to clean up and exit. You do not need to call this function at shutdown. Under normal 
+        circumstances the compositor will manage its own life cycle based on what applications are running.
+        """
+
         fn = self.function_table.compositorQuit
         result = fn()
 
     def isFullscreen(self):
+        "Return whether the compositor is fullscreen"
+
         fn = self.function_table.isFullscreen
         result = fn()
         return result
 
     def getCurrentSceneFocusProcess(self):
+        "Returns the process ID of the process that is currently rendering the scene"
+
         fn = self.function_table.getCurrentSceneFocusProcess
         result = fn()
         return result
 
     def getLastFrameRenderer(self):
+        """
+        Returns the process ID of the process that rendered the last frame (or 0 if the compositor itself rendered the frame.)
+        Returns 0 when fading out from an app and the app's process Id when fading into an app.
+        """
+
         fn = self.function_table.getLastFrameRenderer
         result = fn()
         return result
 
     def canRenderScene(self):
+        "Returns true if the current process has the scene focus"
+
         fn = self.function_table.canRenderScene
         result = fn()
         return result
 
     def showMirrorWindow(self):
+        "Creates a window on the primary monitor to display what is being shown in the headset."
+
         fn = self.function_table.showMirrorWindow
         result = fn()
 
     def hideMirrorWindow(self):
+        "Closes the mirror window."
+
         fn = self.function_table.hideMirrorWindow
         result = fn()
 
     def isMirrorWindowVisible(self):
+        "Returns true if the mirror window is shown."
+
         fn = self.function_table.isMirrorWindowVisible
         result = fn()
         return result
 
     def compositorDumpImages(self):
+        "Writes all images that the compositor knows about (including overlays) to a 'screenshots' folder in the SteamVR runtime root."
+
         fn = self.function_table.compositorDumpImages
         result = fn()
 
     def shouldAppRenderWithLowResources(self):
+        "Let an app know it should be rendering with low resources."
+
         fn = self.function_table.shouldAppRenderWithLowResources
         result = fn()
         return result
 
     def forceInterleavedReprojectionOn(self, bOverride):
+        "Override interleaved reprojection logic to force on."
+
         fn = self.function_table.forceInterleavedReprojectionOn
         result = fn(bOverride)
 
     def forceReconnectProcess(self):
+        "Force reconnecting to the compositor process."
+
         fn = self.function_table.forceReconnectProcess
         result = fn()
 
     def suspendRendering(self, bSuspend):
+        "Temporarily suspends rendering (useful for finer control over scene transitions)."
+
         fn = self.function_table.suspendRendering
         result = fn(bSuspend)
 
@@ -2201,45 +2771,82 @@ class IVROverlay(object):
         self.function_table = fn_table_ptr.contents
 
     def findOverlay(self, pchOverlayKey):
+        "Finds an existing overlay with the specified key."
+
         fn = self.function_table.findOverlay
         pOverlayHandle = VROverlayHandle_t()
         result = fn(pchOverlayKey, byref(pOverlayHandle))
         return result, pOverlayHandle
 
     def createOverlay(self, pchOverlayKey, pchOverlayFriendlyName):
+        "Creates a new named overlay. All overlays start hidden and with default settings."
+
         fn = self.function_table.createOverlay
         pOverlayHandle = VROverlayHandle_t()
         result = fn(pchOverlayKey, pchOverlayFriendlyName, byref(pOverlayHandle))
         return result, pOverlayHandle
 
     def destroyOverlay(self, ulOverlayHandle):
+        """
+        Destroys the specified overlay. When an application calls VR_Shutdown all overlays created by that app are
+        automatically destroyed.
+        """
+
         fn = self.function_table.destroyOverlay
         result = fn(ulOverlayHandle)
         return result
 
     def setHighQualityOverlay(self, ulOverlayHandle):
+        """
+        Specify which overlay to use the high quality render path.  This overlay will be composited in during the distortion pass which
+        results in it drawing on top of everything else, but also at a higher quality as it samples the source texture directly rather than
+        rasterizing into each eye's render texture first.  Because if this, only one of these is supported at any given time.  It is most useful
+        for overlays that are expected to take up most of the user's view (e.g. streaming video).
+        This mode does not support mouse input to your overlay.
+        """
+
         fn = self.function_table.setHighQualityOverlay
         result = fn(ulOverlayHandle)
         return result
 
     def getHighQualityOverlay(self):
+        """
+        Returns the overlay handle of the current overlay being rendered using the single high quality overlay render path.
+        Otherwise it will return k_ulOverlayHandleInvalid.
+        """
+
         fn = self.function_table.getHighQualityOverlay
         result = fn()
         return result
 
     def getOverlayKey(self, ulOverlayHandle, pchValue, unBufferSize):
+        """
+        Fills the provided buffer with the string key of the overlay. Returns the size of buffer required to store the key, including
+        the terminating null character. k_unVROverlayMaxKeyLength will be enough bytes to fit the string.
+        """
+
         fn = self.function_table.getOverlayKey
         pError = EVROverlayError()
         result = fn(ulOverlayHandle, pchValue, unBufferSize, byref(pError))
         return result, pError
 
     def getOverlayName(self, ulOverlayHandle, pchValue, unBufferSize):
+        """
+        Fills the provided buffer with the friendly name of the overlay. Returns the size of buffer required to store the key, including
+        the terminating null character. k_unVROverlayMaxNameLength will be enough bytes to fit the string.
+        """
+
         fn = self.function_table.getOverlayName
         pError = EVROverlayError()
         result = fn(ulOverlayHandle, pchValue, unBufferSize, byref(pError))
         return result, pError
 
     def getOverlayImageData(self, ulOverlayHandle, pvBuffer, unBufferSize):
+        """
+        Gets the raw image data from an overlay. Overlay image data is always returned as RGBA data, 4 bytes per pixel. If the buffer is not large enough, width and height 
+        will be set and VROverlayError_ArrayTooSmall is returned.
+        """
+
         fn = self.function_table.getOverlayImageData
         punWidth = c_uint32()
         punHeight = c_uint32()
@@ -2247,37 +2854,57 @@ class IVROverlay(object):
         return result, punWidth, punHeight
 
     def getOverlayErrorNameFromEnum(self, error):
+        """
+        returns a string that corresponds with the specified overlay error. The string will be the name 
+        of the error enum value for all valid error codes
+        """
+
         fn = self.function_table.getOverlayErrorNameFromEnum
         result = fn(error)
         return result
 
     def setOverlayRenderingPid(self, ulOverlayHandle, unPID):
+        """
+        Sets the pid that is allowed to render to this overlay (the creator pid is always allow to render),
+        by default this is the pid of the process that made the overlay
+        """
+
         fn = self.function_table.setOverlayRenderingPid
         result = fn(ulOverlayHandle, unPID)
         return result
 
     def getOverlayRenderingPid(self, ulOverlayHandle):
+        "Gets the pid that is allowed to render to this overlay"
+
         fn = self.function_table.getOverlayRenderingPid
         result = fn(ulOverlayHandle)
         return result
 
     def setOverlayFlag(self, ulOverlayHandle, eOverlayFlag, bEnabled):
+        "Specify flag setting for a given overlay"
+
         fn = self.function_table.setOverlayFlag
         result = fn(ulOverlayHandle, eOverlayFlag, bEnabled)
         return result
 
     def getOverlayFlag(self, ulOverlayHandle, eOverlayFlag):
+        "Sets flag setting for a given overlay"
+
         fn = self.function_table.getOverlayFlag
         pbEnabled = openvr_bool()
         result = fn(ulOverlayHandle, eOverlayFlag, byref(pbEnabled))
         return result, pbEnabled
 
     def setOverlayColor(self, ulOverlayHandle, fRed, fGreen, fBlue):
+        "Sets the color tint of the overlay quad. Use 0.0 to 1.0 per channel."
+
         fn = self.function_table.setOverlayColor
         result = fn(ulOverlayHandle, fRed, fGreen, fBlue)
         return result
 
     def getOverlayColor(self, ulOverlayHandle):
+        "Gets the color tint of the overlay quad."
+
         fn = self.function_table.getOverlayColor
         pfRed = c_float()
         pfGreen = c_float()
@@ -2286,33 +2913,51 @@ class IVROverlay(object):
         return result, pfRed, pfGreen, pfBlue
 
     def setOverlayAlpha(self, ulOverlayHandle, fAlpha):
+        "Sets the alpha of the overlay quad. Use 1.0 for 100 percent opacity to 0.0 for 0 percent opacity."
+
         fn = self.function_table.setOverlayAlpha
         result = fn(ulOverlayHandle, fAlpha)
         return result
 
     def getOverlayAlpha(self, ulOverlayHandle):
+        "Gets the alpha of the overlay quad. By default overlays are rendering at 100 percent alpha (1.0)."
+
         fn = self.function_table.getOverlayAlpha
         pfAlpha = c_float()
         result = fn(ulOverlayHandle, byref(pfAlpha))
         return result, pfAlpha
 
     def setOverlayWidthInMeters(self, ulOverlayHandle, fWidthInMeters):
+        "Sets the width of the overlay quad in meters. By default overlays are rendered on a quad that is 1 meter across"
+
         fn = self.function_table.setOverlayWidthInMeters
         result = fn(ulOverlayHandle, fWidthInMeters)
         return result
 
     def getOverlayWidthInMeters(self, ulOverlayHandle):
+        "Returns the width of the overlay quad in meters. By default overlays are rendered on a quad that is 1 meter across"
+
         fn = self.function_table.getOverlayWidthInMeters
         pfWidthInMeters = c_float()
         result = fn(ulOverlayHandle, byref(pfWidthInMeters))
         return result, pfWidthInMeters
 
     def setOverlayAutoCurveDistanceRangeInMeters(self, ulOverlayHandle, fMinDistanceInMeters, fMaxDistanceInMeters):
+        """
+        For high-quality curved overlays only, sets the distance range in meters from the overlay used to automatically curve
+        the surface around the viewer.  Min is distance is when the surface will be most curved.  Max is when least curved.
+        """
+
         fn = self.function_table.setOverlayAutoCurveDistanceRangeInMeters
         result = fn(ulOverlayHandle, fMinDistanceInMeters, fMaxDistanceInMeters)
         return result
 
     def getOverlayAutoCurveDistanceRangeInMeters(self, ulOverlayHandle):
+        """
+        For high-quality curved overlays only, gets the distance range in meters from the overlay used to automatically curve
+        the surface around the viewer.  Min is distance is when the surface will be most curved.  Max is when least curved.
+        """
+
         fn = self.function_table.getOverlayAutoCurveDistanceRangeInMeters
         pfMinDistanceInMeters = c_float()
         pfMaxDistanceInMeters = c_float()
@@ -2320,41 +2965,58 @@ class IVROverlay(object):
         return result, pfMinDistanceInMeters, pfMaxDistanceInMeters
 
     def setOverlayTextureColorSpace(self, ulOverlayHandle, eTextureColorSpace):
+        """
+        Sets the colorspace the overlay texture's data is in.  Defaults to 'auto'.
+        If the texture needs to be resolved, you should call SetOverlayTexture with the appropriate colorspace instead.
+        """
+
         fn = self.function_table.setOverlayTextureColorSpace
         result = fn(ulOverlayHandle, eTextureColorSpace)
         return result
 
     def getOverlayTextureColorSpace(self, ulOverlayHandle):
+        "Gets the overlay's current colorspace setting."
+
         fn = self.function_table.getOverlayTextureColorSpace
         peTextureColorSpace = EColorSpace()
         result = fn(ulOverlayHandle, byref(peTextureColorSpace))
         return result, peTextureColorSpace
 
     def setOverlayTextureBounds(self, ulOverlayHandle):
+        "Sets the part of the texture to use for the overlay. UV Min is the upper left corner and UV Max is the lower right corner."
+
         fn = self.function_table.setOverlayTextureBounds
         pOverlayTextureBounds = VRTextureBounds_t()
         result = fn(ulOverlayHandle, byref(pOverlayTextureBounds))
         return result, pOverlayTextureBounds
 
     def getOverlayTextureBounds(self, ulOverlayHandle):
+        "Gets the part of the texture to use for the overlay. UV Min is the upper left corner and UV Max is the lower right corner."
+
         fn = self.function_table.getOverlayTextureBounds
         pOverlayTextureBounds = VRTextureBounds_t()
         result = fn(ulOverlayHandle, byref(pOverlayTextureBounds))
         return result, pOverlayTextureBounds
 
     def getOverlayTransformType(self, ulOverlayHandle):
+        "Returns the transform type of this overlay."
+
         fn = self.function_table.getOverlayTransformType
         peTransformType = VROverlayTransformType()
         result = fn(ulOverlayHandle, byref(peTransformType))
         return result, peTransformType
 
     def setOverlayTransformAbsolute(self, ulOverlayHandle, eTrackingOrigin):
+        "Sets the transform to absolute tracking origin."
+
         fn = self.function_table.setOverlayTransformAbsolute
         pmatTrackingOriginToOverlayTransform = HmdMatrix34_t()
         result = fn(ulOverlayHandle, eTrackingOrigin, byref(pmatTrackingOriginToOverlayTransform))
         return result, pmatTrackingOriginToOverlayTransform
 
     def getOverlayTransformAbsolute(self, ulOverlayHandle):
+        "Gets the transform if it is absolute. Returns an error if the transform is some other type."
+
         fn = self.function_table.getOverlayTransformAbsolute
         peTrackingOrigin = ETrackingUniverseOrigin()
         pmatTrackingOriginToOverlayTransform = HmdMatrix34_t()
@@ -2362,12 +3024,16 @@ class IVROverlay(object):
         return result, peTrackingOrigin, pmatTrackingOriginToOverlayTransform
 
     def setOverlayTransformTrackedDeviceRelative(self, ulOverlayHandle, unTrackedDevice):
+        "Sets the transform to relative to the transform of the specified tracked device."
+
         fn = self.function_table.setOverlayTransformTrackedDeviceRelative
         pmatTrackedDeviceToOverlayTransform = HmdMatrix34_t()
         result = fn(ulOverlayHandle, unTrackedDevice, byref(pmatTrackedDeviceToOverlayTransform))
         return result, pmatTrackedDeviceToOverlayTransform
 
     def getOverlayTransformTrackedDeviceRelative(self, ulOverlayHandle):
+        "Gets the transform if it is relative to a tracked device. Returns an error if the transform is some other type."
+
         fn = self.function_table.getOverlayTransformTrackedDeviceRelative
         punTrackedDevice = TrackedDeviceIndex_t()
         pmatTrackedDeviceToOverlayTransform = HmdMatrix34_t()
@@ -2375,67 +3041,106 @@ class IVROverlay(object):
         return result, punTrackedDevice, pmatTrackedDeviceToOverlayTransform
 
     def setOverlayTransformTrackedDeviceComponent(self, ulOverlayHandle, unDeviceIndex, pchComponentName):
+        """
+        Sets the transform to draw the overlay on a rendermodel component mesh instead of a quad. This will only draw when the system is
+        drawing the device. Overlays with this transform type cannot receive mouse events.
+        """
+
         fn = self.function_table.setOverlayTransformTrackedDeviceComponent
         result = fn(ulOverlayHandle, unDeviceIndex, pchComponentName)
         return result
 
     def getOverlayTransformTrackedDeviceComponent(self, ulOverlayHandle, pchComponentName, unComponentNameSize):
+        "Gets the transform information when the overlay is rendering on a component."
+
         fn = self.function_table.getOverlayTransformTrackedDeviceComponent
         punDeviceIndex = TrackedDeviceIndex_t()
         result = fn(ulOverlayHandle, byref(punDeviceIndex), pchComponentName, unComponentNameSize)
         return result, punDeviceIndex
 
     def showOverlay(self, ulOverlayHandle):
+        "Shows the VR overlay.  For dashboard overlays, only the Dashboard Manager is allowed to call this."
+
         fn = self.function_table.showOverlay
         result = fn(ulOverlayHandle)
         return result
 
     def hideOverlay(self, ulOverlayHandle):
+        "Hides the VR overlay.  For dashboard overlays, only the Dashboard Manager is allowed to call this."
+
         fn = self.function_table.hideOverlay
         result = fn(ulOverlayHandle)
         return result
 
     def isOverlayVisible(self, ulOverlayHandle):
+        "Returns true if the overlay is visible."
+
         fn = self.function_table.isOverlayVisible
         result = fn(ulOverlayHandle)
         return result
 
     def getTransformForOverlayCoordinates(self, ulOverlayHandle, eTrackingOrigin, coordinatesInOverlay):
+        "Get the transform in 3d space associated with a specific 2d point in the overlay's coordinate space (where 0,0 is the lower left). -Z points out of the overlay"
+
         fn = self.function_table.getTransformForOverlayCoordinates
         pmatTransform = HmdMatrix34_t()
         result = fn(ulOverlayHandle, eTrackingOrigin, coordinatesInOverlay, byref(pmatTransform))
         return result, pmatTransform
 
     def pollNextOverlayEvent(self, ulOverlayHandle, uncbVREvent):
+        """
+        Returns true and fills the event with the next event on the overlay's event queue, if there is one. 
+        If there are no events this method returns false. uncbVREvent should be the size in bytes of the VREvent_t struct
+        """
+
         fn = self.function_table.pollNextOverlayEvent
         pEvent = VREvent_t()
         result = fn(ulOverlayHandle, byref(pEvent), uncbVREvent)
         return result, pEvent
 
     def getOverlayInputMethod(self, ulOverlayHandle):
+        "Returns the current input settings for the specified overlay."
+
         fn = self.function_table.getOverlayInputMethod
         peInputMethod = VROverlayInputMethod()
         result = fn(ulOverlayHandle, byref(peInputMethod))
         return result, peInputMethod
 
     def setOverlayInputMethod(self, ulOverlayHandle, eInputMethod):
+        "Sets the input settings for the specified overlay."
+
         fn = self.function_table.setOverlayInputMethod
         result = fn(ulOverlayHandle, eInputMethod)
         return result
 
     def getOverlayMouseScale(self, ulOverlayHandle):
+        """
+        Gets the mouse scaling factor that is used for mouse events. The actual texture may be a different size, but this is
+        typically the size of the underlying UI in pixels.
+        """
+
         fn = self.function_table.getOverlayMouseScale
         pvecMouseScale = HmdVector2_t()
         result = fn(ulOverlayHandle, byref(pvecMouseScale))
         return result, pvecMouseScale
 
     def setOverlayMouseScale(self, ulOverlayHandle):
+        """
+        Sets the mouse scaling factor that is used for mouse events. The actual texture may be a different size, but this is
+        typically the size of the underlying UI in pixels (not in world space).
+        """
+
         fn = self.function_table.setOverlayMouseScale
         pvecMouseScale = HmdVector2_t()
         result = fn(ulOverlayHandle, byref(pvecMouseScale))
         return result, pvecMouseScale
 
     def computeOverlayIntersection(self, ulOverlayHandle):
+        """
+        Computes the overlay-space pixel coordinates of where the ray intersects the overlay with the
+        specified settings. Returns false if there is no intersection.
+        """
+
         fn = self.function_table.computeOverlayIntersection
         pParams = VROverlayIntersectionParams_t()
         pResults = VROverlayIntersectionResults_t()
@@ -2443,57 +3148,111 @@ class IVROverlay(object):
         return result, pParams, pResults
 
     def handleControllerOverlayInteractionAsMouse(self, ulOverlayHandle, unControllerDeviceIndex):
+        """
+        Processes mouse input from the specified controller as though it were a mouse pointed at a compositor overlay with the
+        specified settings. The controller is treated like a laser pointer on the -z axis. The point where the laser pointer would
+        intersect with the overlay is the mouse position, the trigger is left mouse, and the track pad is right mouse. 
+        * Return true if the controller is pointed at the overlay and an event was generated.
+        """
+
         fn = self.function_table.handleControllerOverlayInteractionAsMouse
         result = fn(ulOverlayHandle, unControllerDeviceIndex)
         return result
 
     def isHoverTargetOverlay(self, ulOverlayHandle):
+        """
+        Returns true if the specified overlay is the hover target. An overlay is the hover target when it is the last overlay "moused over" 
+        by the virtual mouse pointer
+        """
+
         fn = self.function_table.isHoverTargetOverlay
         result = fn(ulOverlayHandle)
         return result
 
     def getGamepadFocusOverlay(self):
+        "Returns the current Gamepad focus overlay"
+
         fn = self.function_table.getGamepadFocusOverlay
         result = fn()
         return result
 
     def setGamepadFocusOverlay(self, ulNewFocusOverlay):
+        "Sets the current Gamepad focus overlay"
+
         fn = self.function_table.setGamepadFocusOverlay
         result = fn(ulNewFocusOverlay)
         return result
 
     def setOverlayNeighbor(self, eDirection, ulFrom, ulTo):
+        """
+        Sets an overlay's neighbor. This will also set the neighbor of the "to" overlay
+        to point back to the "from" overlay. If an overlay's neighbor is set to invalid both
+        ends will be cleared
+        """
+
         fn = self.function_table.setOverlayNeighbor
         result = fn(eDirection, ulFrom, ulTo)
         return result
 
     def moveGamepadFocusToNeighbor(self, eDirection, ulFrom):
+        """
+        Changes the Gamepad focus from one overlay to one of its neighbors. Returns VROverlayError_NoNeighbor if there is no
+        neighbor in that direction
+        """
+
         fn = self.function_table.moveGamepadFocusToNeighbor
         result = fn(eDirection, ulFrom)
         return result
 
     def setOverlayTexture(self, ulOverlayHandle):
+        """
+        Texture to draw for the overlay. This function can only be called by the overlay's creator or renderer process (see SetOverlayRenderingPid) .
+        * OpenGL dirty state:
+        glBindTexture
+        """
+
         fn = self.function_table.setOverlayTexture
         pTexture = Texture_t()
         result = fn(ulOverlayHandle, byref(pTexture))
         return result, pTexture
 
     def clearOverlayTexture(self, ulOverlayHandle):
+        "Use this to tell the overlay system to release the texture set for this overlay."
+
         fn = self.function_table.clearOverlayTexture
         result = fn(ulOverlayHandle)
         return result
 
     def setOverlayRaw(self, ulOverlayHandle, pvBuffer, unWidth, unHeight, unDepth):
+        """
+        Separate interface for providing the data as a stream of bytes, but there is an upper bound on data 
+        that can be sent. This function can only be called by the overlay's renderer process.
+        """
+
         fn = self.function_table.setOverlayRaw
         result = fn(ulOverlayHandle, pvBuffer, unWidth, unHeight, unDepth)
         return result
 
     def setOverlayFromFile(self, ulOverlayHandle, pchFilePath):
+        """
+        Separate interface for providing the image through a filename: can be png or jpg, and should not be bigger than 1920x1080.
+        This function can only be called by the overlay's renderer process
+        """
+
         fn = self.function_table.setOverlayFromFile
         result = fn(ulOverlayHandle, pchFilePath)
         return result
 
     def getOverlayTexture(self, ulOverlayHandle, pNativeTextureRef):
+        """
+        Get the native texture handle/device for an overlay you have created.
+        On windows this handle will be a ID3D11ShaderResourceView with a ID3D11Texture2D bound.
+        * The texture will always be sized to match the backing texture you supplied in SetOverlayTexture above.
+        * You MUST call ReleaseNativeOverlayHandle() with pNativeTextureHandle once you are done with this texture.
+        * pNativeTextureHandle is an OUTPUT, it will be a pointer to a ID3D11ShaderResourceView *.
+        pNativeTextureRef is an INPUT and should be a ID3D11Resource *. The device used by pNativeTextureRef will be used to bind pNativeTextureHandle.
+        """
+
         fn = self.function_table.getOverlayTexture
         pNativeTextureHandle = c_void_p()
         pWidth = c_uint32()
@@ -2505,11 +3264,18 @@ class IVROverlay(object):
         return result, pNativeTextureHandle, pWidth, pHeight, pNativeFormat, pAPI, pColorSpace
 
     def releaseNativeOverlayHandle(self, ulOverlayHandle, pNativeTextureHandle):
+        """
+        Release the pNativeTextureHandle provided from the GetOverlayTexture call, this allows the system to free the underlying GPU resources for this object,
+        so only do it once you stop rendering this texture.
+        """
+
         fn = self.function_table.releaseNativeOverlayHandle
         result = fn(ulOverlayHandle, pNativeTextureHandle)
         return result
 
     def createDashboardOverlay(self, pchOverlayKey, pchOverlayFriendlyName):
+        "Creates a dashboard overlay and returns its handle"
+
         fn = self.function_table.createDashboardOverlay
         pMainHandle = VROverlayHandle_t()
         pThumbnailHandle = VROverlayHandle_t()
@@ -2517,36 +3283,50 @@ class IVROverlay(object):
         return result, pMainHandle, pThumbnailHandle
 
     def isDashboardVisible(self):
+        "Returns true if the dashboard is visible"
+
         fn = self.function_table.isDashboardVisible
         result = fn()
         return result
 
     def isActiveDashboardOverlay(self, ulOverlayHandle):
+        "returns true if the dashboard is visible and the specified overlay is the active system Overlay"
+
         fn = self.function_table.isActiveDashboardOverlay
         result = fn(ulOverlayHandle)
         return result
 
     def setDashboardOverlaySceneProcess(self, ulOverlayHandle, unProcessId):
+        "Sets the dashboard overlay to only appear when the specified process ID has scene focus"
+
         fn = self.function_table.setDashboardOverlaySceneProcess
         result = fn(ulOverlayHandle, unProcessId)
         return result
 
     def getDashboardOverlaySceneProcess(self, ulOverlayHandle):
+        "Gets the process ID that this dashboard overlay requires to have scene focus"
+
         fn = self.function_table.getDashboardOverlaySceneProcess
         punProcessId = c_uint32()
         result = fn(ulOverlayHandle, byref(punProcessId))
         return result, punProcessId
 
     def showDashboard(self, pchOverlayToShow):
+        "Shows the dashboard."
+
         fn = self.function_table.showDashboard
         result = fn(pchOverlayToShow)
 
     def getPrimaryDashboardDevice(self):
+        "Returns the tracked device that has the laser pointer in the dashboard"
+
         fn = self.function_table.getPrimaryDashboardDevice
         result = fn()
         return result
 
     def showKeyboard(self, eInputMode, eLineInputMode, pchDescription, unCharMax, pchExistingText, bUseMinimalMode, uUserValue):
+        "Show the virtual keyboard to accept input"
+
         fn = self.function_table.showKeyboard
         result = fn(eInputMode, eLineInputMode, pchDescription, unCharMax, pchExistingText, bUseMinimalMode, uUserValue)
         return result
@@ -2557,21 +3337,29 @@ class IVROverlay(object):
         return result
 
     def getKeyboardText(self, pchText, cchText):
+        "Get the text that was entered into the text input"
+
         fn = self.function_table.getKeyboardText
         result = fn(pchText, cchText)
         return result
 
     def hideKeyboard(self):
+        "Hide the virtual keyboard"
+
         fn = self.function_table.hideKeyboard
         result = fn()
 
     def setKeyboardTransformAbsolute(self, eTrackingOrigin):
+        "Set the position of the keyboard in world space"
+
         fn = self.function_table.setKeyboardTransformAbsolute
         pmatTrackingOriginToKeyboardTransform = HmdMatrix34_t()
         result = fn(eTrackingOrigin, byref(pmatTrackingOriginToKeyboardTransform))
         return pmatTrackingOriginToKeyboardTransform
 
     def setKeyboardPositionForOverlay(self, ulOverlayHandle, avoidRect):
+        "Set the position of the keyboard in overlay space by telling it to avoid a rectangle in the overlay. Rectangle coords have (0,0) in the bottom left"
+
         fn = self.function_table.setKeyboardPositionForOverlay
         result = fn(ulOverlayHandle, avoidRect)
 
@@ -2611,75 +3399,149 @@ class IVRRenderModels(object):
         self.function_table = fn_table_ptr.contents
 
     def loadRenderModel_Async(self, pchRenderModelName):
+        """
+        Loads and returns a render model for use in the application. pchRenderModelName should be a render model name
+        from the Prop_RenderModelName_String property or an absolute path name to a render model on disk. 
+        * The resulting render model is valid until VR_Shutdown() is called or until FreeRenderModel() is called. When the 
+        application is finished with the render model it should call FreeRenderModel() to free the memory associated
+        with the model.
+        * The method returns VRRenderModelError_Loading while the render model is still being loaded.
+        The method returns VRRenderModelError_None once loaded successfully, otherwise will return an error.
+        """
+
         fn = self.function_table.loadRenderModel_Async
         ppRenderModel = POINTER(RenderModel_t)()
         result = fn(pchRenderModelName, byref(ppRenderModel))
         return result, ppRenderModel
 
     def freeRenderModel(self):
+        """
+        Frees a previously returned render model
+          It is safe to call this on a null ptr.
+        """
+
         fn = self.function_table.freeRenderModel
         pRenderModel = RenderModel_t()
         result = fn(byref(pRenderModel))
         return pRenderModel
 
     def loadTexture_Async(self, textureId):
+        "Loads and returns a texture for use in the application."
+
         fn = self.function_table.loadTexture_Async
         ppTexture = POINTER(RenderModel_TextureMap_t)()
         result = fn(textureId, byref(ppTexture))
         return result, ppTexture
 
     def freeTexture(self):
+        """
+        Frees a previously returned texture
+          It is safe to call this on a null ptr.
+        """
+
         fn = self.function_table.freeTexture
         pTexture = RenderModel_TextureMap_t()
         result = fn(byref(pTexture))
         return pTexture
 
     def loadTextureD3D11_Async(self, textureId, pD3D11Device):
+        "Creates a D3D11 texture and loads data into it."
+
         fn = self.function_table.loadTextureD3D11_Async
         ppD3D11Texture2D = c_void_p()
         result = fn(textureId, pD3D11Device, byref(ppD3D11Texture2D))
         return result, ppD3D11Texture2D
 
     def loadIntoTextureD3D11_Async(self, textureId, pDstTexture):
+        "Helper function to copy the bits into an existing texture."
+
         fn = self.function_table.loadIntoTextureD3D11_Async
         result = fn(textureId, pDstTexture)
         return result
 
     def freeTextureD3D11(self, pD3D11Texture2D):
+        "Use this to free textures created with LoadTextureD3D11_Async instead of calling Release on them."
+
         fn = self.function_table.freeTextureD3D11
         result = fn(pD3D11Texture2D)
 
     def getRenderModelName(self, unRenderModelIndex, pchRenderModelName, unRenderModelNameLen):
+        """
+        Use this to get the names of available render models.  Index does not correlate to a tracked device index, but
+        is only used for iterating over all available render models.  If the index is out of range, this function will return 0.
+        Otherwise, it will return the size of the buffer required for the name.
+        """
+
         fn = self.function_table.getRenderModelName
         result = fn(unRenderModelIndex, pchRenderModelName, unRenderModelNameLen)
         return result
 
     def getRenderModelCount(self):
+        "Returns the number of available render models."
+
         fn = self.function_table.getRenderModelCount
         result = fn()
         return result
 
     def getComponentCount(self, pchRenderModelName):
+        """
+        Returns the number of components of the specified render model.
+         Components are useful when client application wish to draw, label, or otherwise interact with components of tracked objects.
+         Examples controller components:
+          renderable things such as triggers, buttons
+          non-renderable things which include coordinate systems such as 'tip', 'base', a neutral controller agnostic hand-pose
+          If all controller components are enumerated and rendered, it will be equivalent to drawing the traditional render model
+          Returns 0 if components not supported, >0 otherwise
+        """
+
         fn = self.function_table.getComponentCount
         result = fn(pchRenderModelName)
         return result
 
     def getComponentName(self, pchRenderModelName, unComponentIndex, pchComponentName, unComponentNameLen):
+        """
+        Use this to get the names of available components.  Index does not correlate to a tracked device index, but
+        is only used for iterating over all available components.  If the index is out of range, this function will return 0.
+        Otherwise, it will return the size of the buffer required for the name.
+        """
+
         fn = self.function_table.getComponentName
         result = fn(pchRenderModelName, unComponentIndex, pchComponentName, unComponentNameLen)
         return result
 
     def getComponentButtonMask(self, pchRenderModelName, pchComponentName):
+        """
+        Get the button mask for all buttons associated with this component
+          If no buttons (or axes) are associated with this component, return 0
+          Note: multiple components may be associated with the same button. Ex: two grip buttons on a single controller.
+          Note: A single component may be associated with multiple buttons. Ex: A trackpad which also provides "D-pad" functionality
+        """
+
         fn = self.function_table.getComponentButtonMask
         result = fn(pchRenderModelName, pchComponentName)
         return result
 
     def getComponentRenderModelName(self, pchRenderModelName, pchComponentName, pchComponentRenderModelName, unComponentRenderModelNameLen):
+        """
+        Use this to get the render model name for the specified rendermode/component combination, to be passed to LoadRenderModel.
+        If the component name is out of range, this function will return 0.
+        Otherwise, it will return the size of the buffer required for the name.
+        """
+
         fn = self.function_table.getComponentRenderModelName
         result = fn(pchRenderModelName, pchComponentName, pchComponentRenderModelName, unComponentRenderModelNameLen)
         return result
 
     def getComponentState(self, pchRenderModelName, pchComponentName):
+        """
+        Use this to query information about the component, as a function of the controller state.
+        * For dynamic controller components (ex: trigger) values will reflect component motions
+        For static components this will return a consistent value independent of the VRControllerState_t
+        * If the pchRenderModelName or pchComponentName is invalid, this will return false (and transforms will be set to identity).
+        Otherwise, return true
+        Note: For dynamic objects, visibility may be dynamic. (I.e., true/false will be returned based on controller state and controller mode state )
+        """
+
         fn = self.function_table.getComponentState
         pControllerState = VRControllerState_t()
         pState = RenderModel_ControllerMode_State_t()
@@ -2688,6 +3550,8 @@ class IVRRenderModels(object):
         return result, pControllerState, pState, pComponentState
 
     def renderModelHasComponent(self, pchRenderModelName, pchComponentName):
+        "Returns true if the render model has a component with the specified name"
+
         fn = self.function_table.renderModelHasComponent
         result = fn(pchRenderModelName, pchComponentName)
         return result
@@ -2702,6 +3566,11 @@ class IVRNotifications_FnTable(Structure):
 
 
 class IVRNotifications(object):
+    """
+    Allows notification sources to interact with the VR system
+    This current interface is not yet implemented. Do not use yet.
+    """
+
     def __init__(self):
         version_key = IVRNotifications_Version
         if not isInterfaceVersionValid(version_key):
@@ -2715,6 +3584,13 @@ class IVRNotifications(object):
         self.function_table = fn_table_ptr.contents
 
     def createNotification(self, ulOverlayHandle, ulUserValue, type, pchText, style):
+        """
+        Create a notification and enqueue it to be shown to the user.
+        An overlay handle is required to create a notification, as otherwise it would be impossible for a user to act on it.
+        To create a two-line notification, use a line break ('\n') to split the text into two lines.
+        The pImage argument may be NULL, in which case the specified overlay's icon will be used instead.
+        """
+
         fn = self.function_table.createNotification
         pImage = NotificationBitmap_t()
         pNotificationId = VRNotificationId()
@@ -2722,6 +3598,8 @@ class IVRNotifications(object):
         return result, pImage, pNotificationId
 
     def removeNotification(self, notificationId):
+        "Destroy a notification, hiding it first if it currently shown to the user."
+
         fn = self.function_table.removeNotification
         result = fn(notificationId)
         return result
@@ -2764,6 +3642,8 @@ class IVRSettings(object):
         return result
 
     def sync(self, bForce):
+        "Returns true if file sync occurred (force or settings dirty)"
+
         fn = self.function_table.sync
         peError = EVRSettingsError()
         result = fn(bForce, byref(peError))
