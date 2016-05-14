@@ -3,6 +3,12 @@
 use warnings;
 use strict;
 
+# Usually pointer arguments are assumed to be return values.
+# So here we create a special exception for in/out array arguments
+my %inout_array_arguments = ();
+$inout_array_arguments{"GetDeviceToAbsoluteTrackingPose"} = ["pTrackedDevicePoseArray","unTrackedDevicePoseArrayCount"];
+# print $inout_array_arguments{"GetDeviceToAbsoluteTrackingPose"}[1], "\n";
+
 my $header_file = "openvr_capi.h";
 open my $header_fh, "<", $header_file or die;
 my $header_string = do {
@@ -25,15 +31,15 @@ translate_all();
 
 sub translate_all {
 
-    # write_preamble();
+    write_preamble();
 
-    # translate_constants($header_string);
+    translate_constants($header_string);
 
-    # translate_enums($header_string);
+    translate_enums($header_string);
 
-    # translate_typedefs($header_string);
+    translate_typedefs($header_string);
 
-    # translate_structs($header_string);
+    translate_structs($header_string);
 
     translate_functions($cppheader_string);
 
@@ -494,8 +500,21 @@ EOF
                 # "first" argument is the return type
                 push @fn_args, translate_type($return_type);
                 foreach my $arg (split ",", $fn_args0) {
-                    $arg =~ s/\s+\S+\s*$//;
-                    push @fn_args, translate_type($arg);
+                    die unless $arg =~ s/^\s*(.*\S)\s+(\S+)\s*$//;
+                    my $arg_type = $1;
+                    my $arg_name = $2;
+                    $arg_type = translate_type($arg_type);
+                    push @fn_args, $arg_type;
+                    # TODO: remember the array arg type
+                    if (exists $inout_array_arguments{$fn_name}) {
+                        if ($arg_name eq $inout_array_arguments{$fn_name}[0]) {
+                            die $arg_type unless $arg_type =~ /POINTER\((.*)\)/;
+                            my $pointee_type = $1;
+                            $inout_array_arguments{$fn_name}[2] = $pointee_type;
+                        }
+                    }
+
+                    # if ($arg_name eq $)
                 }
 
                 $fn_name = lcfirst($fn_name); # first character lower case for python functions
@@ -583,6 +602,16 @@ EOF
                     my $fn_name = $2;
                     my $fn_args0 = $3;
 
+                    # Hack to reconfigure getDeviceToAbsoluteTrackingPose implementation correct
+                    my $array_arg_name = undef;
+                    my $array_arg_size = undef;
+                    my $array_arg_pointee_type = undef;
+                    if (exists $inout_array_arguments{$fn_name}) {
+                        $array_arg_name = $inout_array_arguments{$fn_name}[0];
+                        $array_arg_size = $inout_array_arguments{$fn_name}[1];
+                        $array_arg_pointee_type = $inout_array_arguments{$fn_name}[2];
+                    }
+
                     my @arg_types = ();
                     my @call_arg_names = ("self",);
                     my @internal_arg_names = ();
@@ -603,7 +632,11 @@ EOF
 
                         $arg_type = translate_type($arg_type);
                         push @arg_types, $arg_type;
-                        if ($arg_type =~ m/^POINTER\((.*)\)/) {
+                        if (defined $array_arg_name and $arg_name eq $array_arg_name) {
+                            push @internal_arg_names, $arg_name;
+                            push @return_arg_names, $arg_name;
+                        }
+                        elsif ($arg_type =~ m/^POINTER\((.*)\)/) {
                             my $pointee_type = $1;
                             push @return_arg_types, $pointee_type;
                             push @internal_arg_names, "byref($arg_name)";
@@ -613,6 +646,11 @@ EOF
                             push @internal_arg_names, $arg_name;
                             push @call_arg_names, $arg_name;
                         }
+
+                    }
+                    # Make the array argument optional and final
+                    if (defined $array_arg_name) {
+                        push @call_arg_names, "$array_arg_name=None";
                     }
 
                     $fn_name = lcfirst($fn_name); # first character lower case for python functions
@@ -623,10 +661,19 @@ EOF
                     print "        fn = self.function_table.$fn_name\n";
                     foreach my $ret_name (@return_arg_names) {
                         next if $ret_name =~ m/^result$/;
+                        next if defined $array_arg_name and $ret_name eq $array_arg_name; # handled below
                         print "        $ret_name = ";
                         print shift @return_arg_types;
                         print "()\n";
                     }
+
+                    # Hack to reconfigure getDeviceToAbsoluteTrackingPose implementation correct
+                    if (defined $array_arg_name) {
+                        print "        if $array_arg_name is None:\n";
+                        print "            $array_arg_name = ($array_arg_pointee_type * $array_arg_size)()\n";
+                        print "        $array_arg_name = cast($array_arg_name, POINTER($array_arg_pointee_type))\n";
+                    }
+
                     print "        result = fn(";
                     print join ", ", @internal_arg_names;
                     print ")\n";
