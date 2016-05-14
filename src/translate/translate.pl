@@ -27,21 +27,112 @@ close $cppheader_fh;
 
 open my $translated, ">", "translated.py" or die;
 
+my %docstrings = ();
+
 translate_all();
 
 sub translate_all {
 
-    write_preamble();
+    parse_docstrings($cppheader_string);
 
-    translate_constants($header_string);
+    # write_preamble();
 
-    translate_enums($header_string);
+    # translate_constants($header_string);
 
-    translate_typedefs($header_string);
+    # translate_enums($header_string);
+
+    # translate_typedefs($header_string);
 
     translate_structs($header_string);
 
-    translate_functions($cppheader_string);
+    # translate_functions($cppheader_string);
+
+}
+
+sub parse_docstrings {
+    my $cpp_header_string = shift;
+
+    my $all_comment_regex = 
+        '(?:/\*(?:[^*]|(?:\*+[^*/]))*\*+/)|(?://.*)';
+        # '\/\*(?:\*[^/]|[^*])*\*\/';
+    my $cpp_comment_regex = '(?:\n\s*//[^\n\r]+)+';
+
+    my $doc_comment_regex = '(?:[\n\r]{1,2}[\ \t]*(?:'.${all_comment_regex}.'))+';
+
+    # Class comments as docstrings
+    while ($cpp_header_string =~ m!
+        (${doc_comment_regex})
+        [\n\r]{1,2}[\ \t]*
+        (?:class|struct)\s+(\S+)
+        # ( # capture 1
+        # (?: # begin multiple comments
+        # [\n\r]{1,2}[\ \t]*(?: # comment is first thing on the first line
+        # (?:/\*(?:[^*]|(?:\*+[^*/]))*\*+/) # c style comment /* foo */
+        # | # "or"
+        # (?://.*) # c++ style comment // foo
+        # ))+ # multiple comments together
+        # ) # end capture 1
+        !xg) 
+    {
+        my $comment = $1;
+        my $class_name = $2;
+
+        $class_name = translate_type($class_name);
+
+        $comment = trim_comment($comment);
+        $docstrings{$class_name} = $comment;
+        # print "$comment\nclass $class_name\n\n\n";
+    }
+
+    while ($cpp_header_string =~ m!
+        (${doc_comment_regex})
+        [\n\r]{1,2}[\ \t]*
+        class\s+(\S+) # 
+        !xg) 
+    {
+        # TODO: function/method docstrings?
+    }
+
+}
+
+sub trim_comment {
+    my $comment = shift;
+
+    $comment =~ s/^\s*//; # trim leading spaces
+    $comment =~ s/\s*$//; # trim trailing spaces
+    $comment =~ s/[\n\r]+\s*/\n/g; # trim spaces from start of line
+    $comment =~ s/^\/+\s?//g; # remove leading slashes
+    $comment =~ s/[\n\r]+\/+\s?/\n/g; # remove leading slashes from lines
+    $comment =~ s/^\*+\s?//g; # remove leading stars
+    $comment =~ s/[\n\r]+\*+\s?/\n/g; # remove leading stars from lines
+    $comment =~ s/\/*$//; # remove trailing slashes
+    $comment =~ s/\**$//; # remove trailing stars
+    $comment =~ s/\n$//; # remove trailing newline
+    $comment =~ s/\s*$//; # remove trailing spaces
+
+    return $comment;
+}
+
+sub print_docstring
+{
+    my $key = shift;
+    my $indent = shift;
+
+    if (! exists $docstrings{$key}) {
+        return; # no docstring for you
+    }
+
+    my $comment = $docstrings{$key};
+    my @lines = split "\n", $comment;
+
+    if ($#lines > 0) {
+        print $indent, '"""', "\n$indent";
+        print join "\n$indent", @lines;
+        print "\n", $indent, '"""', "\n";
+    }
+    else {
+        print $indent, "\"$lines[0]\"\n";
+    }
 
 }
 
@@ -475,6 +566,10 @@ EOF
         }
 
         print "class $struct_name($base):\n";
+
+        # Maybe include docstring
+        print_docstring($struct_name, "    ");
+
         print "    _fields_ = [\n";
         my @fields = split('\n', $struct_contents);
         # print $#fields, "\n";
@@ -568,8 +663,9 @@ EOF
             my $interface_name = $1;
 
             # Create special interface class, e.g. IVRSystem, based on IVRSystem_FnTable
+            print "class $interface_name(object):\n";
+            print_docstring($interface_name, "    ");
             print <<EOF;
-class $interface_name(object):
     def __init__(self):
         version_key = ${interface_name}_Version
         if not isInterfaceVersionValid(version_key):
