@@ -25,7 +25,7 @@ my $cppheader_string = do {
 };
 close $cppheader_fh;
 
-open my $translated, ">", "translated.py" or die;
+# open my $translated, ">", "translated.py" or die;
 
 my %docstrings = ();
 

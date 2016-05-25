@@ -40,21 +40,23 @@ k_unTrackingStringSize = 32
 k_unMaxDriverDebugResponseSize = 32768
 k_unTrackedDeviceIndex_Hmd = 0
 k_unMaxTrackedDeviceCount = 16
+k_unTrackedDeviceIndexOther = 4294967294
 k_unTrackedDeviceIndexInvalid = 4294967295
 k_unMaxPropertyStringSize = 32768
 k_unControllerStateAxisCount = 5
 k_ulOverlayHandleInvalid = 0
 IVRSystem_Version = b"IVRSystem_012"
 IVRExtendedDisplay_Version = b"IVRExtendedDisplay_001"
+IVRTrackedCamera_Version = b"IVRTrackedCamera_002"
 k_unMaxApplicationKeyLength = 128
 IVRApplications_Version = b"IVRApplications_005"
 IVRChaperone_Version = b"IVRChaperone_003"
 IVRChaperoneSetup_Version = b"IVRChaperoneSetup_005"
-IVRCompositor_Version = b"IVRCompositor_014"
+IVRCompositor_Version = b"IVRCompositor_015"
 k_unVROverlayMaxKeyLength = 128
 k_unVROverlayMaxNameLength = 128
 k_unMaxOverlayCount = 32
-IVROverlay_Version = b"IVROverlay_011"
+IVROverlay_Version = b"IVROverlay_012"
 k_pch_Controller_Component_GDC2015 = b"gdc2015"
 k_pch_Controller_Component_Base = b"base"
 k_pch_Controller_Component_Tip = b"tip"
@@ -78,8 +80,12 @@ k_pch_SteamVR_SendSystemButtonToAllApps_Bool = b"sendSystemButtonToAllApps"
 k_pch_SteamVR_LogLevel_Int32 = b"loglevel"
 k_pch_SteamVR_IPD_Float = b"ipd"
 k_pch_SteamVR_Background_String = b"background"
+k_pch_SteamVR_BackgroundCameraHeight_Float = b"backgroundCameraHeight"
+k_pch_SteamVR_BackgroundDomeRadius_Float = b"backgroundDomeRadius"
+k_pch_SteamVR_Environment_String = b"environment"
 k_pch_SteamVR_GridColor_String = b"gridColor"
 k_pch_SteamVR_PlayAreaColor_String = b"playAreaColor"
+k_pch_SteamVR_ShowStage_Bool = b"showStage"
 k_pch_SteamVR_ActivateMultipleDrivers_Bool = b"activateMultipleDrivers"
 k_pch_SteamVR_PowerOffOnExit_Bool = b"powerOffOnExit"
 k_pch_SteamVR_StandbyAppRunningTimeout_Float = b"standbyAppRunningTimeout"
@@ -102,10 +108,6 @@ k_pch_Lighthouse_LighthouseName_String = b"lighthousename"
 k_pch_Lighthouse_MaxIncidenceAngleDegrees_Float = b"maxincidenceangledegrees"
 k_pch_Lighthouse_UseLighthouseDirect_Bool = b"uselighthousedirect"
 k_pch_Lighthouse_DBHistory_Bool = b"dbhistory"
-k_pch_Lighthouse_OriginOffsetX_Float = b"originoffsetx"
-k_pch_Lighthouse_OriginOffsetY_Float = b"originoffsety"
-k_pch_Lighthouse_OriginOffsetZ_Float = b"originoffsetz"
-k_pch_Lighthouse_HeadingOffset_Float = b"headingoffset"
 k_pch_Null_Section = b"driver_null"
 k_pch_Null_EnableNullDriver_Bool = b"enable"
 k_pch_Null_SerialNumber_String = b"serialNumber"
@@ -120,6 +122,7 @@ k_pch_Null_SecondsFromVsyncToPhotons_Float = b"secondsFromVsyncToPhotons"
 k_pch_Null_DisplayFrequency_Float = b"displayFrequency"
 k_pch_UserInterface_Section = b"userinterface"
 k_pch_UserInterface_StatusAlwaysOnTop_Bool = b"StatusAlwaysOnTop"
+k_pch_UserInterface_EnableScreenshots_Bool = b"EnableScreenshots"
 k_pch_Notifications_Section = b"notifications"
 k_pch_Notifications_DoNotDisturb_Bool = b"DoNotDisturb"
 k_pch_Keyboard_Section = b"keyboard"
@@ -163,6 +166,7 @@ k_pch_audio_OnPlaybackMirrorDevice_String = b"onPlaybackMirrorDevice"
 k_pch_audio_OffPlaybackDevice_String = b"offPlaybackDevice"
 k_pch_audio_OffRecordDevice_String = b"offRecordDevice"
 k_pch_audio_VIVEHDMIGain = b"viveHDMIGain"
+k_pch_modelskin_Section = b"modelskins"
 
 #############################
 ### Expose enum constants ###
@@ -275,6 +279,8 @@ Prop_DisplayBootloaderVersion_Uint64 = ENUM_TYPE(2030)
 Prop_DisplayHardwareVersion_Uint64 = ENUM_TYPE(2031)
 Prop_AudioFirmwareVersion_Uint64 = ENUM_TYPE(2032)
 Prop_CameraCompatibilityMode_Int32 = ENUM_TYPE(2033)
+Prop_ScreenshotHorizontalFieldOfViewDegrees_Float = ENUM_TYPE(2034)
+Prop_ScreenshotVerticalFieldOfViewDegrees_Float = ENUM_TYPE(2035)
 Prop_AttachedDeviceId_String = ENUM_TYPE(3000)
 Prop_SupportedButtons_Uint64 = ENUM_TYPE(3001)
 Prop_Axis0Type_Int32 = ENUM_TYPE(3002)
@@ -308,6 +314,7 @@ EVRSubmitFlags = ENUM_TYPE
 Submit_Default = ENUM_TYPE(0)
 Submit_LensDistortionAlreadyApplied = ENUM_TYPE(1)
 Submit_GlRenderBuffer = ENUM_TYPE(2)
+Submit_Screenshot = ENUM_TYPE(4)
 
 EVRState = ENUM_TYPE
 VRState_Undefined = ENUM_TYPE(-1)
@@ -366,6 +373,10 @@ VREvent_OverlayGamepadFocusLost = ENUM_TYPE(512)
 VREvent_OverlaySharedTextureChanged = ENUM_TYPE(513)
 VREvent_DashboardGuideButtonDown = ENUM_TYPE(514)
 VREvent_DashboardGuideButtonUp = ENUM_TYPE(515)
+VREvent_ScreenshotTriggered = ENUM_TYPE(516)
+VREvent_RequestScreenshot = ENUM_TYPE(520)
+VREvent_ScreenshotTaken = ENUM_TYPE(521)
+VREvent_ScreenshotFailed = ENUM_TYPE(522)
 VREvent_Notification_Shown = ENUM_TYPE(600)
 VREvent_Notification_Hidden = ENUM_TYPE(601)
 VREvent_Notification_BeginInteraction = ENUM_TYPE(602)
@@ -384,6 +395,8 @@ VREvent_AudioSettingsHaveChanged = ENUM_TYPE(820)
 VREvent_BackgroundSettingHasChanged = ENUM_TYPE(850)
 VREvent_CameraSettingsHaveChanged = ENUM_TYPE(851)
 VREvent_ReprojectionSettingHasChanged = ENUM_TYPE(852)
+VREvent_ModelSkinSettingsHaveChanged = ENUM_TYPE(853)
+VREvent_EnvironmentSettingsHaveChanged = ENUM_TYPE(854)
 VREvent_StatusUpdate = ENUM_TYPE(900)
 VREvent_MCImageUpdated = ENUM_TYPE(1000)
 VREvent_FirmwareUpdateStarted = ENUM_TYPE(1100)
@@ -394,6 +407,7 @@ VREvent_KeyboardDone = ENUM_TYPE(1202)
 VREvent_ApplicationTransitionStarted = ENUM_TYPE(1300)
 VREvent_ApplicationTransitionAborted = ENUM_TYPE(1301)
 VREvent_ApplicationTransitionNewAppStarted = ENUM_TYPE(1302)
+VREvent_ApplicationListUpdated = ENUM_TYPE(1303)
 VREvent_Compositor_MirrorWindowShown = ENUM_TYPE(1400)
 VREvent_Compositor_MirrorWindowHidden = ENUM_TYPE(1401)
 VREvent_Compositor_ChaperoneBoundsShown = ENUM_TYPE(1410)
@@ -496,6 +510,7 @@ VRNotificationError_OK = ENUM_TYPE(0)
 VRNotificationError_InvalidNotificationId = ENUM_TYPE(100)
 VRNotificationError_NotificationQueueFull = ENUM_TYPE(101)
 VRNotificationError_InvalidOverlayHandle = ENUM_TYPE(102)
+VRNotificationError_SystemWithUserValueAlreadyExists = ENUM_TYPE(103)
 
 EVRInitError = ENUM_TYPE
 VRInitError_None = ENUM_TYPE(0)
@@ -558,6 +573,38 @@ VRInitError_VendorSpecific_HmdFound_UserDataAddressRange = ENUM_TYPE(1111)
 VRInitError_VendorSpecific_HmdFound_UserDataError = ENUM_TYPE(1112)
 VRInitError_VendorSpecific_HmdFound_ConfigFailedSanityCheck = ENUM_TYPE(1113)
 VRInitError_Steam_SteamInstallationNotFound = ENUM_TYPE(2000)
+
+EVRScreenshotType = ENUM_TYPE
+VRScreenshotType_None = ENUM_TYPE(0)
+VRScreenshotType_Mono = ENUM_TYPE(1)
+VRScreenshotType_Stereo = ENUM_TYPE(2)
+VRScreenshotType_Cubemap = ENUM_TYPE(3)
+VRScreenshotType_StereoPanorama = ENUM_TYPE(4)
+
+EVRTrackedCameraError = ENUM_TYPE
+VRTrackedCameraError_None = ENUM_TYPE(0)
+VRTrackedCameraError_OperationFailed = ENUM_TYPE(100)
+VRTrackedCameraError_InvalidHandle = ENUM_TYPE(101)
+VRTrackedCameraError_InvalidFrameHeaderVersion = ENUM_TYPE(102)
+VRTrackedCameraError_OutOfHandles = ENUM_TYPE(103)
+VRTrackedCameraError_IPCFailure = ENUM_TYPE(104)
+VRTrackedCameraError_NotSupportedForThisDevice = ENUM_TYPE(105)
+VRTrackedCameraError_SharedMemoryFailure = ENUM_TYPE(106)
+VRTrackedCameraError_FrameBufferingFailure = ENUM_TYPE(107)
+VRTrackedCameraError_StreamSetupFailure = ENUM_TYPE(108)
+VRTrackedCameraError_InvalidGLTextureId = ENUM_TYPE(109)
+VRTrackedCameraError_InvalidSharedTextureHandle = ENUM_TYPE(110)
+VRTrackedCameraError_FailedToGetGLTextureId = ENUM_TYPE(111)
+VRTrackedCameraError_SharedTextureFailure = ENUM_TYPE(112)
+VRTrackedCameraError_NoFrameAvailable = ENUM_TYPE(113)
+VRTrackedCameraError_InvalidArgument = ENUM_TYPE(114)
+VRTrackedCameraError_InvalidFrameBufferSize = ENUM_TYPE(115)
+
+EVRTrackedCameraFrameType = ENUM_TYPE
+VRTrackedCameraFrameType_Distorted = ENUM_TYPE(0)
+VRTrackedCameraFrameType_Undistorted = ENUM_TYPE(1)
+VRTrackedCameraFrameType_MaximumUndistorted = ENUM_TYPE(2)
+MAX_CAMERA_FRAME_TYPES = ENUM_TYPE(3)
 
 EVRApplicationError = ENUM_TYPE
 VRApplicationError_None = ENUM_TYPE(0)
@@ -624,6 +671,7 @@ EChaperoneImport_BoundsOnly = ENUM_TYPE(1)
 
 EVRCompositorError = ENUM_TYPE
 VRCompositorError_None = ENUM_TYPE(0)
+VRCompositorError_RequestFailed = ENUM_TYPE(1)
 VRCompositorError_IncompatibleVersion = ENUM_TYPE(100)
 VRCompositorError_DoNotHaveFocus = ENUM_TYPE(101)
 VRCompositorError_InvalidTexture = ENUM_TYPE(102)
@@ -632,6 +680,7 @@ VRCompositorError_TextureIsOnWrongDevice = ENUM_TYPE(104)
 VRCompositorError_TextureUsesUnsupportedFormat = ENUM_TYPE(105)
 VRCompositorError_SharedTexturesNotSupported = ENUM_TYPE(106)
 VRCompositorError_IndexOutOfRange = ENUM_TYPE(107)
+VRCompositorError_ScreenshotAlreadyInProgress = ENUM_TYPE(108)
 
 VROverlayInputMethod = ENUM_TYPE
 VROverlayInputMethod_None = ENUM_TYPE(0)
@@ -654,6 +703,10 @@ VROverlayFlags_SendVRScrollEvents = ENUM_TYPE(6)
 VROverlayFlags_SendVRTouchpadEvents = ENUM_TYPE(7)
 VROverlayFlags_ShowTouchPadScrollWheel = ENUM_TYPE(8)
 VROverlayFlags_TransferOwnershipToInternalProcess = ENUM_TYPE(9)
+VROverlayFlags_SideBySide_Parallel = ENUM_TYPE(10)
+VROverlayFlags_SideBySide_Crossed = ENUM_TYPE(11)
+VROverlayFlags_Panorama = ENUM_TYPE(12)
+VROverlayFlags_StereoPanorama = ENUM_TYPE(13)
 
 EGamepadTextInputMode = ENUM_TYPE
 k_EGamepadTextInputModeNormal = ENUM_TYPE(0)
@@ -679,8 +732,11 @@ VRRenderModelError_InvalidArg = ENUM_TYPE(300)
 VRRenderModelError_InvalidModel = ENUM_TYPE(301)
 VRRenderModelError_NoShapes = ENUM_TYPE(302)
 VRRenderModelError_MultipleShapes = ENUM_TYPE(303)
-VRRenderModelError_TooManyIndices = ENUM_TYPE(304)
+VRRenderModelError_TooManyVertices = ENUM_TYPE(304)
 VRRenderModelError_MultipleTextures = ENUM_TYPE(305)
+VRRenderModelError_BufferTooSmall = ENUM_TYPE(306)
+VRRenderModelError_NotEnoughNormals = ENUM_TYPE(307)
+VRRenderModelError_NotEnoughTexCoords = ENUM_TYPE(308)
 VRRenderModelError_InvalidTexture = ENUM_TYPE(400)
 
 EVRComponentProperty = ENUM_TYPE
@@ -693,6 +749,7 @@ VRComponentProperty_IsScrolled = ENUM_TYPE(16)
 EVRNotificationType = ENUM_TYPE
 Transient = ENUM_TYPE(0)
 Persistent = ENUM_TYPE(1)
+Transient_SystemWithUserValue = ENUM_TYPE(2)
 
 EVRNotificationStyle = ENUM_TYPE
 EVRNotificationStyle_None = ENUM_TYPE(0)
@@ -723,6 +780,7 @@ glInt_t = c_int32
 glUInt_t = c_uint32
 TrackedDeviceIndex_t = c_uint32
 VROverlayHandle_t = c_uint64
+TrackedCameraHandle_t = c_void_p
 VRComponentProperties = c_uint32
 TextureID_t = c_int32
 VRNotificationId = c_uint32
@@ -1089,6 +1147,17 @@ class Compositor_OverlaySettings(Structure):
     ]
 
 
+class CameraVideoStreamFrameHeader_t(Structure):
+    _fields_ = [
+        ("eFrameType", EVRTrackedCameraFrameType),
+        ("nWidth", c_uint32),
+        ("nHeight", c_uint32),
+        ("nBytesPerPixel", c_uint32),
+        ("nFrameSequence", c_uint32),
+        ("standingTrackedDevicePose", TrackedDevicePose_t),
+    ]
+
+
 class AppOverrideKeys_t(Structure):
     _fields_ = [
         ("pchKey", c_char_p),
@@ -1123,6 +1192,31 @@ class Compositor_FrameTiming(Structure):
         ("m_HmdPose", TrackedDevicePose_t),
         ("m_nFidelityLevel", c_int32),
         ("m_nReprojectionFlags", c_uint32),
+    ]
+
+
+class Compositor_CumulativeStats(Structure):
+    """
+    Cumulative stats for current application.  These are not cleared until a new app connects,
+    but they do stop accumulating once the associated app disconnects.
+    """
+
+    _fields_ = [
+        ("m_nPid", c_uint32),
+        ("m_nNumFramePresents", c_uint32),
+        ("m_nNumDroppedFrames", c_uint32),
+        ("m_nNumReprojectedFrames", c_uint32),
+        ("m_nNumFramePresentsOnStartup", c_uint32),
+        ("m_nNumDroppedFramesOnStartup", c_uint32),
+        ("m_nNumReprojectedFramesOnStartup", c_uint32),
+        ("m_nNumLoading", c_uint32),
+        ("m_nNumFramePresentsLoading", c_uint32),
+        ("m_nNumDroppedFramesLoading", c_uint32),
+        ("m_nNumReprojectedFramesLoading", c_uint32),
+        ("m_nNumTimedOut", c_uint32),
+        ("m_nNumFramePresentsTimedOut", c_uint32),
+        ("m_nNumDroppedFramesTimedOut", c_uint32),
+        ("m_nNumReprojectedFramesTimedOut", c_uint32),
     ]
 
 
@@ -1193,10 +1287,10 @@ class NotificationBitmap_t(Structure):
     "Used for passing graphic data"
 
     _fields_ = [
-        ("bytes", c_void_p),
-        ("width", c_int32),
-        ("height", c_int32),
-        ("depth", c_int32),
+        ("m_pImageData", c_void_p),
+        ("m_nWidth", c_int32),
+        ("m_nHeight", c_int32),
+        ("m_nBytesPerPixel", c_int32),
     ]
 
 
@@ -1211,6 +1305,7 @@ class COpenVRContext(Structure):
         ("m_pVRExtendedDisplay", POINTER(c_int)),
         ("m_pVRSettings", POINTER(c_int)),
         ("m_pVRApplications", POINTER(c_int)),
+        ("m_pVRTrackedCamera", POINTER(c_int)),
     ]
 
 
@@ -1825,6 +1920,104 @@ class IVRExtendedDisplay(object):
 
 
 
+class IVRTrackedCamera_FnTable(Structure):
+    _fields_ = [
+        ("getCameraErrorNameFromEnum", OPENVR_FNTABLE_CALLTYPE(c_char_p, EVRTrackedCameraError)),
+        ("hasCamera", OPENVR_FNTABLE_CALLTYPE(EVRTrackedCameraError, TrackedDeviceIndex_t, POINTER(openvr_bool))),
+        ("getCameraFrameSize", OPENVR_FNTABLE_CALLTYPE(EVRTrackedCameraError, TrackedDeviceIndex_t, EVRTrackedCameraFrameType, POINTER(c_uint32), POINTER(c_uint32), POINTER(c_uint32))),
+        ("getCameraIntrinisics", OPENVR_FNTABLE_CALLTYPE(EVRTrackedCameraError, TrackedDeviceIndex_t, EVRTrackedCameraFrameType, POINTER(HmdVector2_t), POINTER(HmdVector2_t))),
+        ("getCameraProjection", OPENVR_FNTABLE_CALLTYPE(EVRTrackedCameraError, TrackedDeviceIndex_t, EVRTrackedCameraFrameType, c_float, c_float, POINTER(HmdMatrix44_t))),
+        ("acquireVideoStreamingService", OPENVR_FNTABLE_CALLTYPE(EVRTrackedCameraError, TrackedDeviceIndex_t, POINTER(TrackedCameraHandle_t))),
+        ("releaseVideoStreamingService", OPENVR_FNTABLE_CALLTYPE(EVRTrackedCameraError, TrackedCameraHandle_t)),
+        ("getVideoStreamFrameBuffer", OPENVR_FNTABLE_CALLTYPE(EVRTrackedCameraError, TrackedCameraHandle_t, EVRTrackedCameraFrameType, c_void_p, c_uint32, POINTER(CameraVideoStreamFrameHeader_t), c_uint32)),
+    ]
+
+
+class IVRTrackedCamera(object):
+    def __init__(self):
+        version_key = IVRTrackedCamera_Version
+        if not isInterfaceVersionValid(version_key):
+            _checkInitError(VRInitError_Init_InterfaceNotFound)
+        # Thank you lukexi https://github.com/lukexi/openvr-hs/blob/master/cbits/openvr_capi_helper.c#L9
+        fn_key = b"FnTable:" + version_key
+        fn_type = IVRTrackedCamera_FnTable
+        fn_table_ptr = cast(getGenericInterface(fn_key), POINTER(fn_type))
+        if fn_table_ptr is None:
+            raise OpenVRError("Error retrieving VR API for IVRTrackedCamera")
+        self.function_table = fn_table_ptr.contents
+
+    def getCameraErrorNameFromEnum(self, eCameraError):
+        "Returns a string for an error"
+
+        fn = self.function_table.getCameraErrorNameFromEnum
+        result = fn(eCameraError)
+        return result
+
+    def hasCamera(self, nDeviceIndex):
+        "For convenience, same as tracked property request Prop_HasCamera_Bool"
+
+        fn = self.function_table.hasCamera
+        pHasCamera = openvr_bool()
+        result = fn(nDeviceIndex, byref(pHasCamera))
+        return result, pHasCamera
+
+    def getCameraFrameSize(self, nDeviceIndex, eFrameType):
+        "Gets size of the image frame."
+
+        fn = self.function_table.getCameraFrameSize
+        pnWidth = c_uint32()
+        pnHeight = c_uint32()
+        pnFrameBufferSize = c_uint32()
+        result = fn(nDeviceIndex, eFrameType, byref(pnWidth), byref(pnHeight), byref(pnFrameBufferSize))
+        return result, pnWidth, pnHeight, pnFrameBufferSize
+
+    def getCameraIntrinisics(self, nDeviceIndex, eFrameType):
+        fn = self.function_table.getCameraIntrinisics
+        pFocalLength = HmdVector2_t()
+        pCenter = HmdVector2_t()
+        result = fn(nDeviceIndex, eFrameType, byref(pFocalLength), byref(pCenter))
+        return result, pFocalLength, pCenter
+
+    def getCameraProjection(self, nDeviceIndex, eFrameType, flZNear, flZFar):
+        fn = self.function_table.getCameraProjection
+        pProjection = HmdMatrix44_t()
+        result = fn(nDeviceIndex, eFrameType, flZNear, flZFar, byref(pProjection))
+        return result, pProjection
+
+    def acquireVideoStreamingService(self, nDeviceIndex):
+        """
+        Acquiring streaming service permits video streaming for the caller. Releasing hints the system that video services do not need to be maintained for this client.
+        If the camera has not already been activated, a one time spin up may incur some auto exposure as well as initial streaming frame delays.
+        The camera should be considered a global resource accessible for shared consumption but not exclusive to any caller.
+        The camera may go inactive due to lack of active consumers or headset idleness.
+        """
+
+        fn = self.function_table.acquireVideoStreamingService
+        pHandle = TrackedCameraHandle_t()
+        result = fn(nDeviceIndex, byref(pHandle))
+        return result, pHandle
+
+    def releaseVideoStreamingService(self, hTrackedCamera):
+        fn = self.function_table.releaseVideoStreamingService
+        result = fn(hTrackedCamera)
+        return result
+
+    def getVideoStreamFrameBuffer(self, hTrackedCamera, eFrameType, pFrameBuffer, nFrameBufferSize, nFrameHeaderSize):
+        """
+        Copies the image frame into a caller's provided buffer. The image data is currently provided as RGBA data, 4 bytes per pixel.
+        A caller can provide null for the framebuffer or frameheader if not desired. Requesting the frame header first, followed by the frame buffer allows
+        the caller to determine if the frame as advanced per the frame header sequence. 
+        If there is no frame available yet, due to initial camera spinup or re-activation, the error will be VRTrackedCameraError_NoFrameAvailable.
+        Ideally a caller should be polling at ~16ms intervals
+        """
+
+        fn = self.function_table.getVideoStreamFrameBuffer
+        pFrameHeader = CameraVideoStreamFrameHeader_t()
+        result = fn(hTrackedCamera, eFrameType, pFrameBuffer, nFrameBufferSize, byref(pFrameHeader), nFrameHeaderSize)
+        return result, pFrameHeader
+
+
+
 class IVRApplications_FnTable(Structure):
     _fields_ = [
         ("addApplicationManifest", OPENVR_FNTABLE_CALLTYPE(EVRApplicationError, c_char_p, openvr_bool)),
@@ -2407,6 +2600,7 @@ class IVRCompositor_FnTable(Structure):
         ("postPresentHandoff", OPENVR_FNTABLE_CALLTYPE(None)),
         ("getFrameTiming", OPENVR_FNTABLE_CALLTYPE(openvr_bool, POINTER(Compositor_FrameTiming), c_uint32)),
         ("getFrameTimeRemaining", OPENVR_FNTABLE_CALLTYPE(c_float)),
+        ("getCumulativeStats", OPENVR_FNTABLE_CALLTYPE(None, POINTER(Compositor_CumulativeStats), c_uint32)),
         ("fadeToColor", OPENVR_FNTABLE_CALLTYPE(None, c_float, c_float, c_float, c_float, c_float, openvr_bool)),
         ("fadeGrid", OPENVR_FNTABLE_CALLTYPE(None, c_float, openvr_bool)),
         ("setSkyboxOverride", OPENVR_FNTABLE_CALLTYPE(EVRCompositorError, POINTER(Texture_t), c_uint32)),
@@ -2426,6 +2620,13 @@ class IVRCompositor_FnTable(Structure):
         ("forceInterleavedReprojectionOn", OPENVR_FNTABLE_CALLTYPE(None, openvr_bool)),
         ("forceReconnectProcess", OPENVR_FNTABLE_CALLTYPE(None)),
         ("suspendRendering", OPENVR_FNTABLE_CALLTYPE(None, openvr_bool)),
+        ("requestScreenshot", OPENVR_FNTABLE_CALLTYPE(EVRCompositorError, EVRScreenshotType, c_char_p, c_char_p)),
+        ("getCurrentScreenshotType", OPENVR_FNTABLE_CALLTYPE(EVRScreenshotType)),
+        ("getMirrorTextureD3D11", OPENVR_FNTABLE_CALLTYPE(EVRCompositorError, EVREye, c_void_p, POINTER(c_void_p))),
+        ("getMirrorTextureGL", OPENVR_FNTABLE_CALLTYPE(EVRCompositorError, EVREye, POINTER(glUInt_t), POINTER(glSharedTextureHandle_t))),
+        ("releaseSharedGLTexture", OPENVR_FNTABLE_CALLTYPE(openvr_bool, glUInt_t, glSharedTextureHandle_t)),
+        ("lockGLSharedTextureForAccess", OPENVR_FNTABLE_CALLTYPE(None, glSharedTextureHandle_t)),
+        ("unlockGLSharedTextureForAccess", OPENVR_FNTABLE_CALLTYPE(None, glSharedTextureHandle_t)),
     ]
 
 
@@ -2543,6 +2744,14 @@ class IVRCompositor(object):
         fn = self.function_table.getFrameTimeRemaining
         result = fn()
         return result
+
+    def getCumulativeStats(self, nStatsSizeInBytes):
+        "Fills out stats accumulated for the last connected application.  Pass in sizeof( Compositor_CumulativeStats ) as second parameter."
+
+        fn = self.function_table.getCumulativeStats
+        pStats = Compositor_CumulativeStats()
+        result = fn(byref(pStats), nStatsSizeInBytes)
+        return pStats
 
     def fadeToColor(self, fSeconds, fRed, fGreen, fBlue, fAlpha, bBackground):
         """
@@ -2683,6 +2892,63 @@ class IVRCompositor(object):
         fn = self.function_table.suspendRendering
         result = fn(bSuspend)
 
+    def requestScreenshot(self, type, pchDestinationFileName, pchVRDestinationFileName):
+        """
+        Request a screenshot of the requested type, application
+         will get an event that the screen shot has started.  The
+         application should turn off any stenciling and max out
+         quality for the next frames and include the Screenshot flag
+         when calling Submit so that the compositor knows the
+         screenshot.  The application should keep the higher qualtity
+         and submitted with the ScreenShot flag until gets a
+         screenshot End event.  It can take several frames for a
+         cubemap to be capture for example. The first file is a
+         boring 2D view used for preview, the second is the actual
+         capture of the requested type.  They are the same for
+         VRScreenshotType_Mono
+        """
+
+        fn = self.function_table.requestScreenshot
+        result = fn(type, pchDestinationFileName, pchVRDestinationFileName)
+        return result
+
+    def getCurrentScreenshotType(self):
+        "Returns the current screenshot type if a screenshot is currently being captured"
+
+        fn = self.function_table.getCurrentScreenshotType
+        result = fn()
+        return result
+
+    def getMirrorTextureD3D11(self, eEye, pD3D11DeviceOrResource):
+        "Opens a shared D3D11 texture with the undistorted composited image for each eye."
+
+        fn = self.function_table.getMirrorTextureD3D11
+        ppD3D11ShaderResourceView = c_void_p()
+        result = fn(eEye, pD3D11DeviceOrResource, byref(ppD3D11ShaderResourceView))
+        return result, ppD3D11ShaderResourceView
+
+    def getMirrorTextureGL(self, eEye):
+        "Access to mirror textures from OpenGL."
+
+        fn = self.function_table.getMirrorTextureGL
+        pglTextureId = glUInt_t()
+        pglSharedTextureHandle = glSharedTextureHandle_t()
+        result = fn(eEye, byref(pglTextureId), byref(pglSharedTextureHandle))
+        return result, pglTextureId, pglSharedTextureHandle
+
+    def releaseSharedGLTexture(self, glTextureId, glSharedTextureHandle):
+        fn = self.function_table.releaseSharedGLTexture
+        result = fn(glTextureId, glSharedTextureHandle)
+        return result
+
+    def lockGLSharedTextureForAccess(self, glSharedTextureHandle):
+        fn = self.function_table.lockGLSharedTextureForAccess
+        result = fn(glSharedTextureHandle)
+
+    def unlockGLSharedTextureForAccess(self, glSharedTextureHandle):
+        fn = self.function_table.unlockGLSharedTextureForAccess
+        result = fn(glSharedTextureHandle)
+
 
 
 class IVROverlay_FnTable(Structure):
@@ -2741,6 +3007,7 @@ class IVROverlay_FnTable(Structure):
         ("setOverlayFromFile", OPENVR_FNTABLE_CALLTYPE(EVROverlayError, VROverlayHandle_t, c_char_p)),
         ("getOverlayTexture", OPENVR_FNTABLE_CALLTYPE(EVROverlayError, VROverlayHandle_t, POINTER(c_void_p), c_void_p, POINTER(c_uint32), POINTER(c_uint32), POINTER(c_uint32), POINTER(EGraphicsAPIConvention), POINTER(EColorSpace))),
         ("releaseNativeOverlayHandle", OPENVR_FNTABLE_CALLTYPE(EVROverlayError, VROverlayHandle_t, c_void_p)),
+        ("getOverlayTextureSize", OPENVR_FNTABLE_CALLTYPE(EVROverlayError, VROverlayHandle_t, POINTER(c_uint32), POINTER(c_uint32))),
         ("createDashboardOverlay", OPENVR_FNTABLE_CALLTYPE(EVROverlayError, c_char_p, c_char_p, POINTER(VROverlayHandle_t), POINTER(VROverlayHandle_t))),
         ("isDashboardVisible", OPENVR_FNTABLE_CALLTYPE(openvr_bool)),
         ("isActiveDashboardOverlay", OPENVR_FNTABLE_CALLTYPE(openvr_bool, VROverlayHandle_t)),
@@ -3273,6 +3540,15 @@ class IVROverlay(object):
         result = fn(ulOverlayHandle, pNativeTextureHandle)
         return result
 
+    def getOverlayTextureSize(self, ulOverlayHandle):
+        "Get the size of the overlay texture"
+
+        fn = self.function_table.getOverlayTextureSize
+        pWidth = c_uint32()
+        pHeight = c_uint32()
+        result = fn(ulOverlayHandle, byref(pWidth), byref(pHeight))
+        return result, pWidth, pHeight
+
     def createDashboardOverlay(self, pchOverlayKey, pchOverlayFriendlyName):
         "Creates a dashboard overlay and returns its handle"
 
@@ -3382,6 +3658,9 @@ class IVRRenderModels_FnTable(Structure):
         ("getComponentRenderModelName", OPENVR_FNTABLE_CALLTYPE(c_uint32, c_char_p, c_char_p, c_char_p, c_uint32)),
         ("getComponentState", OPENVR_FNTABLE_CALLTYPE(openvr_bool, c_char_p, c_char_p, POINTER(VRControllerState_t), POINTER(RenderModel_ControllerMode_State_t), POINTER(RenderModel_ComponentState_t))),
         ("renderModelHasComponent", OPENVR_FNTABLE_CALLTYPE(openvr_bool, c_char_p, c_char_p)),
+        ("getRenderModelThumbnailURL", OPENVR_FNTABLE_CALLTYPE(c_uint32, c_char_p, c_char_p, c_uint32, POINTER(EVRRenderModelError))),
+        ("getRenderModelOriginalPath", OPENVR_FNTABLE_CALLTYPE(c_uint32, c_char_p, c_char_p, c_uint32, POINTER(EVRRenderModelError))),
+        ("getRenderModelErrorNameFromEnum", OPENVR_FNTABLE_CALLTYPE(c_char_p, EVRRenderModelError)),
     ]
 
 
@@ -3554,6 +3833,33 @@ class IVRRenderModels(object):
 
         fn = self.function_table.renderModelHasComponent
         result = fn(pchRenderModelName, pchComponentName)
+        return result
+
+    def getRenderModelThumbnailURL(self, pchRenderModelName, pchThumbnailURL, unThumbnailURLLen):
+        "Returns the URL of the thumbnail image for this rendermodel"
+
+        fn = self.function_table.getRenderModelThumbnailURL
+        peError = EVRRenderModelError()
+        result = fn(pchRenderModelName, pchThumbnailURL, unThumbnailURLLen, byref(peError))
+        return result, peError
+
+    def getRenderModelOriginalPath(self, pchRenderModelName, pchOriginalPath, unOriginalPathLen):
+        """
+        Provides a render model path that will load the unskinned model if the model name provided has been replace by the user. If the model
+        hasn't been replaced the path value will still be a valid path to load the model. Pass this to LoadRenderModel_Async, etc. to load the
+        model.
+        """
+
+        fn = self.function_table.getRenderModelOriginalPath
+        peError = EVRRenderModelError()
+        result = fn(pchRenderModelName, pchOriginalPath, unOriginalPathLen, byref(peError))
+        return result, peError
+
+    def getRenderModelErrorNameFromEnum(self, error):
+        "Returns a string for a render model error"
+
+        fn = self.function_table.getRenderModelErrorNameFromEnum
+        result = fn(error)
         return result
 
 
