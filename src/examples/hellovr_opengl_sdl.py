@@ -1,18 +1,30 @@
+#!/bin/env python
 
+# file: hello_vr_opengl_sdl.py
+#
+# OpenVR example application
+# Manually translated from OpenVR C++ example file hellovr_opengl_main.cpp
+# by Christopher Bruns
+
+import sys
 import time
-import ctypes
 from textwrap import dedent
+from OpenGL.GL import *
 
 from sdl2 import *
 import openvr
 
 
+class Matrix4(object):
+    pass
+
+
 def threadSleep( nMilliseconds ):
-	seconds = nMilliseconds / 1000.0
-	time.sleep(seconds)
+    seconds = nMilliseconds / 1000.0
+    time.sleep(seconds)
 
 
-class CGLRenderModel:
+class CGLRenderModel(object):
     def __init__(self, sRenderModelName):
         self.m_sModelName = sRenderModelName
         self.m_glIndexBuffer = 0
@@ -39,11 +51,11 @@ class CGLRenderModel:
         glBufferData( GL_ARRAY_BUFFER, sizeof( openvr.RenderModel_Vertex_t ) * vrModel.unVertexCount, vrModel.rVertexData, GL_STATIC_DRAW )
         # Identify the components in the vertex buffer
         glEnableVertexAttribArray( 0 )
-        glVertexAttribPointer( 0, 3, GL_FLOAT, GL_FALSE, sizeof( openvr.RenderModel_Vertex_t ), offsetof( openvr.RenderModel_Vertex_t, vPosition ) )
+        glVertexAttribPointer( 0, 3, GL_FLOAT, False, sizeof( openvr.RenderModel_Vertex_t ), offsetof( openvr.RenderModel_Vertex_t, vPosition ) )
         glEnableVertexAttribArray( 1 )
-        glVertexAttribPointer( 1, 3, GL_FLOAT, GL_FALSE, sizeof( openvr.RenderModel_Vertex_t ), offsetof( openvr.RenderModel_Vertex_t, vNormal ) )
+        glVertexAttribPointer( 1, 3, GL_FLOAT, False, sizeof( openvr.RenderModel_Vertex_t ), offsetof( openvr.RenderModel_Vertex_t, vNormal ) )
         glEnableVertexAttribArray( 2 )
-        glVertexAttribPointer( 2, 2, GL_FLOAT, GL_FALSE, sizeof( openvr.RenderModel_Vertex_t ), offsetof( openvr.RenderModel_Vertex_t, rfTextureCoord ) )
+        glVertexAttribPointer( 2, 2, GL_FLOAT, False, sizeof( openvr.RenderModel_Vertex_t ), offsetof( openvr.RenderModel_Vertex_t, rfTextureCoord ) )
         # Create and populate the index buffer
         glGenBuffers( 1, self.m_glIndexBuffer )
         glBindBuffer( GL_ELEMENT_ARRAY_BUFFER, self.m_glIndexBuffer )
@@ -91,7 +103,7 @@ class CGLRenderModel:
 g_bPrintf = True
 
 
-class CMainApplication:
+class CMainApplication(object):
     def __init__(self, argv):
         self.m_pWindow = None
         self.m_pContext = None
@@ -156,21 +168,22 @@ class CMainApplication:
     
     def bInit(self):
         if SDL_Init( SDL_INIT_VIDEO | SDL_INIT_TIMER ) < 0:
-            printf("%s - SDL could not initialize! SDL Error: %s\n", __FUNCTION__, SDL_GetError())
+            print("%s - SDL could not initialize! SDL Error: %s\n" % ("CMainApplication.bInit()", SDL_GetError()))
             return False
         # Loading the SteamVR Runtime
         try:
             openvr.init(openvr.VRApplication_Scene)
-        except:
+        except openvr.OpenVRError as eError:
             self.m_pHMD = None
-            msg = "Unable to init VR runtime: %s" % openvr.VR_GetVRInitErrorAsEnglishDescription( eError )
+            msg = "Unable to init VR runtime: %s" % str(eError)
             SDL_ShowSimpleMessageBox( SDL_MESSAGEBOX_ERROR, "VR_Init Failed", msg, None )
             return False
-        self.m_pRenderModels = openvr.VR_GetGenericInterface( openvr.IVRRenderModels_Version, eError )
-        if self.m_pRenderModels is None:
+        try:
+            self.m_pRenderModels = openvr.getGenericInterface(openvr.IVRRenderModels_Version)
+        except openvr.OpenVRError as eError:
             self.m_pHMD = None
             openvr.shutdown()
-            msg = "Unable to get render model interface: %s" % openvr.VR_GetVRInitErrorAsEnglishDescription( eError )
+            msg = "Unable to get render model interface: %s" % str(eError)
             SDL_ShowSimpleMessageBox( SDL_MESSAGEBOX_ERROR, "VR_Init Failed", msg, None )
             return False
         nWindowPosX = 700
@@ -194,11 +207,6 @@ class CMainApplication:
         if self.m_pContext is None:
             printf( "%s - OpenGL context could not be created! SDL Error: %s\n", __FUNCTION__, SDL_GetError() )
             return False
-        glewExperimental = GL_TRUE
-        nGlewError = glewInit()
-        if nGlewError != GLEW_OK:
-            printf( "%s - Error initializing GLEW! %s\n", __FUNCTION__, glewGetErrorString( nGlewError ) )
-            return False
         glGetError() # to clear the error caused deep in GLEW
         swap_interval = 1 if self.m_bVblank else 0
         if SDL_GL_SetSwapInterval( swap_interval ) < 0:
@@ -206,8 +214,8 @@ class CMainApplication:
             return False
         self.m_strDriver = "No Driver"
         self.m_strDisplay = "No Display"
-        self.m_strDriver = GetTrackedDeviceString( self.m_pHMD, openvr.k_unTrackedDeviceIndex_Hmd, openvr.Prop_TrackingSystemName_String )
-        self.m_strDisplay = GetTrackedDeviceString( self.m_pHMD, openvr.k_unTrackedDeviceIndex_Hmd, openvr.Prop_SerialNumber_String )
+        self.m_strDriver = getTrackedDeviceString( self.m_pHMD, openvr.k_unTrackedDeviceIndex_Hmd, openvr.Prop_TrackingSystemName_String )
+        self.m_strDisplay = getTrackedDeviceString( self.m_pHMD, openvr.k_unTrackedDeviceIndex_Hmd, openvr.Prop_SerialNumber_String )
         strWindowTitle = "hellovr_sdl - " + self.m_strDriver + " " + self.m_strDisplay
         SDL_SetWindowTitle( self.m_pWindow, strWindowTitle )
         # cube array
@@ -222,10 +230,10 @@ class CMainApplication:
         self.m_uiVertcount = 0
         #     self.m_MillisecondsTimer.start(1, this)
         #     self.m_SecondsTimer.start(1000, this)
-        if not BInitGL():
+        if not self.bInitGL():
             printf("%s - Unable to initialize OpenGL!\n", __FUNCTION__)
             return False
-        if not BInitCompositor():
+        if not self.bInitCompositor():
             printf("%s - Failed to initialize VR Compositor!\n", __FUNCTION__)
             return False
         return True
@@ -233,7 +241,7 @@ class CMainApplication:
     def bInitGL(self):
         if self.m_bDebugOpenGL:
             glDebugMessageCallback( DebugCallback, None)
-            glDebugMessageControl( GL_DONT_CARE, GL_DONT_CARE, GL_DONT_CARE, 0, None, GL_TRUE )
+            glDebugMessageControl( GL_DONT_CARE, GL_DONT_CARE, GL_DONT_CARE, 0, None, True )
             glEnable(GL_DEBUG_OUTPUT_SYNCHRONOUS)
         if not self.createAllShaders():
             return False
@@ -269,7 +277,7 @@ class CMainApplication:
             self.m_pHMD = None       
         self.m_vecRenderModels = list()
         if self.m_pContext is not None:
-            glDebugMessageControl( GL_DONT_CARE, GL_DONT_CARE, GL_DONT_CARE, 0, None, GL_FALSE )
+            glDebugMessageControl( GL_DONT_CARE, GL_DONT_CARE, GL_DONT_CARE, 0, None, False )
             glDebugMessageCallback(None, None)
             glDeleteBuffers(1, self.m_glSceneVertBuffer)
             glDeleteBuffers(1, self.m_glIDVertBuffer)
@@ -430,10 +438,10 @@ class CMainApplication:
         stride = sizeof(VertexDataScene)
         offset = 0
         glEnableVertexAttribArray( 0 )
-        glVertexAttribPointer( 0, 3, GL_FLOAT, GL_FALSE, stride , offset)
+        glVertexAttribPointer( 0, 3, GL_FLOAT, False, stride , offset)
         offset += sizeof(Vector3)
         glEnableVertexAttribArray( 1 )
-        glVertexAttribPointer( 1, 2, GL_FLOAT, GL_FALSE, stride, offset)
+        glVertexAttribPointer( 1, 2, GL_FLOAT, False, stride, offset)
         glBindVertexArray( 0 )
         glDisableVertexAttribArray(0)
         glDisableVertexAttribArray(1)
@@ -558,10 +566,10 @@ class CMainApplication:
             stride = 2 * 3 * sizeof( float )
             offset = 0
             glEnableVertexAttribArray( 0 )
-            glVertexAttribPointer( 0, 3, GL_FLOAT, GL_FALSE, stride, offset)
+            glVertexAttribPointer( 0, 3, GL_FLOAT, False, stride, offset)
             offset += sizeof( Vector3 )
             glEnableVertexAttribArray( 1 )
-            glVertexAttribPointer( 1, 3, GL_FLOAT, GL_FALSE, stride, offset)
+            glVertexAttribPointer( 1, 3, GL_FLOAT, False, stride, offset)
             glBindVertexArray( 0 )
         glBindBuffer( GL_ARRAY_BUFFER, self.m_glControllerVertBuffer )
         # set vertex data if we have some
@@ -648,13 +656,13 @@ class CMainApplication:
         glBindBuffer( GL_ELEMENT_ARRAY_BUFFER, self.m_glIDIndexBuffer )
         glBufferData( GL_ELEMENT_ARRAY_BUFFER, vIndices.size()*sizeof(GLushort), vIndices[0], GL_STATIC_DRAW )
         glEnableVertexAttribArray( 0 )
-        glVertexAttribPointer(0, 2, GL_FLOAT, GL_FALSE, sizeof(VertexDataLens), offsetof( VertexDataLens, position ) )
+        glVertexAttribPointer(0, 2, GL_FLOAT, False, sizeof(VertexDataLens), offsetof( VertexDataLens, position ) )
         glEnableVertexAttribArray( 1 )
-        glVertexAttribPointer(1, 2, GL_FLOAT, GL_FALSE, sizeof(VertexDataLens), offsetof( VertexDataLens, texCoordRed ) )
+        glVertexAttribPointer(1, 2, GL_FLOAT, False, sizeof(VertexDataLens), offsetof( VertexDataLens, texCoordRed ) )
         glEnableVertexAttribArray(2)
-        glVertexAttribPointer(2, 2, GL_FLOAT, GL_FALSE, sizeof(VertexDataLens), offsetof( VertexDataLens, texCoordGreen ) )
+        glVertexAttribPointer(2, 2, GL_FLOAT, False, sizeof(VertexDataLens), offsetof( VertexDataLens, texCoordGreen ) )
         glEnableVertexAttribArray(3)
-        glVertexAttribPointer(3, 2, GL_FLOAT, GL_FALSE, sizeof(VertexDataLens), offsetof( VertexDataLens, texCoordBlue ) )
+        glVertexAttribPointer(3, 2, GL_FLOAT, False, sizeof(VertexDataLens), offsetof( VertexDataLens, texCoordBlue ) )
         glBindVertexArray( 0 )
         glDisableVertexAttribArray(0)
         glDisableVertexAttribArray(1)
@@ -727,7 +735,7 @@ class CMainApplication:
         glEnable(GL_DEPTH_TEST)
         if self.m_bShowCubes:
             glUseProgram( self.m_unSceneProgramID )
-            glUniformMatrix4fv( self.m_nSceneMatrixLocation, 1, GL_FALSE, GetCurrentViewProjectionMatrix( nEye ).get() )
+            glUniformMatrix4fv( self.m_nSceneMatrixLocation, 1, False, GetCurrentViewProjectionMatrix( nEye ).get() )
             glBindVertexArray( self.m_unSceneVAO )
             glBindTexture( GL_TEXTURE_2D, self.m_iTexture )
             glDrawArrays( GL_TRIANGLES, 0, self.m_uiVertcount )
@@ -736,7 +744,7 @@ class CMainApplication:
         if not bIsInputCapturedByAnotherProcess:
             # draw the controller axis lines
             glUseProgram( self.m_unControllerTransformProgramID )
-            glUniformMatrix4fv( self.m_nControllerMatrixLocation, 1, GL_FALSE, GetCurrentViewProjectionMatrix( nEye ).get() )
+            glUniformMatrix4fv( self.m_nControllerMatrixLocation, 1, False, GetCurrentViewProjectionMatrix( nEye ).get() )
             glBindVertexArray( self.m_unControllerVAO )
             glDrawArrays( GL_LINES, 0, self.m_uiControllerVertcount )
             glBindVertexArray( 0 )
@@ -752,7 +760,7 @@ class CMainApplication:
                 continue
             matDeviceToTracking = self.m_rmat4DevicePose[ unTrackedDevice ]
             matMVP = GetCurrentViewProjectionMatrix( nEye ) * matDeviceToTracking
-            glUniformMatrix4fv( self.m_nRenderModelMatrixLocation, 1, GL_FALSE, matMVP.get() )
+            glUniformMatrix4fv( self.m_nRenderModelMatrixLocation, 1, False, matMVP.get() )
             self.m_rTrackedDeviceToRenderModel[ unTrackedDevice ].Draw()
         glUseProgram( 0 )
 
@@ -822,7 +830,7 @@ class CMainApplication:
         matPose.m[0][1], matPose.m[1][1], matPose.m[2][1], 0.0,
         matPose.m[0][2], matPose.m[1][2], matPose.m[2][2], 0.0,
         matPose.m[0][3], matPose.m[1][3], matPose.m[2][3], 1.0)
-    return matrixObj
+        return matrixObj
 
 
     def compileGLShader(self, pchShaderName, pchVertexShader, pchFragmentShader):
@@ -832,11 +840,10 @@ class CMainApplication:
         """
         unProgramID = glCreateProgram()
         nSceneVertexShader = glCreateShader(GL_VERTEX_SHADER)
-        glShaderSource( nSceneVertexShader, 1, pchVertexShader, None)
+        glShaderSource( nSceneVertexShader, pchVertexShader)
         glCompileShader( nSceneVertexShader )
-        vShaderCompiled = GL_FALSE
-        glGetShaderiv( nSceneVertexShader, GL_COMPILE_STATUS, vShaderCompiled)
-        if vShaderCompiled != GL_TRUE:
+        vShaderCompiled = glGetShaderiv( nSceneVertexShader, GL_COMPILE_STATUS)
+        if not vShaderCompiled:
             dprintf("%s - Unable to compile vertex shader %d!\n", pchShaderName, nSceneVertexShader)
             glDeleteProgram( unProgramID )
             glDeleteShader( nSceneVertexShader )
@@ -844,11 +851,10 @@ class CMainApplication:
         glAttachShader( unProgramID, nSceneVertexShader)
         glDeleteShader( nSceneVertexShader ) # the program hangs onto this once it's attached
         nSceneFragmentShader = glCreateShader(GL_FRAGMENT_SHADER)
-        glShaderSource( nSceneFragmentShader, 1, pchFragmentShader, None)
+        glShaderSource( nSceneFragmentShader, pchFragmentShader)
         glCompileShader( nSceneFragmentShader )
-        fShaderCompiled = GL_FALSE
-        glGetShaderiv( nSceneFragmentShader, GL_COMPILE_STATUS, fShaderCompiled)
-        if fShaderCompiled != GL_TRUE:
+        fShaderCompiled = glGetShaderiv( nSceneFragmentShader, GL_COMPILE_STATUS)
+        if not fShaderCompiled:
             dprintf("%s - Unable to compile fragment shader %d!\n", pchShaderName, nSceneFragmentShader )
             glDeleteProgram( unProgramID )
             glDeleteShader( nSceneFragmentShader )
@@ -856,9 +862,8 @@ class CMainApplication:
         glAttachShader( unProgramID, nSceneFragmentShader )
         glDeleteShader( nSceneFragmentShader ) # the program hangs onto this once it's attached
         glLinkProgram( unProgramID )
-        programSuccess = GL_TRUE
-        glGetProgramiv( unProgramID, GL_LINK_STATUS, programSuccess)
-        if programSuccess != GL_TRUE:
+        programSuccess = glGetProgramiv( unProgramID, GL_LINK_STATUS)
+        if programSuccess != True:
             dprintf("%s - Error linking program %d!\n", pchShaderName, unProgramID)
             glDeleteProgram( unProgramID )
             return 0
@@ -868,7 +873,7 @@ class CMainApplication:
 
     def createAllShaders(self):
         "Purpose: Creates all the shaders used by HelloVR SDL"
-        self.m_unSceneProgramID = CompileGLShader( 
+        self.m_unSceneProgramID = self.compileGLShader( 
             "Scene",
             # Vertex Shader
             dedent("""\
@@ -900,7 +905,7 @@ class CMainApplication:
         if self.m_nSceneMatrixLocation == -1:
             dprintf( "Unable to find matrix uniform in scene shader\n" )
             return False
-        self.m_unControllerTransformProgramID = CompileGLShader(
+        self.m_unControllerTransformProgramID = self.compileGLShader(
             "Controller",
             # vertex shader
             dedent("""\
@@ -929,7 +934,7 @@ class CMainApplication:
         if self.m_nControllerMatrixLocation == -1:
             dprintf( "Unable to find matrix uniform in controller shader\n" )
             return False
-        self.m_unRenderModelProgramID = CompileGLShader( 
+        self.m_unRenderModelProgramID = self.compileGLShader( 
             "render model",
             # vertex shader
             dedent("""\
@@ -960,7 +965,7 @@ class CMainApplication:
         if self.m_nRenderModelMatrixLocation == -1:
             dprintf( "Unable to find matrix uniform in render model shader\n" )
             return False
-        self.m_unLensProgramID = CompileGLShader(
+        self.m_unLensProgramID = self.compileGLShader(
             "Distortion",
             # vertex shader
             dedent("""\
@@ -1012,10 +1017,10 @@ class CMainApplication:
         if unTrackedDeviceIndex >= openvr.k_unMaxTrackedDeviceCount:
             return
         # try to find a model we've already set up
-        sRenderModelName = GetTrackedDeviceString( self.m_pHMD, unTrackedDeviceIndex, openvr.Prop_RenderModelName_String )
+        sRenderModelName = getTrackedDeviceString( self.m_pHMD, unTrackedDeviceIndex, openvr.Prop_RenderModelName_String )
         pRenderModel = FindOrLoadRenderModel( sRenderModelName.c_str() )
         if pRenderModel is None:        
-            sTrackingSystemName = GetTrackedDeviceString( self.m_pHMD, unTrackedDeviceIndex, openvr.Prop_TrackingSystemName_String )
+            sTrackingSystemName = getTrackedDeviceString( self.m_pHMD, unTrackedDeviceIndex, openvr.Prop_TrackingSystemName_String )
             dprintf( "Unable to load render model for tracked device %d (%s.%s)", unTrackedDeviceIndex, sTrackingSystemName.c_str(), sRenderModelName.c_str() )
         else:
             self.m_rTrackedDeviceToRenderModel[ unTrackedDeviceIndex ] = pRenderModel
@@ -1061,295 +1066,86 @@ class CMainApplication:
             openvr.VRRenderModels().FreeTexture( pTexture )
         return pRenderModel
 
-    # SDL bookkeeping
-    SDL_Window self.m_pWindow
-    uint32_t self.m_nWindowWidth
-    uint32_t self.m_nWindowHeight
-
-    SDL_GLContext self.m_pContext
-
-    # OpenGL bookkeeping
-    int self.m_iTrackedControllerCount
-    int self.m_iTrackedControllerCount_Last
-    int self.m_iValidPoseCount
-    int self.m_iValidPoseCount_Last
-    bool self.m_bShowCubes
-
-    std.string self.m_strPoseClasses                            # what classes we saw poses for this frame
-    char self.m_rDevClassChar[ openvr.k_unMaxTrackedDeviceCount ]   # for each device, a character representing its class
-
-    int self.m_iSceneVolumeWidth
-    int self.m_iSceneVolumeHeight
-    int self.m_iSceneVolumeDepth
-    float self.m_fScaleSpacing
-    float self.m_fScale
+    class VertexDataScene(object):
+        def __init__(self, position, texCoord):
+            self.position = position
+            self.texCoord = texCoord
     
-    int self.m_iSceneVolumeInit                                  # if you want something other than the default 20x20x20
+    class VertexDataLens(object):
+        def __init__(self, position, texCoordRed, texCoordGreen, texCoordBlue):
+            self.position = position
+            self.texCoordRed = texCoordRed
+            self.texCoordGreen = texCoordGreen
+            self.texCoordBlue = texCoordBlue
+
+    class FramebufferDesc(object):
+        def __init__(self, depthBufferId, renderTextureId, renderFramebufferId, resolveTextureId, resolveFramebufferId):
+            self.m_nDepthBufferId = depthBufferId
+            self.m_nRenderTextureId = renderTextureId
+            self.m_nRenderFramebufferId = renderFramebufferId
+            self.m_nResolveTextureId = resolveTextureId
+            self.m_nResolveFramebufferId = resolveFramebufferId
     
-    float self.m_fNearClip
-    float self.m_fFarClip
-
-    GLuint self.m_iTexture
-
-    unsigned int self.m_uiVertcount
-
-    GLuint self.m_glSceneVertBuffer
-    GLuint self.m_unSceneVAO
-    GLuint self.m_unLensVAO
-    GLuint self.m_glIDVertBuffer
-    GLuint self.m_glIDIndexBuffer
-    unsigned int self.m_uiIndexSize
-
-    GLuint self.m_glControllerVertBuffer
-    GLuint self.m_unControllerVAO
-    unsigned int self.m_uiControllerVertcount
-
-    Matrix4 self.m_mat4HMDPose
-    Matrix4 self.m_mat4eyePosLeft
-    Matrix4 self.m_mat4eyePosRight
-
-    Matrix4 self.m_mat4ProjectionCenter
-    Matrix4 self.m_mat4ProjectionLeft
-    Matrix4 self.m_mat4ProjectionRight
-
-    struct VertexDataScene
-    
-        Vector3 position
-        Vector2 texCoord
-    
-
-    struct VertexDataLens
-    
-        Vector2 position
-        Vector2 texCoordRed
-        Vector2 texCoordGreen
-        Vector2 texCoordBlue
-    
-
-    GLuint self.m_unSceneProgramID
-    GLuint self.m_unLensProgramID
-    GLuint self.m_unControllerTransformProgramID
-    GLuint self.m_unRenderModelProgramID
-
-    GLint self.m_nSceneMatrixLocation
-    GLint self.m_nControllerMatrixLocation
-    GLint self.m_nRenderModelMatrixLocation
-
-    struct FramebufferDesc
-    
-        GLuint self.m_nDepthBufferId
-        GLuint self.m_nRenderTextureId
-        GLuint self.m_nRenderFramebufferId
-        GLuint self.m_nResolveTextureId
-        GLuint self.m_nResolveFramebufferId
-    
-    FramebufferDesc leftEyeDesc
-    FramebufferDesc rightEyeDesc
-
-    bool CreateFrameBuffer( int nWidth, int nHeight, FramebufferDesc framebufferDesc )
-    
-    uint32_t self.m_nRenderWidth
-    uint32_t self.m_nRenderHeight
-
-    std.vector< CGLRenderModel * > self.m_vecRenderModels
-    CGLRenderModel self.m_rTrackedDeviceToRenderModel[ openvr.k_unMaxTrackedDeviceCount ]
+    def createFrameBuffer(self, nWidth, nHeight, framebufferDesc):
+        glGenFramebuffers(1, framebufferDesc.m_nRenderFramebufferId )
+        glBindFramebuffer(GL_FRAMEBUFFER, framebufferDesc.m_nRenderFramebufferId)
+        glGenRenderbuffers(1, framebufferDesc.m_nDepthBufferId)
+        glBindRenderbuffer(GL_RENDERBUFFER, framebufferDesc.m_nDepthBufferId)
+        glRenderbufferStorageMultisample(GL_RENDERBUFFER, 4, GL_DEPTH_COMPONENT, nWidth, nHeight )
+        glFramebufferRenderbuffer(GL_FRAMEBUFFER, GL_DEPTH_ATTACHMENT, GL_RENDERBUFFER,    framebufferDesc.m_nDepthBufferId )
+        glGenTextures(1, framebufferDesc.m_nRenderTextureId )
+        glBindTexture(GL_TEXTURE_2D_MULTISAMPLE, framebufferDesc.m_nRenderTextureId )
+        glTexImage2DMultisample(GL_TEXTURE_2D_MULTISAMPLE, 4, GL_RGBA8, nWidth, nHeight, True)
+        glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_TEXTURE_2D_MULTISAMPLE, framebufferDesc.m_nRenderTextureId, 0)
+        glGenFramebuffers(1, framebufferDesc.m_nResolveFramebufferId )
+        glBindFramebuffer(GL_FRAMEBUFFER, framebufferDesc.m_nResolveFramebufferId)
+        glGenTextures(1, framebufferDesc.m_nResolveTextureId )
+        glBindTexture(GL_TEXTURE_2D, framebufferDesc.m_nResolveTextureId )
+        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR)
+        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAX_LEVEL, 0)
+        glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA8, nWidth, nHeight, 0, GL_RGBA, GL_UNSIGNED_BYTE, None)
+        glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_TEXTURE_2D, framebufferDesc.m_nResolveTextureId, 0)
+        # check FBO status
+        status = glCheckFramebufferStatus(GL_FRAMEBUFFER)
+        if status != GL_FRAMEBUFFER_COMPLETE:
+            return False
+        glBindFramebuffer( GL_FRAMEBUFFER, 0 )
+        return True
 
 
-#-----------------------------------------------------------------------------
-# Purpose:
-#-----------------------------------------------------------------------------
-void dprintf( const char fmt, ... )
-
-    va_list args
-    char buffer[ 2048 ]
-
-    va_start( args, fmt )
-    vsprintf_s( buffer, fmt, args )
-    va_end( args )
-
-    if ( g_bPrintf )
-        printf( "%s", buffer )
-
-    OutputDebugStringA( buffer )
+def dprintf( fmt, *args ):
+    buffer = fmt % (args)
+    if g_bPrintf:
+        print( "%s" % buffer )
+    # OutputDebugStringA( buffer )
 
 
-#-----------------------------------------------------------------------------
-# Purpose: Helper to get a string from a tracked device property and turn it
-#            into a std.string
-#-----------------------------------------------------------------------------
-std.string GetTrackedDeviceString( openvr.IVRSystem pHmd, openvr.TrackedDeviceIndex_t unDevice, openvr.TrackedDeviceProperty prop, openvr.TrackedPropertyError peError = None )
-
-    uint32_t unRequiredBufferLen = pHmd.GetStringTrackedDeviceProperty( unDevice, prop, None, 0, peError )
-    if( unRequiredBufferLen == 0 )
+def getTrackedDeviceString( pHmd, unDevice, prop, peError = None ):
+    """
+    Purpose: Helper to get a string from a tracked device property and turn it
+    into a std.string
+    """
+    if pHmd is None:
         return ""
-
-    char pchBuffer = char[ unRequiredBufferLen ]
-    unRequiredBufferLen = pHmd.GetStringTrackedDeviceProperty( unDevice, prop, pchBuffer, unRequiredBufferLen, peError )
-    std.string sResult = pchBuffer
-    delete [] pchBuffer
+    unRequiredBufferLen = pHmd.getStringTrackedDeviceProperty( unDevice, prop, None, 0, peError )
+    if unRequiredBufferLen == 0:
+        return ""
+    pchBuffer = ctypes.c_char * unRequiredBufferLen
+    unRequiredBufferLen = pHmd.getStringTrackedDeviceProperty( unDevice, prop, pchBuffer, unRequiredBufferLen, peError )
+    sResult = pchBuffer
+    # delete [] pchBuffer
     return sResult
 
 
-def debugCallback(source, type, id, severity, length, message, userParam)
+def debugCallback(source, type, id, severity, length, message, userParam):
     dprintf( "GL Error: %s\n", message )
 
 
-#-----------------------------------------------------------------------------
-# Purpose: Draw all of the controllers as X/Y/Z lines
-#-----------------------------------------------------------------------------
-void CMainApplication.DrawControllers()
-
-    # don't draw controllers if somebody else has input focus
-    if( self.m_pHMD.IsInputFocusCapturedByAnotherProcess() )
-        return
-
-    std.vector<float> vertdataarray
-
-    self.m_uiControllerVertcount = 0
-    self.m_iTrackedControllerCount = 0
-
-    for ( openvr.TrackedDeviceIndex_t unTrackedDevice = openvr.k_unTrackedDeviceIndex_Hmd + 1 unTrackedDevice < openvr.k_unMaxTrackedDeviceCount ++unTrackedDevice )
-    
-        if ( !self.m_pHMD.IsTrackedDeviceConnected( unTrackedDevice ) )
-            continue
-
-        if( self.m_pHMD.GetTrackedDeviceClass( unTrackedDevice ) != openvr.TrackedDeviceClass_Controller )
-            continue
-
-        self.m_iTrackedControllerCount += 1
-
-        if( !self.m_rTrackedDevicePose[ unTrackedDevice ].bPoseIsValid )
-            continue
-
-        const Matrix4 & mat = self.m_rmat4DevicePose[unTrackedDevice]
-
-        Vector4 center = mat * Vector4( 0, 0, 0, 1 )
-
-        for ( int i = 0 i < 3 ++i )
-        
-            Vector3 color( 0, 0, 0 )
-            Vector4 point( 0, 0, 0, 1 )
-            point[i] += 0.05f  # offset in X, Y, Z
-            color[i] = 1.0  # R, G, B
-            point = mat * point
-            vertdataarray.push_back( center.x )
-            vertdataarray.push_back( center.y )
-            vertdataarray.push_back( center.z )
-
-            vertdataarray.push_back( color.x )
-            vertdataarray.push_back( color.y )
-            vertdataarray.push_back( color.z )
-        
-            vertdataarray.push_back( point.x )
-            vertdataarray.push_back( point.y )
-            vertdataarray.push_back( point.z )
-        
-            vertdataarray.push_back( color.x )
-            vertdataarray.push_back( color.y )
-            vertdataarray.push_back( color.z )
-        
-            self.m_uiControllerVertcount += 2
-        
-
-        Vector4 start = mat * Vector4( 0, 0, -0.02f, 1 )
-        Vector4 end = mat * Vector4( 0, 0, -39.f, 1 )
-        Vector3 color( .92f, .92f, .71f )
-
-        vertdataarray.push_back( start.x )vertdataarray.push_back( start.y )vertdataarray.push_back( start.z )
-        vertdataarray.push_back( color.x )vertdataarray.push_back( color.y )vertdataarray.push_back( color.z )
-
-        vertdataarray.push_back( end.x )vertdataarray.push_back( end.y )vertdataarray.push_back( end.z )
-        vertdataarray.push_back( color.x )vertdataarray.push_back( color.y )vertdataarray.push_back( color.z )
-        self.m_uiControllerVertcount += 2
-    
-
-    # Setup the VAO the first time through.
-    if ( self.m_unControllerVAO == 0 )
-    
-        glGenVertexArrays( 1, self.m_unControllerVAO )
-        glBindVertexArray( self.m_unControllerVAO )
-
-        glGenBuffers( 1, self.m_glControllerVertBuffer )
-        glBindBuffer( GL_ARRAY_BUFFER, self.m_glControllerVertBuffer )
-
-        GLuint stride = 2 * 3 * sizeof( float )
-        GLuint offset = 0
-
-        glEnableVertexAttribArray( 0 )
-        glVertexAttribPointer( 0, 3, GL_FLOAT, GL_FALSE, stride, (const void *)offset)
-
-        offset += sizeof( Vector3 )
-        glEnableVertexAttribArray( 1 )
-        glVertexAttribPointer( 1, 3, GL_FLOAT, GL_FALSE, stride, (const void *)offset)
-
-        glBindVertexArray( 0 )
-    
-
-    glBindBuffer( GL_ARRAY_BUFFER, self.m_glControllerVertBuffer )
-
-    # set vertex data if we have some
-    if( vertdataarray.size() > 0 )
-    
-        #$ TODO: Use glBufferSubData for this...
-        glBufferData( GL_ARRAY_BUFFER, sizeof(float) * vertdataarray.size(), vertdataarray[0], GL_STREAM_DRAW )
-
-
-#-----------------------------------------------------------------------------
-# Purpose:
-#-----------------------------------------------------------------------------
-bool CMainApplication.CreateFrameBuffer( int nWidth, int nHeight, FramebufferDesc framebufferDesc )
-
-    glGenFramebuffers(1, framebufferDesc.m_nRenderFramebufferId )
-    glBindFramebuffer(GL_FRAMEBUFFER, framebufferDesc.m_nRenderFramebufferId)
-
-    glGenRenderbuffers(1, framebufferDesc.m_nDepthBufferId)
-    glBindRenderbuffer(GL_RENDERBUFFER, framebufferDesc.m_nDepthBufferId)
-    glRenderbufferStorageMultisample(GL_RENDERBUFFER, 4, GL_DEPTH_COMPONENT, nWidth, nHeight )
-    glFramebufferRenderbuffer(GL_FRAMEBUFFER, GL_DEPTH_ATTACHMENT, GL_RENDERBUFFER,    framebufferDesc.m_nDepthBufferId )
-
-    glGenTextures(1, framebufferDesc.m_nRenderTextureId )
-    glBindTexture(GL_TEXTURE_2D_MULTISAMPLE, framebufferDesc.m_nRenderTextureId )
-    glTexImage2DMultisample(GL_TEXTURE_2D_MULTISAMPLE, 4, GL_RGBA8, nWidth, nHeight, True)
-    glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_TEXTURE_2D_MULTISAMPLE, framebufferDesc.m_nRenderTextureId, 0)
-
-    glGenFramebuffers(1, framebufferDesc.m_nResolveFramebufferId )
-    glBindFramebuffer(GL_FRAMEBUFFER, framebufferDesc.m_nResolveFramebufferId)
-
-    glGenTextures(1, framebufferDesc.m_nResolveTextureId )
-    glBindTexture(GL_TEXTURE_2D, framebufferDesc.m_nResolveTextureId )
-    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR)
-    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAX_LEVEL, 0)
-    glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA8, nWidth, nHeight, 0, GL_RGBA, GL_UNSIGNED_BYTE, None)
-    glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_TEXTURE_2D, framebufferDesc.m_nResolveTextureId, 0)
-
-    # check FBO status
-    GLenum status = glCheckFramebufferStatus(GL_FRAMEBUFFER)
-    if (status != GL_FRAMEBUFFER_COMPLETE)
-    
-        return False
-    
-
-    glBindFramebuffer( GL_FRAMEBUFFER, 0 )
-
-    return True
-
-
-#-----------------------------------------------------------------------------
-# Purpose:
-#-----------------------------------------------------------------------------
-int main(int argc, char argv[])
-
-    CMainApplication pMainApplication = CMainApplication( argc, argv )
-
-    if (!pMainApplication.BInit())
-    
+if __name__ == "__main__":
+    pMainApplication = CMainApplication( sys.argv )
+    if not pMainApplication.bInit():
         pMainApplication.Shutdown()
-        return 1
-    
-
+        sys.exit(1)
     pMainApplication.RunMainLoop()
-
     pMainApplication.Shutdown()
-
-    return 0
-
+    sys.exit(0)
