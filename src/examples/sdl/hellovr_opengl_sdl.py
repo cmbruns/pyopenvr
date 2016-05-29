@@ -32,10 +32,48 @@ logging.basicConfig(format="%(filename)s:%(funcName)s:%(message)s", level=loggin
 g_bPrintf = True # Global variable affects logging via command-line option
 
 
-class Vector2(object):
+class Vector2(ctypes.Structure):
     "Stand-in for a custom class from the C++ OpenVR example programs"
-    pass
+    
+    _fields_ = [
+        ("x", ctypes.c_float),
+        ("y", ctypes.c_float),
+    ]
+    
+    def __init__(self, vec=None):
+        if vec is None:
+            vec = [0.0,0.0]
+        self.x = vec[0]
+        self.y = vec[1]
 
+
+class Vector3(ctypes.Structure):
+    "Stand-in for a custom class from the C++ OpenVR example programs"
+    
+    _fields_ = [
+        ("x", ctypes.c_float),
+        ("y", ctypes.c_float),
+        ("z", ctypes.c_float),
+    ]
+    
+    def __init__(self, vec=None):
+        if vec is None:
+            vec = [0.0, 0.0, 0.0]
+        self.x = vec[0]
+        self.y = vec[1]
+        self.z = vec[2]
+
+
+class VertexDataScene(ctypes.Structure):
+    _fields_ = [
+        ("position", Vector3),
+        ("texCoord", Vector2),
+    ]
+    
+    def __init__(self, position, texCoord):
+        self.position = position
+        self.texCoord = texCoord
+    
 
 class Vector4(numpy.ndarray):
     "Stand-in for a custom class from the C++ OpenVR example programs"
@@ -101,6 +139,7 @@ class Matrix4(numpy.matrix):
         for col in range(4):
             for row in range(3):
                 m[row,col] += m[3,col] * vec[row]
+        return self
                 
     def __mul__(self, rhs):
         result = numpy.matrix.__mul__(self, rhs)
@@ -249,6 +288,7 @@ class CMainApplication(object):
         self.m_rTrackedDevicePose = [openvr.TrackedDevicePose_t(),] * openvr.k_unMaxTrackedDeviceCount
         self.m_rmat4DevicePose = [Matrix4(),] * openvr.k_unMaxTrackedDeviceCount
         self.m_rbShowTrackedDevice = [False,] * openvr.k_unMaxTrackedDeviceCount
+        self.m_vecRenderModels = list()
         self.leftEyeDesc = FramebufferDesc()
         self.rightEyeDesc = FramebufferDesc()
         i = 0
@@ -374,7 +414,6 @@ class CMainApplication(object):
     def setupRenderModels(self):
         "Purpose: Create/destroy GL Render Models"
         self.m_rTrackedDeviceToRenderModel = [None] * openvr.k_unMaxTrackedDeviceCount
-        memset( self.m_rTrackedDeviceToRenderModel, 0, sizeof( self.m_rTrackedDeviceToRenderModel ) )
         if self.m_pHMD is None:
             return
         for unTrackedDevice in range(openvr.k_unTrackedDeviceIndex_Hmd + 1, openvr.k_unMaxTrackedDeviceCount):
@@ -384,7 +423,7 @@ class CMainApplication(object):
 
     def shutdown(self):
         if self.m_pHMD is not None:
-            openvr.VR_Shutdown()
+            openvr.shutdown()
             self.m_pHMD = None       
         self.m_vecRenderModels = list()
         if self.m_pContext is not None:
@@ -445,7 +484,7 @@ class CMainApplication(object):
         # Process SteamVR events
         event = openvr.VREvent_t()
         while self.m_pHMD.PollNextEvent( event, sizeof( event ) ):
-            ProcessVREvent( event )
+            self.processVREvent( event )
         # Process SteamVR controller state
         for unDevice in range(openvr.k_unMaxTrackedDeviceCount):
             state = self.m_pHMD.GetControllerState( unDevice )
@@ -467,9 +506,9 @@ class CMainApplication(object):
     def renderFrame(self):
         # for now as fast as possible
         if  self.m_pHMD is not None:
-            DrawControllers()
-            RenderStereoTargets()
-            RenderDistortion()
+            self.drawControllers()
+            self.renderStereoTargets()
+            self.renderDistortion()
             leftEyeTexture = self.leftEyeDesc.m_nResolveTextureId, openvr.API_OpenGL, openvr.ColorSpace_Gamma 
             openvr.VRCompositor().Submit(openvr.Eye_Left, leftEyeTexture )
             rightEyeTexture = self.self.rightEyeDesc.m_nResolveTextureId, openvr.API_OpenGL, openvr.ColorSpace_Gamma 
@@ -545,7 +584,7 @@ class CMainApplication(object):
         self.m_glSceneVertBuffer = glGenBuffers(1)
         glBindBuffer( GL_ARRAY_BUFFER, self.m_glSceneVertBuffer )
         vertdataarray = numpy.array(vertdataarray, numpy.float32) # convert to numpy array at last possible moment
-        glBufferData( GL_ARRAY_BUFFER, sizeof(float) * len(vertdataarray), vertdataarray, GL_STATIC_DRAW)
+        glBufferData( GL_ARRAY_BUFFER, sizeof(ctypes.c_float) * len(vertdataarray), vertdataarray, GL_STATIC_DRAW)
         glBindBuffer( GL_ARRAY_BUFFER, self.m_glSceneVertBuffer )
         stride = sizeof(VertexDataScene)
         offset = 0
@@ -619,7 +658,7 @@ class CMainApplication(object):
         # don't draw controllers if somebody else has input focus
         if self.m_pHMD.IsInputFocusCapturedByAnotherProcess():
             return
-        std.vector<float> vertdataarray
+        vertdataarray = list()
         self.m_uiControllerVertcount = 0
         self.m_iTrackedControllerCount = 0
     
@@ -639,34 +678,34 @@ class CMainApplication(object):
                 point[i] += 0.05  # offset in X, Y, Z
                 color[i] = 1.0  # R, G, B
                 point = mat * point
-                vertdataarray.push_back( center.x )
-                vertdataarray.push_back( center.y )
-                vertdataarray.push_back( center.z )
-                vertdataarray.push_back( color.x )
-                vertdataarray.push_back( color.y )
-                vertdataarray.push_back( color.z )
-                vertdataarray.push_back( point.x )
-                vertdataarray.push_back( point.y )
-                vertdataarray.push_back( point.z )
-                vertdataarray.push_back( color.x )
-                vertdataarray.push_back( color.y )
-                vertdataarray.push_back( color.z )
+                vertdataarray.append( center.x )
+                vertdataarray.append( center.y )
+                vertdataarray.append( center.z )
+                vertdataarray.append( color.x )
+                vertdataarray.append( color.y )
+                vertdataarray.append( color.z )
+                vertdataarray.append( point.x )
+                vertdataarray.append( point.y )
+                vertdataarray.append( point.z )
+                vertdataarray.append( color.x )
+                vertdataarray.append( color.y )
+                vertdataarray.append( color.z )
                 self.m_uiControllerVertcount += 2
             start = mat * Vector4( 0, 0, -0.02, 1 )
             end = mat * Vector4( 0, 0, -39., 1 )
             color = Vector3( .92, .92, .71 )
-            vertdataarray.push_back( start.x )
-            vertdataarray.push_back( start.y )
-            vertdataarray.push_back( start.z )
-            vertdataarray.push_back( color.x )
-            vertdataarray.push_back( color.y )
-            vertdataarray.push_back( color.z )
-            vertdataarray.push_back( end.x )
-            vertdataarray.push_back( end.y )
-            vertdataarray.push_back( end.z )
-            vertdataarray.push_back( color.x )
-            vertdataarray.push_back( color.y )
-            vertdataarray.push_back( color.z )
+            vertdataarray.append( start.x )
+            vertdataarray.append( start.y )
+            vertdataarray.append( start.z )
+            vertdataarray.append( color.x )
+            vertdataarray.append( color.y )
+            vertdataarray.append( color.z )
+            vertdataarray.append( end.x )
+            vertdataarray.append( end.y )
+            vertdataarray.append( end.z )
+            vertdataarray.append( color.x )
+            vertdataarray.append( color.y )
+            vertdataarray.append( color.z )
             self.m_uiControllerVertcount += 2
         # Setup the VAO the first time through.
         if self.m_unControllerVAO == 0:        
@@ -704,7 +743,7 @@ class CMainApplication(object):
         w = float( 1.0/float(self.m_iLensGridSegmentCountH-1) )
         h = float( 1.0/float(self.m_iLensGridSegmentCountV-1) )
         u, v = 0
-        std.vector<VertexDataLens> vVerts(0)
+        vVerts = list()
         vert = VertexDataLens()
         #left eye distortion verts
         Xoffset = -1
@@ -717,7 +756,7 @@ class CMainApplication(object):
                 vert.texCoordRed = Vector2(dc0.rfRed[0], 1 - dc0.rfRed[1])
                 vert.texCoordGreen =  Vector2(dc0.rfGreen[0], 1 - dc0.rfGreen[1])
                 vert.texCoordBlue = Vector2(dc0.rfBlue[0], 1 - dc0.rfBlue[1])
-                vVerts.push_back( vert )
+                vVerts.append( vert )
         #right eye distortion verts
         Xoffset = 0
         for y in range(self.m_iLensGridSegmentCountV):
@@ -729,7 +768,7 @@ class CMainApplication(object):
                 vert.texCoordRed = Vector2(dc0.rfRed[0], 1 - dc0.rfRed[1])
                 vert.texCoordGreen = Vector2(dc0.rfGreen[0], 1 - dc0.rfGreen[1])
                 vert.texCoordBlue = Vector2(dc0.rfBlue[0], 1 - dc0.rfBlue[1])
-                vVerts.push_back( vert )
+                vVerts.append( vert )
         vIndices = list()
         offset = 0
         for y in range(self.m_iLensGridSegmentCountV-1):
@@ -738,12 +777,12 @@ class CMainApplication(object):
                 b = self.m_iLensGridSegmentCountH*y+x+1 +offset
                 c = (y+1)*self.m_iLensGridSegmentCountH+x+1 +offset
                 d = (y+1)*self.m_iLensGridSegmentCountH+x +offset
-                vIndices.push_back( a )
-                vIndices.push_back( b )
-                vIndices.push_back( c )
-                vIndices.push_back( a )
-                vIndices.push_back( c )
-                vIndices.push_back( d )
+                vIndices.append( a )
+                vIndices.append( b )
+                vIndices.append( c )
+                vIndices.append( a )
+                vIndices.append( c )
+                vIndices.append( d )
         offset = (self.m_iLensGridSegmentCountH)*(self.m_iLensGridSegmentCountV)
         for y in range(self.m_iLensGridSegmentCountV-1):
             for x in range(self.m_iLensGridSegmentCountH-1):
@@ -751,12 +790,12 @@ class CMainApplication(object):
                 b = self.m_iLensGridSegmentCountH*y+x+1 +offset
                 c = (y+1)*self.m_iLensGridSegmentCountH+x+1 +offset
                 d = (y+1)*self.m_iLensGridSegmentCountH+x +offset
-                vIndices.push_back( a )
-                vIndices.push_back( b )
-                vIndices.push_back( c )
-                vIndices.push_back( a )
-                vIndices.push_back( c )
-                vIndices.push_back( d )
+                vIndices.append( a )
+                vIndices.append( b )
+                vIndices.append( c )
+                vIndices.append( a )
+                vIndices.append( c )
+                vIndices.append( d )
         self.m_uiIndexSize = vIndices.size()
         self.m_unLensVAO = glGenVertexArrays(1)
         glBindVertexArray( self.m_unLensVAO )
@@ -783,10 +822,10 @@ class CMainApplication(object):
         glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, 0)
 
     def setupCameras(self):
-        self.m_mat4ProjectionLeft = GetHMDMatrixProjectionEye( openvr.Eye_Left )
-        self.m_mat4ProjectionRight = GetHMDMatrixProjectionEye( openvr.Eye_Right )
-        self.m_mat4eyePosLeft = GetHMDMatrixPoseEye( openvr.Eye_Left )
-        self.m_mat4eyePosRight = GetHMDMatrixPoseEye( openvr.Eye_Right )
+        self.m_mat4ProjectionLeft = self.getHMDMatrixProjectionEye( openvr.Eye_Left )
+        self.m_mat4ProjectionRight = self.getHMDMatrixProjectionEye( openvr.Eye_Right )
+        self.m_mat4eyePosLeft = self.getHMDMatrixPoseEye( openvr.Eye_Left )
+        self.m_mat4eyePosRight = self.getHMDMatrixPoseEye( openvr.Eye_Right )
 
     def renderStereoTargets(self):
         glClearColor( 0.15, 0.15, 0.18, 1.0 ) # nice background color, but not black
@@ -794,7 +833,7 @@ class CMainApplication(object):
         # Left Eye
         glBindFramebuffer( GL_FRAMEBUFFER, self.leftEyeDesc.m_nRenderFramebufferId )
         glViewport(0, 0, self.m_nRenderWidth, self.m_nRenderHeight )
-        RenderScene( openvr.Eye_Left )
+        self.renderScene( openvr.Eye_Left )
         glBindFramebuffer( GL_FRAMEBUFFER, 0 )
         glDisable( GL_MULTISAMPLE )
         glBindFramebuffer(GL_READ_FRAMEBUFFER, self.leftEyeDesc.m_nRenderFramebufferId)
@@ -846,7 +885,7 @@ class CMainApplication(object):
         glEnable(GL_DEPTH_TEST)
         if self.m_bShowCubes:
             glUseProgram( self.m_unSceneProgramID )
-            glUniformMatrix4fv( self.m_nSceneMatrixLocation, 1, False, GetCurrentViewProjectionMatrix( nEye ).get() )
+            glUniformMatrix4fv( self.m_nSceneMatrixLocation, 1, False, self.getCurrentViewProjectionMatrix( nEye ).get() )
             glBindVertexArray( self.m_unSceneVAO )
             glBindTexture( GL_TEXTURE_2D, self.m_iTexture )
             glDrawArrays( GL_TRIANGLES, 0, self.m_uiVertcount )
@@ -855,7 +894,7 @@ class CMainApplication(object):
         if not bIsInputCapturedByAnotherProcess:
             # draw the controller axis lines
             glUseProgram( self.m_unControllerTransformProgramID )
-            glUniformMatrix4fv( self.m_nControllerMatrixLocation, 1, False, GetCurrentViewProjectionMatrix( nEye ).get() )
+            glUniformMatrix4fv( self.m_nControllerMatrixLocation, 1, False, self.getCurrentViewProjectionMatrix( nEye ).get() )
             glBindVertexArray( self.m_unControllerVAO )
             glDrawArrays( GL_LINES, 0, self.m_uiControllerVertcount )
             glBindVertexArray( 0 )
@@ -870,7 +909,7 @@ class CMainApplication(object):
             if bIsInputCapturedByAnotherProcess and self.m_pHMD.GetTrackedDeviceClass( unTrackedDevice ) == openvr.TrackedDeviceClass_Controller:
                 continue
             matDeviceToTracking = self.m_rmat4DevicePose[ unTrackedDevice ]
-            matMVP = GetCurrentViewProjectionMatrix( nEye ) * matDeviceToTracking
+            matMVP = self.getCurrentViewProjectionMatrix( nEye ) * matDeviceToTracking
             glUniformMatrix4fv( self.m_nRenderModelMatrixLocation, 1, False, matMVP.get() )
             self.m_rTrackedDeviceToRenderModel[ unTrackedDevice ].Draw()
         glUseProgram( 0 )
@@ -914,7 +953,7 @@ class CMainApplication(object):
         for nDevice in range(openvr.k_unMaxTrackedDeviceCount):
             if self.m_rTrackedDevicePose[nDevice].bPoseIsValid:
                 self.m_iValidPoseCount += 1
-                self.m_rmat4DevicePose[nDevice] = ConvertSteamVRMatrixToMatrix4( self.m_rTrackedDevicePose[nDevice].mDeviceToAbsoluteTracking )
+                self.m_rmat4DevicePose[nDevice] = self.convertSteamVRMatrixToMatrix4( self.m_rTrackedDevicePose[nDevice].mDeviceToAbsoluteTracking )
                 if self.m_rDevClassChar[nDevice]==0:
                     dc = self.m_pHMD.GetTrackedDeviceClass(nDevice)
                     if dc == openvr.TrackedDeviceClass_Controller:
@@ -1154,7 +1193,7 @@ class CMainApplication(object):
             pModel = openvr.RenderModel_t()
             error = openvr.EVRRenderModelError()
             while True:
-                error = openvr.VRRenderModels().LoadRenderModel_Async( pchRenderModelName, pModel )
+                error = openvr.VRRenderModels().loadRenderModel_Async( pchRenderModelName, pModel )
                 if error != openvr.VRRenderModelError_Loading:
                     break
                 threadSleep( 1 )
@@ -1168,7 +1207,7 @@ class CMainApplication(object):
                 error = openvr.VRRenderModels().LoadTexture_Async( pModel.diffuseTextureId, pTexture )
                 if error != openvr.VRRenderModelError_Loading:
                     break
-                ThreadSleep( 1 )
+                threadSleep( 1 )
             if error != openvr.VRRenderModelError_None:
                 dprintf( "Unable to load render texture id:%d for render model %s\n" % (
                         pModel.diffuseTextureId, pchRenderModelName) )
@@ -1180,16 +1219,11 @@ class CMainApplication(object):
                 # delete pRenderModel
                 pRenderModel = None
             else:
-                self.m_vecRenderModels.push_back( pRenderModel )
+                self.m_vecRenderModels.append( pRenderModel )
             openvr.VRRenderModels().FreeRenderModel( pModel )
             openvr.VRRenderModels().FreeTexture( pTexture )
         return pRenderModel
 
-    class VertexDataScene(object):
-        def __init__(self, position, texCoord):
-            self.position = position
-            self.texCoord = texCoord
-    
     def createFrameBuffer(self, nWidth, nHeight, framebufferDesc):
         framebufferDesc.m_nRenderFramebufferId = glGenFramebuffers(1)
         glBindFramebuffer(GL_FRAMEBUFFER, framebufferDesc.m_nRenderFramebufferId)

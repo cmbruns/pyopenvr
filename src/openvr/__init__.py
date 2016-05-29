@@ -1294,19 +1294,51 @@ class NotificationBitmap_t(Structure):
     ]
 
 
-class COpenVRContext(Structure):
-    _fields_ = [
-        ("m_pVRSystem", POINTER(c_int)),
-        ("m_pVRChaperone", POINTER(c_int)),
-        ("m_pVRChaperoneSetup", POINTER(c_int)),
-        ("m_pVRCompositor", POINTER(c_int)),
-        ("m_pVROverlay", POINTER(c_int)),
-        ("m_pVRRenderModels", POINTER(c_int)),
-        ("m_pVRExtendedDisplay", POINTER(c_int)),
-        ("m_pVRSettings", POINTER(c_int)),
-        ("m_pVRApplications", POINTER(c_int)),
-        ("m_pVRTrackedCamera", POINTER(c_int)),
-    ]
+class COpenVRContext(object):
+    def __init__(self):
+        self.clear()
+        
+    def checkClear(self):
+        global _vr_token
+        if _vr_token != getInitToken():
+            self.clear()
+            _vr_token = getInitToken()
+            
+    def clear(self):
+        self.m_pVRSystem = None
+        self.m_pVRChaperoneSetup = None
+        self.m_pVRCompositor = None
+        self.m_pVROverlay = None
+        self.m_pVRRenderModels = None
+        self.m_pVRExtendedDisplay = None
+        self.m_pVRSettings = None
+        self.m_pVRApplications = None
+        self.m_pVRTrackedCamera = None
+    
+    def VRRenderModels(self):
+        self.checkClear()
+        if self.m_pVRRenderModels is None:
+            self.m_pVRRenderModels = IVRRenderModels()
+        return self.m_pVRRenderModels
+    
+    def VRCompositor(self):
+        self.checkClear()
+        if self.m_pVRCompositor is None:
+            self.m_pVRCompositor = IVRCompositor()
+        return self.m_pVRCompositor
+
+
+# Globals for context management
+_vr_token = None
+_internal_module_context = COpenVRContext()
+
+
+def VRRenderModels():
+    return _internal_module_context.VRRenderModels()
+
+
+def VRCompositor():
+    return _internal_module_context.VRCompositor()
 
 
 class VREvent_Data_t(Union):
