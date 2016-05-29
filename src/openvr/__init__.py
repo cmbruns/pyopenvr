@@ -1671,7 +1671,7 @@ class IVRSystem(object):
         result = fn(unDeviceIndex, prop, byref(pError))
         return result, pError
 
-    def getStringTrackedDeviceProperty(self, unDeviceIndex, prop, pchValue, unBufferSize):
+    def getStringTrackedDeviceProperty(self, unDeviceIndex, prop):
         """
         Returns a string property. If the device index is not valid or the property is not a string type this function will 
         return 0. Otherwise it returns the length of the number of bytes necessary to hold this string including the trailing
@@ -1680,8 +1680,16 @@ class IVRSystem(object):
 
         fn = self.function_table.getStringTrackedDeviceProperty
         pError = ETrackedPropertyError()
-        result = fn(unDeviceIndex, prop, pchValue, unBufferSize, byref(pError))
-        return result, pError
+        # TODO: automate this string argument manipulation ****
+        unRequiredBufferLen = fn( unDeviceIndex, prop, None, 0, byref(pError) )
+        if unRequiredBufferLen == 0:
+            return ""
+        pchBuffer = ctypes.create_string_buffer(unRequiredBufferLen)
+        fn( unDeviceIndex, prop, pchBuffer, unRequiredBufferLen, byref(pError) )
+        if pError.value != TrackedProp_Success.value:
+            raise OpenVRError(str(pError))
+        sResult = str(pchBuffer.value)
+        return sResult
 
     def getPropErrorNameFromEnum(self, error):
         """

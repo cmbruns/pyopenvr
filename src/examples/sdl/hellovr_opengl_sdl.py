@@ -8,13 +8,16 @@
 
 # Python standard library imports
 import sys
+import os
 import time
 from textwrap import dedent
 import logging
 
 # Third-party module imports
+import Image
 import ctypes
-from ctypes import sizeof
+from ctypes import sizeof, byref
+import numpy
 from OpenGL.GL import *
 from OpenGL.GL.EXT.texture_filter_anisotropic import *
 from OpenGL.GL.ARB.debug_output import *
@@ -34,9 +37,77 @@ class Vector2(object):
     pass
 
 
-class Matrix4(object):
+class Vector4(numpy.ndarray):
     "Stand-in for a custom class from the C++ OpenVR example programs"
-    pass
+    
+    def __new__(cls, data=None):
+        if data is None: # use identity with empty constructor
+            data = [0,0,0,0]
+        obj = numpy.ndarray.__new__(cls, shape=(4,1), dtype=numpy.float)
+        obj[:,0] = data[:]
+        return obj
+    
+    def getx(self):
+        return self[0,0]
+    def setx(self, val):
+        self[0,0] = val
+    x = property(getx, setx)
+
+    def gety(self):
+        return self[1,0]
+    def sety(self, val):
+        self[1,0] = val
+    y = property(gety, sety)
+
+    def getz(self):
+        return self[2,0]
+    def setz(self, val):
+        self[2,0] = val
+    z = property(getz, setz)
+
+    def getw(self):
+        return self[3,0]
+    def setw(self, val):
+        self[3,0] = val
+    w = property(getw, setw)
+
+
+class Matrix4(numpy.matrix):
+    """
+    Stand-in for a custom class from the C++ OpenVR example programs
+    """
+    
+    def __new__(cls, data=None):
+        if data is None: # use identity with empty constructor
+            data = numpy.identity(4, numpy.float)
+        return numpy.matrix.__new__(cls, data)
+    
+    def scale(self, x, y=None, z=None):
+        "Uniform scale, if only sx argument is specified"
+        if y is None:
+            y = x
+        if z is None:
+            z = x
+        m = self
+        for col in range(4):
+            # Only the top three rows
+            m[0,col] *= x
+            m[1,col] *= y
+            m[2,col] *= z
+        return self
+    
+    def translate(self, vec):
+        m = self
+        for col in range(4):
+            for row in range(3):
+                m[row,col] += m[3,col] * vec[row]
+                
+    def __mul__(self, rhs):
+        result = numpy.matrix.__mul__(self, rhs)
+        # Vector result should be vector type
+        if result.shape == (4,1):
+            result = result.view(Vector4)
+        return result
 
 
 # Translated from hello_opengl_main.cpp line 21
@@ -65,10 +136,10 @@ class CGLRenderModel(object):
     def bInit( self, vrModel, vrDiffuseTexture ):
         "Purpose: Allocates and populates the GL resources for a render model"
         # create and bind a VAO to hold state for this model
-        glGenVertexArrays( 1, self.m_glVertArray )
+        self.m_glVertArray = glGenVertexArrays(1)
         glBindVertexArray( self.m_glVertArray )
         # Populate a vertex buffer
-        glGenBuffers( 1, self.m_glVertBuffer )
+        self.m_glVertBuffer = glGenBuffers(1)
         glBindBuffer( GL_ARRAY_BUFFER, self.m_glVertBuffer )
         glBufferData( GL_ARRAY_BUFFER, sizeof( openvr.RenderModel_Vertex_t ) * vrModel.unVertexCount, vrModel.rVertexData, GL_STATIC_DRAW )
         # Identify the components in the vertex buffer
@@ -79,12 +150,12 @@ class CGLRenderModel(object):
         glEnableVertexAttribArray( 2 )
         glVertexAttribPointer( 2, 2, GL_FLOAT, False, sizeof( openvr.RenderModel_Vertex_t ), openvr.RenderModel_Vertex_t.rfTextureCoord.offset )
         # Create and populate the index buffer
-        glGenBuffers( 1, self.m_glIndexBuffer )
+        self.m_glIndexBufferglGenBuffers(1)
         glBindBuffer( GL_ELEMENT_ARRAY_BUFFER, self.m_glIndexBuffer )
         glBufferData( GL_ELEMENT_ARRAY_BUFFER, sizeof( ctypes.c_uint16 ) * vrModel.unTriangleCount * 3, vrModel.rIndexData, GL_STATIC_DRAW )
         glBindVertexArray( 0 )
         # create and populate the texture
-        glGenTextures(1, self.m_glTexture )
+        self.m_glTexture = glGenTextures(1)
         glBindTexture( GL_TEXTURE_2D, self.m_glTexture )
         glTexImage2D( GL_TEXTURE_2D, 0, GL_RGBA, vrDiffuseTexture.unWidth, vrDiffuseTexture.unHeight,
             0, GL_RGBA, GL_UNSIGNED_BYTE, vrDiffuseTexture.rubTextureMapData )
@@ -213,7 +284,7 @@ class CMainApplication(object):
             return False
         # Loading the SteamVR Runtime
         try:
-            openvr.init(openvr.VRApplication_Scene)
+            self.m_pHMD = openvr.init(openvr.VRApplication_Scene)
         except openvr.OpenVRError as eError:
             self.m_pHMD = None
             msg = "Unable to init VR runtime: %s" % str(eError)
@@ -429,14 +500,14 @@ class CMainApplication(object):
         
 
     def setupTexturemaps(self):
-        sExecutableDirectory = Path_StripFilename( Path_GetExecutablePath() )
-        strFullPath = Path_MakeAbsolute( "../cube_texture.png", sExecutableDirectory )
-        img = Image.open(strFullPath)
+        this_folder = os.path.dirname(os.path.abspath(__file__))
+        image_path = os.path.join(this_folder, "cube_texture_small.png")
+        img = Image.open(image_path)
         imageRGBA = numpy.array(list(img.getdata()), numpy.uint8)
-        glGenTextures(1, self.m_iTexture )
+        self.m_iTexture = glGenTextures(1)
         glBindTexture( GL_TEXTURE_2D, self.m_iTexture )
-        glTexImage2D( GL_TEXTURE_2D, 0, GL_RGBA, img.size[0], img.size[1],
-            0, GL_RGBA, GL_UNSIGNED_BYTE, imageRGBA )
+        glTexImage2D( GL_TEXTURE_2D, 0, GL_RGB, img.size[0], img.size[1],
+            0, GL_RGB, GL_UNSIGNED_BYTE, imageRGBA )
         glGenerateMipmap(GL_TEXTURE_2D)
         glTexParameteri( GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE )
         glTexParameteri( GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE )
@@ -452,28 +523,29 @@ class CMainApplication(object):
         "Purpose: create a sea of cubes"
         if self.m_pHMD is None:
             return
-        std.vector<float> vertdataarray
+        vertdataarray = list()
         matScale = Matrix4()
         matScale.scale( self.m_fScale, self.m_fScale, self.m_fScale )
         matTransform = Matrix4()
-        matTransform.translate(
+        matTransform.translate([
             -( float(self.m_iSceneVolumeWidth) * self.m_fScaleSpacing ) / 2.0,
             -( float(self.m_iSceneVolumeHeight) * self.m_fScaleSpacing ) / 2.0,
-            -( float(self.m_iSceneVolumeDepth) * self.m_fScaleSpacing ) / 2.0)
+            -( float(self.m_iSceneVolumeDepth) * self.m_fScaleSpacing ) / 2.0 ])
         mat = matScale * matTransform
         for z in range(self.m_iSceneVolumeDepth):
             for y in range(self.m_iSceneVolumeHeight):
                 for x in range(self.m_iSceneVolumeWidth):
                     self.addCubeToScene( mat, vertdataarray )
-                    mat = mat * Matrix4().translate( self.m_fScaleSpacing, 0, 0 )
-                mat = mat * Matrix4().translate( -(float(self.m_iSceneVolumeWidth)) * self.m_fScaleSpacing, self.m_fScaleSpacing, 0 )
-            mat = mat * Matrix4().translate( 0, -(float(self.m_iSceneVolumeHeight)) * self.m_fScaleSpacing, self.m_fScaleSpacing )
-        self.m_uiVertcount = vertdataarray.size()/5
-        glGenVertexArrays( 1, self.m_unSceneVAO )
+                    mat = mat * Matrix4().translate( [self.m_fScaleSpacing, 0, 0] )
+                mat = mat * Matrix4().translate( [-(float(self.m_iSceneVolumeWidth)) * self.m_fScaleSpacing, self.m_fScaleSpacing, 0] )
+            mat = mat * Matrix4().translate( [0, -(float(self.m_iSceneVolumeHeight)) * self.m_fScaleSpacing, self.m_fScaleSpacing] )
+        self.m_uiVertcount = len(vertdataarray)/5
+        self.m_unSceneVAO = glGenVertexArrays(1)
         glBindVertexArray( self.m_unSceneVAO )
-        glGenBuffers( 1, self.m_glSceneVertBuffer )
+        self.m_glSceneVertBuffer = glGenBuffers(1)
         glBindBuffer( GL_ARRAY_BUFFER, self.m_glSceneVertBuffer )
-        glBufferData( GL_ARRAY_BUFFER, sizeof(float) * vertdataarray.size(), vertdataarray[0], GL_STATIC_DRAW)
+        vertdataarray = numpy.array(vertdataarray, numpy.float32) # convert to numpy array at last possible moment
+        glBufferData( GL_ARRAY_BUFFER, sizeof(float) * len(vertdataarray), vertdataarray, GL_STATIC_DRAW)
         glBindBuffer( GL_ARRAY_BUFFER, self.m_glSceneVertBuffer )
         stride = sizeof(VertexDataScene)
         offset = 0
@@ -489,14 +561,14 @@ class CMainApplication(object):
         
     def addCubeToScene( self, mat, vertdata ):
         # Matrix4 mat( outermat.data() )
-        A = mat * Vector4( 0, 0, 0, 1 )
-        B = mat * Vector4( 1, 0, 0, 1 )
-        C = mat * Vector4( 1, 1, 0, 1 )
-        D = mat * Vector4( 0, 1, 0, 1 )
-        E = mat * Vector4( 0, 0, 1, 1 )
-        F = mat * Vector4( 1, 0, 1, 1 )
-        G = mat * Vector4( 1, 1, 1, 1 )
-        H = mat * Vector4( 0, 1, 1, 1 )
+        A = mat * Vector4( [0, 0, 0, 1] )
+        B = mat * Vector4( [1, 0, 0, 1] )
+        C = mat * Vector4( [1, 1, 0, 1] )
+        D = mat * Vector4( [0, 1, 0, 1] )
+        E = mat * Vector4( [0, 0, 1, 1] )
+        F = mat * Vector4( [1, 0, 1, 1] )
+        G = mat * Vector4( [1, 1, 1, 1] )
+        H = mat * Vector4( [0, 1, 1, 1] )
         # triangles instead of quads
         self.addCubeVertex( E.x, E.y, E.z, 0, 1, vertdata ) #Front
         self.addCubeVertex( F.x, F.y, F.z, 1, 1, vertdata )
@@ -535,13 +607,12 @@ class CMainApplication(object):
         self.addCubeVertex( G.x, G.y, G.z, 0, 0, vertdata )
         self.addCubeVertex( F.x, F.y, F.z, 0, 1, vertdata )
         
-        
     def addCubeVertex( self, fl0, fl1, fl2, fl3, fl4, vertdata ):
-        vertdata.push_back( fl0 )
-        vertdata.push_back( fl1 )
-        vertdata.push_back( fl2 )
-        vertdata.push_back( fl3 )
-        vertdata.push_back( fl4 )
+        vertdata.append( fl0 )
+        vertdata.append( fl1 )
+        vertdata.append( fl2 )
+        vertdata.append( fl3 )
+        vertdata.append( fl4 )
 
     def DrawControllers(self):
         "Purpose: Draw all of the controllers as X/Y/Z lines"
@@ -599,9 +670,9 @@ class CMainApplication(object):
             self.m_uiControllerVertcount += 2
         # Setup the VAO the first time through.
         if self.m_unControllerVAO == 0:        
-            glGenVertexArrays( 1, self.m_unControllerVAO )
+            self.m_unControllerVAO = glGenVertexArrays(1)
             glBindVertexArray( self.m_unControllerVAO )
-            glGenBuffers( 1, self.m_glControllerVertBuffer )
+            self.m_glControllerVertBuffer = glGenBuffers(1)
             glBindBuffer( GL_ARRAY_BUFFER, self.m_glControllerVertBuffer )
             stride = 2 * 3 * sizeof( float )
             offset = 0
@@ -687,12 +758,12 @@ class CMainApplication(object):
                 vIndices.push_back( c )
                 vIndices.push_back( d )
         self.m_uiIndexSize = vIndices.size()
-        glGenVertexArrays( 1, self.m_unLensVAO )
+        self.m_unLensVAO = glGenVertexArrays(1)
         glBindVertexArray( self.m_unLensVAO )
-        glGenBuffers( 1, self.m_glIDVertBuffer )
+        self.m_glIDVertBuffer = glGenBuffers(1)
         glBindBuffer( GL_ARRAY_BUFFER, self.m_glIDVertBuffer )
         glBufferData( GL_ARRAY_BUFFER, vVerts.size()*sizeof(VertexDataLens), vVerts[0], GL_STATIC_DRAW )
-        glGenBuffers( 1, self.m_glIDIndexBuffer )
+        self.m_glIDIndexBuffer = glGenBuffers(1)
         glBindBuffer( GL_ELEMENT_ARRAY_BUFFER, self.m_glIDIndexBuffer )
         glBufferData( GL_ELEMENT_ARRAY_BUFFER, vIndices.size()*sizeof(GLushort), vIndices[0], GL_STATIC_DRAW )
         glEnableVertexAttribArray( 0 )
@@ -1120,19 +1191,19 @@ class CMainApplication(object):
             self.texCoord = texCoord
     
     def createFrameBuffer(self, nWidth, nHeight, framebufferDesc):
-        glGenFramebuffers(1, framebufferDesc.m_nRenderFramebufferId )
+        framebufferDesc.m_nRenderFramebufferId = glGenFramebuffers(1)
         glBindFramebuffer(GL_FRAMEBUFFER, framebufferDesc.m_nRenderFramebufferId)
-        glGenRenderbuffers(1, framebufferDesc.m_nDepthBufferId)
+        framebufferDesc.m_nDepthBufferId = glGenRenderbuffers(1)
         glBindRenderbuffer(GL_RENDERBUFFER, framebufferDesc.m_nDepthBufferId)
         glRenderbufferStorageMultisample(GL_RENDERBUFFER, 4, GL_DEPTH_COMPONENT, nWidth, nHeight )
         glFramebufferRenderbuffer(GL_FRAMEBUFFER, GL_DEPTH_ATTACHMENT, GL_RENDERBUFFER,    framebufferDesc.m_nDepthBufferId )
-        glGenTextures(1, framebufferDesc.m_nRenderTextureId )
+        framebufferDesc.m_nRenderTextureId = glGenTextures(1)
         glBindTexture(GL_TEXTURE_2D_MULTISAMPLE, framebufferDesc.m_nRenderTextureId )
         glTexImage2DMultisample(GL_TEXTURE_2D_MULTISAMPLE, 4, GL_RGBA8, nWidth, nHeight, True)
         glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_TEXTURE_2D_MULTISAMPLE, framebufferDesc.m_nRenderTextureId, 0)
-        glGenFramebuffers(1, framebufferDesc.m_nResolveFramebufferId )
+        framebufferDesc.m_nResolveFramebufferId = glGenFramebuffers(1)
         glBindFramebuffer(GL_FRAMEBUFFER, framebufferDesc.m_nResolveFramebufferId)
-        glGenTextures(1, framebufferDesc.m_nResolveTextureId )
+        framebufferDesc.m_nResolveTextureId = glGenTextures(1)
         glBindTexture(GL_TEXTURE_2D, framebufferDesc.m_nResolveTextureId )
         glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR)
         glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAX_LEVEL, 0)
@@ -1152,21 +1223,14 @@ def dprintf( message ):
     logging.debug(message)
 
 
-def getTrackedDeviceString( pHmd, unDevice, prop, peError = None ):
+def getTrackedDeviceString( pHmd, unDevice, prop ):
     """
     Purpose: Helper to get a string from a tracked device property and turn it
     into a std.string
     """
     if pHmd is None:
         return ""
-    unRequiredBufferLen = pHmd.getStringTrackedDeviceProperty( unDevice, prop, None, 0, peError )
-    if unRequiredBufferLen == 0:
-        return ""
-    pchBuffer = ctypes.c_char * unRequiredBufferLen
-    unRequiredBufferLen = pHmd.getStringTrackedDeviceProperty( unDevice, prop, pchBuffer, unRequiredBufferLen, peError )
-    sResult = pchBuffer
-    # delete [] pchBuffer
-    return sResult
+    return pHmd.getStringTrackedDeviceProperty( unDevice, prop )
 
 
 def debugCallback(source, type_arg, id_arg, severity, length, message, userParam):
