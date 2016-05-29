@@ -15,13 +15,13 @@ import logging
 
 # Third-party module imports
 import Image
-import ctypes
-from ctypes import sizeof, byref
+import ctypes  # @UnusedImport this comment silences eclipse warning
+from ctypes import sizeof, byref # @UnusedImport
 import numpy
-from OpenGL.GL import *
-from OpenGL.GL.EXT.texture_filter_anisotropic import *
-from OpenGL.GL.ARB.debug_output import *
-from sdl2 import *
+from OpenGL.GL import *  # @UnusedWildImport
+from OpenGL.GL.EXT.texture_filter_anisotropic import *  # @UnusedWildImport
+from OpenGL.GL.ARB.debug_output import *  # @UnusedWildImport
+from sdl2 import *  # @UnusedWildImport
 
 # Local package imports
 import openvr
@@ -571,9 +571,9 @@ class CMainApplication(object):
             -( float(self.m_iSceneVolumeHeight) * self.m_fScaleSpacing ) / 2.0,
             -( float(self.m_iSceneVolumeDepth) * self.m_fScaleSpacing ) / 2.0 ])
         mat = matScale * matTransform
-        for z in range(self.m_iSceneVolumeDepth):
-            for y in range(self.m_iSceneVolumeHeight):
-                for x in range(self.m_iSceneVolumeWidth):
+        for z in range(self.m_iSceneVolumeDepth):  # @UnusedVariable
+            for y in range(self.m_iSceneVolumeHeight):  # @UnusedVariable
+                for x in range(self.m_iSceneVolumeWidth):  # @UnusedVariable
                     self.addCubeToScene( mat, vertdataarray )
                     mat = mat * Matrix4().translate( [self.m_fScaleSpacing, 0, 0] )
                 mat = mat * Matrix4().translate( [-(float(self.m_iSceneVolumeWidth)) * self.m_fScaleSpacing, self.m_fScaleSpacing, 0] )
