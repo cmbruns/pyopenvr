@@ -1440,7 +1440,7 @@ class IVRSystem(object):
         pnWidth = c_uint32()
         pnHeight = c_uint32()
         result = fn(byref(pnWidth), byref(pnHeight))
-        return pnWidth, pnHeight
+        return pnWidth.value, pnHeight.value
 
     def getProjectionMatrix(self, eEye, fNearZ, fFarZ, eProjType):
         "The projection matrix for the specified eye"
@@ -1733,16 +1733,15 @@ class IVRSystem(object):
         result = fn(error)
         return result
 
-    def pollNextEvent(self, uncbVREvent):
+    def pollNextEvent(self, pEvent):
         """
         Returns true and fills the event with the next event on the queue if there is one. If there are no events
         this method returns false. uncbVREvent should be the size in bytes of the VREvent_t struct
         """
 
         fn = self.function_table.pollNextEvent
-        pEvent = VREvent_t()
-        result = fn(byref(pEvent), uncbVREvent)
-        return result, pEvent
+        result = fn(byref(pEvent), sizeof(VREvent_t))
+        return result
 
     def pollNextEventWithPose(self, eOrigin, uncbVREvent):
         """
@@ -3733,16 +3732,14 @@ class IVRRenderModels(object):
         result = fn(pchRenderModelName, byref(ppRenderModel))
         return result, ppRenderModel
 
-    def freeRenderModel(self):
+    def freeRenderModel(self, model_ptr):
         """
         Frees a previously returned render model
           It is safe to call this on a null ptr.
         """
 
         fn = self.function_table.freeRenderModel
-        pRenderModel = RenderModel_t()
-        result = fn(byref(pRenderModel))
-        return pRenderModel
+        fn(model_ptr)
 
     def loadTexture_Async(self, textureId):
         "Loads and returns a texture for use in the application."
@@ -3752,16 +3749,14 @@ class IVRRenderModels(object):
         result = fn(textureId, byref(ppTexture))
         return result, ppTexture
 
-    def freeTexture(self):
+    def freeTexture(self, texture_ptr):
         """
         Frees a previously returned texture
           It is safe to call this on a null ptr.
         """
 
         fn = self.function_table.freeTexture
-        pTexture = RenderModel_TextureMap_t()
-        result = fn(byref(pTexture))
-        return pTexture
+        fn(texture_ptr)
 
     def loadTextureD3D11_Async(self, textureId, pD3D11Device):
         "Creates a D3D11 texture and loads data into it."
