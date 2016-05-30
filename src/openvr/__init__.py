@@ -2697,14 +2697,12 @@ class IVRCompositor(object):
         result = fn()
         return result
 
-    def waitGetPoses(self, unRenderPoseArrayCount, unGamePoseArrayCount):
+    def waitGetPoses(self, pRenderPoseArray, unRenderPoseArrayCount, pGamePoseArray, unGamePoseArrayCount):
         "Returns pose(s) to use to render scene (and optionally poses predicted two frames out for gameplay)."
 
         fn = self.function_table.waitGetPoses
-        pRenderPoseArray = TrackedDevicePose_t()
-        pGamePoseArray = TrackedDevicePose_t()
-        result = fn(byref(pRenderPoseArray), unRenderPoseArrayCount, byref(pGamePoseArray), unGamePoseArrayCount)
-        return result, pRenderPoseArray, pGamePoseArray
+        result = fn(pRenderPoseArray, unRenderPoseArrayCount, pGamePoseArray, unGamePoseArrayCount)
+        return result
 
     def getLastPoses(self, unRenderPoseArrayCount, unGamePoseArrayCount):
         "Get the last set of poses returned by WaitGetPoses."
@@ -2728,7 +2726,7 @@ class IVRCompositor(object):
         result = fn(unDeviceIndex, byref(pOutputPose), byref(pOutputGamePose))
         return result, pOutputPose, pOutputGamePose
 
-    def submit(self, eEye, nSubmitFlags):
+    def submit(self, eEye, pTexture, pBounds=None, nSubmitFlags=Submit_Default):
         """
         Updated scene texture to display. If pBounds is NULL the entire texture will be used.  If called from an OpenGL app, consider adding a glFlush after
         Submitting both frames to signal the driver to start processing, otherwise it may wait until the command buffer fills up, causing the app to miss frames.
@@ -2737,10 +2735,8 @@ class IVRCompositor(object):
         """
 
         fn = self.function_table.submit
-        pTexture = Texture_t()
-        pBounds = VRTextureBounds_t()
-        result = fn(eEye, byref(pTexture), byref(pBounds), nSubmitFlags)
-        return result, pTexture, pBounds
+        eError = fn(eEye, pTexture, pBounds, nSubmitFlags)
+        return eError
 
     def clearLastSubmittedFrame(self):
         """

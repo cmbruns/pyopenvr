@@ -90,6 +90,16 @@ class VertexDataLens(ctypes.Structure):
         self.texCoordGreen = texCoordGreen
         self.texCoordBlue = texCoordBlue
 
+    def as_floats(self):
+        return [float(v) for v in [
+                self.position.x,
+                self.position.y,
+                self.texCoordRed.x,
+                self.texCoordRed.y,       
+                self.texCoordGreen.x,
+                self.texCoordGreen.y,       
+                self.texCoordBlue.x,
+                self.texCoordBlue.y]]
 
 class Vector4(numpy.ndarray):
     "Stand-in for a custom class from the C++ OpenVR example programs"
@@ -134,7 +144,9 @@ class Matrix4(numpy.matrix):
     def __new__(cls, data=None):
         if data is None: # use identity with empty constructor
             data = numpy.identity(4, numpy.float32)
-        return numpy.matrix.__new__(cls, data, numpy.float32)
+        obj = numpy.matrix.__new__(cls, data, numpy.float32)
+        obj.reshape(4,4)
+        return obj
     
     def get(self):
         return self
@@ -164,7 +176,11 @@ class Matrix4(numpy.matrix):
         return self
                 
     def __mul__(self, rhs):
-        result = numpy.matrix.__mul__(self, rhs)
+        result = None
+        try:
+            result = numpy.matrix.__mul__(self, rhs)
+        except ValueError:
+            pass
         # Vector result should be vector type
         if result.shape == (4,1):
             result = result.view(Vector4)
@@ -300,7 +316,8 @@ class CMainApplication(object):
         self.m_bShowCubes =  True
         self.m_strDriver = None
         self.m_strDisplay = None
-        self.m_rTrackedDevicePose = [openvr.TrackedDevicePose_t(),] * openvr.k_unMaxTrackedDeviceCount
+        pose_array_t = openvr.TrackedDevicePose_t * openvr.k_unMaxTrackedDeviceCount
+        self.m_rTrackedDevicePose = pose_array_t()
         self.m_rmat4DevicePose = [Matrix4(),] * openvr.k_unMaxTrackedDeviceCount
         self.m_mat4HMDPose = Matrix4()
         self.m_rbShowTrackedDevice = [False,] * openvr.k_unMaxTrackedDeviceCount
@@ -525,10 +542,10 @@ class CMainApplication(object):
             self.drawControllers()
             self.renderStereoTargets()
             self.renderDistortion()
-            leftEyeTexture = self.leftEyeDesc.m_nResolveTextureId, openvr.API_OpenGL, openvr.ColorSpace_Gamma 
-            openvr.VRCompositor().Submit(openvr.Eye_Left, leftEyeTexture )
-            rightEyeTexture = self.self.rightEyeDesc.m_nResolveTextureId, openvr.API_OpenGL, openvr.ColorSpace_Gamma 
-            openvr.VRCompositor().Submit(openvr.Eye_Right, rightEyeTexture )
+            leftEyeTexture = openvr.Texture_t(self.leftEyeDesc.m_nResolveTextureId, openvr.API_OpenGL, openvr.ColorSpace_Gamma)
+            openvr.VRCompositor().submit(openvr.Eye_Left, leftEyeTexture )
+            rightEyeTexture = openvr.Texture_t(self.rightEyeDesc.m_nResolveTextureId, openvr.API_OpenGL, openvr.ColorSpace_Gamma)
+            openvr.VRCompositor().submit(openvr.Eye_Right, rightEyeTexture )
         if self.m_bVblank and self.m_bGlFinishHack:
             #$ HACKHACK. From gpuview profiling, it looks like there is a bug where two renders and a present
             # happen right before and after the vsync causing all kinds of jittering issues. This glFinish()
@@ -772,7 +789,7 @@ class CMainApplication(object):
                 vert.texCoordRed = Vector2([dc0.rfRed[0], 1 - dc0.rfRed[1]])
                 vert.texCoordGreen =  Vector2([dc0.rfGreen[0], 1 - dc0.rfGreen[1]])
                 vert.texCoordBlue = Vector2([dc0.rfBlue[0], 1 - dc0.rfBlue[1]])
-                vVerts.append( vert )
+                vVerts.extend( vert.as_floats() )
         #right eye distortion verts
         Xoffset = 0
         for y in range(self.m_iLensGridSegmentCountV):
@@ -784,7 +801,7 @@ class CMainApplication(object):
                 vert.texCoordRed = Vector2([dc0.rfRed[0], 1 - dc0.rfRed[1]])
                 vert.texCoordGreen = Vector2([dc0.rfGreen[0], 1 - dc0.rfGreen[1]])
                 vert.texCoordBlue = Vector2([dc0.rfBlue[0], 1 - dc0.rfBlue[1]])
-                vVerts.append( vert )
+                vVerts.extend( vert.as_floats() )
         vIndices = list()
         offset = 0
         for y in range(self.m_iLensGridSegmentCountV-1):
@@ -817,10 +834,12 @@ class CMainApplication(object):
         glBindVertexArray( self.m_unLensVAO )
         self.m_glIDVertBuffer = glGenBuffers(1)
         glBindBuffer( GL_ARRAY_BUFFER, self.m_glIDVertBuffer )
-        glBufferData( GL_ARRAY_BUFFER, len(vVerts)*sizeof(VertexDataLens), numpy.array(vVerts), GL_STATIC_DRAW )
+        vert_data = numpy.array(vVerts, dtype='float32')
+        glBufferData( GL_ARRAY_BUFFER, vert_data, GL_STATIC_DRAW )
         self.m_glIDIndexBuffer = glGenBuffers(1)
         glBindBuffer( GL_ELEMENT_ARRAY_BUFFER, self.m_glIDIndexBuffer )
-        glBufferData( GL_ELEMENT_ARRAY_BUFFER, len(vIndices)*sizeof(GLushort), numpy.array(vIndices), GL_STATIC_DRAW )
+        index_data = numpy.array(vIndices, dtype='float32')
+        glBufferData( GL_ELEMENT_ARRAY_BUFFER, index_data, GL_STATIC_DRAW )
         glEnableVertexAttribArray( 0 )
         glVertexAttribPointer(0, 2, GL_FLOAT, False, sizeof(VertexDataLens), VertexDataLens.position.offset )
         glEnableVertexAttribArray( 1 )
@@ -927,7 +946,7 @@ class CMainApplication(object):
             matDeviceToTracking = self.m_rmat4DevicePose[ unTrackedDevice ]
             matMVP = self.getCurrentViewProjectionMatrix( nEye ) * matDeviceToTracking
             glUniformMatrix4fv( self.m_nRenderModelMatrixLocation, 1, False, matMVP.get() )
-            self.m_rTrackedDeviceToRenderModel[ unTrackedDevice ].Draw()
+            self.m_rTrackedDeviceToRenderModel[ unTrackedDevice ].draw()
         glUseProgram( 0 )
 
 
@@ -936,20 +955,20 @@ class CMainApplication(object):
             return Matrix4()
         mat = self.m_pHMD.getProjectionMatrix( nEye, self.m_fNearClip, self.m_fFarClip, openvr.API_OpenGL)
         return Matrix4( [
-            mat.m[0][0], mat.m[1][0], mat.m[2][0], mat.m[3][0],
-            mat.m[0][1], mat.m[1][1], mat.m[2][1], mat.m[3][1], 
-            mat.m[0][2], mat.m[1][2], mat.m[2][2], mat.m[3][2], 
-            mat.m[0][3], mat.m[1][3], mat.m[2][3], mat.m[3][3] ] )
+            [mat.m[0][0], mat.m[1][0], mat.m[2][0], mat.m[3][0]],
+            [mat.m[0][1], mat.m[1][1], mat.m[2][1], mat.m[3][1]], 
+            [mat.m[0][2], mat.m[1][2], mat.m[2][2], mat.m[3][2]], 
+            [mat.m[0][3], mat.m[1][3], mat.m[2][3], mat.m[3][3]] ] )
         
     def getHMDMatrixPoseEye(self, nEye):
         if self.m_pHMD is None:
             return Matrix4()
         matEyeRight = self.m_pHMD.getEyeToHeadTransform( nEye )
         matrixObj = Matrix4( [
-            matEyeRight.m[0][0], matEyeRight.m[1][0], matEyeRight.m[2][0], 0.0, 
-            matEyeRight.m[0][1], matEyeRight.m[1][1], matEyeRight.m[2][1], 0.0,
-            matEyeRight.m[0][2], matEyeRight.m[1][2], matEyeRight.m[2][2], 0.0,
-            matEyeRight.m[0][3], matEyeRight.m[1][3], matEyeRight.m[2][3], 1.0 ])
+            [matEyeRight.m[0][0], matEyeRight.m[1][0], matEyeRight.m[2][0], 0.0], 
+            [matEyeRight.m[0][1], matEyeRight.m[1][1], matEyeRight.m[2][1], 0.0],
+            [matEyeRight.m[0][2], matEyeRight.m[1][2], matEyeRight.m[2][2], 0.0],
+            [matEyeRight.m[0][3], matEyeRight.m[1][3], matEyeRight.m[2][3], 1.0] ])
         return matrixObj.invert()
 
     def getCurrentViewProjectionMatrix(self, nEye):
@@ -962,7 +981,7 @@ class CMainApplication(object):
     def updateHMDMatrixPose(self):
         if self.m_pHMD is None:
             return
-        openvr.VRCompositor().WaitGetPoses(self.m_rTrackedDevicePose, openvr.k_unMaxTrackedDeviceCount, None, 0 )
+        openvr.VRCompositor().waitGetPoses(self.m_rTrackedDevicePose, openvr.k_unMaxTrackedDeviceCount, None, 0 )
         self.m_iValidPoseCount = 0
         self.m_strPoseClasses = ""
         for nDevice in range(openvr.k_unMaxTrackedDeviceCount):
@@ -990,11 +1009,11 @@ class CMainApplication(object):
 
     def convertSteamVRMatrixToMatrix4(self, matPose):
         "Purpose: Converts a SteamVR matrix to our local matrix class"
-        matrixObj = Matrix4(
-        matPose.m[0][0], matPose.m[1][0], matPose.m[2][0], 0.0,
-        matPose.m[0][1], matPose.m[1][1], matPose.m[2][1], 0.0,
-        matPose.m[0][2], matPose.m[1][2], matPose.m[2][2], 0.0,
-        matPose.m[0][3], matPose.m[1][3], matPose.m[2][3], 1.0)
+        matrixObj = Matrix4( [
+        [matPose.m[0][0], matPose.m[1][0], matPose.m[2][0], 0.0],
+        [matPose.m[0][1], matPose.m[1][1], matPose.m[2][1], 0.0],
+        [matPose.m[0][2], matPose.m[1][2], matPose.m[2][2], 0.0],
+        [matPose.m[0][3], matPose.m[1][3], matPose.m[2][3], 1.0] ] ) 
         return matrixObj
 
 
@@ -1201,7 +1220,7 @@ class CMainApplication(object):
         pRenderModel = None
         for model in self.m_vecRenderModels:
             if model.getName() == pchRenderModelName:
-                pRenderModel = i
+                pRenderModel = model
                 break
         # load the model if we didn't find one
         if pRenderModel is None:
