@@ -2701,6 +2701,11 @@ class IVRCompositor(object):
         "Returns pose(s) to use to render scene (and optionally poses predicted two frames out for gameplay)."
 
         fn = self.function_table.waitGetPoses
+        # Convert non-pointer python arguments to pointers
+        if pRenderPoseArray is not None:
+            pRenderPoseArray = byref(pRenderPoseArray[0])
+        if pGamePoseArray is not None:
+            pGamePoseArray = byref(pGamePoseArray[0])
         result = fn(pRenderPoseArray, unRenderPoseArrayCount, pGamePoseArray, unGamePoseArrayCount)
         return result
 
@@ -2735,7 +2740,7 @@ class IVRCompositor(object):
         """
 
         fn = self.function_table.submit
-        eError = fn(eEye, pTexture, pBounds, nSubmitFlags)
+        eError = fn(eEye, byref(pTexture), pBounds, nSubmitFlags)
         return eError
 
     def clearLastSubmittedFrame(self):
