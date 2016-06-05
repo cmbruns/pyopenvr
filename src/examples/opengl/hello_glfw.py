@@ -98,36 +98,37 @@ class BasicGlResource(object):
         pass
 
 
-class OpenVrGlRenderer(BasicGlResource):
-    "Renders to virtual reality headset using OpenVR and OpenGL APIs"
+def matrixForOpenVrMatrix(mat):
+    if len(mat.m) == 4: # 4x4?
+        return numpy.array(
+                (mat.m[0][0], mat.m[1][0], mat.m[2][0], mat.m[3][0],
+                mat.m[0][1], mat.m[1][1], mat.m[2][1], mat.m[3][1], 
+                mat.m[0][2], mat.m[1][2], mat.m[2][2], mat.m[3][2], 
+                mat.m[0][3], mat.m[1][3], mat.m[2][3], mat.m[3][3],)
+            , numpy.float32)            
 
-    def __init__(self, actor):
-        self.actor = actor
-        self.vr_system = None
-        self.texture_id = 0
+
+class OpenVrFramebuffer(BasicGlResource):
+    "Framebuffer for rendering one eye"
+    
+    def __init__(self, width, height):
         self.fb = 0
         self.depth_buffer = 0
-
+        self.texture_id = 0
+        self.width = width
+        self.height = height
+        
     def init_gl(self):
-        "allocate OpenGL resources"
-        self.actor.init_gl()
-        self.vr_system = openvr.init(openvr.VRApplication_Scene)
-        self.vr_width, self.vr_height = self.vr_system.getRecommendedRenderTargetSize()
-        self.compositor = openvr.VRCompositor()
-        if self.compositor is None:
-            raise Exception("Unable to create compositor") 
-        poses_t = openvr.TrackedDevicePose_t * openvr.k_unMaxTrackedDeviceCount
-        self.poses = poses_t()
         # Set up framebuffer and render textures
         self.fb = glGenFramebuffers(1)
         glBindFramebuffer(GL_FRAMEBUFFER, self.fb)
         self.depth_buffer = glGenRenderbuffers(1)
         glBindRenderbuffer(GL_RENDERBUFFER, self.depth_buffer)
-        glRenderbufferStorage(GL_RENDERBUFFER, GL_DEPTH24_STENCIL8, self.vr_width, self.vr_height)
+        glRenderbufferStorage(GL_RENDERBUFFER, GL_DEPTH24_STENCIL8, self.width, self.height)
         glFramebufferRenderbuffer(GL_FRAMEBUFFER, GL_DEPTH_STENCIL_ATTACHMENT, GL_RENDERBUFFER, self.depth_buffer)
         self.texture_id = glGenTextures(1)
         glBindTexture(GL_TEXTURE_2D, self.texture_id)
-        glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA8, self.vr_width, self.vr_height, 0, GL_RGBA, GL_UNSIGNED_BYTE, None)
+        glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA8, self.width, self.height, 0, GL_RGBA, GL_UNSIGNED_BYTE, None)
         glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR)
         glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR)
         glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE)
@@ -144,6 +145,46 @@ class OpenVrGlRenderer(BasicGlResource):
         self.texture.handle = self.texture_id
         self.texture.eType = openvr.API_OpenGL
         self.texture.eColorSpace = openvr.ColorSpace_Gamma 
+        
+    def dispose_gl(self):
+        glDeleteTextures([self.texture_id])
+        glDeleteRenderbuffers(1, [self.depth_buffer])
+        glDeleteFramebuffers(1, [self.fb])
+        self.fb = 0
+
+
+class OpenVrGlRenderer(BasicGlResource):
+    "Renders to virtual reality headset using OpenVR and OpenGL APIs"
+
+    def __init__(self, actor):
+        self.actor = actor
+        self.vr_system = None
+
+    def init_gl(self):
+        "allocate OpenGL resources"
+        self.actor.init_gl()
+        self.vr_system = openvr.init(openvr.VRApplication_Scene)
+        w, h = self.vr_system.getRecommendedRenderTargetSize()
+        self.left_fb = OpenVrFramebuffer(w, h)
+        self.right_fb = OpenVrFramebuffer(w, h)
+        self.compositor = openvr.VRCompositor()
+        if self.compositor is None:
+            raise Exception("Unable to create compositor") 
+        poses_t = openvr.TrackedDevicePose_t * openvr.k_unMaxTrackedDeviceCount
+        self.poses = poses_t()
+        self.left_fb.init_gl()
+        self.right_fb.init_gl()
+        # Compute projection matrix
+        zNear = 0.1
+        zFar = 100.0
+        self.projection_left = matrixForOpenVrMatrix(self.vr_system.getProjectionMatrix(
+                openvr.Eye_Left, 
+                zNear, zFar, 
+                openvr.API_OpenGL))
+        self.projection_right = matrixForOpenVrMatrix(self.vr_system.getProjectionMatrix(
+                openvr.Eye_Right, 
+                zNear, zFar, 
+                openvr.API_OpenGL))
 
     def render_scene(self):
         self.compositor.waitGetPoses(self.poses, openvr.k_unMaxTrackedDeviceCount, None, 0)
@@ -154,17 +195,18 @@ class OpenVrGlRenderer(BasicGlResource):
         # TODO: use the pose to compute things
         # 1) On-screen render:
         modelview = None # TODO:
-        projection = None # TODO:
+        projection = self.projection_left # TODO:
         self.display_gl(modelview, projection)
         # 2) VR render
         # TODO: render different things to each eye
-        glBindFramebuffer(GL_FRAMEBUFFER, self.fb)
-        self.display_gl(modelview, projection)
-        glBindFramebuffer(GL_FRAMEBUFFER, 0)
-        #
-        # TODO: use different textures for each eye
-        self.compositor.submit(openvr.Eye_Left, self.texture)
-        self.compositor.submit(openvr.Eye_Right, self.texture)
+        # Left eye view
+        glBindFramebuffer(GL_FRAMEBUFFER, self.left_fb.fb)
+        self.display_gl(modelview, self.projection_left)
+        self.compositor.submit(openvr.Eye_Left, self.left_fb.texture)
+        # Right eye view
+        glBindFramebuffer(GL_FRAMEBUFFER, self.right_fb.fb)
+        self.display_gl(modelview, self.projection_right)
+        self.compositor.submit(openvr.Eye_Right, self.right_fb.texture)
         glBindFramebuffer(GL_FRAMEBUFFER, 0)
         
     def display_gl(self, modelview, projection):
@@ -175,10 +217,8 @@ class OpenVrGlRenderer(BasicGlResource):
         if self.vr_system is not None:
             openvr.shutdown()
             self.vr_system = None
-        glDeleteTextures([self.texture_id])
-        glDeleteRenderbuffers(1, [self.depth_buffer])
-        glDeleteFramebuffers([self.fb])
-        self.fb = 0
+        self.left_fb.dispose_gl()
+        self.right_fb.dispose_gl()
 
 
 class BlueBackgroundActor(BasicGlResource):
