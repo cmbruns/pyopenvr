@@ -100,12 +100,13 @@ class BasicGlResource(object):
 
 def matrixForOpenVrMatrix(mat):
     if len(mat.m) == 4: # HmdMatrix44_t?
-        return numpy.array(
-                (mat.m[0][0], mat.m[0][1], mat.m[0][2], mat.m[0][3],
-                 mat.m[1][0], mat.m[1][1], mat.m[1][2], mat.m[1][3], 
-                 mat.m[2][0], mat.m[2][1], mat.m[2][2], mat.m[2][3], 
-                 mat.m[3][0], mat.m[3][1], mat.m[3][2], mat.m[3][3],)
+        result = numpy.matrix(
+                ((mat.m[0][0], mat.m[1][0], mat.m[2][0], mat.m[3][0]),
+                 (mat.m[0][1], mat.m[1][1], mat.m[2][1], mat.m[3][1]), 
+                 (mat.m[0][2], mat.m[1][2], mat.m[2][2], mat.m[3][2]), 
+                 (mat.m[0][3], mat.m[1][3], mat.m[2][3], mat.m[3][3]),)
             , numpy.float32)
+        return result
     elif len(mat.m) == 3: # HmdMatrix34_t?
         result = numpy.matrix(
                 ((mat.m[0][0], mat.m[0][1], mat.m[0][2], mat.m[0][3]),
@@ -262,23 +263,24 @@ class ColorCubeActor(BasicGlResource):
         vertex_shader = compileShader(dedent(
             """\
             #version 450 core
-            #line 260
+            #line 266
             
             // Adapted from @jherico's RiftDemo.py in pyovr
             
             layout(location = 0) uniform mat4 Projection = mat4(1);
             layout(location = 4) uniform mat4 ModelView = mat4(1);
-            layout(location = 8) uniform float Size = 0.1;
+            layout(location = 8) uniform float Size = 0.3;
             
+            // Minimum Y value is zero, so cube sits on the floor in room scale
             const vec3 UNIT_CUBE[8] = vec3[8](
-              vec3(-1.0, -1.0, -1.0), // 0: lower left rear
-              vec3(+1.0, -1.0, -1.0), // 1: lower right rear
-              vec3(-1.0, +1.0, -1.0), // 2: upper left rear
-              vec3(+1.0, +1.0, -1.0), // 3: upper right rear
-              vec3(-1.0, -1.0, +1.0), // 4: lower left front
-              vec3(+1.0, -1.0, +1.0), // 5: lower right front
-              vec3(-1.0, +1.0, +1.0), // 6: upper left front
-              vec3(+1.0, +1.0, +1.0)  // 7: upper right front
+              vec3(-1.0, -0.0, -1.0), // 0: lower left rear
+              vec3(+1.0, -0.0, -1.0), // 1: lower right rear
+              vec3(-1.0, +2.0, -1.0), // 2: upper left rear
+              vec3(+1.0, +2.0, -1.0), // 3: upper right rear
+              vec3(-1.0, -0.0, +1.0), // 4: lower left front
+              vec3(+1.0, -0.0, +1.0), // 5: lower right front
+              vec3(-1.0, +2.0, +1.0), // 6: upper left front
+              vec3(+1.0, +2.0, +1.0)  // 7: upper right front
             );
             
             const vec3 UNIT_CUBE_NORMALS[6] = vec3[6](
@@ -318,7 +320,7 @@ class ColorCubeActor(BasicGlResource):
         fragment_shader = compileShader(dedent(
             """\
             #version 450 core
-            #line 316
+            #line 322
             
             in vec3 _color;
             out vec4 FragColor;
@@ -335,11 +337,11 @@ class ColorCubeActor(BasicGlResource):
         glEnable(GL_DEPTH_TEST)
         
     def display_gl(self, modelview, projection):
-        glClearColor(0.8, 0.5, 0.5, 0.0) # pink background
+        glClearColor(0.3, 0.3, 0.3, 0.0) # gray background
         glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT)
         #
         glUseProgram(self.shader)
-        glUniformMatrix4fv(0, 1, True, projection)
+        glUniformMatrix4fv(0, 1, False, projection)
         glUniformMatrix4fv(4, 1, False, modelview)
         glDrawArrays(GL_TRIANGLES, 0, 36)
     
