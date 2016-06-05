@@ -20,9 +20,10 @@ Minimal glfw programming example which creates a blue OpenGL window that can be 
 class GlfwApp(object):
     "GlfwApp uses glfw library to create an opengl context, listen to keyboard events, and clean up"
 
-    def __init__(self, renderer):
+    def __init__(self, renderer, title="GLFW test"):
         "Creates an OpenGL context and a window, and acquires OpenGL resources"
         self.renderer = renderer
+        self.title = title
         self._is_initialized = False # keep track of whether self.init_gl() has been called
         self.window = None
 
@@ -43,7 +44,7 @@ class GlfwApp(object):
         glfw.window_hint(glfw.CONTEXT_VERSION_MAJOR, 4)
         glfw.window_hint(glfw.CONTEXT_VERSION_MINOR, 1)
         glfw.window_hint(glfw.OPENGL_PROFILE, glfw.OPENGL_CORE_PROFILE)
-        self.window = glfw.create_window(800, 600, "GLFW test", None, None)
+        self.window = glfw.create_window(800, 600, self.title, None, None)
         if self.window is None:
             glfw.terminate()
             raise Exception("GLFW window creation error")
@@ -53,11 +54,11 @@ class GlfwApp(object):
             self.renderer.init_gl()
         self._is_initialized = True
 
-    def display_gl(self):
+    def render_scene(self):
         "render scene one time"
         self.init_gl() # should be a no-op after the first frame is rendered
         glfw.make_context_current(self.window)
-        self.renderer.display_gl()
+        self.renderer.render_scene()
         # Done rendering
         glfw.swap_buffers(self.window)
         glfw.poll_events()
@@ -78,7 +79,7 @@ class GlfwApp(object):
     def run_loop(self):
         "keep rendering until the user says quit"
         while not glfw.window_should_close(self.window):
-            self.display_gl()
+            self.render_scene()
 
 
 class BasicGlResource(object):
@@ -88,7 +89,7 @@ class BasicGlResource(object):
         "allocate OpenGL resources"
         pass
 
-    def display_gl(self):
+    def display_gl(self, modelview, projection):
         "render scene one time"
         pass
 
@@ -144,7 +145,7 @@ class OpenVrGlRenderer(BasicGlResource):
         self.texture.eType = openvr.API_OpenGL
         self.texture.eColorSpace = openvr.ColorSpace_Gamma 
 
-    def display_gl(self):
+    def render_scene(self):
         self.compositor.waitGetPoses(self.poses, openvr.k_unMaxTrackedDeviceCount, None, 0)
         hmd_pose0 = self.poses[openvr.k_unTrackedDeviceIndex_Hmd]
         if not hmd_pose0.bPoseIsValid:
@@ -152,17 +153,22 @@ class OpenVrGlRenderer(BasicGlResource):
         # hmd_pose = hmd_pose0.mDeviceToAbsoluteTracking
         # TODO: use the pose to compute things
         # 1) On-screen render:
-        self.actor.display_gl()
+        modelview = None # TODO:
+        projection = None # TODO:
+        self.display_gl(modelview, projection)
         # 2) VR render
         # TODO: render different things to each eye
         glBindFramebuffer(GL_FRAMEBUFFER, self.fb)
-        self.actor.display_gl()
+        self.display_gl(modelview, projection)
         glBindFramebuffer(GL_FRAMEBUFFER, 0)
         #
         # TODO: use different textures for each eye
         self.compositor.submit(openvr.Eye_Left, self.texture)
         self.compositor.submit(openvr.Eye_Right, self.texture)
         glBindFramebuffer(GL_FRAMEBUFFER, 0)
+        
+    def display_gl(self, modelview, projection):
+        self.actor.display_gl(modelview, projection)
 
     def dispose_gl(self):
         self.actor.dispose_gl()
@@ -178,103 +184,120 @@ class OpenVrGlRenderer(BasicGlResource):
 class BlueBackgroundActor(BasicGlResource):
     "Simplest possible renderer just paints the whole universe blue"
 
-    def display_gl(self):
+    def display_gl(self, modelview, projection):
         "render scene one time"
         glClearColor(0.5, 0.5, 1.0, 0.0)
         glClear(GL_COLOR_BUFFER_BIT)
 
 
-class CubeActor(BasicGlResource):
+class ColorCubeActor(BasicGlResource):
     """
     Draws a cube
     
-       2________ 1
+       2________ 3
        /|      /|
-     7/_|____5/ |
+     6/_|____7/ |
       | |_____|_| 
-      | /3    | /0
+      | /0    | /1
       |/______|/
-      6       4
+      4       5
     """
     
     def __init__(self):
-        # We can draw a cube with one triangle strip
-        self.indices = numpy.array( [
-                1,2,5,7,6,2,3,1,0,5,4,6,3,0
-            ], numpy.ushort )
-        self.vertices = numpy.array( [
-                (+1, -1, -1), # 0: right lower rear
-                (+1, +1, -1), # 1: right top rear
-                (-1, +1, -1), # 2: left top rear
-                (-1, -1, -1), # 3: left lower rear
-                (+1, -1, +1), # 4: right lower front
-                (+1, +1, +1), # 5: right top front
-                (-1, -1, +1), # 6: left lower front
-                (-1, +1, +1), # 7: left top front
-            ], numpy.float32)
-        # self.vertices = self.vertices.flatten()
-        self.program = 0
+        self.shader = 0
     
     def init_gl(self):
-        self.vao = glGenVertexArrays(1)
-        glBindVertexArray(self.vao)
         vertex_shader = compileShader(dedent(
             """\
-            #version 410
+            #version 450 core
+            #line 207
             
-            uniform mat4 modelview = mat4(1);
-            uniform mat4 projection = mat4(1);
+            // Adapted from @jherico's RiftDemo.py in pyovr
             
-            layout(location = 0) in vec3 position;
+            layout(location = 0) uniform mat4 Projection = mat4(1);
+            layout(location = 4) uniform mat4 ModelView = mat4(1);
+            layout(location = 8) uniform float Size = 1.0;
             
-            void main() 
-            {
-                gl_Position = projection * modelview * vec4(position,1);
+            const vec3 UNIT_CUBE[8] = vec3[8](
+              vec3(-1.0, -1.0, -1.0), // 0: lower left rear
+              vec3(+1.0, -1.0, -1.0), // 1: lower right rear
+              vec3(-1.0, +1.0, -1.0), // 2: upper left rear
+              vec3(+1.0, +1.0, -1.0), // 3: upper right rear
+              vec3(-1.0, -1.0, +1.0), // 4: lower left front
+              vec3(+1.0, -1.0, +1.0), // 5: lower right front
+              vec3(-1.0, +1.0, +1.0), // 6: upper left front
+              vec3(+1.0, +1.0, +1.0)  // 7: upper right front
+            );
+            
+            const vec3 UNIT_CUBE_NORMALS[6] = vec3[6](
+              vec3(0.0, 0.0, -1.0),
+              vec3(0.0, 0.0, 1.0),
+              vec3(1.0, 0.0, 0.0),
+              vec3(-1.0, 0.0, 0.0),
+              vec3(0.0, 1.0, 0.0),
+              vec3(0.0, -1.0, 0.0)
+            );
+            
+            const int CUBE_INDICES[36] = int[36](
+              0, 1, 2, 2, 1, 3, // front
+              4, 6, 5, 6, 5, 7, // back
+              0, 2, 4, 4, 2, 6, // left
+              1, 3, 5, 5, 3, 7, // right
+              2, 6, 3, 6, 3, 7, // top
+              0, 1, 4, 4, 1, 5  // bottom
+            );
+            
+            out vec3 _color;
+            
+            void main() {
+              _color = vec3(1.0, 0.0, 0.0);
+              int vertexIndex = CUBE_INDICES[gl_VertexID];
+              int normalIndex = gl_VertexID / 6;
+              
+              _color = UNIT_CUBE_NORMALS[normalIndex];
+              if (any(lessThan(_color, vec3(0.0)))) {
+                  _color = vec3(1.0) + _color;
+              }
+            
+              gl_Position = Projection * ModelView * vec4(UNIT_CUBE[vertexIndex] * Size, 1.0);
             }
             """), 
             GL_VERTEX_SHADER)
         fragment_shader = compileShader(dedent(
             """\
-            #version 410
-
-            out vec4 outputColor;
+            #version 450 core
+            #line 278
             
-            void main() 
-            {
-                outputColor = vec4(0, 1, 0, 1); // green
+            in vec3 _color;
+            out vec4 FragColor;
+            
+            void main() {
+              FragColor = vec4(_color, 1.0);
             }
             """), 
             GL_FRAGMENT_SHADER)
-        self.program = compileProgram(vertex_shader, fragment_shader)
+        self.shader = compileProgram(vertex_shader, fragment_shader)
         #
-        self.vbo = vbo.VBO(self.vertices)
-        self.ibo = vbo.VBO(self.indices, target=GL_ELEMENT_ARRAY_BUFFER)
-        #
-        glBindBuffer(GL_ARRAY_BUFFER, 0)
-        glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, 0)
+        self.vao = glGenVertexArrays(1)
+        glBindVertexArray(self.vao)
         
-    def display_gl(self):
-        glClearColor(0.8, 0.5, 0.5, 0.0)
+    def display_gl(self, modelview, projection):
+        glClearColor(0.8, 0.5, 0.5, 0.0) # pink background
         glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT)
         #
-        glUseProgram(self.program)
-        # glEnableVertexAttribArray(0)
-        glVertexAttribPointer(0, 3, GL_FLOAT, False, 0, None)
-        self.vbo.bind()
-        self.ibo.bind()
-        glDrawElements(GL_TRIANGLE_STRIP, 
-                      len(self.indices), 
-                      GL_UNSIGNED_SHORT,
-                      None)
+        glUseProgram(self.shader)
+        glDrawArrays(GL_TRIANGLES, 0, 36)
     
     def dispose_gl(self):
-        glDeleteProgram(self.program)
-        self.program = 0
+        glDeleteProgram(self.shader)
+        self.shader = 0
+        glDeleteVertexArrays(1, (self.vao,))
+        self.vao = 0
 
 
 if __name__ == "__main__":
     # Show a blue OpenGL window
-    actor0 = CubeActor()
+    actor0 = ColorCubeActor()
     renderer0 = OpenVrGlRenderer(actor0)
-    with GlfwApp(renderer0) as glfwApp:
+    with GlfwApp(renderer0, "glfw OpenVR color cube") as glfwApp:
         glfwApp.run_loop()
