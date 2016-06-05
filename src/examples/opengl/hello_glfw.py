@@ -2,9 +2,13 @@
 
 # file hello_glfw.py
 
+from textwrap import dedent
 
 from OpenGL.GL import *  # @UnusedWildImport # this comment squelches an IDE warning
+from OpenGL.GL.shaders import compileShader, compileProgram
+from OpenGL.arrays import vbo
 import glfw
+import numpy
 
 import openvr
 
@@ -98,6 +102,10 @@ class OpenVrGlRenderer(BasicGlResource):
 
     def __init__(self, actor):
         self.actor = actor
+        self.vr_system = None
+        self.texture_id = 0
+        self.fb = 0
+        self.depth_buffer = 0
 
     def init_gl(self):
         "allocate OpenGL resources"
@@ -176,9 +184,97 @@ class BlueBackgroundActor(BasicGlResource):
         glClear(GL_COLOR_BUFFER_BIT)
 
 
+class CubeActor(BasicGlResource):
+    """
+    Draws a cube
+    
+       2________ 1
+       /|      /|
+     7/_|____5/ |
+      | |_____|_| 
+      | /3    | /0
+      |/______|/
+      6       4
+    """
+    
+    def __init__(self):
+        # We can draw a cube with one triangle strip
+        self.indices = numpy.array( [
+                1,2,5,7,6,2,3,1,0,5,4,6,3,0
+            ], numpy.ushort )
+        self.vertices = numpy.array( [
+                (+1, -1, -1), # 0: right lower rear
+                (+1, +1, -1), # 1: right top rear
+                (-1, +1, -1), # 2: left top rear
+                (-1, -1, -1), # 3: left lower rear
+                (+1, -1, +1), # 4: right lower front
+                (+1, +1, +1), # 5: right top front
+                (-1, -1, +1), # 6: left lower front
+                (-1, +1, +1), # 7: left top front
+            ], numpy.float32)
+        # self.vertices = self.vertices.flatten()
+        self.program = 0
+    
+    def init_gl(self):
+        self.vao = glGenVertexArrays(1)
+        glBindVertexArray(self.vao)
+        vertex_shader = compileShader(dedent(
+            """\
+            #version 410
+            
+            uniform mat4 modelview = mat4(1);
+            uniform mat4 projection = mat4(1);
+            
+            layout(location = 0) in vec3 position;
+            
+            void main() 
+            {
+                gl_Position = projection * modelview * vec4(position,1);
+            }
+            """), 
+            GL_VERTEX_SHADER)
+        fragment_shader = compileShader(dedent(
+            """\
+            #version 410
+
+            out vec4 outputColor;
+            
+            void main() 
+            {
+                outputColor = vec4(0, 1, 0, 1); // green
+            }
+            """), 
+            GL_FRAGMENT_SHADER)
+        self.program = compileProgram(vertex_shader, fragment_shader)
+        #
+        self.vbo = vbo.VBO(self.vertices)
+        self.ibo = vbo.VBO(self.indices, target=GL_ELEMENT_ARRAY_BUFFER)
+        #
+        glBindBuffer(GL_ARRAY_BUFFER, 0)
+        glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, 0)
+        
+    def display_gl(self):
+        glClearColor(0.8, 0.5, 0.5, 0.0)
+        glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT)
+        #
+        glUseProgram(self.program)
+        # glEnableVertexAttribArray(0)
+        glVertexAttribPointer(0, 3, GL_FLOAT, False, 0, None)
+        self.vbo.bind()
+        self.ibo.bind()
+        glDrawElements(GL_TRIANGLE_STRIP, 
+                      len(self.indices), 
+                      GL_UNSIGNED_SHORT,
+                      None)
+    
+    def dispose_gl(self):
+        glDeleteProgram(self.program)
+        self.program = 0
+
+
 if __name__ == "__main__":
     # Show a blue OpenGL window
-    actor0 = BlueBackgroundActor()
+    actor0 = CubeActor()
     renderer0 = OpenVrGlRenderer(actor0)
     with GlfwApp(renderer0) as glfwApp:
         glfwApp.run_loop()
