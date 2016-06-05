@@ -99,13 +99,21 @@ class BasicGlResource(object):
 
 
 def matrixForOpenVrMatrix(mat):
-    if len(mat.m) == 4: # 4x4?
+    if len(mat.m) == 4: # HmdMatrix44_t?
         return numpy.array(
-                (mat.m[0][0], mat.m[1][0], mat.m[2][0], mat.m[3][0],
-                mat.m[0][1], mat.m[1][1], mat.m[2][1], mat.m[3][1], 
-                mat.m[0][2], mat.m[1][2], mat.m[2][2], mat.m[3][2], 
-                mat.m[0][3], mat.m[1][3], mat.m[2][3], mat.m[3][3],)
-            , numpy.float32)            
+                (mat.m[0][0], mat.m[0][1], mat.m[0][2], mat.m[0][3],
+                 mat.m[1][0], mat.m[1][1], mat.m[1][2], mat.m[1][3], 
+                 mat.m[2][0], mat.m[2][1], mat.m[2][2], mat.m[2][3], 
+                 mat.m[3][0], mat.m[3][1], mat.m[3][2], mat.m[3][3],)
+            , numpy.float32)
+    elif len(mat.m) == 3: # HmdMatrix34_t?
+        result = numpy.matrix(
+                ((mat.m[0][0], mat.m[0][1], mat.m[0][2], mat.m[0][3]),
+                 (mat.m[1][0], mat.m[1][1], mat.m[1][2], mat.m[1][3]), 
+                 (mat.m[2][0], mat.m[2][1], mat.m[2][2], mat.m[2][3]), 
+                 (0.0, 0.0, 0.0, 1.0,),)
+            , numpy.float32)  
+        return result.I
 
 
 class OpenVrFramebuffer(BasicGlResource):
@@ -159,6 +167,8 @@ class OpenVrGlRenderer(BasicGlResource):
     def __init__(self, actor):
         self.actor = actor
         self.vr_system = None
+        self.left_fb = None
+        self.right_fb = None
 
     def init_gl(self):
         "allocate OpenGL resources"
@@ -191,16 +201,17 @@ class OpenVrGlRenderer(BasicGlResource):
         hmd_pose0 = self.poses[openvr.k_unTrackedDeviceIndex_Hmd]
         if not hmd_pose0.bPoseIsValid:
             return
-        # hmd_pose = hmd_pose0.mDeviceToAbsoluteTracking
+        hmd_pose1 = hmd_pose0.mDeviceToAbsoluteTracking
+        hmd_pose = matrixForOpenVrMatrix(hmd_pose1)
         # TODO: use the pose to compute things
         # 1) On-screen render:
-        modelview = None # TODO:
-        projection = self.projection_left # TODO:
-        self.display_gl(modelview, projection)
+        modelview = hmd_pose # TODO: per eye...
+        glViewport(0, 0, 800, 600)
+        self.display_gl(modelview, self.projection_left)
         # 2) VR render
-        # TODO: render different things to each eye
         # Left eye view
         glBindFramebuffer(GL_FRAMEBUFFER, self.left_fb.fb)
+        glViewport(0, 0, self.left_fb.width, self.left_fb.height)
         self.display_gl(modelview, self.projection_left)
         self.compositor.submit(openvr.Eye_Left, self.left_fb.texture)
         # Right eye view
@@ -217,8 +228,9 @@ class OpenVrGlRenderer(BasicGlResource):
         if self.vr_system is not None:
             openvr.shutdown()
             self.vr_system = None
-        self.left_fb.dispose_gl()
-        self.right_fb.dispose_gl()
+        if self.left_fb is not None:
+            self.left_fb.dispose_gl()
+            self.right_fb.dispose_gl()
 
 
 class BlueBackgroundActor(BasicGlResource):
@@ -250,13 +262,13 @@ class ColorCubeActor(BasicGlResource):
         vertex_shader = compileShader(dedent(
             """\
             #version 450 core
-            #line 207
+            #line 260
             
             // Adapted from @jherico's RiftDemo.py in pyovr
             
             layout(location = 0) uniform mat4 Projection = mat4(1);
             layout(location = 4) uniform mat4 ModelView = mat4(1);
-            layout(location = 8) uniform float Size = 1.0;
+            layout(location = 8) uniform float Size = 0.1;
             
             const vec3 UNIT_CUBE[8] = vec3[8](
               vec3(-1.0, -1.0, -1.0), // 0: lower left rear
@@ -306,7 +318,7 @@ class ColorCubeActor(BasicGlResource):
         fragment_shader = compileShader(dedent(
             """\
             #version 450 core
-            #line 278
+            #line 316
             
             in vec3 _color;
             out vec4 FragColor;
@@ -320,12 +332,15 @@ class ColorCubeActor(BasicGlResource):
         #
         self.vao = glGenVertexArrays(1)
         glBindVertexArray(self.vao)
+        glEnable(GL_DEPTH_TEST)
         
     def display_gl(self, modelview, projection):
         glClearColor(0.8, 0.5, 0.5, 0.0) # pink background
         glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT)
         #
         glUseProgram(self.shader)
+        glUniformMatrix4fv(0, 1, True, projection)
+        glUniformMatrix4fv(4, 1, False, modelview)
         glDrawArrays(GL_TRIANGLES, 0, 36)
     
     def dispose_gl(self):
