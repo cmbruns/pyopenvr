@@ -4064,7 +4064,7 @@ def _checkInitError(error):
     """
     if error.value != VRInitError_None.value:
         shutdown()
-        raise OpenVRError(getVRInitErrorAsSymbol(error) + str(error))    
+        raise OpenVRError("%s (error number %d)" %(getVRInitErrorAsSymbol(error), error.value))
 
 
 # Copying VR_Init inline implementation from https://github.com/ValveSoftware/openvr/blob/master/headers/openvr.h

@@ -13,7 +13,7 @@ import numpy
 import openvr
 
 """
-Minimal glfw programming example which creates a blue OpenGL window that can be closed by pressing ESCAPE.
+Minimal glfw programming example which colored OpenGL cube scene that can be closed by pressing ESCAPE.
 """
 
 
@@ -98,6 +98,8 @@ class BasicGlResource(object):
         pass
 
 
+# TODO: matrixForOpenVrMatrix() is not general, it is specific the perspective and 
+# modelview matrices used in this example
 def matrixForOpenVrMatrix(mat):
     if len(mat.m) == 4: # HmdMatrix44_t?
         result = numpy.matrix(
@@ -263,7 +265,7 @@ class ColorCubeActor(BasicGlResource):
         vertex_shader = compileShader(dedent(
             """\
             #version 450 core
-            #line 266
+            #line 268
             
             // Adapted from @jherico's RiftDemo.py in pyovr
             
@@ -320,7 +322,7 @@ class ColorCubeActor(BasicGlResource):
         fragment_shader = compileShader(dedent(
             """\
             #version 450 core
-            #line 322
+            #line 325
             
             in vec3 _color;
             out vec4 FragColor;
