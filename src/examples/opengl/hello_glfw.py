@@ -6,7 +6,6 @@ from textwrap import dedent
 
 from OpenGL.GL import *  # @UnusedWildImport # this comment squelches an IDE warning
 from OpenGL.GL.shaders import compileShader, compileProgram
-from OpenGL.arrays import vbo
 import glfw
 import numpy
 
@@ -111,10 +110,10 @@ def matrixForOpenVrMatrix(mat):
         return result
     elif len(mat.m) == 3: # HmdMatrix34_t?
         result = numpy.matrix(
-                ((mat.m[0][0], mat.m[0][1], mat.m[0][2], mat.m[0][3]),
-                 (mat.m[1][0], mat.m[1][1], mat.m[1][2], mat.m[1][3]), 
-                 (mat.m[2][0], mat.m[2][1], mat.m[2][2], mat.m[2][3]), 
-                 (0.0, 0.0, 0.0, 1.0,),)
+                ((mat.m[0][0], mat.m[1][0], mat.m[2][0], 0.0),
+                 (mat.m[0][1], mat.m[1][1], mat.m[2][1], 0.0), 
+                 (mat.m[0][2], mat.m[1][2], mat.m[2][2], 0.0), 
+                 (mat.m[0][3], mat.m[1][3], mat.m[2][3], 1.0),)
             , numpy.float32)  
         return result.I
 
@@ -198,6 +197,10 @@ class OpenVrGlRenderer(BasicGlResource):
                 openvr.Eye_Right, 
                 zNear, zFar, 
                 openvr.API_OpenGL))
+        self.view_left = matrixForOpenVrMatrix(
+                self.vr_system.getEyeToHeadTransform(openvr.Eye_Left))
+        self.view_right = matrixForOpenVrMatrix(
+                self.vr_system.getEyeToHeadTransform(openvr.Eye_Right))
 
     def render_scene(self):
         self.compositor.waitGetPoses(self.poses, openvr.k_unMaxTrackedDeviceCount, None, 0)
@@ -206,20 +209,27 @@ class OpenVrGlRenderer(BasicGlResource):
             return
         hmd_pose1 = hmd_pose0.mDeviceToAbsoluteTracking
         hmd_pose = matrixForOpenVrMatrix(hmd_pose1)
-        # TODO: use the pose to compute things
+        # Use the pose to compute things
+        modelview = hmd_pose
+        mvl = modelview * self.view_left
+        mvr = modelview * self.view_right
+        # Repack the resulting matrices to have default stride, to avoid
+        # problems with weird strides and OpenGL
+        mvl = numpy.matrix(mvl, dtype=numpy.float32)
+        mvr = numpy.matrix(mvr, dtype=numpy.float32)
         # 1) On-screen render:
-        modelview = hmd_pose # TODO: per eye...
         glViewport(0, 0, 800, 600)
-        self.display_gl(modelview, self.projection_left)
+        # Display left eye view to screen
+        self.display_gl(mvl, self.projection_left)
         # 2) VR render
         # Left eye view
         glBindFramebuffer(GL_FRAMEBUFFER, self.left_fb.fb)
         glViewport(0, 0, self.left_fb.width, self.left_fb.height)
-        self.display_gl(modelview, self.projection_left)
+        self.display_gl(mvl, self.projection_left)
         self.compositor.submit(openvr.Eye_Left, self.left_fb.texture)
         # Right eye view
         glBindFramebuffer(GL_FRAMEBUFFER, self.right_fb.fb)
-        self.display_gl(modelview, self.projection_right)
+        self.display_gl(mvr, self.projection_right)
         self.compositor.submit(openvr.Eye_Right, self.right_fb.texture)
         glBindFramebuffer(GL_FRAMEBUFFER, 0)
         
