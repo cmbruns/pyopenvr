@@ -2,7 +2,6 @@
 
 # file glfwapp.py
 
-from OpenGL.GL import *  # @UnusedWildImport # this comment squelches an IDE warning
 import glfw
 
 """
