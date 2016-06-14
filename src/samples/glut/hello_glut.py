@@ -3,8 +3,8 @@
 # file hello_glfw.py
 
 from glut_app import GlutApp
-from openvr_gl_renderer import OpenVrGlRenderer
-from color_cube_actor import ColorCubeActor
+from openvr.gl_renderer import OpenVrGlRenderer
+from openvr.color_cube_actor import ColorCubeActor
 
 """
 Minimal glfw programming example which colored OpenGL cube scene that can be closed by pressing ESCAPE.
