@@ -67,6 +67,7 @@ class OpenVrFramebuffer(object):
         glBindFramebuffer(GL_FRAMEBUFFER, 0)   
         # OpenVR texture data
         self.texture = openvr.Texture_t()
+        self.texture.handle = self.texture_id
         self.texture.eType = openvr.API_OpenGL
         self.texture.eColorSpace = openvr.ColorSpace_Gamma 
         
