@@ -5,6 +5,9 @@
 # OpenVR example application
 # Manually translated from OpenVR C++ example file hellovr_opengl_main.cpp
 # by Christopher Bruns
+#
+# NOTE -- This example does not yet work!!!
+# Try hello_sdl2.py instead.
 
 # Python standard library imports
 import sys

@@ -1,25 +1,19 @@
 #!/bin/env python
 
-# file hello_sdl.py
-
-from textwrap import dedent
+# file sdl_app.py
 
 from OpenGL.GL import *  # @UnusedWildImport # this comment squelches an IDE warning
-from OpenGL.GL.shaders import compileShader, compileProgram
-from sdl2 import *
-
-from openvr.gl_renderer import OpenVrGlRenderer
-from openvr.color_cube_actor import ColorCubeActor
+from sdl2 import * # @UnusedWildImport
 
 
 """
 Minimal sdl programming example which colored OpenGL cube scene that can be closed by pressing ESCAPE.
 """
 
-class HelloAppQuit(Exception):
+class SdlAppQuit(Exception):
 	pass
 
-class HelloApp(object):
+class SdlApp(object):
 	"SdlApp uses sdl2 library to create an opengl context, listen to keyboard events, and clean up"
 	renderer = None
 	title = None
@@ -47,7 +41,7 @@ class HelloApp(object):
 	
 	def __exit__(self, type_arg, value, traceback):
 		"cleanup for RAII using 'with' keyword"
-		print('HelloApp exiting')
+		print('SdlApp exiting')
 		self.dispose_gl()
 	
 	def init_gl(self):
@@ -110,7 +104,7 @@ class HelloApp(object):
 	
 	def on_sdl_quit ( self, event ):
 		self.running = False
-		raise HelloAppQuit()
+		raise SdlAppQuit()
 	
 	def run_loop(self):
 		"keep rendering until the user says quit"
@@ -123,13 +117,5 @@ class HelloApp(object):
 					if f is not None:
 						f ( event )
 				self.render_scene()
-		except HelloAppQuit as e:
+		except SdlAppQuit as e:
 			pass
-
-
-if __name__ == "__main__":
-	# Show a blue OpenGL window
-	actor0 = ColorCubeActor()
-	renderer0 = OpenVrGlRenderer(actor0, (800,600))
-	with HelloApp(renderer0, "sdl2 OpenVR color cube") as app:
-		app.run_loop()
