@@ -17,8 +17,8 @@ class GlutApp(object):
         "Creates an OpenGL context and a window, and acquires OpenGL resources"
         self.renderer = renderer
         self.title = title
-        self._is_initialized = False # keep track of whether self.init_gl() has been called
         self.window = None
+        self.init_gl()
 
     def __enter__(self):
         "setup for RAII using 'with' keyword"
@@ -29,11 +29,10 @@ class GlutApp(object):
         self.dispose_gl()
 
     def init_gl(self):
-        if self._is_initialized:
-            return # only initialize once
         glutInit()
         glutInitDisplayMode(GLUT_RGBA | GLUT_DEPTH | GLUT_DOUBLE)
-        glutInitContextVersion(4, 1)
+        if bool(glutInitContextVersion):
+            glutInitContextVersion(4, 1)
         # Create a regular desktop window, just so we can have an OpenGL context to play with
         glutInitWindowSize(800, 600)
         glutInitWindowPosition(50, 50)
@@ -43,15 +42,13 @@ class GlutApp(object):
         glutIdleFunc(self.render_scene)
         glutReshapeFunc(self.resize_gl)
         glutKeyboardFunc(self.key_press)
-
         if self.renderer is not None:
             self.renderer.init_gl()
-        self._is_initialized = True
 
     def render_scene(self):
         "render scene one time"
-        self.init_gl() # should be a no-op after the first frame is rendered
         self.renderer.render_scene()
+        glutSwapBuffers()
 
     def dispose_gl(self):
         if self.window is not None:
@@ -60,7 +57,7 @@ class GlutApp(object):
             self.window = None
         self._is_initialized = False
 
-    def key_callback(self, key, x, y):
+    def key_press(self, key, x, y):
         "Close the application when the player presses ESCAPE"
         if ord(key) == 27:
             # print "Escape!"
