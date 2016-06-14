@@ -67,7 +67,6 @@ class OpenVrFramebuffer(object):
         glBindFramebuffer(GL_FRAMEBUFFER, 0)   
         # OpenVR texture data
         self.texture = openvr.Texture_t()
-        self.texture.handle = self.texture_id
         self.texture.eType = openvr.API_OpenGL
         self.texture.eColorSpace = openvr.ColorSpace_Gamma 
         
@@ -81,11 +80,12 @@ class OpenVrFramebuffer(object):
 class OpenVrGlRenderer(object):
     "Renders to virtual reality headset using OpenVR and OpenGL APIs"
 
-    def __init__(self, actor):
+    def __init__(self, actor, window_size=(800,600)):
         self.actor = actor
         self.vr_system = None
         self.left_fb = None
         self.right_fb = None
+        self.window_size = window_size
 
     def init_gl(self):
         "allocate OpenGL resources"
@@ -133,7 +133,7 @@ class OpenVrGlRenderer(object):
         mvl = numpy.matrix(mvl, dtype=numpy.float32)
         mvr = numpy.matrix(mvr, dtype=numpy.float32)
         # 1) On-screen render:
-        glViewport(0, 0, 800, 600)
+        glViewport(0, 0, self.window_size[0], self.window_size[1])
         # Display left eye view to screen
         self.display_gl(mvl, self.projection_left)
         # 2) VR render
