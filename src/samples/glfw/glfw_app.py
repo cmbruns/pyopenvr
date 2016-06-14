@@ -37,7 +37,7 @@ class GlfwApp(object):
         glfw.window_hint(glfw.CONTEXT_VERSION_MAJOR, 4)
         glfw.window_hint(glfw.CONTEXT_VERSION_MINOR, 1)
         glfw.window_hint(glfw.OPENGL_PROFILE, glfw.OPENGL_CORE_PROFILE)
-        self.window = glfw.create_window(800, 600, self.title, None, None)
+        self.window = glfw.create_window(self.renderer.window_size[0], self.renderer.window_size[1], self.title, None, None)
         if self.window is None:
             glfw.terminate()
             raise Exception("GLFW window creation error")
