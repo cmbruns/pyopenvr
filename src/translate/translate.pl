@@ -160,7 +160,7 @@ def _checkInitError(error):
     """
     if error.value != VRInitError_None.value:
         shutdown()
-        raise OpenVRError(getVRInitErrorAsSymbol(error) + str(error))    
+        raise OpenVRError("%s (error number %d)" %(getVRInitErrorAsSymbol(error), error.value))
 
 
 # Copying VR_Init inline implementation from https://github.com/ValveSoftware/openvr/blob/master/headers/openvr.h
@@ -565,6 +565,12 @@ EOF
         }
 
         $struct_name = translate_type($struct_name);
+        
+        # Special handling of COpenVRContext class
+        if ($struct_name =~ m/^COpenVRContext$/) {
+        	expose_openvr_context($struct_contents);
+        	next;
+        }
 
         # Add special methods to vector classes
         if ($struct_name =~ m/^HmdVector/) {
@@ -603,13 +609,14 @@ EOF
                 my @fn_args = ();
                 # "first" argument is the return type
                 push @fn_args, translate_type($return_type);
+                # Iterate over second through nth arguments
                 foreach my $arg (split ",", $fn_args0) {
-                    die unless $arg =~ s/^\s*(.*\S)\s+(\S+)\s*$//;
+                    die unless $arg =~ m/^\s*(.*\S)\s+(\S+)\s*$/;
                     my $arg_type = $1;
                     my $arg_name = $2;
                     $arg_type = translate_type($arg_type);
                     push @fn_args, $arg_type;
-                    # TODO: remember the array arg type
+                    # Store inout array argument type for later processing
                     if (exists $inout_array_arguments{$fn_name}) {
                         if ($arg_name eq $inout_array_arguments{$fn_name}[0]) {
                             die $arg_type unless $arg_type =~ /POINTER\((.*)\)/;
@@ -799,6 +806,64 @@ EOF
 
     }
     # print $struct_count2, "\n";    
+}
+
+sub expose_openvr_context {
+	my $struct_contents = shift;
+	my @fields = split('\n', $struct_contents);
+	my @context_classes = ();
+	foreach my $field (@fields) {
+		$field =~ s/^\s*//;
+		$field =~ s/\s*$//;
+		next unless $field =~ m/\S/;
+		# print "# $field #\n";
+		# "intptr_t m_pVRChaperoneSetup; // class vr::IVRChaperoneSetup *"
+		die $field unless $field =~ m/^intptr_t\s+m_p(VR\S+);/; 
+		my $cls_root = $1; # e.g. "VRChaperoneSetup"
+		push @context_classes, $cls_root
+	}
+    # exit(0); # TODO
+
+    print <<EOF;
+class COpenVRContext(object):
+    def __init__(self):
+        self.clear()
+        
+    def checkClear(self):
+        global _vr_token
+        if _vr_token != getInitToken():
+            self.clear()
+            _vr_token = getInitToken()
+            
+    def clear(self):  
+EOF
+
+	# enumerate members to clear in clear method
+	foreach my $cls_name (@context_classes) {
+		print "        self.m_p$cls_name = None\n";
+	}
+
+	# enumerate accessors for each interface class types
+	foreach my $cls_name (@context_classes) {
+		print <<EOF;
+
+    def $cls_name(self):
+        self.checkClear()
+        if self.m_p$cls_name is None:
+            self.m_p$cls_name = I$cls_name()
+        return self.m_p$cls_name
+EOF
+	}
+
+    print <<EOF;
+
+
+# Globals for context management
+_vr_token = None
+_internal_module_context = COpenVRContext()
+
+
+EOF
 }
 
 sub translate_type {
