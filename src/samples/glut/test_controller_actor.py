@@ -4,8 +4,10 @@
 
 from textwrap import dedent
 
+import numpy
 from OpenGL.GL import *  # @UnusedWildImport # this comment squelches an IDE warning
 from OpenGL.GL.shaders import compileShader, compileProgram
+from OpenGL.arrays import vbo
 
 
 """
@@ -33,44 +35,23 @@ class ControllerActor(object):
         vertex_shader = compileShader(dedent(
             """\
             #version 450 core
-            #line 36
+            #line 38
             
-            // Adapted from @jherico's RiftDemo.py in pyovr
+            in vec3 in_Position;
             
             layout(location = 0) uniform mat4 Projection = mat4(1);
             layout(location = 4) uniform mat4 ModelView = mat4(1);
             
-            // Minimum Y value is zero, so cube sits on the floor in room scale
-            const vec3 UNIT_CUBE[8] = vec3[8](
-              vec3(-0.3, -0.0, -0.3), // 0: lower left rear
-              vec3(+0.3, -0.0, -0.3), // 1: lower right rear
-              vec3(-0.3, +0.6, -0.3), // 2: upper left rear
-              vec3(+0.3, +0.6, -0.3), // 3: upper right rear
-              vec3(-0.3, -0.0, +0.3), // 4: lower left front
-              vec3(+0.3, -0.0, +0.3), // 5: lower right front
-              vec3(-0.3, +0.6, +0.3), // 6: upper left front
-              vec3(+0.3, +0.6, +0.3)  // 7: upper right front
-            );
-            
-            const int CUBE_INDICES[36] = int[36](
-              0, 1, 2, 2, 1, 3, // front
-              4, 6, 5, 6, 5, 7, // back
-              0, 2, 4, 4, 2, 6, // left
-              1, 3, 5, 5, 3, 7, // right
-              2, 6, 3, 6, 3, 7, // top
-              0, 1, 4, 4, 1, 5  // bottom
-            );
-            
             void main() {
-              int vertexIndex = CUBE_INDICES[gl_VertexID];
-              gl_Position = Projection * ModelView * vec4(UNIT_CUBE[vertexIndex], 1.0);
+              vec3 vertex = in_Position;
+              gl_Position = Projection * ModelView * vec4(vertex, 1.0);
             }
             """), 
             GL_VERTEX_SHADER)
         fragment_shader = compileShader(dedent(
             """\
             #version 450 core
-            #line 93
+            #line 54
             
             out vec4 fragColor;
             
@@ -81,21 +62,33 @@ class ControllerActor(object):
             GL_FRAGMENT_SHADER)
         self.shader = compileProgram(vertex_shader, fragment_shader)
         #
-        self.vao = glGenVertexArrays(1)
-        glBindVertexArray(self.vao)
+        self.vbo = glGenBuffers(1)
+        glBindBuffer(GL_ARRAY_BUFFER, self.vbo)
+        vertices = numpy.array([
+            [0, 0, 0],
+            [0.5, 0, 0],
+            [0.5, 0.8, 0],
+            ], dtype='float32')
+        self.vertexPositions = vbo.VBO(vertices)
+        indices = numpy.array([0, 1, 2], dtype=numpy.int32)
+        self.indexPositions = vbo.VBO(indices, target=GL_ELEMENT_ARRAY_BUFFER)
+        glBufferData(GL_ARRAY_BUFFER, vertices, GL_STATIC_DRAW)
         glEnable(GL_DEPTH_TEST)
         
     def display_gl(self, modelview, projection):
         glClearColor(0.3, 0.3, 0.3, 0.0) # gray background
         glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT)
-        #
         glUseProgram(self.shader)
         glUniformMatrix4fv(0, 1, False, projection)
         glUniformMatrix4fv(4, 1, False, modelview)
-        glDrawArrays(GL_TRIANGLES, 0, 36)
+        self.indexPositions.bind()
+        self.vertexPositions.bind()
+        glEnableVertexAttribArray(0)
+        glVertexAttribPointer(0, 3, GL_FLOAT, False, 0, None)
+        glDrawElements(GL_TRIANGLES, 3, GL_UNSIGNED_INT, None)
     
     def dispose_gl(self):
         glDeleteProgram(self.shader)
         self.shader = 0
-        glDeleteVertexArrays(1, (self.vao,))
-        self.vao = 0
+        glDeleteBuffers(1, (self.vbo,))
+        self.vbo = 0
