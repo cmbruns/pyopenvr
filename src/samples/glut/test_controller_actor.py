@@ -71,18 +71,8 @@ class ControllerActor(object):
               0, 1, 4, 4, 1, 5  // bottom
             );
             
-            out vec3 _color;
-            
             void main() {
-              _color = vec3(1.0, 0.0, 0.0);
               int vertexIndex = CUBE_INDICES[gl_VertexID];
-              int normalIndex = gl_VertexID / 6;
-              
-              _color = UNIT_CUBE_NORMALS[normalIndex];
-              if (any(lessThan(_color, vec3(0.0)))) {
-                  _color = vec3(1.0) + _color;
-              }
-            
               gl_Position = Projection * ModelView * vec4(UNIT_CUBE[vertexIndex] * Size, 1.0);
             }
             """), 
@@ -92,7 +82,6 @@ class ControllerActor(object):
             #version 450 core
             #line 93
             
-            in vec3 _color;
             out vec4 fragColor;
             
             void main() {
