@@ -107,9 +107,6 @@ class ColorCubeActor(object):
         glEnable(GL_DEPTH_TEST)
         
     def display_gl(self, modelview, projection):
-        glClearColor(0.3, 0.3, 0.3, 0.0) # gray background
-        glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT)
-        #
         glUseProgram(self.shader)
         glUniformMatrix4fv(0, 1, False, projection)
         glUniformMatrix4fv(4, 1, False, modelview)
