@@ -39,27 +39,17 @@ class ControllerActor(object):
             
             layout(location = 0) uniform mat4 Projection = mat4(1);
             layout(location = 4) uniform mat4 ModelView = mat4(1);
-            layout(location = 8) uniform float Size = 0.3;
             
             // Minimum Y value is zero, so cube sits on the floor in room scale
             const vec3 UNIT_CUBE[8] = vec3[8](
-              vec3(-1.0, -0.0, -1.0), // 0: lower left rear
-              vec3(+1.0, -0.0, -1.0), // 1: lower right rear
-              vec3(-1.0, +2.0, -1.0), // 2: upper left rear
-              vec3(+1.0, +2.0, -1.0), // 3: upper right rear
-              vec3(-1.0, -0.0, +1.0), // 4: lower left front
-              vec3(+1.0, -0.0, +1.0), // 5: lower right front
-              vec3(-1.0, +2.0, +1.0), // 6: upper left front
-              vec3(+1.0, +2.0, +1.0)  // 7: upper right front
-            );
-            
-            const vec3 UNIT_CUBE_NORMALS[6] = vec3[6](
-              vec3(0.0, 0.0, -1.0),
-              vec3(0.0, 0.0, 1.0),
-              vec3(1.0, 0.0, 0.0),
-              vec3(-1.0, 0.0, 0.0),
-              vec3(0.0, 1.0, 0.0),
-              vec3(0.0, -1.0, 0.0)
+              vec3(-0.3, -0.0, -0.3), // 0: lower left rear
+              vec3(+0.3, -0.0, -0.3), // 1: lower right rear
+              vec3(-0.3, +0.6, -0.3), // 2: upper left rear
+              vec3(+0.3, +0.6, -0.3), // 3: upper right rear
+              vec3(-0.3, -0.0, +0.3), // 4: lower left front
+              vec3(+0.3, -0.0, +0.3), // 5: lower right front
+              vec3(-0.3, +0.6, +0.3), // 6: upper left front
+              vec3(+0.3, +0.6, +0.3)  // 7: upper right front
             );
             
             const int CUBE_INDICES[36] = int[36](
@@ -73,7 +63,7 @@ class ControllerActor(object):
             
             void main() {
               int vertexIndex = CUBE_INDICES[gl_VertexID];
-              gl_Position = Projection * ModelView * vec4(UNIT_CUBE[vertexIndex] * Size, 1.0);
+              gl_Position = Projection * ModelView * vec4(UNIT_CUBE[vertexIndex], 1.0);
             }
             """), 
             GL_VERTEX_SHADER)
