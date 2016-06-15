@@ -176,7 +176,7 @@ def init(applicationType):
     """
     initInternal(applicationType)
     # Retrieve "System" API
-    return IVRSystem()
+    return VRSystem()
 
 
 def shutdown():
@@ -748,11 +748,19 @@ EOF
                             push @internal_arg_names, $arg_name;
                             push @return_arg_names, $arg_name;
                         }
+                        # Pointer arguments are assumed to be OUTPUT arguments at this point
                         elsif ($arg_type =~ m/^POINTER\((.*)\)/) {
                             my $pointee_type = $1;
                             push @return_arg_types, $pointee_type;
                             push @internal_arg_names, "byref($arg_name)";
-                            push @return_arg_names, $arg_name;
+                            # Pointers to primitive types return the .value member
+                            if ($pointee_type =~ m/^c_/) {
+	                            push @return_arg_names, "${arg_name}.value";
+								# print "VALUE ${arg_name}\n";
+                            }
+                            else {
+	                            push @return_arg_names, $arg_name;
+                            }
                         }
                         else {
                             push @internal_arg_names, $arg_name;
@@ -774,9 +782,12 @@ EOF
                     print_docstring($fn_name, "        ");
 
                     print "        fn = self.function_table.$fn_name\n";
-                    foreach my $ret_name (@return_arg_names) {
+					# Assign local variables for return/out arguments
+                    foreach my $ret_name0 (@return_arg_names) {
+						my $ret_name = $ret_name0;
                         next if $ret_name =~ m/^result$/;
                         next if defined $array_arg_name and $ret_name eq $array_arg_name; # handled below
+                        $ret_name =~ s/\.value$//;
                         print "        $ret_name = ";
                         print shift @return_arg_types;
                         print "()\n";
@@ -864,6 +875,16 @@ _internal_module_context = COpenVRContext()
 
 
 EOF
+
+	# enumerate global accessors for each interface class type
+	foreach my $cls_name (@context_classes) {
+		print <<EOF;
+def ${cls_name}():
+    return _internal_module_context.${cls_name}()
+
+EOF
+	}
+
 }
 
 sub translate_type {
