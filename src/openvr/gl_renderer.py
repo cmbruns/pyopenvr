@@ -91,7 +91,6 @@ class OpenVrGlRenderer(object):
 
     def init_gl(self):
         "allocate OpenGL resources"
-        self.actor.init_gl()
         self.vr_system = openvr.init(openvr.VRApplication_Scene)
         w, h = self.vr_system.getRecommendedRenderTargetSize()
         self.left_fb = OpenVrFramebuffer(w, h)
@@ -118,6 +117,7 @@ class OpenVrGlRenderer(object):
                 self.vr_system.getEyeToHeadTransform(openvr.Eye_Left)).I # head_X_eye in Kane notation
         self.view_right = matrixForOpenVrMatrix(
                 self.vr_system.getEyeToHeadTransform(openvr.Eye_Right)).I # head_X_eye in Kane notation
+        self.actor.init_gl()
 
     def render_scene(self):
         if self.compositor is None:
@@ -153,6 +153,8 @@ class OpenVrGlRenderer(object):
         glBindFramebuffer(GL_FRAMEBUFFER, 0)
         
     def display_gl(self, modelview, projection):
+        glClearColor(0.2, 0.2, 0.2, 0.0) # gray background
+        glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT)
         self.actor.display_gl(modelview, projection)
 
     def dispose_gl(self):

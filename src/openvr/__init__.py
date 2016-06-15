@@ -741,7 +741,7 @@ OverlayDirection_Count = ENUM_TYPE(4)
 
 EVRRenderModelError = ENUM_TYPE
 VRRenderModelError_None = ENUM_TYPE(0)
-VRRenderModelError_Loading = ENUM_TYPE(100)
+VRRenderModelError_Loading = 100
 VRRenderModelError_NotSupported = ENUM_TYPE(200)
 VRRenderModelError_InvalidArg = ENUM_TYPE(300)
 VRRenderModelError_InvalidModel = ENUM_TYPE(301)
@@ -1816,7 +1816,7 @@ class IVRSystem(object):
         result = fn(unDeviceIndex, prop, byref(pError))
         return result, pError
 
-    def getStringTrackedDeviceProperty(self, unDeviceIndex, prop, pchValue, unBufferSize):
+    def getStringTrackedDeviceProperty(self, unDeviceIndex, prop):
         """
         Returns a string property. If the device index is not valid or the property is not a string type this function will 
         return 0. Otherwise it returns the length of the number of bytes necessary to hold this string including the trailing
@@ -1825,8 +1825,16 @@ class IVRSystem(object):
 
         fn = self.function_table.getStringTrackedDeviceProperty
         pError = ETrackedPropertyError()
-        result = fn(unDeviceIndex, prop, pchValue, unBufferSize, byref(pError))
-        return result, pError
+        # TODO: automate this string argument manipulation ****
+        unRequiredBufferLen = fn( unDeviceIndex, prop, None, 0, byref(pError) )
+        if unRequiredBufferLen == 0:
+            return ""
+        pchBuffer = ctypes.create_string_buffer(unRequiredBufferLen)
+        fn( unDeviceIndex, prop, pchBuffer, unRequiredBufferLen, byref(pError) )
+        if pError.value != TrackedProp_Success.value:
+            raise OpenVRError(str(pError))
+        sResult = str(pchBuffer.value)
+        return sResult
 
     def getPropErrorNameFromEnum(self, error):
         """
@@ -3854,7 +3862,11 @@ class IVRRenderModels(object):
         fn = self.function_table.loadRenderModel_Async
         ppRenderModel = POINTER(RenderModel_t)()
         result = fn(pchRenderModelName, byref(ppRenderModel))
-        return result, ppRenderModel
+        if ppRenderModel:
+            model = ppRenderModel.contents
+        else:
+            model = None
+        return result, model
 
     def freeRenderModel(self):
         """
