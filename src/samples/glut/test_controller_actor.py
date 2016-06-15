@@ -20,15 +20,7 @@ Color cube for use in "hello world" openvr apps
 
 class ControllerActor(object):
     """
-    Draws a cube
-    
-       2________ 3
-       /|      /|
-     6/_|____7/ |
-      | |_____|_| 
-      | /0    | /1
-      |/______|/
-      4       5
+    Draws a Vive controller
     """
     
     def __init__(self):
@@ -42,6 +34,7 @@ class ControllerActor(object):
             
             layout(location = 0) in vec3 in_Position;
             layout(location = 1) in vec3 in_Normal;
+            layout(location = 2) in vec2 in_TexCoord;
             
             layout(location = 0) uniform mat4 projection = mat4(1);
             layout(location = 4) uniform mat4 model_view = mat4(1);
@@ -50,7 +43,8 @@ class ControllerActor(object):
             
             void main() {
               gl_Position = projection * model_view * vec4(in_Position, 1.0);
-              color = (normalize(in_Normal) + vec3(1,1,1)) * 0.5; // color by normal
+              // color = (normalize(in_Normal) + vec3(1,1,1)) * 0.5; // color by normal
+              color = vec3(in_TexCoord, 0.5); // color by texture coordinate
             }
             """), 
             GL_VERTEX_SHADER)
