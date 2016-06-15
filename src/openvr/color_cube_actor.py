@@ -33,7 +33,7 @@ class ColorCubeActor(object):
         vertex_shader = compileShader(dedent(
             """\
             #version 450 core
-            #line 268
+            #line 36
             
             // Adapted from @jherico's RiftDemo.py in pyovr
             
@@ -90,7 +90,7 @@ class ColorCubeActor(object):
         fragment_shader = compileShader(dedent(
             """\
             #version 450 core
-            #line 325
+            #line 93
             
             in vec3 _color;
             out vec4 FragColor;
