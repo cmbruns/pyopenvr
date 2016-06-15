@@ -30,7 +30,7 @@ def matrixForOpenVrMatrix(mat):
                  (mat.m[0][2], mat.m[1][2], mat.m[2][2], 0.0), 
                  (mat.m[0][3], mat.m[1][3], mat.m[2][3], 1.0),)
             , numpy.float32)  
-        return result.I
+        return result
 
 
 class OpenVrFramebuffer(object):
@@ -42,6 +42,7 @@ class OpenVrFramebuffer(object):
         self.texture_id = 0
         self.width = width
         self.height = height
+        self.compositor = None
         
     def init_gl(self):
         # Set up framebuffer and render textures
@@ -114,21 +115,23 @@ class OpenVrGlRenderer(object):
                 zNear, zFar, 
                 openvr.API_OpenGL))
         self.view_left = matrixForOpenVrMatrix(
-                self.vr_system.getEyeToHeadTransform(openvr.Eye_Left))
+                self.vr_system.getEyeToHeadTransform(openvr.Eye_Left)).I # head_X_eye in Kane notation
         self.view_right = matrixForOpenVrMatrix(
-                self.vr_system.getEyeToHeadTransform(openvr.Eye_Right))
+                self.vr_system.getEyeToHeadTransform(openvr.Eye_Right)).I # head_X_eye in Kane notation
 
     def render_scene(self):
+        if self.compositor is None:
+            return
         self.compositor.waitGetPoses(self.poses, openvr.k_unMaxTrackedDeviceCount, None, 0)
         hmd_pose0 = self.poses[openvr.k_unTrackedDeviceIndex_Hmd]
         if not hmd_pose0.bPoseIsValid:
             return
-        hmd_pose1 = hmd_pose0.mDeviceToAbsoluteTracking
-        hmd_pose = matrixForOpenVrMatrix(hmd_pose1)
+        hmd_pose1 = hmd_pose0.mDeviceToAbsoluteTracking # head_X_room in Kane notation
+        hmd_pose = matrixForOpenVrMatrix(hmd_pose1).I # room_X_head in Kane notation
         # Use the pose to compute things
         modelview = hmd_pose
-        mvl = modelview * self.view_left
-        mvr = modelview * self.view_right
+        mvl = modelview * self.view_left # room_X_eye(left) in Kane notation
+        mvr = modelview * self.view_right # room_X_eye(right) in Kane notation
         # Repack the resulting matrices to have default stride, to avoid
         # problems with weird strides and OpenGL
         mvl = numpy.matrix(mvl, dtype=numpy.float32)
