@@ -49,7 +49,6 @@ class PinkWorld(object):
         poses_t = openvr.TrackedDevicePose_t * openvr.k_unMaxTrackedDeviceCount
         self.poses = poses_t()
         #
-        self.frame_count = 0
         # Set up framebuffer and render textures
         self.fb = glGenFramebuffers(1)
         glBindFramebuffer(GL_FRAMEBUFFER, self.fb)
@@ -98,12 +97,7 @@ class PinkWorld(object):
         if not hmd_pose0.bPoseIsValid:
             return
         # hmd_pose = hmd_pose0.mDeviceToAbsoluteTracking
-        # TODO: use the pose to compute things
-        self.frame_count += 1
-        # print("pose %d" % self.frame_count)
         # 1) On-screen render:
-        # Assuming monitor is at least half as fast as VR headset, we can
-        # render one out of every two frames
         if True:
             glClearColor(0.8, 0.4, 0.4, 0) # Pink background
             glClear(GL_COLOR_BUFFER_BIT)
