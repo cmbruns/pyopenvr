@@ -12,6 +12,7 @@ from OpenGL.GL.shaders import compileShader, compileProgram
 from OpenGL.arrays import vbo
 
 import openvr
+from openvr.gl_renderer import matrixForOpenVrMatrix
 
 """
 Color cube for use in "hello world" openvr apps
@@ -23,8 +24,10 @@ class ControllerActor(object):
     Draws a Vive controller
     """
     
-    def __init__(self):
+    def __init__(self, pose_array, tracked_index=1):
         self.shader = 0
+        self.tracked_index = tracked_index
+        self.pose_array = pose_array
     
     def init_gl(self):
         vertex_shader = compileShader(dedent(
@@ -43,8 +46,8 @@ class ControllerActor(object):
             
             void main() {
               gl_Position = projection * model_view * vec4(in_Position, 1.0);
-              // color = (normalize(in_Normal) + vec3(1,1,1)) * 0.5; // color by normal
-              color = vec3(in_TexCoord, 0.5); // color by texture coordinate
+              color = (normalize(in_Normal) + vec3(1,1,1)) * 0.5; // color by normal
+              // color = vec3(in_TexCoord, 0.5); // color by texture coordinate
             }
             """), 
             GL_VERTEX_SHADER)
@@ -67,7 +70,7 @@ class ControllerActor(object):
         glBindBuffer(GL_ARRAY_BUFFER, self.vbo)
         # Load controller model
         error = openvr.EVRRenderModelError()
-        modelName = openvr.VRSystem().getStringTrackedDeviceProperty(1, openvr.Prop_RenderModelName_String)
+        modelName = openvr.VRSystem().getStringTrackedDeviceProperty(self.tracked_index, openvr.Prop_RenderModelName_String)
         while True:
             error, model = openvr.VRRenderModels().loadRenderModel_Async(modelName)
             if error != openvr.VRRenderModelError_Loading:
@@ -98,6 +101,15 @@ class ControllerActor(object):
         glEnable(GL_DEPTH_TEST)
         
     def display_gl(self, modelview, projection):
+        pose = self.pose_array[self.tracked_index]
+        if pose.bPoseIsValid:
+            controller_X_room = pose.mDeviceToAbsoluteTracking
+            controller_X_room = matrixForOpenVrMatrix(controller_X_room)
+            modelview = controller_X_room * modelview
+            # Repack before use, just in case
+            modelview = numpy.matrix(modelview, dtype=numpy.float32)
+        else:
+            print ("Controller pose is not valid")
         glUseProgram(self.shader)
         glUniformMatrix4fv(0, 1, False, projection)
         glUniformMatrix4fv(4, 1, False, modelview)

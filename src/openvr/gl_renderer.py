@@ -79,15 +79,16 @@ class OpenVrFramebuffer(object):
         self.fb = 0
 
 
-class OpenVrGlRenderer(object):
+class OpenVrGlRenderer(list):
     "Renders to virtual reality headset using OpenVR and OpenGL APIs"
 
-    def __init__(self, actor, window_size=(800,600)):
-        self.actor = actor
+    def __init__(self, window_size=(800,600)):
         self.vr_system = None
         self.left_fb = None
         self.right_fb = None
         self.window_size = window_size
+        poses_t = openvr.TrackedDevicePose_t * openvr.k_unMaxTrackedDeviceCount
+        self.poses = poses_t()
 
     def init_gl(self):
         "allocate OpenGL resources"
@@ -98,8 +99,6 @@ class OpenVrGlRenderer(object):
         self.compositor = openvr.VRCompositor()
         if self.compositor is None:
             raise Exception("Unable to create compositor") 
-        poses_t = openvr.TrackedDevicePose_t * openvr.k_unMaxTrackedDeviceCount
-        self.poses = poses_t()
         self.left_fb.init_gl()
         self.right_fb.init_gl()
         # Compute projection matrix
@@ -117,7 +116,8 @@ class OpenVrGlRenderer(object):
                 self.vr_system.getEyeToHeadTransform(openvr.Eye_Left)).I # head_X_eye in Kane notation
         self.view_right = matrixForOpenVrMatrix(
                 self.vr_system.getEyeToHeadTransform(openvr.Eye_Right)).I # head_X_eye in Kane notation
-        self.actor.init_gl()
+        for actor in self:
+            actor.init_gl()
 
     def render_scene(self):
         if self.compositor is None:
@@ -155,10 +155,12 @@ class OpenVrGlRenderer(object):
     def display_gl(self, modelview, projection):
         glClearColor(0.2, 0.2, 0.2, 0.0) # gray background
         glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT)
-        self.actor.display_gl(modelview, projection)
+        for actor in self:
+            actor.display_gl(modelview, projection)
 
     def dispose_gl(self):
-        self.actor.dispose_gl()
+        for actor in self:
+            actor.dispose_gl()
         if self.vr_system is not None:
             openvr.shutdown()
             self.vr_system = None

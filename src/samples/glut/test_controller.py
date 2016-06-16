@@ -12,7 +12,8 @@ Minimal glfw programming example which colored OpenGL cube scene that can be clo
 
 
 if __name__ == "__main__":
-    actor = ControllerActor()
-    renderer = OpenVrGlRenderer(actor)
+    renderer = OpenVrGlRenderer()
+    actor = ControllerActor(renderer.poses, 1)
+    renderer.append(actor)
     with GlutApp(renderer, "glut OpenVR color cube") as glutApp:
         glutApp.run_loop()
