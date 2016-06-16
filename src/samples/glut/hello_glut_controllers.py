@@ -1,10 +1,10 @@
 #!/bin/env python
 
-# file hello_glfw.py
+# file hello_glut_controllers.py
 
 from glut_app import GlutApp
 from openvr.gl_renderer import OpenVrGlRenderer
-from test_controller_actor import TrackedDevicesActor
+from openvr.tracked_devices_actor import TrackedDevicesActor
 from openvr.color_cube_actor import ColorCubeActor
 
 """

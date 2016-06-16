@@ -1,6 +1,6 @@
 #!/bin/env python
 
-# file color_cube_actor.py
+# file tracked_devices_actor.py
 
 import time
 from textwrap import dedent
