@@ -2,7 +2,9 @@
 
 # file sdl_app.py
 
-from OpenGL.GL import *  # @UnusedWildImport # this comment squelches an IDE warning
+import ctypes
+
+from OpenGL.GL import glFlush  # @UnusedWildImport # this comment squelches an IDE warning
 from sdl2 import * # @UnusedWildImport
 
 
@@ -58,7 +60,7 @@ class SdlApp(object):
 		SDL_GL_SetAttribute( SDL_GL_GREEN_SIZE, 5 )
 		SDL_GL_SetAttribute( SDL_GL_BLUE_SIZE, 5 )
 		SDL_GL_SetAttribute( SDL_GL_DEPTH_SIZE, 16 )
-		SDL_GL_SetAttribute( SDL_GL_DOUBLEBUFFER, 1 )
+		SDL_GL_SetAttribute( SDL_GL_DOUBLEBUFFER, 0 )
 		self.window = SDL_CreateWindow (
 			self.title.encode('utf-8'),
 			SDL_WINDOWPOS_CENTERED, SDL_WINDOWPOS_CENTERED,
@@ -78,7 +80,8 @@ class SdlApp(object):
 		SDL_GL_MakeCurrent ( self.window, self.context )
 		self.renderer.render_scene()
 		# Done rendering
-		SDL_GL_SwapWindow(self.window)
+		# SDL_GL_SwapWindow(self.window)
+		glFlush()
 	
 	def dispose_gl(self):
 		if self.window is not None:

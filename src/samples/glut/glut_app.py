@@ -30,7 +30,7 @@ class GlutApp(object):
 
     def init_gl(self):
         glutInit()
-        glutInitDisplayMode(GLUT_RGBA | GLUT_DEPTH | GLUT_DOUBLE)
+        glutInitDisplayMode(GLUT_RGBA | GLUT_DEPTH | GLUT_SINGLE)
         if bool(glutInitContextVersion):
             glutInitContextVersion(4, 1)
         # Create a regular desktop window, just so we can have an OpenGL context to play with
@@ -48,7 +48,8 @@ class GlutApp(object):
     def render_scene(self):
         "render scene one time"
         self.renderer.render_scene()
-        glutSwapBuffers()
+        # glutSwapBuffers() # double buffering stalls rendering
+        glFlush()
 
     def dispose_gl(self):
         if self.window is not None:

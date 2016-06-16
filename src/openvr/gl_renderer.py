@@ -82,13 +82,19 @@ class OpenVrFramebuffer(object):
 class OpenVrGlRenderer(list):
     "Renders to virtual reality headset using OpenVR and OpenGL APIs"
 
-    def __init__(self, window_size=(800,600)):
+    def __init__(self, actor=None, window_size=(800,600)):
         self.vr_system = None
         self.left_fb = None
         self.right_fb = None
         self.window_size = window_size
         poses_t = openvr.TrackedDevicePose_t * openvr.k_unMaxTrackedDeviceCount
         self.poses = poses_t()
+        if actor is not None:
+            try:
+                len(actor)
+                self.extend(actor)
+            except TypeError:
+                self.append(actor)            
 
     def init_gl(self):
         "allocate OpenGL resources"

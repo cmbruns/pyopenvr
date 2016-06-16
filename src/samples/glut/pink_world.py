@@ -30,7 +30,7 @@ class PinkWorld(object):
         "One time initialization"
         # Glut
         glutInit()
-        glutInitDisplayMode(GLUT_RGBA | GLUT_DOUBLE)
+        glutInitDisplayMode(GLUT_RGBA)
         # Create a regular desktop window, just so we can have an OpenGL context to play with
         glutInitWindowSize(400, 400)
         glutInitWindowPosition(50, 50)
@@ -70,7 +70,7 @@ class PinkWorld(object):
         if status != GL_FRAMEBUFFER_COMPLETE:
             glBindFramebuffer(GL_FRAMEBUFFER, 0)
             raise Exception("Incomplete framebuffer")
-        glBindFramebuffer(GL_FRAMEBUFFER, 0)   
+        glBindFramebuffer(GL_FRAMEBUFFER, 0)
         # OpenVR texture data
         self.texture = openvr.Texture_t()
         self.texture.handle = self.texture_id
@@ -102,9 +102,13 @@ class PinkWorld(object):
         self.frame_count += 1
         # print("pose %d" % self.frame_count)
         # 1) On-screen render:
-        glClearColor(0.8, 0.4, 0.4, 0) # Pink background
-        glClear(GL_COLOR_BUFFER_BIT)
-        glutSwapBuffers()
+        # Assuming monitor is at least half as fast as VR headset, we can
+        # render one out of every two frames
+        if True:
+            glClearColor(0.8, 0.4, 0.4, 0) # Pink background
+            glClear(GL_COLOR_BUFFER_BIT)
+            # glutSwapBuffers()
+            glFlush() # Single buffer
         # 2) VR render
         # TODO: render different things to each eye
         glBindFramebuffer(GL_FRAMEBUFFER, self.fb)

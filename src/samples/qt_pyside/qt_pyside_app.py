@@ -45,7 +45,7 @@ class MyGlWidget(QGLWidget):
     def paintGL(self):
         "render scene one time"
         self.renderer.render_scene()
-        self.swapBuffers()
+        self.swapBuffers() # Seems OK even in single-buffer mode
         
     def render_vr(self):
         self.makeCurrent()
@@ -76,6 +76,7 @@ class QtPysideApp(QApplication):
         glformat = QGLFormat()
         glformat.setVersion(4, 1)
         glformat.setProfile(QGLFormat.CoreProfile)
+        glformat.setDoubleBuffer(False)
         self.glwidget = MyGlWidget(renderer, glformat, self)
         self.window.setCentralWidget(self.glwidget)
         self.window.show()

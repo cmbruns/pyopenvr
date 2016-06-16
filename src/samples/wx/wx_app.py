@@ -4,6 +4,8 @@
 
 import sys
 
+from OpenGL.GL import glFlush, glFinish
+
 import wx
 from wx import glcanvas
 
@@ -52,7 +54,7 @@ class WxApp(wx.App):
 		self.window = wx.Frame ( parent=None, id=wx.ID_ANY, title=self.title,
 			style=wx.DEFAULT_FRAME_STYLE|wx.WS_EX_PROCESS_IDLE )
 		print('creating GLCanvas')
-		self.canvas = glcanvas.GLCanvas ( self.window )
+		self.canvas = glcanvas.GLCanvas ( self.window, glcanvas.WX_GL_RGBA )
 		print('creating GLContext')
 		self.context = glcanvas.GLContext(self.canvas)
 		self.canvas.SetFocus()
@@ -82,7 +84,15 @@ class WxApp(wx.App):
 		self.canvas.SetCurrent ( self.context )
 		self.renderer.render_scene()
 		# Done rendering
-		self.canvas.SwapBuffers()
+		# self.canvas.SwapBuffers()
+		if self.canvas.IsDoubleBuffered():
+			self.canvas.SwapBuffers()
+			print "double buffered" # Do not want
+		else:
+			pass
+			# TODO: SwapBuffers() seems required to show on desktop monitor,
+			# but causes stalling when monitor is slower than VR headset
+			self.canvas.SwapBuffers()
 	
 	def dispose_gl(self):
 		pass
