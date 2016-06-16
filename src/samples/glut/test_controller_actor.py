@@ -15,64 +15,20 @@ import openvr
 from openvr.gl_renderer import matrixForOpenVrMatrix
 
 """
-Color cube for use in "hello world" openvr apps
+Tracked item (controllers, lighthouses, etc) actor for "hello world" openvr apps
 """
 
-
-class ControllerActor(object):
-    """
-    Draws a Vive controller
-    """
-    
-    def __init__(self, pose_array, tracked_index=1):
-        self.shader = 0
-        self.tracked_index = tracked_index
-        self.pose_array = pose_array
-    
-    def init_gl(self):
-        vertex_shader = compileShader(dedent(
-            """\
-            #version 450 core
-            #line 40
-            
-            layout(location = 0) in vec3 in_Position;
-            layout(location = 1) in vec3 in_Normal;
-            layout(location = 2) in vec2 in_TexCoord;
-            
-            layout(location = 0) uniform mat4 projection = mat4(1);
-            layout(location = 4) uniform mat4 model_view = mat4(1);
-            
-            out vec3 color;
-            
-            void main() {
-              gl_Position = projection * model_view * vec4(in_Position, 1.0);
-              color = (normalize(in_Normal) + vec3(1,1,1)) * 0.5; // color by normal
-              // color = vec3(in_TexCoord, 0.5); // color by texture coordinate
-            }
-            """), 
-            GL_VERTEX_SHADER)
-        fragment_shader = compileShader(dedent(
-            """\
-            #version 450 core
-            #line 59
-            
-            in vec3 color;
-            out vec4 fragColor;
-            
-            void main() {
-              fragColor = vec4(color, 1.0);
-            }
-            """), 
-            GL_FRAGMENT_SHADER)
-        self.shader = compileProgram(vertex_shader, fragment_shader)
+class TrackedDeviceMesh(object):
+    def __init__(self, model_name):
+        "This constructor must only be called with a live OpenGL context"
+        self.model_name = model_name
         # http://stackoverflow.com/questions/14365484/how-to-draw-with-vertex-array-objects-and-gldrawelements-in-pyopengl
         self.vbo = glGenBuffers(1)
         glBindBuffer(GL_ARRAY_BUFFER, self.vbo)
         # Load controller model
         error = openvr.EVRRenderModelError()
-        modelName = openvr.VRSystem().getStringTrackedDeviceProperty(self.tracked_index, openvr.Prop_RenderModelName_String)
         while True:
-            error, model = openvr.VRRenderModels().loadRenderModel_Async(modelName)
+            error, model = openvr.VRRenderModels().loadRenderModel_Async(model_name)
             if error != openvr.VRRenderModelError_Loading:
                 break
             time.sleep(1)
@@ -97,22 +53,17 @@ class ControllerActor(object):
         #
         self.vertexPositions = vbo.VBO(vertices0)
         self.indexPositions = vbo.VBO(indices0, target=GL_ELEMENT_ARRAY_BUFFER)
-        #
-        glEnable(GL_DEPTH_TEST)
-        
-    def display_gl(self, modelview, projection):
-        pose = self.pose_array[self.tracked_index]
-        if pose.bPoseIsValid:
-            controller_X_room = pose.mDeviceToAbsoluteTracking
-            controller_X_room = matrixForOpenVrMatrix(controller_X_room)
-            modelview = controller_X_room * modelview
-            # Repack before use, just in case
-            modelview = numpy.matrix(modelview, dtype=numpy.float32)
-        else:
-            print ("Controller pose is not valid")
-        glUseProgram(self.shader)
-        glUniformMatrix4fv(0, 1, False, projection)
-        glUniformMatrix4fv(4, 1, False, modelview)
+
+    def display_gl(self, modelview, projection, pose):
+        controller_X_room = pose.mDeviceToAbsoluteTracking
+        controller_X_room = matrixForOpenVrMatrix(controller_X_room)
+        modelview0 = controller_X_room * modelview
+        # Repack before use, just in case
+        modelview0 = numpy.matrix(modelview0, dtype=numpy.float32)
+        glUniformMatrix4fv(4, 1, False, modelview0)
+        normal_matrix = controller_X_room.I.T
+        normal_matrix = numpy.matrix(normal_matrix, dtype=numpy.float32)
+        glUniformMatrix4fv(8, 1, False, normal_matrix)
         self.indexPositions.bind()
         self.vertexPositions.bind()
         # Vertices
@@ -127,9 +78,90 @@ class ControllerActor(object):
         glVertexAttribPointer(2, 2, GL_FLOAT, False, 8 * fsize, cast(6 * fsize, c_void_p))
         #
         glDrawElements(GL_TRIANGLES, len(self.indexPositions), GL_UNSIGNED_INT, None)
+        
+    def dispose_gl(self):
+        glDeleteBuffers(1, (self.vbo,))
+        self.vbo = 0        
+
+
+class TrackedDevicesActor(object):
+    """
+    Draws Vive controllers and lighthouses.
+    """
+    
+    def __init__(self, pose_array):
+        self.shader = 0
+        self.poses = pose_array
+        self.meshes = dict()
+    
+    def _check_devices(self):
+        "Enumerate OpenVR tracked devices and check whether any need to be initialized"
+        for i in range(1, len(self.poses)):
+            pose = self.poses[i]
+            if not pose.bPoseIsValid:
+                continue
+            model_name = openvr.VRSystem().getStringTrackedDeviceProperty(i, openvr.Prop_RenderModelName_String)
+            if not model_name in self.meshes:
+                self.meshes[model_name] = TrackedDeviceMesh(model_name)
+    
+    def init_gl(self):
+        vertex_shader = compileShader(dedent(
+            """\
+            #version 450 core
+            #line 40
+            
+            layout(location = 0) in vec3 in_Position;
+            layout(location = 1) in vec3 in_Normal;
+            layout(location = 2) in vec2 in_TexCoord;
+            
+            layout(location = 0) uniform mat4 projection = mat4(1);
+            layout(location = 4) uniform mat4 model_view = mat4(1);
+            layout(location = 8) uniform mat4 normal_matrix = mat4(1);
+            
+            out vec3 color;
+            
+            void main() {
+              gl_Position = projection * model_view * vec4(in_Position, 1.0);
+              vec3 normal = normalize((normal_matrix * vec4(in_Normal, 0)).xyz);
+              color = (normal + vec3(1,1,1)) * 0.5; // color by normal
+              // color = vec3(in_TexCoord, 0.5); // color by texture coordinate
+            }
+            """), 
+            GL_VERTEX_SHADER)
+        fragment_shader = compileShader(dedent(
+            """\
+            #version 450 core
+            #line 59
+            
+            in vec3 color;
+            out vec4 fragColor;
+            
+            void main() {
+              fragColor = vec4(color, 1.0);
+            }
+            """), 
+            GL_FRAGMENT_SHADER)
+        self.shader = compileProgram(vertex_shader, fragment_shader)
+        self._check_devices()
+        glEnable(GL_DEPTH_TEST)
+        
+    def display_gl(self, modelview, projection):
+        self._check_devices()
+        glUseProgram(self.shader)
+        glUniformMatrix4fv(0, 1, False, projection)
+        for i in range(1, len(self.poses)):
+            pose = self.poses[i]
+            if not pose.bPoseIsValid:
+                continue
+            model_name = openvr.VRSystem().getStringTrackedDeviceProperty(i, openvr.Prop_RenderModelName_String)
+            if not model_name in self.meshes:
+                continue # Come on, we already tried to load it a moment ago. Maybe next time.
+            mesh = self.meshes[model_name]
+            mesh.display_gl(modelview, projection, pose)
     
     def dispose_gl(self):
         glDeleteProgram(self.shader)
         self.shader = 0
-        glDeleteBuffers(1, (self.vbo,))
-        self.vbo = 0
+        for key, mesh in self.meshes.iteritems():
+            mesh.dispose_gl()
+            del self.meshes[key]
