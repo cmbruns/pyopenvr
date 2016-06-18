@@ -22,9 +22,6 @@ class TrackedDeviceMesh(object):
     def __init__(self, model_name):
         "This constructor must only be called with a live OpenGL context"
         self.model_name = model_name
-        # http://stackoverflow.com/questions/14365484/how-to-draw-with-vertex-array-objects-and-gldrawelements-in-pyopengl
-        self.vbo = glGenBuffers(1)
-        glBindBuffer(GL_ARRAY_BUFFER, self.vbo)
         # Load controller model
         error = openvr.EVRRenderModelError()
         while True:
@@ -53,19 +50,11 @@ class TrackedDeviceMesh(object):
         #
         self.vertexPositions = vbo.VBO(vertices0)
         self.indexPositions = vbo.VBO(indices0, target=GL_ELEMENT_ARRAY_BUFFER)
-
-    def display_gl(self, modelview, projection, pose):
-        controller_X_room = pose.mDeviceToAbsoluteTracking
-        controller_X_room = matrixForOpenVrMatrix(controller_X_room)
-        modelview0 = controller_X_room * modelview
-        # Repack before use, just in case
-        modelview0 = numpy.matrix(modelview0, dtype=numpy.float32)
-        glUniformMatrix4fv(4, 1, False, modelview0)
-        normal_matrix = controller_X_room.I.T
-        normal_matrix = numpy.matrix(normal_matrix, dtype=numpy.float32)
-        glUniformMatrix4fv(8, 1, False, normal_matrix)
-        self.indexPositions.bind()
+        # http://stackoverflow.com/questions/14365484/how-to-draw-with-vertex-array-objects-and-gldrawelements-in-pyopengl
+        self.vao = glGenVertexArrays(1)
+        glBindVertexArray(self.vao)
         self.vertexPositions.bind()
+        self.indexPositions.bind()
         # Vertices
         glEnableVertexAttribArray(0)
         fsize = sizeof(c_float)
@@ -76,7 +65,18 @@ class TrackedDeviceMesh(object):
         # Texture coordinates    
         glEnableVertexAttribArray(2)
         glVertexAttribPointer(2, 2, GL_FLOAT, False, 8 * fsize, cast(6 * fsize, c_void_p))
-        #
+        glBindVertexArray(0)
+
+    def display_gl(self, modelview, projection, pose):
+        controller_X_room = pose.mDeviceToAbsoluteTracking
+        controller_X_room = matrixForOpenVrMatrix(controller_X_room)
+        modelview0 = controller_X_room * modelview
+        # Repack before use, just in case
+        modelview0 = numpy.matrix(modelview0, dtype=numpy.float32)
+        glUniformMatrix4fv(4, 1, False, modelview0)
+        normal_matrix = controller_X_room
+        glUniformMatrix4fv(8, 1, False, normal_matrix)
+        glBindVertexArray(self.vao)
         glDrawElements(GL_TRIANGLES, len(self.indexPositions), GL_UNSIGNED_INT, None)
         
     def dispose_gl(self):
