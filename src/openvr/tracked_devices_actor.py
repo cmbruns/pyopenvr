@@ -72,9 +72,9 @@ class TrackedDeviceMesh(object):
         controller_X_room = matrixForOpenVrMatrix(controller_X_room)
         modelview0 = controller_X_room * modelview
         # Repack before use, just in case
-        modelview0 = numpy.matrix(modelview0, dtype=numpy.float32)
+        modelview0 = numpy.asarray(numpy.matrix(modelview0, dtype=numpy.float32))
         glUniformMatrix4fv(4, 1, False, modelview0)
-        normal_matrix = controller_X_room
+        normal_matrix = numpy.asarray(controller_X_room)
         glUniformMatrix4fv(8, 1, False, normal_matrix)
         glBindVertexArray(self.vao)
         glDrawElements(GL_TRIANGLES, len(self.indexPositions), GL_UNSIGNED_INT, None)

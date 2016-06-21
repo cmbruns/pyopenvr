@@ -111,14 +111,14 @@ class OpenVrGlRenderer(list):
         # Compute projection matrix
         zNear = 0.1
         zFar = 100.0
-        self.projection_left = matrixForOpenVrMatrix(self.vr_system.getProjectionMatrix(
+        self.projection_left = numpy.asarray(matrixForOpenVrMatrix(self.vr_system.getProjectionMatrix(
                 openvr.Eye_Left, 
                 zNear, zFar, 
-                openvr.API_OpenGL))
-        self.projection_right = matrixForOpenVrMatrix(self.vr_system.getProjectionMatrix(
+                openvr.API_OpenGL)))
+        self.projection_right = numpy.asarray(matrixForOpenVrMatrix(self.vr_system.getProjectionMatrix(
                 openvr.Eye_Right, 
                 zNear, zFar, 
-                openvr.API_OpenGL))
+                openvr.API_OpenGL)))
         self.view_left = matrixForOpenVrMatrix(
                 self.vr_system.getEyeToHeadTransform(openvr.Eye_Left)).I # head_X_eye in Kane notation
         self.view_right = matrixForOpenVrMatrix(
@@ -141,8 +141,8 @@ class OpenVrGlRenderer(list):
         mvr = modelview * self.view_right # room_X_eye(right) in Kane notation
         # Repack the resulting matrices to have default stride, to avoid
         # problems with weird strides and OpenGL
-        mvl = numpy.matrix(mvl, dtype=numpy.float32)
-        mvr = numpy.matrix(mvr, dtype=numpy.float32)
+        mvl = numpy.asarray(numpy.matrix(mvl, dtype=numpy.float32))
+        mvr = numpy.asarray(numpy.matrix(mvr, dtype=numpy.float32))
         # 1) On-screen render:
         if self.do_mirror:
             glViewport(0, 0, self.window_size[0], self.window_size[1])
