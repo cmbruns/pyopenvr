@@ -8,14 +8,14 @@ from openvr.tracked_devices_actor import TrackedDevicesActor
 from openvr.color_cube_actor import ColorCubeActor
 
 """
-Minimal glfw programming example which colored OpenGL cube scene that can be closed by pressing ESCAPE.
+Minimal glut programming example showing a colored OpenGL cube scene that can be closed by pressing ESCAPE.
 """
-
 
 if __name__ == "__main__":
     renderer = OpenVrGlRenderer()
-    actor = TrackedDevicesActor(renderer.poses)
-    renderer.append(actor)
     renderer.append(ColorCubeActor())
+    controllers = TrackedDevicesActor(renderer.poses)
+    controllers.show_controllers_only = False
+    renderer.append(controllers)
     with GlutApp(renderer, "Controller test") as glutApp:
         glutApp.run_loop()

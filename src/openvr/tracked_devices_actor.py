@@ -93,14 +93,22 @@ class TrackedDevicesActor(object):
         self.shader = 0
         self.poses = pose_array
         self.meshes = dict()
+        self.show_controllers_only = True
     
     def _check_devices(self):
         "Enumerate OpenVR tracked devices and check whether any need to be initialized"
         for i in range(1, len(self.poses)):
             pose = self.poses[i]
+            if not pose.bDeviceIsConnected:
+                continue
             if not pose.bPoseIsValid:
                 continue
+            if self.show_controllers_only:
+                device_class = openvr.VRSystem().getTrackedDeviceActivityLevel(i)
+                if not device_class == openvr.TrackedDeviceClass_Controller:
+                    continue
             model_name = openvr.VRSystem().getStringTrackedDeviceProperty(i, openvr.Prop_RenderModelName_String)
+            # Create a new mesh object, if necessary
             if not model_name in self.meshes:
                 self.meshes[model_name] = TrackedDeviceMesh(model_name)
     

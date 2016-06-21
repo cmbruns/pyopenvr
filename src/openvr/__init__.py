@@ -201,11 +201,11 @@ TrackingResult_Running_OK = ENUM_TYPE(200)
 TrackingResult_Running_OutOfRange = ENUM_TYPE(201)
 
 ETrackedDeviceClass = ENUM_TYPE
-TrackedDeviceClass_Invalid = ENUM_TYPE(0)
-TrackedDeviceClass_HMD = ENUM_TYPE(1)
-TrackedDeviceClass_Controller = ENUM_TYPE(2)
-TrackedDeviceClass_TrackingReference = ENUM_TYPE(4)
-TrackedDeviceClass_Other = ENUM_TYPE(1000)
+TrackedDeviceClass_Invalid = 0
+TrackedDeviceClass_HMD = 1
+TrackedDeviceClass_Controller = 2
+TrackedDeviceClass_TrackingReference = 3
+TrackedDeviceClass_Other = 1000
 
 ETrackedControllerRole = ENUM_TYPE
 TrackedControllerRole_Invalid = ENUM_TYPE(0)

@@ -94,7 +94,8 @@ class OpenVrGlRenderer(list):
                 len(actor)
                 self.extend(actor)
             except TypeError:
-                self.append(actor)            
+                self.append(actor)
+        self.do_mirror = False         
 
     def init_gl(self):
         "allocate OpenGL resources"
@@ -143,9 +144,10 @@ class OpenVrGlRenderer(list):
         mvl = numpy.matrix(mvl, dtype=numpy.float32)
         mvr = numpy.matrix(mvr, dtype=numpy.float32)
         # 1) On-screen render:
-        glViewport(0, 0, self.window_size[0], self.window_size[1])
-        # Display left eye view to screen
-        self.display_gl(mvl, self.projection_left)
+        if self.do_mirror:
+            glViewport(0, 0, self.window_size[0], self.window_size[1])
+            # Display left eye view to screen
+            self.display_gl(mvl, self.projection_left)
         # 2) VR render
         # Left eye view
         glBindFramebuffer(GL_FRAMEBUFFER, self.left_fb.fb)
@@ -159,7 +161,7 @@ class OpenVrGlRenderer(list):
         glBindFramebuffer(GL_FRAMEBUFFER, 0)
         
     def display_gl(self, modelview, projection):
-        glClearColor(0.2, 0.2, 0.2, 0.0) # gray background
+        glClearColor(0.5, 0.5, 0.5, 0.0) # gray background
         glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT)
         for actor in self:
             actor.display_gl(modelview, projection)
