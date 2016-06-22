@@ -36,13 +36,14 @@ def matrixForOpenVrMatrix(mat):
 class OpenVrFramebuffer(object):
     "Framebuffer for rendering one eye"
     
-    def __init__(self, width, height):
+    def __init__(self, width, height, multisample = 0):
         self.fb = 0
         self.depth_buffer = 0
         self.texture_id = 0
         self.width = width
         self.height = height
         self.compositor = None
+        self.multisample = multisample
         
     def init_gl(self):
         # Set up framebuffer and render textures
@@ -50,39 +51,81 @@ class OpenVrFramebuffer(object):
         glBindFramebuffer(GL_FRAMEBUFFER, self.fb)
         self.depth_buffer = glGenRenderbuffers(1)
         glBindRenderbuffer(GL_RENDERBUFFER, self.depth_buffer)
-        glRenderbufferStorage(GL_RENDERBUFFER, GL_DEPTH24_STENCIL8, self.width, self.height)
+        if self.multisample > 0:
+            glRenderbufferStorageMultisample(GL_RENDERBUFFER, self.multisample, GL_DEPTH24_STENCIL8, self.width, self.height)
+        else:
+            glRenderbufferStorage(GL_RENDERBUFFER, GL_DEPTH24_STENCIL8, self.width, self.height)
         glFramebufferRenderbuffer(GL_FRAMEBUFFER, GL_DEPTH_STENCIL_ATTACHMENT, GL_RENDERBUFFER, self.depth_buffer)
         self.texture_id = glGenTextures(1)
-        glBindTexture(GL_TEXTURE_2D, self.texture_id)
-        glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA8, self.width, self.height, 0, GL_RGBA, GL_UNSIGNED_BYTE, None)
-        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR)
-        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR)
-        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE)
-        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE)
-        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAX_LEVEL, 0)  
-        glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_TEXTURE_2D, self.texture_id, 0)
+        if self.multisample > 0:
+            glBindTexture(GL_TEXTURE_2D_MULTISAMPLE, self.texture_id)
+            glTexImage2DMultisample(GL_TEXTURE_2D_MULTISAMPLE, self.multisample, GL_RGBA8, self.width, self.height, True)
+            glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_TEXTURE_2D_MULTISAMPLE, self.texture_id, 0)
+        else:
+            glBindTexture(GL_TEXTURE_2D, self.texture_id)
+            glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA8, self.width, self.height, 0, GL_RGBA, GL_UNSIGNED_BYTE, None)
+            glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR)
+            glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR)
+            glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE)
+            glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE)
+            glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAX_LEVEL, 0)
+            glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_TEXTURE_2D, self.texture_id, 0)
         status = glCheckFramebufferStatus(GL_FRAMEBUFFER)
         if status != GL_FRAMEBUFFER_COMPLETE:
             glBindFramebuffer(GL_FRAMEBUFFER, 0)
             raise Exception("Incomplete framebuffer")
+        # Resolver framebuffer in case of multisample antialiasing
+        if self.multisample > 0:
+            self.resolve_fb = glGenFramebuffers(1)
+            glBindFramebuffer(GL_FRAMEBUFFER, self.resolve_fb)
+            self.resolve_texture_id = glGenTextures(1)
+            glBindTexture(GL_TEXTURE_2D, self.resolve_texture_id)
+            glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR)
+            glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR)
+            glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE)
+            glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE)
+            glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAX_LEVEL, 0)
+            glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA8, self.width, self.height, 0, GL_RGBA, GL_UNSIGNED_BYTE, None)
+            glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_TEXTURE_2D, self.resolve_texture_id, 0)
+            status = glCheckFramebufferStatus(GL_FRAMEBUFFER)
+            if status != GL_FRAMEBUFFER_COMPLETE:
+                glBindFramebuffer(GL_FRAMEBUFFER, 0)
+                raise Exception("Incomplete framebuffer")
         glBindFramebuffer(GL_FRAMEBUFFER, 0)   
         # OpenVR texture data
         self.texture = openvr.Texture_t()
-        self.texture.handle = self.texture_id
+        if self.multisample > 0:
+            self.texture.handle = self.resolve_texture_id
+        else:
+            self.texture.handle = self.texture_id
         self.texture.eType = openvr.API_OpenGL
-        self.texture.eColorSpace = openvr.ColorSpace_Gamma 
+        self.texture.eColorSpace = openvr.ColorSpace_Gamma
+        
+    def submit(self, eye):
+        if self.multisample > 0:
+            glBindFramebuffer(GL_READ_FRAMEBUFFER, self.fb)
+            glBindFramebuffer(GL_DRAW_FRAMEBUFFER, self.resolve_fb)
+            glBlitFramebuffer(0, 0, self.width, self.height, 
+                              0, 0, self.width, self.height,
+                              GL_COLOR_BUFFER_BIT, GL_LINEAR)
+            glBindFramebuffer(GL_READ_FRAMEBUFFER, 0)
+            glBindFramebuffer(GL_DRAW_FRAMEBUFFER, 0)
+        openvr.VRCompositor().submit(eye, self.texture)
         
     def dispose_gl(self):
         glDeleteTextures([self.texture_id])
         glDeleteRenderbuffers(1, [self.depth_buffer])
         glDeleteFramebuffers(1, [self.fb])
         self.fb = 0
+        if self.multisample > 0:
+            glDeleteTextures([self.resolve_texture_id])
+            glDeleteFramebuffers(1, [self.resolve_fb])
 
 
 class OpenVrGlRenderer(list):
     "Renders to virtual reality headset using OpenVR and OpenGL APIs"
 
-    def __init__(self, actor=None, window_size=(800,600)):
+    def __init__(self, actor=None, window_size=(800,600), multisample=0):
         self.vr_system = None
         self.left_fb = None
         self.right_fb = None
@@ -95,14 +138,15 @@ class OpenVrGlRenderer(list):
                 self.extend(actor)
             except TypeError:
                 self.append(actor)
-        self.do_mirror = False         
+        self.do_mirror = False
+        self.multisample = multisample      
 
     def init_gl(self):
         "allocate OpenGL resources"
         self.vr_system = openvr.init(openvr.VRApplication_Scene)
         w, h = self.vr_system.getRecommendedRenderTargetSize()
-        self.left_fb = OpenVrFramebuffer(w, h)
-        self.right_fb = OpenVrFramebuffer(w, h)
+        self.left_fb = OpenVrFramebuffer(w, h, multisample=self.multisample)
+        self.right_fb = OpenVrFramebuffer(w, h, multisample=self.multisample)
         self.compositor = openvr.VRCompositor()
         if self.compositor is None:
             raise Exception("Unable to create compositor") 
@@ -153,11 +197,13 @@ class OpenVrGlRenderer(list):
         glBindFramebuffer(GL_FRAMEBUFFER, self.left_fb.fb)
         glViewport(0, 0, self.left_fb.width, self.left_fb.height)
         self.display_gl(mvl, self.projection_left)
-        self.compositor.submit(openvr.Eye_Left, self.left_fb.texture)
+        self.left_fb.submit(openvr.Eye_Left)
+        # self.compositor.submit(openvr.Eye_Left, self.left_fb.texture)
         # Right eye view
         glBindFramebuffer(GL_FRAMEBUFFER, self.right_fb.fb)
         self.display_gl(mvr, self.projection_right)
-        self.compositor.submit(openvr.Eye_Right, self.right_fb.texture)
+        self.right_fb.submit(openvr.Eye_Right)
+        # self.compositor.submit(openvr.Eye_Right, self.right_fb.texture)
         glBindFramebuffer(GL_FRAMEBUFFER, 0)
         
     def display_gl(self, modelview, projection):

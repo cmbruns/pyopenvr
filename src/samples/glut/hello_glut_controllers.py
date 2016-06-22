@@ -12,7 +12,7 @@ Minimal glut programming example showing a colored OpenGL cube scene that can be
 """
 
 if __name__ == "__main__":
-    renderer = OpenVrGlRenderer()
+    renderer = OpenVrGlRenderer(multisample=4)
     renderer.append(ColorCubeActor())
     controllers = TrackedDevicesActor(renderer.poses)
     controllers.show_controllers_only = False
