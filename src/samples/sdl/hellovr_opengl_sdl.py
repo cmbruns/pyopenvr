@@ -518,9 +518,10 @@ class CMainApplication(object):
                 if sdlEvent.key.keysym.sym == SDLK_c:
                     self.m_bShowCubes = not self.m_bShowCubes
         # Process SteamVR events
-        event = openvr.VREvent_t()
-        while self.m_pHMD.pollNextEvent( event ):
+        hasEvent, event = self.m_pHMD.pollNextEvent()
+        while hasEvent:
             self.processVREvent( event )
+            hasEvent, event = self.m_pHMD.pollNextEvent()
         # Process SteamVR controller state
         for unDevice in range(openvr.k_unMaxTrackedDeviceCount):
             result, state = self.m_pHMD.getControllerState( unDevice )
@@ -1230,20 +1231,20 @@ class CMainApplication(object):
             error = openvr.EVRRenderModelError()
             while True:
                 error, pModel = openvr.VRRenderModels().loadRenderModel_Async( pchRenderModelName )
-                if error != openvr.VRRenderModelError_Loading.value:
+                if error != openvr.VRRenderModelError_Loading:
                     break
                 threadSleep( 1 )
-            if error != openvr.VRRenderModelError_None.value:
+            if error != openvr.VRRenderModelError_None:
                 dprintf( "Unable to load render model %s - %s\n" % (
                         pchRenderModelName, 
                         openvr.VRRenderModels().getRenderModelErrorNameFromEnum( error )) )
                 return None # move on to the next tracked device
             while True:
                 error, pTexture = openvr.VRRenderModels().loadTexture_Async( pModel.contents.diffuseTextureId )
-                if error != openvr.VRRenderModelError_Loading.value:
+                if error != openvr.VRRenderModelError_Loading:
                     break
                 threadSleep( 1 )
-            if error != openvr.VRRenderModelError_None.value:
+            if error != openvr.VRRenderModelError_None:
                 dprintf( "Unable to load render texture id:%d for render model %s\n" % (
                         pModel.contents.diffuseTextureId, pchRenderModelName) )
                 openvr.VRRenderModels().FreeRenderModel( pModel )
