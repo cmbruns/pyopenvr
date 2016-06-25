@@ -10,6 +10,7 @@ import numpy
 from OpenGL.GL import *  # @UnusedWildImport # this comment squelches an IDE warning
 from OpenGL.GL.shaders import compileShader, compileProgram
 from OpenGL.arrays import vbo
+from OpenGL.GL.EXT.texture_filter_anisotropic import GL_TEXTURE_MAX_ANISOTROPY_EXT, GL_MAX_TEXTURE_MAX_ANISOTROPY_EXT
 
 import openvr
 from openvr.gl_renderer import matrixForOpenVrMatrix
@@ -66,6 +67,26 @@ class TrackedDeviceMesh(object):
         glEnableVertexAttribArray(2)
         glVertexAttribPointer(2, 2, GL_FLOAT, False, 8 * fsize, cast(6 * fsize, c_void_p))
         glBindVertexArray(0)
+        # Surface texture
+        while True:
+            error, texture_map = openvr.VRRenderModels().loadTexture_Async(model.diffuseTextureId)
+            if error != openvr.VRRenderModelError_Loading:
+                break
+            time.sleep(1)
+        self.texture_map = texture_map.contents
+        self.diffuse_texture = glGenTextures(1)
+        glBindTexture(GL_TEXTURE_2D, self.diffuse_texture)
+        glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, self.texture_map.unWidth, self.texture_map.unHeight, 
+                     0, GL_RGBA,
+                     GL_UNSIGNED_BYTE, self.texture_map.rubTextureMapData)
+        glGenerateMipmap(GL_TEXTURE_2D)
+        glTexParameteri( GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE )
+        glTexParameteri( GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE )
+        glTexParameteri( GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR )
+        glTexParameteri( GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR_MIPMAP_LINEAR )
+        fLargest = glGetFloatv( GL_MAX_TEXTURE_MAX_ANISOTROPY_EXT )
+        glTexParameterf( GL_TEXTURE_2D, GL_TEXTURE_MAX_ANISOTROPY_EXT, fLargest )
+        glBindTexture(GL_TEXTURE_2D, 0)
 
     def display_gl(self, modelview, projection, pose):
         controller_X_room = pose.mDeviceToAbsoluteTracking
@@ -76,8 +97,11 @@ class TrackedDeviceMesh(object):
         glUniformMatrix4fv(4, 1, False, modelview0)
         normal_matrix = numpy.asarray(controller_X_room)
         glUniformMatrix4fv(8, 1, False, normal_matrix)
+        glActiveTexture(GL_TEXTURE0)
+        glBindTexture(GL_TEXTURE_2D, self.diffuse_texture)
         glBindVertexArray(self.vao)
         glDrawElements(GL_TRIANGLES, len(self.indexPositions), GL_UNSIGNED_INT, None)
+        glBindVertexArray(0)
         
     def dispose_gl(self):
         glDeleteBuffers(1, (self.vbo,))
@@ -127,11 +151,13 @@ class TrackedDevicesActor(object):
             layout(location = 8) uniform mat4 normal_matrix = mat4(1);
             
             out vec3 color;
+            out vec2 fragTexCoord;
             
             void main() {
               gl_Position = projection * model_view * vec4(in_Position, 1.0);
               vec3 normal = normalize((normal_matrix * vec4(in_Normal, 0)).xyz);
               color = (normal + vec3(1,1,1)) * 0.5; // color by normal
+              fragTexCoord = in_TexCoord;
               // color = vec3(in_TexCoord, 0.5); // color by texture coordinate
             }
             """), 
@@ -141,11 +167,14 @@ class TrackedDevicesActor(object):
             #version 450 core
             #line 59
             
+            uniform sampler2D diffuse;
             in vec3 color;
+            in vec2 fragTexCoord;
             out vec4 fragColor;
             
             void main() {
-              fragColor = vec4(color, 1.0);
+              // fragColor = vec4(color, 1.0);
+              fragColor = texture(diffuse, fragTexCoord);
             }
             """), 
             GL_FRAGMENT_SHADER)
