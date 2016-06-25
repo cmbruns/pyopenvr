@@ -130,7 +130,7 @@ class TrackedDevicesActor(object):
             if not pose.bPoseIsValid:
                 continue
             if self.show_controllers_only:
-                device_class = openvr.VRSystem().getTrackedDeviceActivityLevel(i)
+                device_class = openvr.VRSystem().getTrackedDeviceClass(i)
                 if not device_class == openvr.TrackedDeviceClass_Controller:
                     continue
             model_name = openvr.VRSystem().getStringTrackedDeviceProperty(i, openvr.Prop_RenderModelName_String)
