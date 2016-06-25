@@ -110,6 +110,7 @@ class ColorCubeActor(object):
         glUseProgram(self.shader)
         glUniformMatrix4fv(0, 1, False, projection)
         glUniformMatrix4fv(4, 1, False, modelview)
+        glBindVertexArray(self.vao)
         glDrawArrays(GL_TRIANGLES, 0, 36)
     
     def dispose_gl(self):

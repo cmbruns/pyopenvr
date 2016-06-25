@@ -104,8 +104,10 @@ class TrackedDeviceMesh(object):
         glBindVertexArray(0)
         
     def dispose_gl(self):
-        glDeleteBuffers(1, (self.vbo,))
-        self.vbo = 0        
+        glDeleteVertexArrays(1, (self.vao,))
+        self.vbo = 0
+        self.vertexPositions.delete()
+        self.indexPositions.delete()     
 
 
 class TrackedDevicesActor(object):
@@ -199,6 +201,7 @@ class TrackedDevicesActor(object):
     def dispose_gl(self):
         glDeleteProgram(self.shader)
         self.shader = 0
-        for key, mesh in self.meshes.iteritems():
+        for key in self.meshes.keys():
+            mesh = self.meshes[key]
             mesh.dispose_gl()
             del self.meshes[key]
