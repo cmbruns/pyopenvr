@@ -17,5 +17,6 @@ Minimal sdl programming example which colored OpenGL cube scene that can be clos
 if __name__ == "__main__":
 	renderer = OpenVrGlRenderer(multisample=2)
 	renderer.append(ColorCubeActor())
+	renderer.append(TrackedDevicesActor(renderer.poses))
 	with SdlApp(renderer, "sdl2 OpenVR color cube") as app:
 		app.run_loop()
