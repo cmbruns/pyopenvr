@@ -1833,7 +1833,7 @@ class IVRSystem(object):
         fn( unDeviceIndex, prop, pchBuffer, unRequiredBufferLen, byref(pError) )
         if pError.value != TrackedProp_Success.value:
             raise OpenVRError(str(pError))
-        sResult = str(pchBuffer.value)
+        sResult = bytes(pchBuffer.value)
         return sResult
 
     def getPropErrorNameFromEnum(self, error):

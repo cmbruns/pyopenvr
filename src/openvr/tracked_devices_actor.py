@@ -201,7 +201,7 @@ class TrackedDevicesActor(object):
     def dispose_gl(self):
         glDeleteProgram(self.shader)
         self.shader = 0
-        for key in self.meshes.keys():
+        for key in list(self.meshes):
             mesh = self.meshes[key]
             mesh.dispose_gl()
             del self.meshes[key]
