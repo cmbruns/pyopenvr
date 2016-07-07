@@ -4,7 +4,7 @@
 
 from openvr.gl_renderer import OpenVrGlRenderer
 from openvr.color_cube_actor import ColorCubeActor
-from wx_app import WxApp
+from openvr.glframework.wx_app import WxApp
 
 
 """

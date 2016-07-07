@@ -34,7 +34,7 @@ class PinkWorld(object):
         # Create a regular desktop window, just so we can have an OpenGL context to play with
         glutInitWindowSize(400, 400)
         glutInitWindowPosition(50, 50)
-        self.win = glutCreateWindow("Pink world")
+        self.win = glutCreateWindow(b"Pink world")
         # Set up callback methods for use during the GLUT main loop
         glutDisplayFunc(self.display)
         glutIdleFunc(self.display)

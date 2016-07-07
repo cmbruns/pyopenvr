@@ -2,7 +2,7 @@
 
 # file hello_glfw.py
 
-from glfw_app import GlfwApp
+from openvr.glframework.glfw_app import GlfwApp
 from openvr.gl_renderer import OpenVrGlRenderer
 from openvr.color_cube_actor import ColorCubeActor
 

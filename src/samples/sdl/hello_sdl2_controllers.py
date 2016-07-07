@@ -6,7 +6,7 @@
 from openvr.gl_renderer import OpenVrGlRenderer
 from openvr.color_cube_actor import ColorCubeActor
 from openvr.tracked_devices_actor import TrackedDevicesActor
-from sdl_app import SdlApp
+from openvr.glframework.sdl_app import SdlApp
 
 
 """

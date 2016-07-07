@@ -4,8 +4,6 @@
 
 import sys
 
-from OpenGL.GL import glFlush, glFinish
-
 import wx
 from wx import glcanvas
 
@@ -87,7 +85,7 @@ class WxApp(wx.App):
 		# self.canvas.SwapBuffers()
 		if self.canvas.IsDoubleBuffered():
 			self.canvas.SwapBuffers()
-			print "double buffered" # Do not want
+			print ("double buffered") # Do not want
 		else:
 			pass
 			# TODO: SwapBuffers() seems required to show on desktop monitor,

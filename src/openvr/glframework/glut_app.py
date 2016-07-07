@@ -13,7 +13,7 @@ Toy glut application for use with "hello world" examples demonstrating pyopenvr
 class GlutApp(object):
     "GlutApp uses freeglut library to create an opengl context, listen to keyboard events, and clean up"
 
-    def __init__(self, renderer, title="GLUT test"):
+    def __init__(self, renderer, title=b"GLUT test"):
         "Creates an OpenGL context and a window, and acquires OpenGL resources"
         self.renderer = renderer
         self.title = title

@@ -4,10 +4,7 @@
 
 import sys
 
-from PySide.QtCore import Qt, QTimer
-from PySide.QtGui import QApplication, QMainWindow
-from PySide.QtOpenGL import QGLWidget, QGLFormat
-from qt_pyside_app import QtPysideApp
+from openvr.glframework.qt_pyside_app import QtPysideApp
 
 
 """
