@@ -158,9 +158,9 @@ def _checkInitError(error):
     """
     Replace openvr error return code with a python exception
     """
-    if error.value != VRInitError_None.value:
+    if error != VRInitError_None:
         shutdown()
-        raise OpenVRError("%s (error number %d)" %(getVRInitErrorAsSymbol(error), error.value))
+        raise OpenVRError("%s (error number %d)" %(getVRInitErrorAsSymbol(error), error))
 
 
 # Copying VR_Init inline implementation from https://github.com/ValveSoftware/openvr/blob/master/headers/openvr.h
@@ -303,7 +303,7 @@ EOF
 
         # Raise exception if error state returned
         if (defined $error_arg_name) {
-            print "    _checkInitError($error_arg_name)\n";
+            print "    _checkInitError(${error_arg_name}.value)\n";
         }
         if ($#py_return_val_names >= 0) {
             print "    return ";
@@ -422,6 +422,7 @@ sub translate_enums {
 #############################
 
 ENUM_TYPE = c_uint32
+ENUM_VALUE_TYPE = int
 
 EOF
 
@@ -463,7 +464,7 @@ EOF
             {
             	$item =~ s/^${enum_name1}_//; # strip outer enum name from value
             }
-            print "$item = ENUM_TYPE($value)\n"
+            print "$item = ENUM_VALUE_TYPE($value)\n"
         }
         print "\n";
 
