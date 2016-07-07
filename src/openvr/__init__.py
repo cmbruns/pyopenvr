@@ -50,14 +50,14 @@ IVRSystem_Version = b"IVRSystem_012"
 IVRExtendedDisplay_Version = b"IVRExtendedDisplay_001"
 IVRTrackedCamera_Version = b"IVRTrackedCamera_003"
 k_unMaxApplicationKeyLength = 128
-IVRApplications_Version = b"IVRApplications_005"
+IVRApplications_Version = b"IVRApplications_006"
 IVRChaperone_Version = b"IVRChaperone_003"
 IVRChaperoneSetup_Version = b"IVRChaperoneSetup_005"
-IVRCompositor_Version = b"IVRCompositor_015"
+IVRCompositor_Version = b"IVRCompositor_016"
 k_unVROverlayMaxKeyLength = 128
 k_unVROverlayMaxNameLength = 128
-k_unMaxOverlayCount = 32
-IVROverlay_Version = b"IVROverlay_012"
+k_unMaxOverlayCount = 64
+IVROverlay_Version = b"IVROverlay_013"
 k_pch_Controller_Component_GDC2015 = b"gdc2015"
 k_pch_Controller_Component_Base = b"base"
 k_pch_Controller_Component_Tip = b"tip"
@@ -104,6 +104,9 @@ k_pch_SteamVR_ForceReprojection_Bool = b"forceReprojection"
 k_pch_SteamVR_ForceFadeOnBadTracking_Bool = b"forceFadeOnBadTracking"
 k_pch_SteamVR_DefaultMirrorView_Int32 = b"defaultMirrorView"
 k_pch_SteamVR_ShowMirrorView_Bool = b"showMirrorView"
+k_pch_SteamVR_StartMonitorFromAppLaunch = b"startMonitorFromAppLaunch"
+k_pch_SteamVR_AutoLaunchSteamVROnButtonPress = b"autoLaunchSteamVROnButtonPress"
+k_pch_SteamVR_UseGenericGraphcisDevice_Bool = b"useGenericGraphicsDevice"
 k_pch_Lighthouse_Section = b"driver_lighthouse"
 k_pch_Lighthouse_DisableIMU_Bool = b"disableimu"
 k_pch_Lighthouse_UseDisambiguation_String = b"usedisambiguation"
@@ -127,7 +130,8 @@ k_pch_Null_SecondsFromVsyncToPhotons_Float = b"secondsFromVsyncToPhotons"
 k_pch_Null_DisplayFrequency_Float = b"displayFrequency"
 k_pch_UserInterface_Section = b"userinterface"
 k_pch_UserInterface_StatusAlwaysOnTop_Bool = b"StatusAlwaysOnTop"
-k_pch_UserInterface_EnableScreenshots_Bool = b"EnableScreenshots"
+k_pch_UserInterface_Screenshots_Bool = b"screenshots"
+k_pch_UserInterface_ScreenshotType_Int = b"screenshotType"
 k_pch_Notifications_Section = b"notifications"
 k_pch_Notifications_DoNotDisturb_Bool = b"DoNotDisturb"
 k_pch_Keyboard_Section = b"keyboard"
@@ -173,6 +177,7 @@ k_pch_audio_OffRecordDevice_String = b"offRecordDevice"
 k_pch_audio_VIVEHDMIGain = b"viveHDMIGain"
 k_pch_modelskin_Section = b"modelskins"
 IVRScreenshots_Version = b"IVRScreenshots_001"
+IVRResources_Version = b"IVRResources_001"
 
 #############################
 ### Expose enum constants ###
@@ -296,6 +301,7 @@ Prop_Axis1Type_Int32 = ENUM_VALUE_TYPE(3003)
 Prop_Axis2Type_Int32 = ENUM_VALUE_TYPE(3004)
 Prop_Axis3Type_Int32 = ENUM_VALUE_TYPE(3005)
 Prop_Axis4Type_Int32 = ENUM_VALUE_TYPE(3006)
+Prop_ControllerRoleHint_Int32 = ENUM_VALUE_TYPE(3007)
 Prop_FieldOfViewLeftDegrees_Float = ENUM_VALUE_TYPE(4000)
 Prop_FieldOfViewRightDegrees_Float = ENUM_VALUE_TYPE(4001)
 Prop_FieldOfViewTopDegrees_Float = ENUM_VALUE_TYPE(4002)
@@ -332,6 +338,7 @@ VRState_Ready = ENUM_VALUE_TYPE(3)
 VRState_Ready_Alert = ENUM_VALUE_TYPE(4)
 VRState_NotReady = ENUM_VALUE_TYPE(5)
 VRState_Standby = ENUM_VALUE_TYPE(6)
+VRState_Ready_Alert_Low = ENUM_VALUE_TYPE(7)
 
 EVREventType = ENUM_TYPE
 VREvent_None = ENUM_VALUE_TYPE(0)
@@ -344,6 +351,7 @@ VREvent_IpdChanged = ENUM_VALUE_TYPE(105)
 VREvent_EnterStandbyMode = ENUM_VALUE_TYPE(106)
 VREvent_LeaveStandbyMode = ENUM_VALUE_TYPE(107)
 VREvent_TrackedDeviceRoleChanged = ENUM_VALUE_TYPE(108)
+VREvent_WatchdogWakeUpRequested = ENUM_VALUE_TYPE(109)
 VREvent_ButtonPress = ENUM_VALUE_TYPE(200)
 VREvent_ButtonUnpress = ENUM_VALUE_TYPE(201)
 VREvent_ButtonTouch = ENUM_VALUE_TYPE(202)
@@ -355,6 +363,7 @@ VREvent_FocusEnter = ENUM_VALUE_TYPE(303)
 VREvent_FocusLeave = ENUM_VALUE_TYPE(304)
 VREvent_Scroll = ENUM_VALUE_TYPE(305)
 VREvent_TouchPadMove = ENUM_VALUE_TYPE(306)
+VREvent_OverlayFocusChanged = ENUM_VALUE_TYPE(307)
 VREvent_InputFocusCaptured = ENUM_VALUE_TYPE(400)
 VREvent_InputFocusReleased = ENUM_VALUE_TYPE(401)
 VREvent_SceneFocusLost = ENUM_VALUE_TYPE(402)
@@ -387,6 +396,7 @@ VREvent_RequestScreenshot = ENUM_VALUE_TYPE(520)
 VREvent_ScreenshotTaken = ENUM_VALUE_TYPE(521)
 VREvent_ScreenshotFailed = ENUM_VALUE_TYPE(522)
 VREvent_SubmitScreenshotToDashboard = ENUM_VALUE_TYPE(523)
+VREvent_ScreenshotProgressToDashboard = ENUM_VALUE_TYPE(524)
 VREvent_Notification_Shown = ENUM_VALUE_TYPE(600)
 VREvent_Notification_Hidden = ENUM_VALUE_TYPE(601)
 VREvent_Notification_BeginInteraction = ENUM_VALUE_TYPE(602)
@@ -418,6 +428,7 @@ VREvent_ApplicationTransitionStarted = ENUM_VALUE_TYPE(1300)
 VREvent_ApplicationTransitionAborted = ENUM_VALUE_TYPE(1301)
 VREvent_ApplicationTransitionNewAppStarted = ENUM_VALUE_TYPE(1302)
 VREvent_ApplicationListUpdated = ENUM_VALUE_TYPE(1303)
+VREvent_ApplicationMimeTypeLoad = ENUM_VALUE_TYPE(1304)
 VREvent_Compositor_MirrorWindowShown = ENUM_VALUE_TYPE(1400)
 VREvent_Compositor_MirrorWindowHidden = ENUM_VALUE_TYPE(1401)
 VREvent_Compositor_ChaperoneBoundsShown = ENUM_VALUE_TYPE(1410)
@@ -509,6 +520,8 @@ VRApplication_Overlay = ENUM_VALUE_TYPE(2)
 VRApplication_Background = ENUM_VALUE_TYPE(3)
 VRApplication_Utility = ENUM_VALUE_TYPE(4)
 VRApplication_VRMonitor = ENUM_VALUE_TYPE(5)
+VRApplication_SteamWatchdog = ENUM_VALUE_TYPE(6)
+VRApplication_Max = ENUM_VALUE_TYPE(7)
 
 EVRFirmwareError = ENUM_TYPE
 VRFirmwareError_None = ENUM_VALUE_TYPE(0)
@@ -550,6 +563,14 @@ VRInitError_Init_NoServerForBackgroundApp = ENUM_VALUE_TYPE(121)
 VRInitError_Init_NotSupportedWithCompositor = ENUM_VALUE_TYPE(122)
 VRInitError_Init_NotAvailableToUtilityApps = ENUM_VALUE_TYPE(123)
 VRInitError_Init_Internal = ENUM_VALUE_TYPE(124)
+VRInitError_Init_HmdDriverIdIsNone = ENUM_VALUE_TYPE(125)
+VRInitError_Init_HmdNotFoundPresenceFailed = ENUM_VALUE_TYPE(126)
+VRInitError_Init_VRMonitorNotFound = ENUM_VALUE_TYPE(127)
+VRInitError_Init_VRMonitorStartupFailed = ENUM_VALUE_TYPE(128)
+VRInitError_Init_LowPowerWatchdogNotSupported = ENUM_VALUE_TYPE(129)
+VRInitError_Init_InvalidApplicationType = ENUM_VALUE_TYPE(130)
+VRInitError_Init_NotAvailableToWatchdogApps = ENUM_VALUE_TYPE(131)
+VRInitError_Init_WatchdogDisabledInSettings = ENUM_VALUE_TYPE(132)
 VRInitError_Driver_Failed = ENUM_VALUE_TYPE(200)
 VRInitError_Driver_Unknown = ENUM_VALUE_TYPE(201)
 VRInitError_Driver_HmdUnknown = ENUM_VALUE_TYPE(202)
@@ -559,12 +580,18 @@ VRInitError_Driver_HmdInUse = ENUM_VALUE_TYPE(205)
 VRInitError_Driver_NotCalibrated = ENUM_VALUE_TYPE(206)
 VRInitError_Driver_CalibrationInvalid = ENUM_VALUE_TYPE(207)
 VRInitError_Driver_HmdDisplayNotFound = ENUM_VALUE_TYPE(208)
+VRInitError_Driver_TrackedDeviceInterfaceUnknown = ENUM_VALUE_TYPE(209)
+VRInitError_Driver_HmdDriverIdOutOfBounds = ENUM_VALUE_TYPE(211)
+VRInitError_Driver_HmdDisplayMirrored = ENUM_VALUE_TYPE(212)
 VRInitError_IPC_ServerInitFailed = ENUM_VALUE_TYPE(300)
 VRInitError_IPC_ConnectFailed = ENUM_VALUE_TYPE(301)
 VRInitError_IPC_SharedStateInitFailed = ENUM_VALUE_TYPE(302)
 VRInitError_IPC_CompositorInitFailed = ENUM_VALUE_TYPE(303)
 VRInitError_IPC_MutexInitFailed = ENUM_VALUE_TYPE(304)
 VRInitError_IPC_Failed = ENUM_VALUE_TYPE(305)
+VRInitError_IPC_CompositorConnectFailed = ENUM_VALUE_TYPE(306)
+VRInitError_IPC_CompositorInvalidConnectResponse = ENUM_VALUE_TYPE(307)
+VRInitError_IPC_ConnectFailedAfterMultipleAttempts = ENUM_VALUE_TYPE(308)
 VRInitError_Compositor_Failed = ENUM_VALUE_TYPE(400)
 VRInitError_Compositor_D3D11HardwareRequired = ENUM_VALUE_TYPE(401)
 VRInitError_Compositor_FirmwareRequiresUpdate = ENUM_VALUE_TYPE(402)
@@ -723,6 +750,7 @@ VROverlayFlags_SideBySide_Parallel = ENUM_VALUE_TYPE(10)
 VROverlayFlags_SideBySide_Crossed = ENUM_VALUE_TYPE(11)
 VROverlayFlags_Panorama = ENUM_VALUE_TYPE(12)
 VROverlayFlags_StereoPanorama = ENUM_VALUE_TYPE(13)
+VROverlayFlags_SortWithNonSceneOverlays = ENUM_VALUE_TYPE(14)
 
 EGamepadTextInputMode = ENUM_TYPE
 k_EGamepadTextInputModeNormal = ENUM_VALUE_TYPE(0)
@@ -1126,6 +1154,19 @@ class VREvent_Screenshot_t(Structure):
     ]
 
 
+class VREvent_ScreenshotProgress_t(Structure):
+    _fields_ = [
+        ("progress", c_float),
+    ]
+
+
+class VREvent_ApplicationLaunch_t(Structure):
+    _fields_ = [
+        ("pid", c_uint32),
+        ("unArgsHandle", c_uint32),
+    ]
+
+
 class HiddenAreaMesh_t(Structure):
     """
     The mesh to draw into the stencil (or depth) buffer to perform 
@@ -1206,8 +1247,10 @@ class Compositor_FrameTiming(Structure):
         ("m_nFrameIndex", c_uint32),
         ("m_nNumFramePresents", c_uint32),
         ("m_nNumDroppedFrames", c_uint32),
+        ("m_nReprojectionFlags", c_uint32),
         ("m_flSystemTimeInSeconds", c_double),
-        ("m_flSceneRenderGpuMs", c_float),
+        ("m_flPreSubmitGpuMs", c_float),
+        ("m_flPostSubmitGpuMs", c_float),
         ("m_flTotalRenderGpuMs", c_float),
         ("m_flCompositorRenderGpuMs", c_float),
         ("m_flCompositorRenderCpuMs", c_float),
@@ -1223,8 +1266,6 @@ class Compositor_FrameTiming(Structure):
         ("m_flCompositorUpdateEndMs", c_float),
         ("m_flCompositorRenderStartMs", c_float),
         ("m_HmdPose", TrackedDevicePose_t),
-        ("m_nFidelityLevel", c_int32),
-        ("m_nReprojectionFlags", c_uint32),
     ]
 
 
@@ -1343,6 +1384,7 @@ class COpenVRContext(object):
         self.m_pVRChaperoneSetup = None
         self.m_pVRCompositor = None
         self.m_pVROverlay = None
+        self.m_pVRResources = None
         self.m_pVRRenderModels = None
         self.m_pVRExtendedDisplay = None
         self.m_pVRSettings = None
@@ -1379,6 +1421,12 @@ class COpenVRContext(object):
         if self.m_pVROverlay is None:
             self.m_pVROverlay = IVROverlay()
         return self.m_pVROverlay
+
+    def VRResources(self):
+        self.checkClear()
+        if self.m_pVRResources is None:
+            self.m_pVRResources = IVRResources()
+        return self.m_pVRResources
 
     def VRRenderModels(self):
         self.checkClear()
@@ -1436,6 +1484,9 @@ def VRCompositor():
 
 def VROverlay():
     return _internal_module_context.VROverlay()
+
+def VRResources():
+    return _internal_module_context.VRResources()
 
 def VRRenderModels():
     return _internal_module_context.VRRenderModels()
@@ -2022,7 +2073,7 @@ class IVRExtendedDisplay_FnTable(Structure):
 class IVRExtendedDisplay(object):
     """
     NOTE: Use of this interface is not recommended in production applications. It will not work for displays which use
-    direct-to-display mode. It is also incompatible with the VR compositor and is not available when the compositor is running.
+    direct-to-display mode. Creating our own window is also incompatible with the VR compositor and is not available when the compositor is running.
     """
 
     def __init__(self):
@@ -2084,6 +2135,10 @@ class IVRTrackedCamera_FnTable(Structure):
         ("acquireVideoStreamingService", OPENVR_FNTABLE_CALLTYPE(EVRTrackedCameraError, TrackedDeviceIndex_t, POINTER(TrackedCameraHandle_t))),
         ("releaseVideoStreamingService", OPENVR_FNTABLE_CALLTYPE(EVRTrackedCameraError, TrackedCameraHandle_t)),
         ("getVideoStreamFrameBuffer", OPENVR_FNTABLE_CALLTYPE(EVRTrackedCameraError, TrackedCameraHandle_t, EVRTrackedCameraFrameType, c_void_p, c_uint32, POINTER(CameraVideoStreamFrameHeader_t), c_uint32)),
+        ("getVideoStreamTextureSize", OPENVR_FNTABLE_CALLTYPE(EVRTrackedCameraError, TrackedDeviceIndex_t, EVRTrackedCameraFrameType, POINTER(VRTextureBounds_t), POINTER(c_uint32), POINTER(c_uint32))),
+        ("getVideoStreamTextureD3D11", OPENVR_FNTABLE_CALLTYPE(EVRTrackedCameraError, TrackedCameraHandle_t, EVRTrackedCameraFrameType, c_void_p, POINTER(c_void_p), POINTER(CameraVideoStreamFrameHeader_t), c_uint32)),
+        ("getVideoStreamTextureGL", OPENVR_FNTABLE_CALLTYPE(EVRTrackedCameraError, TrackedCameraHandle_t, EVRTrackedCameraFrameType, POINTER(glUInt_t), POINTER(CameraVideoStreamFrameHeader_t), c_uint32)),
+        ("releaseVideoStreamTextureGL", OPENVR_FNTABLE_CALLTYPE(EVRTrackedCameraError, TrackedCameraHandle_t, glUInt_t)),
     ]
 
 
@@ -2170,6 +2225,39 @@ class IVRTrackedCamera(object):
         result = fn(hTrackedCamera, eFrameType, pFrameBuffer, nFrameBufferSize, byref(pFrameHeader), nFrameHeaderSize)
         return result, pFrameHeader
 
+    def getVideoStreamTextureSize(self, nDeviceIndex, eFrameType):
+        "Gets size of the image frame."
+
+        fn = self.function_table.getVideoStreamTextureSize
+        pTextureBounds = VRTextureBounds_t()
+        pnWidth = c_uint32()
+        pnHeight = c_uint32()
+        result = fn(nDeviceIndex, eFrameType, byref(pTextureBounds), byref(pnWidth), byref(pnHeight))
+        return result, pTextureBounds, pnWidth.value, pnHeight.value
+
+    def getVideoStreamTextureD3D11(self, hTrackedCamera, eFrameType, pD3D11DeviceOrResource, nFrameHeaderSize):
+        "Access a shared D3D11 texture for the specified tracked camera stream"
+
+        fn = self.function_table.getVideoStreamTextureD3D11
+        ppD3D11ShaderResourceView = c_void_p()
+        pFrameHeader = CameraVideoStreamFrameHeader_t()
+        result = fn(hTrackedCamera, eFrameType, pD3D11DeviceOrResource, byref(ppD3D11ShaderResourceView), byref(pFrameHeader), nFrameHeaderSize)
+        return result, ppD3D11ShaderResourceView.value, pFrameHeader
+
+    def getVideoStreamTextureGL(self, hTrackedCamera, eFrameType, nFrameHeaderSize):
+        "Access a shared GL texture for the specified tracked camera stream"
+
+        fn = self.function_table.getVideoStreamTextureGL
+        pglTextureId = glUInt_t()
+        pFrameHeader = CameraVideoStreamFrameHeader_t()
+        result = fn(hTrackedCamera, eFrameType, byref(pglTextureId), byref(pFrameHeader), nFrameHeaderSize)
+        return result, pglTextureId, pFrameHeader
+
+    def releaseVideoStreamTextureGL(self, hTrackedCamera, glTextureId):
+        fn = self.function_table.releaseVideoStreamTextureGL
+        result = fn(hTrackedCamera, glTextureId)
+        return result
+
 
 
 class IVRApplications_FnTable(Structure):
@@ -2182,6 +2270,7 @@ class IVRApplications_FnTable(Structure):
         ("getApplicationKeyByProcessId", OPENVR_FNTABLE_CALLTYPE(EVRApplicationError, c_uint32, c_char_p, c_uint32)),
         ("launchApplication", OPENVR_FNTABLE_CALLTYPE(EVRApplicationError, c_char_p)),
         ("launchTemplateApplication", OPENVR_FNTABLE_CALLTYPE(EVRApplicationError, c_char_p, c_char_p, POINTER(AppOverrideKeys_t), c_uint32)),
+        ("launchApplicationFromMimeType", OPENVR_FNTABLE_CALLTYPE(EVRApplicationError, c_char_p, c_char_p)),
         ("launchDashboardOverlay", OPENVR_FNTABLE_CALLTYPE(EVRApplicationError, c_char_p)),
         ("cancelApplicationLaunch", OPENVR_FNTABLE_CALLTYPE(openvr_bool, c_char_p)),
         ("identifyApplication", OPENVR_FNTABLE_CALLTYPE(EVRApplicationError, c_uint32, c_char_p)),
@@ -2192,6 +2281,11 @@ class IVRApplications_FnTable(Structure):
         ("getApplicationPropertyUint64", OPENVR_FNTABLE_CALLTYPE(c_uint64, c_char_p, EVRApplicationProperty, POINTER(EVRApplicationError))),
         ("setApplicationAutoLaunch", OPENVR_FNTABLE_CALLTYPE(EVRApplicationError, c_char_p, openvr_bool)),
         ("getApplicationAutoLaunch", OPENVR_FNTABLE_CALLTYPE(openvr_bool, c_char_p)),
+        ("setDefaultApplicationForMimeType", OPENVR_FNTABLE_CALLTYPE(EVRApplicationError, c_char_p, c_char_p)),
+        ("getDefaultApplicationForMimeType", OPENVR_FNTABLE_CALLTYPE(openvr_bool, c_char_p, c_char_p, c_uint32)),
+        ("getApplicationSupportedMimeTypes", OPENVR_FNTABLE_CALLTYPE(openvr_bool, c_char_p, c_char_p, c_uint32)),
+        ("getApplicationsThatSupportMimeType", OPENVR_FNTABLE_CALLTYPE(c_uint32, c_char_p, c_char_p, c_uint32)),
+        ("getApplicationLaunchArguments", OPENVR_FNTABLE_CALLTYPE(c_uint32, c_uint32, c_char_p, c_uint32)),
         ("getStartingApplication", OPENVR_FNTABLE_CALLTYPE(EVRApplicationError, c_char_p, c_uint32)),
         ("getTransitionState", OPENVR_FNTABLE_CALLTYPE(EVRApplicationTransitionState)),
         ("performApplicationPrelaunchCheck", OPENVR_FNTABLE_CALLTYPE(EVRApplicationError, c_char_p)),
@@ -2287,6 +2381,13 @@ class IVRApplications(object):
         result = fn(pchTemplateAppKey, pchNewAppKey, byref(pKeys), unKeys)
         return result, pKeys
 
+    def launchApplicationFromMimeType(self, pchMimeType, pchArgs):
+        "launches the application currently associated with this mime type and passes it the option args, typically the filename or object name of the item being launched"
+
+        fn = self.function_table.launchApplicationFromMimeType
+        result = fn(pchMimeType, pchArgs)
+        return result
+
     def launchDashboardOverlay(self, pchAppKey):
         """
         Launches the dashboard overlay application if it is not already running. This call is only valid for 
@@ -2366,6 +2467,41 @@ class IVRApplications(object):
 
         fn = self.function_table.getApplicationAutoLaunch
         result = fn(pchAppKey)
+        return result
+
+    def setDefaultApplicationForMimeType(self, pchAppKey, pchMimeType):
+        "Adds this mime-type to the list of supported mime types for this application"
+
+        fn = self.function_table.setDefaultApplicationForMimeType
+        result = fn(pchAppKey, pchMimeType)
+        return result
+
+    def getDefaultApplicationForMimeType(self, pchMimeType, pchAppKeyBuffer, unAppKeyBufferLen):
+        "return the app key that will open this mime type"
+
+        fn = self.function_table.getDefaultApplicationForMimeType
+        result = fn(pchMimeType, pchAppKeyBuffer, unAppKeyBufferLen)
+        return result
+
+    def getApplicationSupportedMimeTypes(self, pchAppKey, pchMimeTypesBuffer, unMimeTypesBuffer):
+        "Get the list of supported mime types for this application, comma-delimited"
+
+        fn = self.function_table.getApplicationSupportedMimeTypes
+        result = fn(pchAppKey, pchMimeTypesBuffer, unMimeTypesBuffer)
+        return result
+
+    def getApplicationsThatSupportMimeType(self, pchMimeType, pchAppKeysThatSupportBuffer, unAppKeysThatSupportBuffer):
+        "Get the list of app-keys that support this mime type, comma-delimited, the return value is number of bytes you need to return the full string"
+
+        fn = self.function_table.getApplicationsThatSupportMimeType
+        result = fn(pchMimeType, pchAppKeysThatSupportBuffer, unAppKeysThatSupportBuffer)
+        return result
+
+    def getApplicationLaunchArguments(self, unHandle, pchArgs, unArgs):
+        "Get the args list from an app launch that had the process already running, you call this when you get a VREvent_ApplicationMimeTypeLoad"
+
+        fn = self.function_table.getApplicationLaunchArguments
+        result = fn(unHandle, pchArgs, unArgs)
         return result
 
     def getStartingApplication(self, pchAppKeyBuffer, unAppKeyBufferLen):
@@ -2774,8 +2910,6 @@ class IVRCompositor_FnTable(Structure):
         ("forceInterleavedReprojectionOn", OPENVR_FNTABLE_CALLTYPE(None, openvr_bool)),
         ("forceReconnectProcess", OPENVR_FNTABLE_CALLTYPE(None)),
         ("suspendRendering", OPENVR_FNTABLE_CALLTYPE(None, openvr_bool)),
-        ("requestScreenshot", OPENVR_FNTABLE_CALLTYPE(EVRCompositorError, EVRScreenshotType, c_char_p, c_char_p)),
-        ("getCurrentScreenshotType", OPENVR_FNTABLE_CALLTYPE(EVRScreenshotType)),
         ("getMirrorTextureD3D11", OPENVR_FNTABLE_CALLTYPE(EVRCompositorError, EVREye, c_void_p, POINTER(c_void_p))),
         ("getMirrorTextureGL", OPENVR_FNTABLE_CALLTYPE(EVRCompositorError, EVREye, POINTER(glUInt_t), POINTER(glSharedTextureHandle_t))),
         ("releaseSharedGLTexture", OPENVR_FNTABLE_CALLTYPE(openvr_bool, glUInt_t, glSharedTextureHandle_t)),
@@ -3047,50 +3181,6 @@ class IVRCompositor(object):
         fn = self.function_table.suspendRendering
         fn(bSuspend)
 
-    def requestScreenshot(self, type_, pchDestinationFileName, pchVRDestinationFileName):
-        """
-        Request a screenshot of the requested type.
-         A request of the VRScreenshotType_Stereo type will always
-         work. Other types will depend on the underlying application
-         support.
-         The first file name is for the preview image and should be a
-         regular screenshot (ideally from the left eye). The second
-         is the VR screenshot in the correct format. They should be
-         in the same aspect ratio.  Formats per type:
-         VRScreenshotType_Mono: the VR filename is ignored (can be
-         nullptr), this is a normal flat single shot.
-         VRScreenshotType_Stereo:  The VR image should be a
-         side-by-side with the left eye image on the left.
-         VRScreenshotType_Cubemap: The VR image should be six square
-         images composited horizontally.
-         VRScreenshotType_StereoPanorama: above/below with left eye
-         panorama being the above image.  Image is typically square
-         with the panorama being 2x horizontal.
-         
-         Note that the VR dashboard will call this function when
-         the user presses the screenshot binding (currently System
-         Button + Trigger).  If Steam is running, the destination
-         file names will be in %TEMP% and will be copied into
-         Steam's screenshot library for the running application
-         once SubmitScreenshot() is called.
-         If Steam is not running, the paths will be in the user's
-         documents folder under Documents\SteamVR\Screenshots.
-         Other VR applications can call this to initate a
-         screenshot outside of user control.
-         The destination file names do not need an extension,
-         will be replaced with the correct one for the format
-         which is currently .png.
-        """
-
-        fn = self.function_table.requestScreenshot
-        result = fn(type, pchDestinationFileName, pchVRDestinationFileName)
-        return result
-
-    def getCurrentScreenshotType(self):
-        fn = self.function_table.getCurrentScreenshotType
-        result = fn()
-        return result
-
     def getMirrorTextureD3D11(self, eEye, pD3D11DeviceOrResource):
         "Opens a shared D3D11 texture with the undistorted composited image for each eye."
 
@@ -3142,6 +3232,10 @@ class IVROverlay_FnTable(Structure):
         ("getOverlayColor", OPENVR_FNTABLE_CALLTYPE(EVROverlayError, VROverlayHandle_t, POINTER(c_float), POINTER(c_float), POINTER(c_float))),
         ("setOverlayAlpha", OPENVR_FNTABLE_CALLTYPE(EVROverlayError, VROverlayHandle_t, c_float)),
         ("getOverlayAlpha", OPENVR_FNTABLE_CALLTYPE(EVROverlayError, VROverlayHandle_t, POINTER(c_float))),
+        ("setOverlayTexelAspect", OPENVR_FNTABLE_CALLTYPE(EVROverlayError, VROverlayHandle_t, c_float)),
+        ("getOverlayTexelAspect", OPENVR_FNTABLE_CALLTYPE(EVROverlayError, VROverlayHandle_t, POINTER(c_float))),
+        ("setOverlaySortOrder", OPENVR_FNTABLE_CALLTYPE(EVROverlayError, VROverlayHandle_t, c_uint32)),
+        ("getOverlaySortOrder", OPENVR_FNTABLE_CALLTYPE(EVROverlayError, VROverlayHandle_t, POINTER(c_uint32))),
         ("setOverlayWidthInMeters", OPENVR_FNTABLE_CALLTYPE(EVROverlayError, VROverlayHandle_t, c_float)),
         ("getOverlayWidthInMeters", OPENVR_FNTABLE_CALLTYPE(EVROverlayError, VROverlayHandle_t, POINTER(c_float))),
         ("setOverlayAutoCurveDistanceRangeInMeters", OPENVR_FNTABLE_CALLTYPE(EVROverlayError, VROverlayHandle_t, c_float, c_float)),
@@ -3365,6 +3459,46 @@ class IVROverlay(object):
         pfAlpha = c_float()
         result = fn(ulOverlayHandle, byref(pfAlpha))
         return result, pfAlpha.value
+
+    def setOverlayTexelAspect(self, ulOverlayHandle, fTexelAspect):
+        """
+        Sets the aspect ratio of the texels in the overlay. 1.0 means the texels are square. 2.0 means the texels
+        are twice as wide as they are tall. Defaults to 1.0.
+        """
+
+        fn = self.function_table.setOverlayTexelAspect
+        result = fn(ulOverlayHandle, fTexelAspect)
+        return result
+
+    def getOverlayTexelAspect(self, ulOverlayHandle):
+        "Gets the aspect ratio of the texels in the overlay. Defaults to 1.0"
+
+        fn = self.function_table.getOverlayTexelAspect
+        pfTexelAspect = c_float()
+        result = fn(ulOverlayHandle, byref(pfTexelAspect))
+        return result, pfTexelAspect.value
+
+    def setOverlaySortOrder(self, ulOverlayHandle, unSortOrder):
+        """
+        Sets the rendering sort order for the overlay. Overlays are rendered this order:
+             Overlays owned by the scene application
+             Overlays owned by some other application
+        *	Within a category overlays are rendered lowest sort order to highest sort order. Overlays with the same 
+        sort order are rendered back to front base on distance from the HMD.
+        *	Sort order defaults to 0.
+        """
+
+        fn = self.function_table.setOverlaySortOrder
+        result = fn(ulOverlayHandle, unSortOrder)
+        return result
+
+    def getOverlaySortOrder(self, ulOverlayHandle):
+        "Gets the sort order of the overlay. See SetOverlaySortOrder for how this works."
+
+        fn = self.function_table.getOverlaySortOrder
+        punSortOrder = c_uint32()
+        result = fn(ulOverlayHandle, byref(punSortOrder))
+        return result, punSortOrder.value
 
     def setOverlayWidthInMeters(self, ulOverlayHandle, fWidthInMeters):
         "Sets the width of the overlay quad in meters. By default overlays are rendered on a quad that is 1 meter across"
@@ -4076,7 +4210,7 @@ class IVRNotifications(object):
         fn = self.function_table.createNotification
         pImage = NotificationBitmap_t()
         pNotificationId = VRNotificationId()
-        result = fn(ulOverlayHandle, ulUserValue, type, pchText, style, byref(pImage), byref(pNotificationId))
+        result = fn(ulOverlayHandle, ulUserValue, type_, pchText, style, byref(pImage), byref(pNotificationId))
         return result, pImage, pNotificationId
 
     def removeNotification(self, notificationId):
@@ -4257,7 +4391,7 @@ class IVRScreenshots(object):
 
         fn = self.function_table.requestScreenshot
         pOutScreenshotHandle = ScreenshotHandle_t()
-        result = fn(byref(pOutScreenshotHandle), type, pchPreviewFilename, pchVRFilename)
+        result = fn(byref(pOutScreenshotHandle), type_, pchPreviewFilename, pchVRFilename)
         return result, pOutScreenshotHandle
 
     def hookScreenshot(self, numTypes):
@@ -4346,7 +4480,50 @@ class IVRScreenshots(object):
         """
 
         fn = self.function_table.submitScreenshot
-        result = fn(screenshotHandle, type, pchSourcePreviewFilename, pchSourceVRFilename)
+        result = fn(screenshotHandle, type_, pchSourcePreviewFilename, pchSourceVRFilename)
+        return result
+
+
+
+class IVRResources_FnTable(Structure):
+    _fields_ = [
+        ("loadSharedResource", OPENVR_FNTABLE_CALLTYPE(c_uint32, c_char_p, c_char_p, c_uint32)),
+        ("getResourceFullPath", OPENVR_FNTABLE_CALLTYPE(c_uint32, c_char_p, c_char_p, c_char_p, c_uint32)),
+    ]
+
+
+class IVRResources(object):
+    def __init__(self):
+        version_key = IVRResources_Version
+        if not isInterfaceVersionValid(version_key):
+            _checkInitError(VRInitError_Init_InterfaceNotFound)
+        # Thank you lukexi https://github.com/lukexi/openvr-hs/blob/master/cbits/openvr_capi_helper.c#L9
+        fn_key = b"FnTable:" + version_key
+        fn_type = IVRResources_FnTable
+        fn_table_ptr = cast(getGenericInterface(fn_key), POINTER(fn_type))
+        if fn_table_ptr is None:
+            raise OpenVRError("Error retrieving VR API for IVRResources")
+        self.function_table = fn_table_ptr.contents
+
+    def loadSharedResource(self, pchResourceName, pchBuffer, unBufferLen):
+        """
+        Loads the specified resource into the provided buffer if large enough.
+        Returns the size in bytes of the buffer required to hold the specified resource.
+        """
+
+        fn = self.function_table.loadSharedResource
+        result = fn(pchResourceName, pchBuffer, unBufferLen)
+        return result
+
+    def getResourceFullPath(self, pchResourceName, pchResourceTypeDirectory, pchPathBuffer, unBufferLen):
+        """
+        Provides the full path to the specified resource. Resource names can include named directories for
+        drivers and other things, and this resolves all of those and returns the actual physical path. 
+        pchResourceTypeDirectory is the subdirectory of resources to look in.
+        """
+
+        fn = self.function_table.getResourceFullPath
+        result = fn(pchResourceName, pchResourceTypeDirectory, pchPathBuffer, unBufferLen)
         return result
 
 
