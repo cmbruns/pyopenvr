@@ -11,6 +11,9 @@ from OpenGL.GL import *  # @UnusedWildImport # this comment squelches an IDE war
 from OpenGL.GL.shaders import compileShader, compileProgram
 from OpenGL.arrays import vbo
 
+import glfw
+import openvr
+
 from openvr.glframework.glfw_app import GlfwApp
 from openvr.gl_renderer import OpenVrGlRenderer
 from openvr.tracked_devices_actor import TrackedDevicesActor
@@ -174,5 +177,39 @@ if __name__ == "__main__":
     controllers.show_controllers_only = True
     renderer.append(controllers)
     renderer.append(obj)
+    new_event = openvr.VREvent_t()
     with GlfwApp(renderer, "mouse brain") as glfwApp:
-        glfwApp.run_loop()
+        while not glfw.window_should_close(glfwApp.window):
+            glfwApp.render_scene()
+            # TODO poll events
+            while openvr.VRSystem().pollNextEvent(new_event):
+                dix = new_event.trackedDeviceIndex
+                device_class = openvr.VRSystem().getTrackedDeviceClass(dix)
+                # We only want to watch controller events
+                if device_class != openvr.TrackedDeviceClass_Controller:
+                    continue
+                # print("device class = %d" % device_class)
+                t = new_event.eventType
+                # "Touch" event happens earlier than "Press" event,
+                # so allow a light touch for grabbing here
+                if t == openvr.VREvent_ButtonTouch:
+                    # print("Button touched")
+                    action = "touched"
+                    pass
+                elif t == openvr.VREvent_ButtonUntouch:
+                    # print("Button detouched")
+                    action = "released"
+                    pass
+                else:
+                    continue
+                bix = new_event.data.controller.button
+                # Pay attention to trigger presses only
+                if bix != openvr.k_EButton_SteamVR_Trigger:
+                    continue
+                role = openvr.VRSystem().getControllerRoleForTrackedDeviceIndex(dix)
+                if role == openvr.TrackedControllerRole_RightHand:
+                    print("  right controller trigger %s" % action)
+                else:
+                    print("  left controller trigger %s" % action)
+                # print("button %d" % new_event.data.controller.button)
+                

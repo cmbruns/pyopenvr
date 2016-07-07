@@ -1898,16 +1898,15 @@ class IVRSystem(object):
         result = fn(error)
         return result
 
-    def pollNextEvent(self):
+    def pollNextEvent(self, pEvent):
         """
         Returns true and fills the event with the next event on the queue if there is one. If there are no events
         this method returns false. uncbVREvent should be the size in bytes of the VREvent_t struct
         """
 
         fn = self.function_table.pollNextEvent
-        pEvent = VREvent_t()
         result = fn(byref(pEvent), sizeof(VREvent_t))
-        return result, pEvent
+        return result != 0
 
     def pollNextEventWithPose(self, eOrigin, uncbVREvent):
         """
