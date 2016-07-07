@@ -297,7 +297,11 @@ EOF
             print "    $error_arg_name = EVRInitError()\n";
         }
 
-        print "    result = _openvr.$fn_name(";
+        print "    "; # indent
+        if ($return_type ne "None") { # avoid IDE warning when "result" value is unused
+        	print "result = ";
+        }
+        print "    _openvr.$fn_name(";
         print join ", ", @arg_names;
         print ")\n";
 
@@ -801,7 +805,12 @@ EOF
                         print "        $array_arg_name = cast($array_arg_name, POINTER($array_arg_pointee_type))\n";
                     }
 
-                    print "        result = fn(";
+                    print "        "; # indent
+                    if ($return_type !~ m/^void$/) {
+                    	# avoid IDE warning when "result"" value is unused
+                        print "result = ";
+                    }
+                    print "fn(";
                     print join ", ", @internal_arg_names;
                     print ")\n";
                     if ($#return_arg_names >= 0) {
