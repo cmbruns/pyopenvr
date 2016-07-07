@@ -250,6 +250,9 @@ EOF
                 $arg_name = $1;
                 $arg_name = lcfirst($arg_name);
             }
+            
+            # avoid reserved words in argument name
+            $arg_name =~ s/^type$/type_/;
 
             if ($arg_type eq "POINTER\(EVRInitError\)") {
                 # Handle error argument specially
@@ -746,6 +749,9 @@ EOF
                         die unless $arg =~ m/^\s*(.*)\s+(\S+)\s*$/;
                         my $arg_type = $1;
                         my $arg_name = $2;
+                        
+                        # avoid reserved words in argument name
+                        $arg_name =~ s/^type$/type_/;
 
                         $arg_type = translate_type($arg_type);
                         push @arg_types, $arg_type;
