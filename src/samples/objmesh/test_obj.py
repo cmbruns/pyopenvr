@@ -293,13 +293,11 @@ class ControllerState(object):
             dy = X1.m[1][3] - X0.m[1][3]
             dz = X1.m[2][3] - X0.m[2][3]
             # print("%+7.4f, %+7.4f, %+7.4f" % (dx, dy, dz))
-            result = MyTransform.translation(dx, dy, dz)
-            test = ~MyTransform.fromOpenVrMatrix34(X0) * MyTransform.fromOpenVrMatrix34(X1)
-            print("%+7.4f, %+7.4f" % (test[3, 0], result[3, 0]) )
             do_translation_only = False
-            if not do_translation_only:
-                result = test
-            # TODO: Return difference matrix
+            if do_translation_only:
+                result = MyTransform.translation(dx, dy, dz)
+            else:
+                result = ~MyTransform.fromOpenVrMatrix34(X0) * MyTransform.fromOpenVrMatrix34(X1)
         else:
             result = None
         # Create a COPY of the current pose for comparison next time
