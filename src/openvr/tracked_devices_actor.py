@@ -4,7 +4,7 @@
 
 import time
 from textwrap import dedent
-from ctypes import cast, c_float, c_void_p
+from ctypes import cast, c_float, c_void_p, sizeof
 
 import numpy
 from OpenGL.GL import *  # @UnusedWildImport # this comment squelches an IDE warning
