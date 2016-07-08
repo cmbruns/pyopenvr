@@ -7,7 +7,9 @@ import itertools
 from textwrap import dedent
 from ctypes import cast, c_float, c_void_p, sizeof
 
-from OpenGL.GL import *  # @UnusedWildImport # this comment squelches an IDE warning
+# from OpenGL.GL import *  # @UnusedWildImport # this comment squelches an IDE warning
+from OpenGL.GL import GL_FLOAT, GL_ELEMENT_ARRAY_BUFFER, GL_FRAGMENT_SHADER, GL_TRIANGLES, GL_UNSIGNED_INT, GL_VERTEX_SHADER
+from OpenGL.GL import glUniformMatrix4fv, glUseProgram, glVertexAttribPointer, glDrawElements, glBindVertexArray, glGenVertexArrays, glEnableVertexAttribArray, glDeleteVertexArrays
 from OpenGL.GL.shaders import compileShader, compileProgram
 from OpenGL.arrays import vbo
 
@@ -17,6 +19,8 @@ import openvr
 from openvr.glframework.glfw_app import GlfwApp
 from openvr.gl_renderer import OpenVrGlRenderer
 from openvr.tracked_devices_actor import TrackedDevicesActor
+from openvr.gl_renderer import matrixForOpenVrMatrix
+
 
 """
 Minimal glfw programming example which colored OpenGL cube scene that can be closed by pressing ESCAPE.
@@ -35,6 +39,7 @@ class ObjMesh(object):
         self.vertexPositions = None
         self.indexPositions = None
         # self.init_gl()
+        self.model_matrix = numpy.matrix(numpy.identity(4, dtype=numpy.float32))
 
     def _parse_line(self, line):
         fields = line.split()
@@ -149,7 +154,13 @@ class ObjMesh(object):
     def display_gl(self, modelview, projection):
         glUseProgram(self.shader)
         glUniformMatrix4fv(0, 1, False, projection)
-        glUniformMatrix4fv(4, 1, False, modelview)
+        
+        # TODO: Adjust modelview matrix
+        modelview0 = self.model_matrix * modelview
+        modelview0 = numpy.asarray(numpy.matrix(modelview0, dtype=numpy.float32))
+        # print(modelview0[3,0])
+        
+        glUniformMatrix4fv(4, 1, False, modelview0)
         glBindVertexArray(self.vao)
         glDrawElements(GL_TRIANGLES, len(self.indexPositions), GL_UNSIGNED_INT, None)
         glBindVertexArray(0)
@@ -166,11 +177,76 @@ class ObjMesh(object):
             self._parse_line(line)
 
 
+class ControllerState(object):
+    def __init__(self, name):
+        self.name = name
+        self.is_dragging = False
+        self.device_index = None
+        self.current_pose = None
+        self.previous_pose = None
+        
+    def check_drag(self, poses):
+        if self.device_index is None:
+            return
+        self.current_pose = poses[self.device_index]
+        is_good_drag = True # start optimistic
+        if not self.is_dragging:
+            is_good_drag = False
+            self.previous_pose = None
+        if self.previous_pose is None:
+            is_good_drag = False
+        elif not self.previous_pose.bPoseIsValid:
+            is_good_drag = False
+        if not self.current_pose.bPoseIsValid:
+            is_good_drag = False
+        if is_good_drag:
+            X0 = self.previous_pose.mDeviceToAbsoluteTracking.m
+            X1 = self.current_pose.mDeviceToAbsoluteTracking.m
+            # Translation only, for now
+            dx = X1[0][3] - X0[0][3]
+            dy = X1[1][3] - X0[1][3]
+            dz = X1[2][3] - X0[2][3]
+            # print("%+7.4f, %+7.4f, %+7.4f" % (dx, dy, dz))
+            result = (dx, dy, dz)
+        else:
+            result = None
+        # Create a COPY of the current pose for comparison next time
+        self.previous_pose = openvr.TrackedDevicePose_t(self.current_pose.mDeviceToAbsoluteTracking)
+        self.previous_pose.bPoseIsValid = self.current_pose.bPoseIsValid
+        return result
+
+
+left_controller = ControllerState("left controller")
+right_controller = ControllerState("right controller")
+def check_controller_drag(event):
+    dix = new_event.trackedDeviceIndex
+    device_class = openvr.VRSystem().getTrackedDeviceClass(dix)
+    # We only want to watch controller events
+    if device_class != openvr.TrackedDeviceClass_Controller:
+        return
+    bix = event.data.controller.button
+    # Pay attention to trigger presses only
+    if bix != openvr.k_EButton_SteamVR_Trigger:
+        return
+    role = openvr.VRSystem().getControllerRoleForTrackedDeviceIndex(dix)
+    if role == openvr.TrackedControllerRole_RightHand:
+        controller = right_controller
+        # print("  right controller trigger %s" % action)
+    else:
+        controller = left_controller
+        # print("  left controller trigger %s" % action)
+    controller.device_index = dix
+    t = event.eventType
+    # "Touch" event happens earlier than "Press" event,
+    # so allow a light touch for grabbing here
+    if t == openvr.VREvent_ButtonTouch:
+        controller.is_dragging = True
+    elif t == openvr.VREvent_ButtonUntouch:
+        controller.is_dragging = False
 
 if __name__ == "__main__":
     obj = ObjMesh(open("root_997.obj", 'r'))
     # obj = ObjMesh(open("AIv6b_699.obj", 'r'))
-
     renderer = OpenVrGlRenderer(multisample=2)
     # renderer.append(ColorCubeActor())
     controllers = TrackedDevicesActor(renderer.poses)
@@ -181,35 +257,12 @@ if __name__ == "__main__":
     with GlfwApp(renderer, "mouse brain") as glfwApp:
         while not glfw.window_should_close(glfwApp.window):
             glfwApp.render_scene()
-            # TODO poll events
+            # Update controller drag state when buttons are pushed
             while openvr.VRSystem().pollNextEvent(new_event):
-                dix = new_event.trackedDeviceIndex
-                device_class = openvr.VRSystem().getTrackedDeviceClass(dix)
-                # We only want to watch controller events
-                if device_class != openvr.TrackedDeviceClass_Controller:
-                    continue
-                # print("device class = %d" % device_class)
-                t = new_event.eventType
-                # "Touch" event happens earlier than "Press" event,
-                # so allow a light touch for grabbing here
-                if t == openvr.VREvent_ButtonTouch:
-                    # print("Button touched")
-                    action = "touched"
-                    pass
-                elif t == openvr.VREvent_ButtonUntouch:
-                    # print("Button detouched")
-                    action = "released"
-                    pass
-                else:
-                    continue
-                bix = new_event.data.controller.button
-                # Pay attention to trigger presses only
-                if bix != openvr.k_EButton_SteamVR_Trigger:
-                    continue
-                role = openvr.VRSystem().getControllerRoleForTrackedDeviceIndex(dix)
-                if role == openvr.TrackedControllerRole_RightHand:
-                    print("  right controller trigger %s" % action)
-                else:
-                    print("  left controller trigger %s" % action)
-                # print("button %d" % new_event.data.controller.button)
-                
+                check_controller_drag(new_event)
+            tx = right_controller.check_drag(renderer.poses)
+            if tx is not None:
+                # TODO: translate the brain model
+                for i in range(3):
+                    obj.model_matrix[3,i] += tx[i]
+                    # print("%+7.4f, %+7.4f, %+7.4f" % tx)
