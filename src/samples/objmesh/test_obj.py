@@ -3,6 +3,7 @@
 # file hello_glfw.py
 
 import numpy
+from numpy.linalg import inv
 import itertools
 from textwrap import dedent
 from ctypes import cast, c_float, c_void_p, sizeof
@@ -44,7 +45,7 @@ class MyTransform(object):
         self._m += rhs
 
     def __invert__(self):
-        return MyTransform(self._m.I)
+        return MyTransform(inv(self._m))
 
     def __isub__(self, rhs):
         self._m -= rhs
@@ -81,15 +82,26 @@ class MyTransform(object):
     def __sub__(self, rhs):
         return MyTransform(self._m - rhs)
 
+    @staticmethod
+    def fromOpenVrMatrix34(mat):
+        return MyTransform( 
+                ((mat.m[0][0], mat.m[1][0], mat.m[2][0], 0.0),
+                 (mat.m[0][1], mat.m[1][1], mat.m[2][1], 0.0), 
+                 (mat.m[0][2], mat.m[1][2], mat.m[2][2], 0.0), 
+                 (mat.m[0][3], mat.m[1][3], mat.m[2][3], 1.0),)
+                )
+
     def pack(self):
         "create a packed copy, ready for use by OpenGL calls"
         return numpy.asarray(self._m, dtype=numpy.float32)
-    
-    def translate(self, x, y, z):
-        return self * ((1, 0, 0, 0),
-                       (0, 1, 0, 0),
-                       (0, 0, 1, 0),
-                       (x, y, z, 1),)
+        
+    @staticmethod
+    def translation(x, y, z):
+        return MyTransform( (
+                             (1, 0, 0, 0),
+                             (0, 1, 0, 0),
+                             (0, 0, 1, 0),
+                             (x, y, z, 1),) )
     
     def transpose(self):
         return MyTransform(self._m.T)
@@ -274,14 +286,19 @@ class ControllerState(object):
         if not self.current_pose.bPoseIsValid:
             is_good_drag = False
         if is_good_drag:
-            X0 = self.previous_pose.mDeviceToAbsoluteTracking.m
-            X1 = self.current_pose.mDeviceToAbsoluteTracking.m
+            X0 = self.previous_pose.mDeviceToAbsoluteTracking
+            X1 = self.current_pose.mDeviceToAbsoluteTracking
             # Translation only, for now
-            dx = X1[0][3] - X0[0][3]
-            dy = X1[1][3] - X0[1][3]
-            dz = X1[2][3] - X0[2][3]
+            dx = X1.m[0][3] - X0.m[0][3]
+            dy = X1.m[1][3] - X0.m[1][3]
+            dz = X1.m[2][3] - X0.m[2][3]
             # print("%+7.4f, %+7.4f, %+7.4f" % (dx, dy, dz))
-            result = (dx, dy, dz)
+            result = MyTransform.translation(dx, dy, dz)
+            test = ~MyTransform.fromOpenVrMatrix34(X0) * MyTransform.fromOpenVrMatrix34(X1)
+            print("%+7.4f, %+7.4f" % (test[3, 0], result[3, 0]) )
+            do_translation_only = False
+            if not do_translation_only:
+                result = test
             # TODO: Return difference matrix
         else:
             result = None
@@ -337,8 +354,5 @@ if __name__ == "__main__":
                 check_controller_drag(new_event)
             tx = right_controller.check_drag(renderer.poses)
             if tx is not None:
-                # TODO: translate the brain model
-                obj.model_matrix = obj.model_matrix.translate(tx[0], tx[1], tx[2])
-                # for i in range(3):
-                #    # obj.model_matrix[3,i] += tx[i]
-                #    # print("%+7.4f, %+7.4f, %+7.4f" % tx)
+                # translate the brain model
+                obj.model_matrix *= tx
