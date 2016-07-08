@@ -16,11 +16,9 @@ from OpenGL.arrays import vbo
 
 import glfw
 import openvr
-
 from openvr.glframework.glfw_app import GlfwApp
 from openvr.gl_renderer import OpenVrGlRenderer
 from openvr.tracked_devices_actor import TrackedDevicesActor
-from openvr.gl_renderer import matrixForOpenVrMatrix
 
 
 """
@@ -293,7 +291,7 @@ class ControllerState(object):
             dy = X1.m[1][3] - X0.m[1][3]
             dz = X1.m[2][3] - X0.m[2][3]
             # print("%+7.4f, %+7.4f, %+7.4f" % (dx, dy, dz))
-            do_translation_only = False
+            do_translation_only = True
             if do_translation_only:
                 result = MyTransform.translation(dx, dy, dz)
             else:
@@ -336,6 +334,12 @@ def check_controller_drag(event):
 
 if __name__ == "__main__":
     obj = ObjMesh(open("root_997.obj", 'r'))
+    # invert up/down
+    obj.model_matrix *= ((1,0,0,0),
+                         (0,-1,0,0),
+                         (0,0,-1,0),
+                         (-0.5,1.5,0.5,1),
+                         )
     # obj = ObjMesh(open("AIv6b_699.obj", 'r'))
     renderer = OpenVrGlRenderer(multisample=2)
     # renderer.append(ColorCubeActor())
