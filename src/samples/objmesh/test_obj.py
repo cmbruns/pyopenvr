@@ -26,6 +26,80 @@ from openvr.gl_renderer import matrixForOpenVrMatrix
 Minimal glfw programming example which colored OpenGL cube scene that can be closed by pressing ESCAPE.
 """
 
+class MyTransform(object):
+    "4x4 linear Transform for use by OpenGL"
+    def __init__(self, template=None):
+        if template is None:
+            self._m = numpy.identity(4, dtype=numpy.float32)
+        else:
+            self._m = numpy.array(template, dtype=numpy.float32)
+
+    def __add__(self, rhs):
+        return MyTransform(self._m + rhs)
+
+    def __getitem__(self, key):
+        return self._m[key]
+        
+    def __iadd__(self, rhs):
+        self._m += rhs
+
+    def __invert__(self):
+        return MyTransform(self._m.I)
+
+    def __isub__(self, rhs):
+        self._m -= rhs
+
+    def __iter__(self):
+        return self._m.__iter__()
+
+    def __len__(self):
+        return len(self._m)
+
+    def __mul__(self, rhs):
+        "matrix multiplication"
+        return MyTransform(numpy.dot(self._m, rhs))
+    
+    def __neg__(self):
+        return MyTransform(-self._m)
+    
+    def __pos__(self):
+        return self
+    
+    def __radd__(self, lhs):
+        return MyTransform(self._m + lhs)
+
+    def __rmul__(self, lhs):
+        "matrix multiplication"
+        return MyTransform(numpy.dot(lhs, self._m))
+    
+    def __rsub__(self, lhs):
+        return MyTransform(lhs - self._m)
+
+    def __setitem__(self, key, value):
+        self._m[key] = value
+    
+    def __sub__(self, rhs):
+        return MyTransform(self._m - rhs)
+
+    def pack(self):
+        "create a packed copy, ready for use by OpenGL calls"
+        return numpy.asarray(self._m, dtype=numpy.float32)
+    
+    def translate(self, x, y, z):
+        return self * ((1, 0, 0, 0),
+                       (0, 1, 0, 0),
+                       (0, 0, 1, 0),
+                       (x, y, z, 1),)
+    
+    def transpose(self):
+        return MyTransform(self._m.T)
+
+
+# TODO - subdivide this example into
+# * mesh
+# * actor
+# * material
+# * lighting
 class ObjMesh(object):
     def __init__(self, file_stream=None):
         "Create a mesh object from a file stream"
@@ -39,7 +113,7 @@ class ObjMesh(object):
         self.vertexPositions = None
         self.indexPositions = None
         # self.init_gl()
-        self.model_matrix = numpy.matrix(numpy.identity(4, dtype=numpy.float32))
+        self.model_matrix = MyTransform()
 
     def _parse_line(self, line):
         fields = line.split()
@@ -157,10 +231,10 @@ class ObjMesh(object):
         
         # TODO: Adjust modelview matrix
         modelview0 = self.model_matrix * modelview
-        modelview0 = numpy.asarray(numpy.matrix(modelview0, dtype=numpy.float32))
+        # modelview0 = numpy.asarray(numpy.matrix(modelview0, dtype=numpy.float32))
         # print(modelview0[3,0])
         
-        glUniformMatrix4fv(4, 1, False, modelview0)
+        glUniformMatrix4fv(4, 1, False, modelview0.pack())
         glBindVertexArray(self.vao)
         glDrawElements(GL_TRIANGLES, len(self.indexPositions), GL_UNSIGNED_INT, None)
         glBindVertexArray(0)
@@ -208,6 +282,7 @@ class ControllerState(object):
             dz = X1[2][3] - X0[2][3]
             # print("%+7.4f, %+7.4f, %+7.4f" % (dx, dy, dz))
             result = (dx, dy, dz)
+            # TODO: Return difference matrix
         else:
             result = None
         # Create a COPY of the current pose for comparison next time
@@ -263,6 +338,7 @@ if __name__ == "__main__":
             tx = right_controller.check_drag(renderer.poses)
             if tx is not None:
                 # TODO: translate the brain model
-                for i in range(3):
-                    obj.model_matrix[3,i] += tx[i]
-                    # print("%+7.4f, %+7.4f, %+7.4f" % tx)
+                obj.model_matrix = obj.model_matrix.translate(tx[0], tx[1], tx[2])
+                # for i in range(3):
+                #    # obj.model_matrix[3,i] += tx[i]
+                #    # print("%+7.4f, %+7.4f, %+7.4f" % tx)
