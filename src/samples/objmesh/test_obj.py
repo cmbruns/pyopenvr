@@ -8,8 +8,8 @@ import itertools
 from textwrap import dedent
 from ctypes import cast, c_float, c_void_p, sizeof
 
-# from OpenGL.GL import *  # @UnusedWildImport # this comment squelches an IDE warning
-from OpenGL.GL import GL_FLOAT, GL_ELEMENT_ARRAY_BUFFER, GL_FRAGMENT_SHADER, GL_TRIANGLES, GL_UNSIGNED_INT, GL_VERTEX_SHADER
+from OpenGL.GL import *  # @UnusedWildImport # this comment squelches an IDE warning
+# from OpenGL.GL import GL_FLOAT, GL_ELEMENT_ARRAY_BUFFER, GL_FRAGMENT_SHADER, GL_TRIANGLES, GL_UNSIGNED_INT, GL_VERTEX_SHADER
 from OpenGL.GL import glUniformMatrix4fv, glUseProgram, glVertexAttribPointer, glDrawElements, glBindVertexArray, glGenVertexArrays, glEnableVertexAttribArray, glDeleteVertexArrays
 from OpenGL.GL.shaders import compileShader, compileProgram
 from OpenGL.arrays import vbo
@@ -310,6 +310,148 @@ class ControllerState(object):
         self.previous_pose = openvr.TrackedDevicePose_t(self.current_pose.mDeviceToAbsoluteTracking)
         self.previous_pose.bPoseIsValid = self.current_pose.bPoseIsValid
         return result
+    
+
+class FloorActor(object):
+    def __init__(self):
+        self.shader = 0
+        
+    def init_gl(self):
+        vertex_shader = compileShader(dedent(
+                """
+                #version 450 core
+                #line 323
+                
+                layout(location = 0) uniform mat4 Projection = mat4(1);
+                layout(location = 4) uniform mat4 ModelView = mat4(1);
+                
+                const vec3 FLOOR_QUAD[4] = vec3[4](
+                    vec3(-1, 0, -1),
+                    vec3(-1, 0, +1),
+                    vec3(+1, 0, +1),
+                    vec3(+1, 0, -1)
+                );
+                
+                const int FLOOR_INDICES[6] = int[6](
+                    2, 1, 0,
+                    0, 3, 2
+                );
+                
+                out vec2 texCoord;
+                
+                void main() {
+                    int vertexIndex = FLOOR_INDICES[gl_VertexID];
+                    vec3 v = FLOOR_QUAD[vertexIndex];
+                    texCoord = v.xz;
+                    gl_Position = Projection * ModelView * vec4(5 * v, 1);
+                }
+                """
+                ), GL_VERTEX_SHADER)
+        fragment_shader = compileShader(dedent(
+            """\
+            #version 450 core
+            #line 349
+            
+            //
+            // Description : Array and textureless GLSL 2D simplex noise function.
+            //      Author : Ian McEwan, Ashima Arts.
+            //  Maintainer : stegu
+            //     Lastmod : 20110822 (ijm)
+            //     License : Copyright (C) 2011 Ashima Arts. All rights reserved.
+            //               Distributed under the MIT License. See LICENSE file.
+            //               https://github.com/ashima/webgl-noise
+            //               https://github.com/stegu/webgl-noise
+            // 
+            
+            vec3 mod289(vec3 x) {
+              return x - floor(x * (1.0 / 289.0)) * 289.0;
+            }
+            
+            vec2 mod289(vec2 x) {
+              return x - floor(x * (1.0 / 289.0)) * 289.0;
+            }
+            
+            vec3 permute(vec3 x) {
+              return mod289(((x*34.0)+1.0)*x);
+            }
+            
+            float snoise(vec2 v)
+              {
+              const vec4 C = vec4(0.211324865405187,  // (3.0-sqrt(3.0))/6.0
+                                  0.366025403784439,  // 0.5*(sqrt(3.0)-1.0)
+                                 -0.577350269189626,  // -1.0 + 2.0 * C.x
+                                  0.024390243902439); // 1.0 / 41.0
+            // First corner
+              vec2 i  = floor(v + dot(v, C.yy) );
+              vec2 x0 = v -   i + dot(i, C.xx);
+            
+            // Other corners
+              vec2 i1;
+              //i1.x = step( x0.y, x0.x ); // x0.x > x0.y ? 1.0 : 0.0
+              //i1.y = 1.0 - i1.x;
+              i1 = (x0.x > x0.y) ? vec2(1.0, 0.0) : vec2(0.0, 1.0);
+              // x0 = x0 - 0.0 + 0.0 * C.xx ;
+              // x1 = x0 - i1 + 1.0 * C.xx ;
+              // x2 = x0 - 1.0 + 2.0 * C.xx ;
+              vec4 x12 = x0.xyxy + C.xxzz;
+              x12.xy -= i1;
+            
+            // Permutations
+              i = mod289(i); // Avoid truncation effects in permutation
+              vec3 p = permute( permute( i.y + vec3(0.0, i1.y, 1.0 ))
+                    + i.x + vec3(0.0, i1.x, 1.0 ));
+            
+              vec3 m = max(0.5 - vec3(dot(x0,x0), dot(x12.xy,x12.xy), dot(x12.zw,x12.zw)), 0.0);
+              m = m*m ;
+              m = m*m ;
+            
+            // Gradients: 41 points uniformly over a line, mapped onto a diamond.
+            // The ring size 17*17 = 289 is close to a multiple of 41 (41*7 = 287)
+            
+              vec3 x = 2.0 * fract(p * C.www) - 1.0;
+              vec3 h = abs(x) - 0.5;
+              vec3 ox = floor(x + 0.5);
+              vec3 a0 = x - ox;
+            
+            // Normalise gradients implicitly by scaling m
+            // Approximation of: m *= inversesqrt( a0*a0 + h*h );
+              m *= 1.79284291400159 - 0.85373472095314 * ( a0*a0 + h*h );
+            
+            // Compute final noise value at P
+              vec3 g;
+              g.x  = a0.x  * x0.x  + h.x  * x0.y;
+              g.yz = a0.yz * x12.xz + h.yz * x12.yw;
+              return 130.0 * dot(m, g);
+            }
+
+            in vec2 texCoord;
+            out vec4 FragColor;
+            
+            void main() 
+            {
+                float noise = 0.25 * (snoise(texCoord * 20) + 1.5);
+                FragColor = vec4(0, 0, noise, 1.0);
+            }
+            """), 
+            GL_FRAGMENT_SHADER)
+        self.shader = compileProgram(vertex_shader, fragment_shader)
+        #
+        self.vao = glGenVertexArrays(1)
+        glBindVertexArray(self.vao)
+        glEnable(GL_DEPTH_TEST)
+
+    def display_gl(self, modelview, projection):
+        glUseProgram(self.shader)
+        glUniformMatrix4fv(0, 1, False, projection)
+        glUniformMatrix4fv(4, 1, False, modelview)
+        glBindVertexArray(self.vao)
+        glDrawArrays(GL_TRIANGLES, 0, 6)
+    
+    def dispose_gl(self):
+        glDeleteProgram(self.shader)
+        self.shader = 0
+        glDeleteVertexArrays(1, (self.vao,))
+        self.vao = 0
 
 
 left_controller = ControllerState("left controller")
@@ -355,6 +497,7 @@ if __name__ == "__main__":
     controllers.show_controllers_only = True
     renderer.append(controllers)
     renderer.append(obj)
+    renderer.append(FloorActor())
     new_event = openvr.VREvent_t()
     with GlfwApp(renderer, "mouse brain") as glfwApp:
         while not glfw.window_should_close(glfwApp.window):
@@ -370,7 +513,7 @@ if __name__ == "__main__":
                 # TODO - combined transform
                 # Translate to average of two translations
                 tx = 0.5 * (tx1 + tx2)
-                obj.model_matrix *= tx
+                # obj.model_matrix *= tx
                 # TODO - scale
                 mat_left = left_controller.current_pose.mDeviceToAbsoluteTracking.m
                 mat_right = right_controller.current_pose.mDeviceToAbsoluteTracking.m
@@ -386,10 +529,12 @@ if __name__ == "__main__":
                 scale = pow(mag1/mag0, 0.5)
                 print("%0.6f" % scale)
                 ts = MyTransform.scale(scale)
-                orig = 0.5 * (pos_left + pos_right)
+                orig = 0.5 * (pos_left + pos_right - 0.5 * dpos_left - 0.5 * dpos_right)
                 to = MyTransform.translation(*orig)
                 ts = ~to * ts * to
                 obj.model_matrix *= ts
+                #
+                obj.model_matrix *= tx
             elif tx1 is not None:
                 obj.model_matrix *= tx1
             else:
