@@ -154,7 +154,7 @@ class OpenVrGlRenderer(list):
         self.right_fb.init_gl()
         # Compute projection matrix
         zNear = 0.2
-        zFar = 100.0
+        zFar = 500.0
         self.projection_left = numpy.asarray(matrixForOpenVrMatrix(self.vr_system.getProjectionMatrix(
                 openvr.Eye_Left, 
                 zNear, zFar, 
