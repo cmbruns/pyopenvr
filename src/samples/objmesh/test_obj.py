@@ -360,7 +360,7 @@ if __name__ == "__main__":
                 pass # No dragging this time
             elif tx1 is not None and tx2 is not None:
                 # TODO - combined transform
-                obj.model_matrix *= tx1
+                obj.model_matrix *= 0.5 * (tx1 + tx2)
             elif tx1 is not None:
                 obj.model_matrix *= tx1
             else:
