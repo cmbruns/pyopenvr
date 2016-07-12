@@ -354,7 +354,14 @@ if __name__ == "__main__":
             # Update controller drag state when buttons are pushed
             while openvr.VRSystem().pollNextEvent(new_event):
                 check_controller_drag(new_event)
-            tx = right_controller.check_drag(renderer.poses)
-            if tx is not None:
-                # translate the brain model
-                obj.model_matrix *= tx
+            tx1 = right_controller.check_drag(renderer.poses)
+            tx2 = left_controller.check_drag(renderer.poses)
+            if tx1 is None and tx2 is None:
+                pass # No dragging this time
+            elif tx1 is not None and tx2 is not None:
+                # TODO - combined transform
+                obj.model_matrix *= tx1
+            elif tx1 is not None:
+                obj.model_matrix *= tx1
+            else:
+                obj.model_matrix *= tx2
