@@ -94,6 +94,14 @@ class MyTransform(object):
         return numpy.asarray(self._m, dtype=numpy.float32)
         
     @staticmethod
+    def scale(s):
+        return MyTransform( (
+                             (s, 0, 0, 0),
+                             (0, s, 0, 0),
+                             (0, 0, s, 0),
+                             (0, 0, 0, 1),) )
+    
+    @staticmethod
     def translation(x, y, z):
         return MyTransform( (
                              (1, 0, 0, 0),
@@ -334,7 +342,7 @@ def check_controller_drag(event):
 
 if __name__ == "__main__":
     obj = ObjMesh(open("root_997.obj", 'r'))
-    # invert up/down
+    # invert up/down, so brain is dorsal-up
     obj.model_matrix *= ((1,0,0,0),
                          (0,-1,0,0),
                          (0,0,-1,0),
@@ -360,7 +368,28 @@ if __name__ == "__main__":
                 pass # No dragging this time
             elif tx1 is not None and tx2 is not None:
                 # TODO - combined transform
-                obj.model_matrix *= 0.5 * (tx1 + tx2)
+                # Translate to average of two translations
+                tx = 0.5 * (tx1 + tx2)
+                obj.model_matrix *= tx
+                # TODO - scale
+                mat_left = left_controller.current_pose.mDeviceToAbsoluteTracking.m
+                mat_right = right_controller.current_pose.mDeviceToAbsoluteTracking.m
+                pos_left = numpy.array([mat_left[i][3] for i in range(3)])
+                pos_right = numpy.array([mat_right[i][3] for i in range(3)])
+                between = pos_left - pos_right
+                mag1 = numpy.dot(between, between)
+                #
+                dpos_left = tx2[3][0:3]
+                dpos_right = tx1[3][0:3]
+                between0 = between - dpos_left + dpos_right
+                mag0 = numpy.dot(between0, between0)
+                scale = pow(mag1/mag0, 0.5)
+                print("%0.6f" % scale)
+                ts = MyTransform.scale(scale)
+                orig = 0.5 * (pos_left + pos_right)
+                to = MyTransform.translation(*orig)
+                ts = ~to * ts * to
+                obj.model_matrix *= ts
             elif tx1 is not None:
                 obj.model_matrix *= tx1
             else:
