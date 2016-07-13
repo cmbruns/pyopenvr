@@ -312,46 +312,12 @@ class ControllerState(object):
         return result
     
 
-class FloorActor(object):
+class ProceduralNoiseShader(object):
     def __init__(self):
-        self.shader = 0
-        
-    def init_gl(self):
-        vertex_shader = compileShader(dedent(
-                """
-                #version 450 core
-                #line 323
-                
-                layout(location = 0) uniform mat4 Projection = mat4(1);
-                layout(location = 4) uniform mat4 ModelView = mat4(1);
-                
-                const vec3 FLOOR_QUAD[4] = vec3[4](
-                    vec3(-1, 0, -1),
-                    vec3(-1, 0, +1),
-                    vec3(+1, 0, +1),
-                    vec3(+1, 0, -1)
-                );
-                
-                const int FLOOR_INDICES[6] = int[6](
-                    2, 1, 0,
-                    0, 3, 2
-                );
-                
-                out vec2 texCoord;
-                
-                void main() {
-                    int vertexIndex = FLOOR_INDICES[gl_VertexID];
-                    vec3 v = FLOOR_QUAD[vertexIndex];
-                    const float scale = 50;
-                    texCoord = scale * v.xz;
-                    gl_Position = Projection * ModelView * vec4(scale * v, 1);
-                }
-                """
-                ), GL_VERTEX_SHADER)
-        fragment_shader = compileShader(dedent(
+        self.fragment_shader = compileShader(dedent(
                 """\
                 #version 450 core
-                #line 354
+                #line 320
                 
                 //
                 // Description : Array and textureless GLSL 2D simplex noise function.
@@ -477,21 +443,73 @@ class FloorActor(object):
                         // return fractal_noise(texCoord, 1); // needs filtering
                     }
                 }
+                """), 
+            GL_FRAGMENT_SHADER)
+        
 
-                in vec2 texCoord;
+
+class FloorActor(object):
+    "Floor plane with procedural texture for context"
+    def __init__(self):
+        self.shader = 0
+        self.vao = 0
+        
+    def init_gl(self):
+        vertex_shader = compileShader(dedent(
+                """
+                #version 450 core
+                #line 461
+                
+                layout(location = 0) uniform mat4 Projection = mat4(1);
+                layout(location = 4) uniform mat4 ModelView = mat4(1);
+                
+                const vec3 FLOOR_QUAD[4] = vec3[4](
+                    vec3(-1, 0, -1),
+                    vec3(-1, 0, +1),
+                    vec3(+1, 0, +1),
+                    vec3(+1, 0, -1)
+                );
+                
+                const int FLOOR_INDICES[6] = int[6](
+                    2, 1, 0,
+                    0, 3, 2
+                );
+                
+                out vec2 texCoord;
+                
+                void main() {
+                    int vertexIndex = FLOOR_INDICES[gl_VertexID];
+                    vec3 v = FLOOR_QUAD[vertexIndex];
+                    const float scale = 50; // meters per side
+                    texCoord = scale * v.xz;
+                    gl_Position = Projection * ModelView * vec4(scale * v, 1);
+                }
+                """
+                ), GL_VERTEX_SHADER)
+        fragment_shader = compileShader(dedent(
+                """\
+                #version 450 core
+                #line 492
+
+                in vec2 texCoord; // Floor texture coordinate in meters
                 out vec4 FragColor;
                 
+                float filtered_noise(in vec2 texCoord, in float detail);
+
                 void main() 
                 {
-                    float noise = 0.50 * (filtered_noise(texCoord * 5 + vec2(10, 10), 8) + 1.0);
-                    const vec3 color1 = vec3(0.25, 0.3, 0.15);
-                    const vec3 color2 = vec3(0.05, 0.05, 0.0);
+                    // shift texture coordinate so origin artifact is probably far away,
+                    // and shift intensity from range [-1,1] to range [0,1]
+                    float noise = 0.50 * (filtered_noise(texCoord * 2 + vec2(10, 10), 8) + 1.0);
+                    // interpolate final color between brown and green
+                    const vec3 color1 = vec3(0.25, 0.3, 0.15); // green
+                    const vec3 color2 = vec3(0.05, 0.05, 0.0); // dark brown
                     vec3 color = mix(color2, color1, noise);
                     FragColor = vec4(color, 1.0);
                 }
                 """), 
             GL_FRAGMENT_SHADER)
-        self.shader = compileProgram(vertex_shader, fragment_shader)
+        self.shader = compileProgram(vertex_shader, fragment_shader, ProceduralNoiseShader().fragment_shader)
         #
         self.vao = glGenVertexArrays(1)
         glBindVertexArray(self.vao)
