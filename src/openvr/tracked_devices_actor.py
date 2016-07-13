@@ -186,6 +186,7 @@ class TrackedDevicesActor(object):
         
     def display_gl(self, modelview, projection):
         self._check_devices()
+        glEnable(GL_DEPTH_TEST)
         glUseProgram(self.shader)
         glUniformMatrix4fv(0, 1, False, projection)
         for i in range(1, len(self.poses)):
