@@ -209,7 +209,7 @@ class ObjMesh(object):
         vertex_shader = compileShader(dedent(
             """\
             #version 450 core
-            #line 113
+            #line 212
             
             layout(location = 0) in vec3 in_Position;
             layout(location = 1) in vec3 in_Normal;
@@ -230,7 +230,7 @@ class ObjMesh(object):
         fragment_shader = compileShader(dedent(
             """\
             #version 450 core
-            #line 134
+            #line 233
 
             in vec3 norm_color;
             out vec4 fragColor;
@@ -342,15 +342,16 @@ class FloorActor(object):
                 void main() {
                     int vertexIndex = FLOOR_INDICES[gl_VertexID];
                     vec3 v = FLOOR_QUAD[vertexIndex];
-                    texCoord = v.xz;
-                    gl_Position = Projection * ModelView * vec4(5 * v, 1);
+                    const float scale = 50;
+                    texCoord = scale * v.xz;
+                    gl_Position = Projection * ModelView * vec4(scale * v, 1);
                 }
                 """
                 ), GL_VERTEX_SHADER)
         fragment_shader = compileShader(dedent(
                 """\
                 #version 450 core
-                #line 349
+                #line 354
                 
                 //
                 // Description : Array and textureless GLSL 2D simplex noise function.
@@ -423,15 +424,70 @@ class FloorActor(object):
                   g.yz = a0.yz * x12.xz + h.yz * x12.yw;
                   return 130.0 * dot(m, g);
                 }
-    
+                
+                float fractal_noise(vec2 texCoord, int nlevels) {
+                    if (nlevels < 1) 
+                        return 0.0;
+                    const float w = 0.5;
+                    float result = 0;
+                    for (int n = 1; n < nlevels + 1; ++n) {
+                        result += pow(w, n) * snoise(n * texCoord);
+                    }
+                    return result;
+                }
+
+                float filtered_noise(in vec2 texCoord, in float detail) {
+                    // Figure out how many spots we might need to sample
+                    vec2 dxv = vec2(dFdx(texCoord.x), dFdy(texCoord.x));
+                    vec2 dyv = vec2(dFdx(texCoord.y) + dFdy(texCoord.y));
+                    float dx = length(dxv);
+                    float dy = length(dyv);
+                    // How many samples are needed in each direction?
+                    const int MaxSamples = 10;
+                    int sx = 1 + clamp( int( detail*dx ), 0, MaxSamples-1 );
+                    int sy = 1 + clamp( int( detail*dy ), 0, MaxSamples-1 );
+                    float dt = length(vec2(dx, dy));
+                    if (dt > 5)
+                        // return -1.0;
+                        return fractal_noise(texCoord, 0); // stuff really far away is just a blurry grey
+                    else if (dt <= 0.1) {
+                        // return 1.0;
+                        return fractal_noise(texCoord, 5); // close stuff gets one exact sample
+                    }
+                    else if (dt <= 0.3) {
+                        // return 1.0;
+                        return fractal_noise(texCoord, 3); // close stuff gets one exact sample
+                    }
+                    else if (dt <= 0.7) {
+                        // return 1.0;
+                        return fractal_noise(texCoord, 1); // close stuff gets one exact sample
+                    }
+                    else {
+                        // TODO: Multisample here
+                        float result = 0.0;
+                        vec2 dv = vec2(dx, dy);
+                        for (int x = 0; x < sx; ++x) {
+                            for (int y = 0; y < sy; ++y) {
+                                vec2 tc = texCoord + dv*vec2(x, y)/vec2(sx, sy) - 0.5*dv;
+                                result += fractal_noise(tc, 1);
+                            }
+                        }
+                        // return 1.0;
+                        return result / (sx*sy);
+                        // return fractal_noise(texCoord, 1); // needs filtering
+                    }
+                }
+
                 in vec2 texCoord;
                 out vec4 FragColor;
                 
                 void main() 
                 {
-                    float noise = 0.25 * (snoise(texCoord * 5) + 1.5);
-                    const vec3 color = vec3(0.3, 0.3, 0.4);
-                    FragColor = vec4(noise * color, 1.0);
+                    float noise = 0.50 * (filtered_noise(texCoord * 5 + vec2(10, 10), 8) + 1.0);
+                    const vec3 color1 = vec3(0.25, 0.3, 0.15);
+                    const vec3 color2 = vec3(0.05, 0.05, 0.0);
+                    vec3 color = mix(color2, color1, noise);
+                    FragColor = vec4(color, 1.0);
                 }
                 """), 
             GL_FRAGMENT_SHADER)
@@ -528,7 +584,7 @@ if __name__ == "__main__":
                 between0 = between - dpos_left + dpos_right
                 mag0 = numpy.dot(between0, between0)
                 scale = pow(mag1/mag0, 0.5)
-                print("%0.6f" % scale)
+                # print("%0.6f" % scale)
                 ts = MyTransform.scale(scale)
                 orig = 0.5 * (pos_left + pos_right - 0.5 * dpos_left - 0.5 * dpos_right)
                 to = MyTransform.translation(*orig)
