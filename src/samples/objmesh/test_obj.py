@@ -214,16 +214,18 @@ class ObjMesh(object):
             layout(location = 0) in vec3 in_Position;
             layout(location = 1) in vec3 in_Normal;
             
-            layout(location = 0) uniform mat4 projection = mat4(1);
-            layout(location = 4) uniform mat4 model_view = mat4(1);
+            layout(location = 0) uniform mat4 projectionMatrix = mat4(1);
+            layout(location = 4) uniform mat4 modelMatrix = mat4(1);
+            layout(location = 8) uniform mat4 viewMatrix = mat4(1);
 
             const mat4 scale = mat4(mat3(0.0001)); // convert micrometers to millimeters
 
-            out vec3 norm_color;
+            out vec3 normal;
             
             void main() {
-              gl_Position = projection * model_view * scale * vec4(in_Position, 1.0);
-              norm_color = 0.5 * (in_Normal + vec3(1));
+              gl_Position = projectionMatrix * viewMatrix * modelMatrix * scale * vec4(in_Position, 1.0);
+              mat3 normalMatrix = transpose(inverse(mat3(modelMatrix * scale)));
+              normal = normalize(normalMatrix * in_Normal);
             }
             """), 
             GL_VERTEX_SHADER)
@@ -232,11 +234,12 @@ class ObjMesh(object):
             #version 450 core
             #line 233
 
-            in vec3 norm_color;
+            in vec3 normal;
             out vec4 fragColor;
             
             void main() {
               // fragColor = vec4(0.1, 0.8, 0.1, 1.0);
+              vec3 norm_color = 0.5 * (normalize(normal) + vec3(1));
               fragColor = vec4(norm_color, 1);
             }
             """), 
@@ -252,7 +255,8 @@ class ObjMesh(object):
         # modelview0 = numpy.asarray(numpy.matrix(modelview0, dtype=numpy.float32))
         # print(modelview0[3,0])
         
-        glUniformMatrix4fv(4, 1, False, modelview0.pack())
+        glUniformMatrix4fv(4, 1, False, self.model_matrix.pack())
+        glUniformMatrix4fv(8, 1, False, MyTransform(modelview).pack())
         glBindVertexArray(self.vao)
         glDrawElements(GL_TRIANGLES, len(self.indexPositions), GL_UNSIGNED_INT, None)
         glBindVertexArray(0)
