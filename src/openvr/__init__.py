@@ -17,9 +17,15 @@ from .version import __version__
 
 # Detect 32-bit vs 64-bit python
 if sizeof(c_void_p) == 4:
-    _openvr_lib_name = "openvr_api_32"
+	if platform.system() == 'Windows':
+    	_openvr_lib_name = "openvr_api_32"
+    else:
+    	_openvr_lib_name = "libopenvr_api_32.so"	
 else:
-    _openvr_lib_name = "openvr_api_64"
+	if platform.system() == 'Windows':
+    	_openvr_lib_name = "openvr_api_64"
+    else:
+    	_openvr_lib_name = "libopenvr_api_64.so"
 
 # Add current directory to PATH, so we can load the DLL from right here.
 os.environ['PATH'] += os.pathsep + os.path.dirname(__file__)
