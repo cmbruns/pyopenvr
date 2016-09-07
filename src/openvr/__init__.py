@@ -16,11 +16,25 @@ from .version import __version__
 ####################################################################
 
 # Detect 32-bit vs 64-bit python
+# Detect platform
 if sizeof(c_void_p) == 4:
-    _openvr_lib_name = "openvr_api_32"
+	if platform.system() == 'Windows':
+    	_openvr_lib_name = "openvr_api_32"
+    elif platform.system() == 'Linux':
+    	_openvr_lib_name = "libopenvr_api_32.so"
+    elif platform.system() == 'Darwin':
+        _openvr_lib_name = "libopenvr_api_32.dylib"	
+    else:
+        raise ValueError("Libraries not available for this platform: " + platform.system())
 else:
-    _openvr_lib_name = "openvr_api_64"
+	if platform.system() == 'Windows':
+    	_openvr_lib_name = "openvr_api_64"
+    elif platform.system() == 'Linux':
+    	_openvr_lib_name = "libopenvr_api_64.so"
+    else:
+        raise ValueError("Libraries not available for this platform: " + platform.system())
 
+        
 # Add current directory to PATH, so we can load the DLL from right here.
 os.environ['PATH'] += os.pathsep + os.path.dirname(__file__)
 _openvr = cdll.LoadLibrary(_openvr_lib_name)
