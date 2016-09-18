@@ -19,7 +19,7 @@ from .version import __version__
 # Detect platform
 if sizeof(c_void_p) == 4:
     if platform.system() == 'Windows':
-        _openvr_lib_name = "openvr_api_32"
+        _openvr_lib_name = "libopenvr_api_32"
     elif platform.system() == 'Linux':
         _openvr_lib_name = "libopenvr_api_32.so"
     elif platform.system() == 'Darwin':
@@ -28,7 +28,7 @@ if sizeof(c_void_p) == 4:
         raise ValueError("Libraries not available for this platform: " + platform.system())
 else:
     if platform.system() == 'Windows':
-        _openvr_lib_name = "openvr_api_64"
+        _openvr_lib_name = "libopenvr_api_64"
     elif platform.system() == 'Linux':
         _openvr_lib_name = "libopenvr_api_64.so"
     else:
