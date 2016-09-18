@@ -18,19 +18,19 @@ from .version import __version__
 # Detect 32-bit vs 64-bit python
 # Detect platform
 if sizeof(c_void_p) == 4:
-	if platform.system() == 'Windows':
-    	_openvr_lib_name = "openvr_api_32"
+    if platform.system() == 'Windows':
+        _openvr_lib_name = "openvr_api_32"
     elif platform.system() == 'Linux':
-    	_openvr_lib_name = "libopenvr_api_32.so"
+        _openvr_lib_name = "libopenvr_api_32.so"
     elif platform.system() == 'Darwin':
-        _openvr_lib_name = "libopenvr_api_32.dylib"	
+        _openvr_lib_name = "libopenvr_api_32.dylib"    
     else:
         raise ValueError("Libraries not available for this platform: " + platform.system())
 else:
-	if platform.system() == 'Windows':
-    	_openvr_lib_name = "openvr_api_64"
+    if platform.system() == 'Windows':
+        _openvr_lib_name = "openvr_api_64"
     elif platform.system() == 'Linux':
-    	_openvr_lib_name = "libopenvr_api_64.so"
+        _openvr_lib_name = "libopenvr_api_64.so"
     else:
         raise ValueError("Libraries not available for this platform: " + platform.system())
 
@@ -2539,7 +2539,7 @@ class IVRApplications(object):
           VRApplicationError_OldApplicationQuitting - An existing application has been told to quit. Wait for a VREvent_ProcessQuit
                                                       and try again.
           VRApplicationError_ApplicationAlreadyStarting - This application is already starting. This is a permanent failure.
-          VRApplicationError_LaunchInProgress	      - A different application is already starting. This is a permanent failure.
+          VRApplicationError_LaunchInProgress          - A different application is already starting. This is a permanent failure.
           VRApplicationError_None                   - Go ahead and launch. Everything is clear.
         """
 
@@ -3496,9 +3496,9 @@ class IVROverlay(object):
         Sets the rendering sort order for the overlay. Overlays are rendered this order:
              Overlays owned by the scene application
              Overlays owned by some other application
-        *	Within a category overlays are rendered lowest sort order to highest sort order. Overlays with the same 
+        *    Within a category overlays are rendered lowest sort order to highest sort order. Overlays with the same 
         sort order are rendered back to front base on distance from the HMD.
-        *	Sort order defaults to 0.
+        *    Sort order defaults to 0.
         """
 
         fn = self.function_table.setOverlaySortOrder
