@@ -3,6 +3,8 @@
 # file hello_glfw.py
 
 import numpy
+import time
+import collections
 from numpy.linalg import inv
 import itertools
 from textwrap import dedent
@@ -24,6 +26,77 @@ from openvr.tracked_devices_actor import TrackedDevicesActor
 """
 glfw programming example with colored mouse brain scene that can be closed by pressing ESCAPE.
 """
+
+class Vec3(object):
+    def __init__(self, value=(0.0, 0.0, 0.0,)):
+        self._data = list(value[0:3])
+    
+    def __add__(self, rhs):
+        result = Vec3(self)
+        result += rhs
+        return result
+
+    def __div__(self, rhs):
+        result = Vec3(self)
+        result /= rhs
+        return result
+
+    def __getitem__(self, index):
+        return self._data[index]
+
+    def __iadd__(self, rhs):
+        for i in range(3):
+            self._data[i] += rhs[i]
+        return self
+            
+    def __idiv__(self, rhs):
+        for i in range(3):
+            self._data[i] /= rhs
+        return self
+
+    def __imul__(self, rhs):
+        for i in range(3):
+            self._data[i] *= rhs
+        return self
+
+    def __isub__(self, rhs):
+        for i in range(3):
+            self._data[i] -= rhs[i]
+        return self
+    
+    def __len__(self):
+        return len(self._data)
+
+    def __mul__(self, rhs):
+        result = Vec3(self)
+        result *= rhs
+        return result
+
+    def __neg__(self):
+        result = Vec3()
+        for i in range(3):
+            result[i] = -self[i]
+        return result
+
+    def __pos__(self):
+        return self
+
+    def __rmul__(self, lhs):
+        result = Vec3(self)
+        result *= lhs # Assume multiplication is commutative...
+        return result
+    
+    def __setitem__(self, index, value):
+        self._data[index] = value
+
+    def __sub__(self, rhs):
+        result = Vec3(self)
+        result -= rhs
+        return result
+
+    def __str__(self):
+        return str(self._data)
+
 
 class MyTransform(object):
     "4x4 linear Transform for use by OpenGL"
@@ -102,12 +175,12 @@ class MyTransform(object):
                              (0, 0, 0, 1),) )
     
     @staticmethod
-    def translation(x, y, z):
+    def translation(tvec):
         return MyTransform( (
                              (1, 0, 0, 0),
                              (0, 1, 0, 0),
                              (0, 0, 1, 0),
-                             (x, y, z, 1),) )
+                             (tvec[0], tvec[1], tvec[2], 1),) )
     
     def transpose(self):
         return MyTransform(self._m.T)
@@ -303,11 +376,7 @@ class ControllerState(object):
             dy = X1.m[1][3] - X0.m[1][3]
             dz = X1.m[2][3] - X0.m[2][3]
             # print("%+7.4f, %+7.4f, %+7.4f" % (dx, dy, dz))
-            do_translation_only = True
-            if do_translation_only:
-                result = MyTransform.translation(dx, dy, dz)
-            else:
-                result = ~MyTransform.fromOpenVrMatrix34(X0) * MyTransform.fromOpenVrMatrix34(X1)
+            result = (dx, dy, dz,)
         else:
             result = None
         # Create a COPY of the current pose for comparison next time
@@ -721,38 +790,93 @@ class SkyActor(object):
         self.vao = 0
 
 
-left_controller = ControllerState("left controller")
-right_controller = ControllerState("right controller")
-def check_controller_drag(event):
-    dix = new_event.trackedDeviceIndex
-    device_class = openvr.VRSystem().getTrackedDeviceClass(dix)
-    # We only want to watch controller events
-    if device_class != openvr.TrackedDeviceClass_Controller:
-        return
-    bix = event.data.controller.button
-    # Pay attention to trigger presses only
-    if bix != openvr.k_EButton_SteamVR_Trigger:
-        return
-    role = openvr.VRSystem().getControllerRoleForTrackedDeviceIndex(dix)
-    if role == openvr.TrackedControllerRole_RightHand:
-        controller = right_controller
-        # print("  right controller trigger %s" % action)
-    else:
-        controller = left_controller
-        # print("  left controller trigger %s" % action)
-    controller.device_index = dix
-    t = event.eventType
-    # "Touch" event happens earlier than "Press" event,
-    # so allow a light touch for grabbing here
-    if t == openvr.VREvent_ButtonTouch:
-        controller.is_dragging = True
-    elif t == openvr.VREvent_ButtonUntouch:
-        controller.is_dragging = False
+class SpatialInteractor(object):
+    "Composite interactor consisting of both controllers plus maybe other inputs"
+    
+    def __init__(self):
+        self.translation_history = collections.deque() # array of translation increments
+        self.max_history_size = 10
+        self.left_controller = ControllerState("left controller")
+        self.right_controller = ControllerState("right controller")
+        self.is_dragging = self.left_controller.is_dragging or self.right_controller.is_dragging
 
-def update_scene_geometry():
-    tx1 = right_controller.check_drag(renderer.poses)
-    tx2 = left_controller.check_drag(renderer.poses)
+    def update_controller_states(self):
+        new_event = openvr.VREvent_t()
+        while openvr.VRSystem().pollNextEvent(new_event):
+            self._check_controller_drag(new_event)
+        now_is_dragging = self.left_controller.is_dragging or self.right_controller.is_dragging
+        # Compute translation vector
+        translation = Vec3()
+        scale = 1.0
+        # print ("combined translation (before) = ", translation)
+        controller_count = 0
+        for controller in (self.left_controller, self.right_controller):
+            trans = controller.check_drag(renderer.poses)
+            if not controller.is_dragging:
+                continue
+            # print ("controller translation = ", trans)
+            if trans is None:
+                continue
+            translation += trans
+            # print ("combined translation (after1) = ", translation)
+            controller_count += 1
+        if controller_count > 0:
+            # print ("combined translation (after2) = ", translation)
+            # Remember translation history
+            time_stamp = time.time()
+            self.translation_history.append( (translation, time_stamp,) )
+            while len(self.translation_history) > self.max_history_size:
+                self.translation_history.popleft()
+            # Translate brain like controller(s)
+            obj.model_matrix *= MyTransform.translation(translation)
+        # Check for drag begin/end
+        if self.is_dragging and not now_is_dragging:
+            print ("drag released!")
+            # TODO: maybe record velocity
+            self.translation_history.clear()
+        elif now_is_dragging and not self.is_dragging:
+            print ("drag started!")
+            self.translation_history.clear()
+        elif now_is_dragging: # continued drag
+            pass
+        # Remember drag state
+        self.is_dragging = now_is_dragging
+
+    def _check_controller_drag(self, event):
+        dix = event.trackedDeviceIndex
+        device_class = openvr.VRSystem().getTrackedDeviceClass(dix)
+        # We only want to watch controller events
+        if device_class != openvr.TrackedDeviceClass_Controller:
+            return
+        bix = event.data.controller.button
+        # Pay attention to trigger presses only
+        if bix != openvr.k_EButton_SteamVR_Trigger:
+            return
+        role = openvr.VRSystem().getControllerRoleForTrackedDeviceIndex(dix)
+        if role == openvr.TrackedControllerRole_RightHand:
+            controller = self.right_controller
+            # print("  right controller trigger %s" % action)
+        else:
+            controller = self.left_controller
+            # print("  left controller trigger %s" % action)
+        controller.device_index = dix
+        t = event.eventType
+        # "Touch" event happens earlier than "Press" event,
+        # so allow a light touch for grabbing here
+        if t == openvr.VREvent_ButtonTouch:
+            controller.is_dragging = True
+        elif t == openvr.VREvent_ButtonUntouch:
+            controller.is_dragging = False
+
+
+def coast_momentum(body):
+    pass
+
+def update_scene_geometry(interactor):
+    tx1 = interactor.right_controller.check_drag(renderer.poses)
+    tx2 = interactor.left_controller.check_drag(renderer.poses)
     if tx1 is None and tx2 is None:
+        coast_momentum(obj)
         return # No dragging this time
     elif tx1 is not None and tx2 is not None:
         # TODO - combined transform
@@ -760,8 +884,8 @@ def update_scene_geometry():
         tx = 0.5 * (tx1 + tx2)
         # obj.model_matrix *= tx
         # TODO - scale
-        mat_left = left_controller.current_pose.mDeviceToAbsoluteTracking.m
-        mat_right = right_controller.current_pose.mDeviceToAbsoluteTracking.m
+        mat_left = interactor.left_controller.current_pose.mDeviceToAbsoluteTracking.m
+        mat_right = interactor.right_controller.current_pose.mDeviceToAbsoluteTracking.m
         pos_left = numpy.array([mat_left[i][3] for i in range(3)])
         pos_right = numpy.array([mat_right[i][3] for i in range(3)])
         between = pos_left - pos_right
@@ -782,9 +906,9 @@ def update_scene_geometry():
         #
         obj.model_matrix *= tx
     elif tx1 is not None:
-        obj.model_matrix *= tx1
+        obj.model_matrix *= MyTransform.translation(tx1)
     else:
-        obj.model_matrix *= tx2 
+        obj.model_matrix *= MyTransform.translation(tx2)
 
 if __name__ == "__main__":
     obj = ObjMesh(open("root_997.obj", 'r'))
@@ -803,12 +927,11 @@ if __name__ == "__main__":
     renderer.append(controllers)
     renderer.append(obj)
     renderer.append(FloorActor())
-    new_event = openvr.VREvent_t()
+    interactor = SpatialInteractor()
     with GlfwApp(renderer, "mouse brain") as glfwApp:
         while not glfw.window_should_close(glfwApp.window):
             glfwApp.render_scene()
             # Update controller drag state when buttons are pushed
-            while openvr.VRSystem().pollNextEvent(new_event):
-                check_controller_drag(new_event)
-            update_scene_geometry()
+            interactor.update_controller_states()
+            # update_scene_geometry(interactor)
 
