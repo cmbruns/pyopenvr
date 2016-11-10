@@ -6,7 +6,7 @@ import numpy
 from numpy.linalg import inv
 import itertools
 from textwrap import dedent
-from ctypes import cast, c_float, c_void_p, sizeof
+from ctypes import cast, c_float, c_void_p
 
 from OpenGL.GL import *  # @UnusedWildImport # this comment squelches an IDE warning
 # from OpenGL.GL import GL_FLOAT, GL_ELEMENT_ARRAY_BUFFER, GL_FRAGMENT_SHADER, GL_TRIANGLES, GL_UNSIGNED_INT, GL_VERTEX_SHADER
@@ -22,7 +22,7 @@ from openvr.tracked_devices_actor import TrackedDevicesActor
 
 
 """
-Minimal glfw programming example which colored OpenGL cube scene that can be closed by pressing ESCAPE.
+glfw programming example with colored mouse brain scene that can be closed by pressing ESCAPE.
 """
 
 class MyTransform(object):
@@ -251,7 +251,7 @@ class ObjMesh(object):
         glUniformMatrix4fv(0, 1, False, projection)
         
         # TODO: Adjust modelview matrix
-        modelview0 = self.model_matrix * modelview
+        # modelview0 = self.model_matrix * modelview
         # modelview0 = numpy.asarray(numpy.matrix(modelview0, dtype=numpy.float32))
         # print(modelview0[3,0])
         
@@ -749,6 +749,43 @@ def check_controller_drag(event):
     elif t == openvr.VREvent_ButtonUntouch:
         controller.is_dragging = False
 
+def update_scene_geometry():
+    tx1 = right_controller.check_drag(renderer.poses)
+    tx2 = left_controller.check_drag(renderer.poses)
+    if tx1 is None and tx2 is None:
+        return # No dragging this time
+    elif tx1 is not None and tx2 is not None:
+        # TODO - combined transform
+        # Translate to average of two translations
+        tx = 0.5 * (tx1 + tx2)
+        # obj.model_matrix *= tx
+        # TODO - scale
+        mat_left = left_controller.current_pose.mDeviceToAbsoluteTracking.m
+        mat_right = right_controller.current_pose.mDeviceToAbsoluteTracking.m
+        pos_left = numpy.array([mat_left[i][3] for i in range(3)])
+        pos_right = numpy.array([mat_right[i][3] for i in range(3)])
+        between = pos_left - pos_right
+        mag1 = numpy.dot(between, between)
+        #
+        dpos_left = tx2[3][0:3]
+        dpos_right = tx1[3][0:3]
+        between0 = between - dpos_left + dpos_right
+        mag0 = numpy.dot(between0, between0)
+        if mag0 > 0:
+            scale = pow(mag1/mag0, 0.5)
+            # print("%0.6f" % scale)
+            ts = MyTransform.scale(scale)
+            orig = 0.5 * (pos_left + pos_right - 0.5 * dpos_left - 0.5 * dpos_right)
+            to = MyTransform.translation(*orig)
+            ts = ~to * ts * to
+            obj.model_matrix *= ts
+        #
+        obj.model_matrix *= tx
+    elif tx1 is not None:
+        obj.model_matrix *= tx1
+    else:
+        obj.model_matrix *= tx2 
+
 if __name__ == "__main__":
     obj = ObjMesh(open("root_997.obj", 'r'))
     # invert up/down, so brain is dorsal-up
@@ -773,38 +810,5 @@ if __name__ == "__main__":
             # Update controller drag state when buttons are pushed
             while openvr.VRSystem().pollNextEvent(new_event):
                 check_controller_drag(new_event)
-            tx1 = right_controller.check_drag(renderer.poses)
-            tx2 = left_controller.check_drag(renderer.poses)
-            if tx1 is None and tx2 is None:
-                pass # No dragging this time
-            elif tx1 is not None and tx2 is not None:
-                # TODO - combined transform
-                # Translate to average of two translations
-                tx = 0.5 * (tx1 + tx2)
-                # obj.model_matrix *= tx
-                # TODO - scale
-                mat_left = left_controller.current_pose.mDeviceToAbsoluteTracking.m
-                mat_right = right_controller.current_pose.mDeviceToAbsoluteTracking.m
-                pos_left = numpy.array([mat_left[i][3] for i in range(3)])
-                pos_right = numpy.array([mat_right[i][3] for i in range(3)])
-                between = pos_left - pos_right
-                mag1 = numpy.dot(between, between)
-                #
-                dpos_left = tx2[3][0:3]
-                dpos_right = tx1[3][0:3]
-                between0 = between - dpos_left + dpos_right
-                mag0 = numpy.dot(between0, between0)
-                if mag0 > 0:
-                    scale = pow(mag1/mag0, 0.5)
-                    # print("%0.6f" % scale)
-                    ts = MyTransform.scale(scale)
-                    orig = 0.5 * (pos_left + pos_right - 0.5 * dpos_left - 0.5 * dpos_right)
-                    to = MyTransform.translation(*orig)
-                    ts = ~to * ts * to
-                    obj.model_matrix *= ts
-                #
-                obj.model_matrix *= tx
-            elif tx1 is not None:
-                obj.model_matrix *= tx1
-            else:
-                obj.model_matrix *= tx2
+            update_scene_geometry()
+
