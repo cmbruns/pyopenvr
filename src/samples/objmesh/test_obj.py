@@ -388,7 +388,7 @@ class ControllerState(object):
             dy = X1.m[1][3] - X0.m[1][3]
             dz = X1.m[2][3] - X0.m[2][3]
             # print("%+7.4f, %+7.4f, %+7.4f" % (dx, dy, dz))
-            result = (dx, dy, dz,)
+            result = Vec3( (dx, dy, dz,) )
         else:
             result = None
         # Create a COPY of the current pose for comparison next time
@@ -820,53 +820,18 @@ class SpatialInteractor(object):
         while openvr.VRSystem().pollNextEvent(new_event):
             self._check_controller_drag(new_event)
         now_is_dragging = self.left_controller.is_dragging or self.right_controller.is_dragging
-        # Compute translation vector
-        translation = Vec3()
-        scale = 1.0
-        # print ("combined translation (before) = ", translation)
-        controller_count = 0
-        for controller in (self.left_controller, self.right_controller):
-            trans = controller.check_drag(renderer.poses)
-            if not controller.is_dragging:
-                continue
-            # print ("controller translation = ", trans)
-            if trans is None:
-                continue
-            translation += trans
-            # print ("combined translation (after1) = ", translation)
-            controller_count += 1
-        if controller_count > 0:
-            # print ("combined translation (after2) = ", translation)
-            # Remember translation history
-            time_stamp = time.time()
-            self.translation_history.append( (translation, time_stamp,) )
-            while len(self.translation_history) > self.max_history_size:
-                self.translation_history.popleft()
-            # Translate brain like controller(s)
-            obj.model_matrix *= MyTransform.translation(translation)
+        
+        xform = self._compute_controllers_transform()
+        if xform is not None:
+            obj.model_matrix *= xform
+        
         # Check for drag begin/end
         if self.is_dragging and not now_is_dragging:
-            print ("drag released!")
+            # print ("drag released!")
             # maybe record velocity
-            if len(self.translation_history) > 20:
-                dx, t1 = self.translation_history[-1]
-                dx = Vec3()
-                for i in range(20):
-                    x, t0 = self.translation_history[-i]
-                    dx += x
-                # x1, t1 = self.translation_history[-1]
-                dt = t1 - t0
-                # dx = x1 - x0
-                velocity = dx/dt;
-                speed = velocity.norm()
-                direction = velocity / speed;
-                print("direction = ", direction)
-                print("speed = ", speed, " meters per second")
-                self.speed = speed
-                self.direction = direction
-            self.translation_history.clear()
+            self._begin_inertial_coast()
         elif now_is_dragging and not self.is_dragging:
-            print ("drag started!")
+            # print ("drag started!")
             self.translation_history.clear()
             self.speed = 0.0
         elif now_is_dragging: # continued drag
@@ -881,13 +846,32 @@ class SpatialInteractor(object):
                 elif self.speed < self.min_velocity: # static friction takes over at the very end
                     self.speed = 0.0
                 else:
-                    print ("speed = %.3f meters per second" % self.speed)
+                    # print ("speed = %.3f meters per second" % self.speed)
                     dx = self.speed * dt * self.direction
                     obj.model_matrix *= MyTransform.translation(dx)
         self.previous_update_time = time.time()
                 
         # Remember drag state
         self.is_dragging = now_is_dragging
+
+    def _begin_inertial_coast(self):
+        history_size = len(self.translation_history)
+        if history_size < 10: # ~100 ms too short a drag to throw
+            self.translation_history.clear()
+            return
+        history_size = min(history_size - 1, 50) # No more than ~500 ms history
+        t1 = self.translation_history[-1][1]
+        dx = Vec3()
+        for i in range(history_size):
+            x, t0 = self.translation_history[-i]
+            dx += x
+        dt = t1 - t0
+        velocity = dx/dt;
+        self.speed = velocity.norm()
+        self.direction = velocity / self.speed;
+        # print("direction = ", self.direction)
+        # print("speed = ", self.speed, " meters per second")
+        self.translation_history.clear()
 
     def _check_controller_drag(self, event):
         dix = event.trackedDeviceIndex
@@ -915,47 +899,55 @@ class SpatialInteractor(object):
         elif t == openvr.VREvent_ButtonUntouch:
             controller.is_dragging = False
 
+    def _compute_controllers_transform(self):
+        tx1 = self.right_controller.check_drag(renderer.poses)
+        tx2 = self.left_controller.check_drag(renderer.poses)
+        result = MyTransform()
+        translation = None
+        if tx1 is None and tx2 is None:
+            result = None # No dragging this time
+        elif tx1 is not None and tx2 is not None:
+            # TODO - combined transform
+            # Translate to average of two translations
+            translation = 0.5 * (tx1 + tx2)
+            # obj.model_matrix *= tx
+            # TODO - scale
+            mat_left = self.left_controller.current_pose.mDeviceToAbsoluteTracking.m
+            mat_right = self.right_controller.current_pose.mDeviceToAbsoluteTracking.m
+            pos_left = numpy.array([mat_left[i][3] for i in range(3)])
+            pos_right = numpy.array([mat_right[i][3] for i in range(3)])
+            between = pos_left - pos_right
+            mag1 = numpy.dot(between, between)
+            #
+            dpos_left = tx2
+            dpos_right = tx1
+            between0 = between - dpos_left + dpos_right
+            mag0 = numpy.dot(between0, between0)
+            if mag0 > 0:
+                scale = pow(mag1/mag0, 0.5)
+                # print("%0.6f" % scale)
+                ts = MyTransform.scale(scale)
+                orig = 0.5 * (pos_left + pos_right - 0.5 * dpos_left - 0.5 * dpos_right)
+                to = MyTransform.translation(orig)
+                ts = ~to * ts * to
+                result *= ts
+            #
+            result *= MyTransform.translation(translation)
+        elif tx1 is not None:
+            translation = tx1
+            result *= MyTransform.translation(tx1)
+        else:
+            translation = tx2
+            result *= MyTransform.translation(tx2)
 
-def coast_momentum(body):
-    pass
-
-def update_scene_geometry(interactor):
-    tx1 = interactor.right_controller.check_drag(renderer.poses)
-    tx2 = interactor.left_controller.check_drag(renderer.poses)
-    if tx1 is None and tx2 is None:
-        coast_momentum(obj)
-        return # No dragging this time
-    elif tx1 is not None and tx2 is not None:
-        # TODO - combined transform
-        # Translate to average of two translations
-        tx = 0.5 * (tx1 + tx2)
-        # obj.model_matrix *= tx
-        # TODO - scale
-        mat_left = interactor.left_controller.current_pose.mDeviceToAbsoluteTracking.m
-        mat_right = interactor.right_controller.current_pose.mDeviceToAbsoluteTracking.m
-        pos_left = numpy.array([mat_left[i][3] for i in range(3)])
-        pos_right = numpy.array([mat_right[i][3] for i in range(3)])
-        between = pos_left - pos_right
-        mag1 = numpy.dot(between, between)
-        #
-        dpos_left = tx2[3][0:3]
-        dpos_right = tx1[3][0:3]
-        between0 = between - dpos_left + dpos_right
-        mag0 = numpy.dot(between0, between0)
-        if mag0 > 0:
-            scale = pow(mag1/mag0, 0.5)
-            # print("%0.6f" % scale)
-            ts = MyTransform.scale(scale)
-            orig = 0.5 * (pos_left + pos_right - 0.5 * dpos_left - 0.5 * dpos_right)
-            to = MyTransform.translation(*orig)
-            ts = ~to * ts * to
-            obj.model_matrix *= ts
-        #
-        obj.model_matrix *= tx
-    elif tx1 is not None:
-        obj.model_matrix *= MyTransform.translation(tx1)
-    else:
-        obj.model_matrix *= MyTransform.translation(tx2)
+        if translation is not None:
+            # Remember translation history
+            time_stamp = time.time()
+            self.translation_history.append( (translation, time_stamp,) )
+            while len(self.translation_history) > self.max_history_size:
+                self.translation_history.popleft()
+        
+        return result
 
 if __name__ == "__main__":
     obj = ObjMesh(open("root_997.obj", 'r'))
