@@ -36,7 +36,7 @@ class Vec3(object):
         result += rhs
         return result
 
-    def __div__(self, rhs):
+    def __truediv__(self, rhs):
         result = Vec3(self)
         result /= rhs
         return result
@@ -49,7 +49,7 @@ class Vec3(object):
             self._data[i] += rhs[i]
         return self
             
-    def __idiv__(self, rhs):
+    def __itruediv__(self, rhs):
         for i in range(3):
             self._data[i] /= rhs
         return self
@@ -65,7 +65,7 @@ class Vec3(object):
         return self
     
     def __len__(self):
-        return len(self._data)
+        return 3
 
     def __mul__(self, rhs):
         result = Vec3(self)
@@ -96,6 +96,18 @@ class Vec3(object):
 
     def __str__(self):
         return str(self._data)
+    
+    def dot(self, rhs):
+        result = 0.0
+        for i in range(3):
+            result += self[i] * rhs[i]
+        return result
+
+    def norm(self):
+        return self.norm_squared() ** 0.5
+            
+    def norm_squared(self):
+        return self.dot(self)
 
 
 class MyTransform(object):
@@ -795,10 +807,13 @@ class SpatialInteractor(object):
     
     def __init__(self):
         self.translation_history = collections.deque() # array of translation increments
-        self.max_history_size = 10
+        self.max_history_size = 100
         self.left_controller = ControllerState("left controller")
         self.right_controller = ControllerState("right controller")
         self.is_dragging = self.left_controller.is_dragging or self.right_controller.is_dragging
+        self.velocity_damping = 1.5 # meters per second per second
+        self.speed = 0.0 # meters per second inertial velocity
+        self.min_velocity = 0.01 # meters per second
 
     def update_controller_states(self):
         new_event = openvr.VREvent_t()
@@ -832,13 +847,45 @@ class SpatialInteractor(object):
         # Check for drag begin/end
         if self.is_dragging and not now_is_dragging:
             print ("drag released!")
-            # TODO: maybe record velocity
+            # maybe record velocity
+            if len(self.translation_history) > 20:
+                dx, t1 = self.translation_history[-1]
+                dx = Vec3()
+                for i in range(20):
+                    x, t0 = self.translation_history[-i]
+                    dx += x
+                # x1, t1 = self.translation_history[-1]
+                dt = t1 - t0
+                # dx = x1 - x0
+                velocity = dx/dt;
+                speed = velocity.norm()
+                direction = velocity / speed;
+                print("direction = ", direction)
+                print("speed = ", speed, " meters per second")
+                self.speed = speed
+                self.direction = direction
             self.translation_history.clear()
         elif now_is_dragging and not self.is_dragging:
             print ("drag started!")
             self.translation_history.clear()
+            self.speed = 0.0
         elif now_is_dragging: # continued drag
             pass
+        else: # not dragging, so maybe slow inertial coasting
+            if self.speed > 0:
+                dt = time.time() - self.previous_update_time
+                dv = dt * self.velocity_damping
+                self.speed -= dv
+                if self.speed < 0: # stay positive
+                    self.speed = 0.0
+                elif self.speed < self.min_velocity: # static friction takes over at the very end
+                    self.speed = 0.0
+                else:
+                    print ("speed = %.3f meters per second" % self.speed)
+                    dx = self.speed * dt * self.direction
+                    obj.model_matrix *= MyTransform.translation(dx)
+        self.previous_update_time = time.time()
+                
         # Remember drag state
         self.is_dragging = now_is_dragging
 
