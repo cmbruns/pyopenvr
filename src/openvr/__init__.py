@@ -16,10 +16,23 @@ from .version import __version__
 ####################################################################
 
 # Detect 32-bit vs 64-bit python
+# Detect platform
 if sizeof(c_void_p) == 4:
-    _openvr_lib_name = "openvr_api_32"
+    if platform.system() == 'Windows':
+        _openvr_lib_name = "libopenvr_api_32"
+    elif platform.system() == 'Linux':
+        _openvr_lib_name = "libopenvr_api_32.so"
+    elif platform.system() == 'Darwin':
+        _openvr_lib_name = "libopenvr_api_32.dylib"    
+    else:
+        raise ValueError("Libraries not available for this platform: " + platform.system())
 else:
-    _openvr_lib_name = "openvr_api_64"
+    if platform.system() == 'Windows':
+        _openvr_lib_name = "libopenvr_api_64"
+    elif platform.system() == 'Linux':
+        _openvr_lib_name = "libopenvr_api_64.so"
+    else:
+        raise ValueError("Libraries not available for this platform: " + platform.system())
 
 # Add current directory to PATH, so we can load the DLL from right here.
 os.environ['PATH'] += os.pathsep + os.path.dirname(__file__)
@@ -30,6 +43,19 @@ if platform.system() == 'Windows':
     OPENVR_FNTABLE_CALLTYPE = WINFUNCTYPE # __stdcall in openvr_capi.h
 else:
     OPENVR_FNTABLE_CALLTYPE = CFUNCTYPE # __cdecl
+    
+# Forward declarations for Vulkan structures
+class VkDevice_T(ctypes.Structure):
+    pass
+    
+class VkPhysicalDevice_T(ctypes.Structure):
+    pass
+
+class VkInstance_T(ctypes.Structure):
+    pass
+
+class VkQueue_T(ctypes.Structure):
+    pass
 
 
 ########################
@@ -50,6 +76,8 @@ IVRSystem_Version = b"IVRSystem_012"
 IVRExtendedDisplay_Version = b"IVRExtendedDisplay_001"
 IVRTrackedCamera_Version = b"IVRTrackedCamera_003"
 k_unMaxApplicationKeyLength = 128
+k_pch_MimeType_HomeApp = b"vr/home"
+k_pch_MimeType_GameTheater = b"vr/game_theater"
 IVRApplications_Version = b"IVRApplications_006"
 IVRChaperone_Version = b"IVRChaperone_003"
 IVRChaperoneSetup_Version = b"IVRChaperoneSetup_005"
@@ -67,7 +95,7 @@ IVRRenderModels_Version = b"IVRRenderModels_005"
 k_unNotificationTextMaxSize = 256
 IVRNotifications_Version = b"IVRNotifications_002"
 k_unMaxSettingsKeyLength = 128
-IVRSettings_Version = b"IVRSettings_001"
+IVRSettings_Version = b"IVRSettings_002"
 k_pch_SteamVR_Section = b"steamvr"
 k_pch_SteamVR_RequireHmd_String = b"requireHmd"
 k_pch_SteamVR_ForcedDriverKey_String = b"forcedDriver"
@@ -88,9 +116,6 @@ k_pch_SteamVR_GridColor_String = b"gridColor"
 k_pch_SteamVR_PlayAreaColor_String = b"playAreaColor"
 k_pch_SteamVR_ShowStage_Bool = b"showStage"
 k_pch_SteamVR_ActivateMultipleDrivers_Bool = b"activateMultipleDrivers"
-k_pch_SteamVR_PowerOffOnExit_Bool = b"powerOffOnExit"
-k_pch_SteamVR_StandbyAppRunningTimeout_Float = b"standbyAppRunningTimeout"
-k_pch_SteamVR_StandbyNoAppTimeout_Float = b"standbyNoAppTimeout"
 k_pch_SteamVR_DirectMode_Bool = b"directMode"
 k_pch_SteamVR_DirectModeEdidVid_Int32 = b"directModeEdidVid"
 k_pch_SteamVR_DirectModeEdidPid_Int32 = b"directModeEdidPid"
@@ -104,17 +129,17 @@ k_pch_SteamVR_ForceReprojection_Bool = b"forceReprojection"
 k_pch_SteamVR_ForceFadeOnBadTracking_Bool = b"forceFadeOnBadTracking"
 k_pch_SteamVR_DefaultMirrorView_Int32 = b"defaultMirrorView"
 k_pch_SteamVR_ShowMirrorView_Bool = b"showMirrorView"
+k_pch_SteamVR_MirrorViewGeometry_String = b"mirrorViewGeometry"
 k_pch_SteamVR_StartMonitorFromAppLaunch = b"startMonitorFromAppLaunch"
-k_pch_SteamVR_AutoLaunchSteamVROnButtonPress = b"autoLaunchSteamVROnButtonPress"
-k_pch_SteamVR_UseGenericGraphcisDevice_Bool = b"useGenericGraphicsDevice"
+k_pch_SteamVR_EnableHomeApp = b"enableHomeApp"
+k_pch_SteamVR_SetInitialDefaultHomeApp = b"setInitialDefaultHomeApp"
+k_pch_SteamVR_CycleBackgroundImageTimeSec_Int32 = b"CycleBackgroundImageTimeSec"
+k_pch_SteamVR_RetailDemo_Bool = b"retailDemo"
 k_pch_Lighthouse_Section = b"driver_lighthouse"
 k_pch_Lighthouse_DisableIMU_Bool = b"disableimu"
 k_pch_Lighthouse_UseDisambiguation_String = b"usedisambiguation"
 k_pch_Lighthouse_DisambiguationDebug_Int32 = b"disambiguationdebug"
 k_pch_Lighthouse_PrimaryBasestation_Int32 = b"primarybasestation"
-k_pch_Lighthouse_LighthouseName_String = b"lighthousename"
-k_pch_Lighthouse_MaxIncidenceAngleDegrees_Float = b"maxincidenceangledegrees"
-k_pch_Lighthouse_UseLighthouseDirect_Bool = b"uselighthousedirect"
 k_pch_Lighthouse_DBHistory_Bool = b"dbhistory"
 k_pch_Null_Section = b"driver_null"
 k_pch_Null_EnableNullDriver_Bool = b"enable"
@@ -168,6 +193,7 @@ k_pch_Camera_BoundsColorGammaR_Int32 = b"cameraBoundsColorGammaR"
 k_pch_Camera_BoundsColorGammaG_Int32 = b"cameraBoundsColorGammaG"
 k_pch_Camera_BoundsColorGammaB_Int32 = b"cameraBoundsColorGammaB"
 k_pch_Camera_BoundsColorGammaA_Int32 = b"cameraBoundsColorGammaA"
+k_pch_Camera_BoundsStrength_Int32 = b"cameraBoundsStrength"
 k_pch_audio_Section = b"audio"
 k_pch_audio_OnPlaybackDevice_String = b"onPlaybackDevice"
 k_pch_audio_OnRecordDevice_String = b"onRecordDevice"
@@ -175,6 +201,15 @@ k_pch_audio_OnPlaybackMirrorDevice_String = b"onPlaybackMirrorDevice"
 k_pch_audio_OffPlaybackDevice_String = b"offPlaybackDevice"
 k_pch_audio_OffRecordDevice_String = b"offRecordDevice"
 k_pch_audio_VIVEHDMIGain = b"viveHDMIGain"
+k_pch_Power_Section = b"power"
+k_pch_Power_PowerOffOnExit_Bool = b"powerOffOnExit"
+k_pch_Power_TurnOffScreensTimeout_Float = b"turnOffScreensTimeout"
+k_pch_Power_TurnOffControllersTimeout_Float = b"turnOffControllersTimeout"
+k_pch_Power_ReturnToWatchdogTimeout_Float = b"returnToWatchdogTimeout"
+k_pch_Power_AutoLaunchSteamVROnButtonPress = b"autoLaunchSteamVROnButtonPress"
+k_pch_Dashboard_Section = b"dashboard"
+k_pch_Dashboard_EnableDashboard_Bool = b"enableDashboard"
+k_pch_Dashboard_ArcadeMode_Bool = b"arcadeMode"
 k_pch_modelskin_Section = b"modelskins"
 IVRScreenshots_Version = b"IVRScreenshots_001"
 IVRResources_Version = b"IVRResources_001"
@@ -211,6 +246,7 @@ TrackedDeviceClass_Invalid = ENUM_VALUE_TYPE(0)
 TrackedDeviceClass_HMD = ENUM_VALUE_TYPE(1)
 TrackedDeviceClass_Controller = ENUM_VALUE_TYPE(2)
 TrackedDeviceClass_TrackingReference = ENUM_VALUE_TYPE(4)
+TrackedDeviceClass_Count = ENUM_VALUE_TYPE(5)
 TrackedDeviceClass_Other = ENUM_VALUE_TYPE(1000)
 
 ETrackedControllerRole = ENUM_TYPE
@@ -309,6 +345,15 @@ Prop_FieldOfViewBottomDegrees_Float = ENUM_VALUE_TYPE(4003)
 Prop_TrackingRangeMinimumMeters_Float = ENUM_VALUE_TYPE(4004)
 Prop_TrackingRangeMaximumMeters_Float = ENUM_VALUE_TYPE(4005)
 Prop_ModeLabel_String = ENUM_VALUE_TYPE(4006)
+Prop_IconPathName_String = ENUM_VALUE_TYPE(5000)
+Prop_NamedIconPathDeviceOff_String = ENUM_VALUE_TYPE(5001)
+Prop_NamedIconPathDeviceSearching_String = ENUM_VALUE_TYPE(5002)
+Prop_NamedIconPathDeviceSearchingAlert_String = ENUM_VALUE_TYPE(5003)
+Prop_NamedIconPathDeviceReady_String = ENUM_VALUE_TYPE(5004)
+Prop_NamedIconPathDeviceReadyAlert_String = ENUM_VALUE_TYPE(5005)
+Prop_NamedIconPathDeviceNotReady_String = ENUM_VALUE_TYPE(5006)
+Prop_NamedIconPathDeviceStandby_String = ENUM_VALUE_TYPE(5007)
+Prop_NamedIconPathDeviceAlertLow_String = ENUM_VALUE_TYPE(5008)
 Prop_VendorSpecific_Reserved_Start = ENUM_VALUE_TYPE(10000)
 Prop_VendorSpecific_Reserved_End = ENUM_VALUE_TYPE(10999)
 
@@ -328,6 +373,7 @@ EVRSubmitFlags = ENUM_TYPE
 Submit_Default = ENUM_VALUE_TYPE(0)
 Submit_LensDistortionAlreadyApplied = ENUM_VALUE_TYPE(1)
 Submit_GlRenderBuffer = ENUM_VALUE_TYPE(2)
+Submit_VulkanTexture = ENUM_VALUE_TYPE(4)
 
 EVRState = ENUM_TYPE
 VRState_Undefined = ENUM_VALUE_TYPE(-1)
@@ -352,6 +398,7 @@ VREvent_EnterStandbyMode = ENUM_VALUE_TYPE(106)
 VREvent_LeaveStandbyMode = ENUM_VALUE_TYPE(107)
 VREvent_TrackedDeviceRoleChanged = ENUM_VALUE_TYPE(108)
 VREvent_WatchdogWakeUpRequested = ENUM_VALUE_TYPE(109)
+VREvent_LensDistortionChanged = ENUM_VALUE_TYPE(110)
 VREvent_ButtonPress = ENUM_VALUE_TYPE(200)
 VREvent_ButtonUnpress = ENUM_VALUE_TYPE(201)
 VREvent_ButtonTouch = ENUM_VALUE_TYPE(202)
@@ -392,6 +439,7 @@ VREvent_DashboardGuideButtonDown = ENUM_VALUE_TYPE(514)
 VREvent_DashboardGuideButtonUp = ENUM_VALUE_TYPE(515)
 VREvent_ScreenshotTriggered = ENUM_VALUE_TYPE(516)
 VREvent_ImageFailed = ENUM_VALUE_TYPE(517)
+VREvent_DashboardOverlayCreated = ENUM_VALUE_TYPE(518)
 VREvent_RequestScreenshot = ENUM_VALUE_TYPE(520)
 VREvent_ScreenshotTaken = ENUM_VALUE_TYPE(521)
 VREvent_ScreenshotFailed = ENUM_VALUE_TYPE(522)
@@ -417,6 +465,7 @@ VREvent_CameraSettingsHaveChanged = ENUM_VALUE_TYPE(851)
 VREvent_ReprojectionSettingHasChanged = ENUM_VALUE_TYPE(852)
 VREvent_ModelSkinSettingsHaveChanged = ENUM_VALUE_TYPE(853)
 VREvent_EnvironmentSettingsHaveChanged = ENUM_VALUE_TYPE(854)
+VREvent_PowerSettingsHaveChanged = ENUM_VALUE_TYPE(855)
 VREvent_StatusUpdate = ENUM_VALUE_TYPE(900)
 VREvent_MCImageUpdated = ENUM_VALUE_TYPE(1000)
 VREvent_FirmwareUpdateStarted = ENUM_VALUE_TYPE(1100)
@@ -437,6 +486,7 @@ VREvent_TrackedCamera_StartVideoStream = ENUM_VALUE_TYPE(1500)
 VREvent_TrackedCamera_StopVideoStream = ENUM_VALUE_TYPE(1501)
 VREvent_TrackedCamera_PauseVideoStream = ENUM_VALUE_TYPE(1502)
 VREvent_TrackedCamera_ResumeVideoStream = ENUM_VALUE_TYPE(1503)
+VREvent_TrackedCamera_EditingSurface = ENUM_VALUE_TYPE(1550)
 VREvent_PerformanceTest_EnableCapture = ENUM_VALUE_TYPE(1600)
 VREvent_PerformanceTest_DisableCapture = ENUM_VALUE_TYPE(1601)
 VREvent_PerformanceTest_FidelityLevel = ENUM_VALUE_TYPE(1602)
@@ -459,6 +509,7 @@ k_EButton_DPad_Up = ENUM_VALUE_TYPE(4)
 k_EButton_DPad_Right = ENUM_VALUE_TYPE(5)
 k_EButton_DPad_Down = ENUM_VALUE_TYPE(6)
 k_EButton_A = ENUM_VALUE_TYPE(7)
+k_EButton_ProximitySensor = ENUM_VALUE_TYPE(31)
 k_EButton_Axis0 = ENUM_VALUE_TYPE(32)
 k_EButton_Axis1 = ENUM_VALUE_TYPE(33)
 k_EButton_Axis2 = ENUM_VALUE_TYPE(34)
@@ -510,7 +561,7 @@ VROverlayError_ArrayTooSmall = ENUM_VALUE_TYPE(22)
 VROverlayError_RequestFailed = ENUM_VALUE_TYPE(23)
 VROverlayError_InvalidTexture = ENUM_VALUE_TYPE(24)
 VROverlayError_UnableToLoadFile = ENUM_VALUE_TYPE(25)
-VROVerlayError_KeyboardAlreadyInUse = ENUM_VALUE_TYPE(26)
+VROverlayError_KeyboardAlreadyInUse = ENUM_VALUE_TYPE(26)
 VROverlayError_NoNeighbor = ENUM_VALUE_TYPE(27)
 
 EVRApplicationType = ENUM_TYPE
@@ -807,6 +858,8 @@ VRSettingsError_None = ENUM_VALUE_TYPE(0)
 VRSettingsError_IPCFailed = ENUM_VALUE_TYPE(1)
 VRSettingsError_WriteFailed = ENUM_VALUE_TYPE(2)
 VRSettingsError_ReadFailed = ENUM_VALUE_TYPE(3)
+VRSettingsError_JsonParseFailed = ENUM_VALUE_TYPE(4)
+VRSettingsError_UnsetSettingHasNoDefault = ENUM_VALUE_TYPE(5)
 
 EVRScreenshotError = ENUM_TYPE
 VRScreenshotError_None = ENUM_VALUE_TYPE(0)
@@ -830,6 +883,7 @@ VROverlayHandle_t = c_uint64
 glSharedTextureHandle_t = c_void_p
 glInt_t = c_int32
 glUInt_t = c_uint32
+SharedTextureHandle_t = c_uint64
 TrackedDeviceIndex_t = c_uint32
 VROverlayHandle_t = c_uint64
 TrackedCameraHandle_t = c_uint64
@@ -1025,6 +1079,26 @@ class VRTextureBounds_t(Structure):
     ]
 
 
+class VulkanData_t(Structure):
+    """
+    Data required for passing Vulkan textures to IVRCompositor::Submit.
+    Be sure to call OpenVR_Shutdown before destroying these resources.
+    """
+
+    _fields_ = [
+        ("m_nImage", c_uint64),
+        ("m_pDevice", POINTER(VkDevice_T)),
+        ("m_pPhysicalDevice", POINTER(VkPhysicalDevice_T)),
+        ("m_pInstance", POINTER(VkInstance_T)),
+        ("m_pQueue", POINTER(VkQueue_T)),
+        ("m_nQueueFamilyIndex", c_uint32),
+        ("m_nWidth", c_uint32),
+        ("m_nHeight", c_uint32),
+        ("m_nFormat", c_uint32),
+        ("m_nSampleCount", c_uint32),
+    ]
+
+
 class VREvent_Controller_t(Structure):
     "used for controller button events"
 
@@ -1164,6 +1238,13 @@ class VREvent_ApplicationLaunch_t(Structure):
     _fields_ = [
         ("pid", c_uint32),
         ("unArgsHandle", c_uint32),
+    ]
+
+
+class VREvent_EditingCameraSurface_t(Structure):
+    _fields_ = [
+        ("overlayHandle", c_uint64),
+        ("nVisualMode", c_uint32),
     ]
 
 
@@ -1632,6 +1713,7 @@ class IVRSystem(object):
         """
         Returns the result of the distortion function for the specified eye and input UVs. UVs go from 0,0 in 
         the upper left of that eye's viewport and 1,1 in the lower right of that eye's viewport.
+        Values may be NAN to indicate an error has occurred.
         """
 
         fn = self.function_table.computeDistortion
@@ -4225,14 +4307,14 @@ class IVRSettings_FnTable(Structure):
     _fields_ = [
         ("getSettingsErrorNameFromEnum", OPENVR_FNTABLE_CALLTYPE(c_char_p, EVRSettingsError)),
         ("sync", OPENVR_FNTABLE_CALLTYPE(openvr_bool, openvr_bool, POINTER(EVRSettingsError))),
-        ("getBool", OPENVR_FNTABLE_CALLTYPE(openvr_bool, c_char_p, c_char_p, openvr_bool, POINTER(EVRSettingsError))),
         ("setBool", OPENVR_FNTABLE_CALLTYPE(None, c_char_p, c_char_p, openvr_bool, POINTER(EVRSettingsError))),
-        ("getInt32", OPENVR_FNTABLE_CALLTYPE(c_int32, c_char_p, c_char_p, c_int32, POINTER(EVRSettingsError))),
         ("setInt32", OPENVR_FNTABLE_CALLTYPE(None, c_char_p, c_char_p, c_int32, POINTER(EVRSettingsError))),
-        ("getFloat", OPENVR_FNTABLE_CALLTYPE(c_float, c_char_p, c_char_p, c_float, POINTER(EVRSettingsError))),
         ("setFloat", OPENVR_FNTABLE_CALLTYPE(None, c_char_p, c_char_p, c_float, POINTER(EVRSettingsError))),
-        ("getString", OPENVR_FNTABLE_CALLTYPE(None, c_char_p, c_char_p, c_char_p, c_uint32, c_char_p, POINTER(EVRSettingsError))),
         ("setString", OPENVR_FNTABLE_CALLTYPE(None, c_char_p, c_char_p, c_char_p, POINTER(EVRSettingsError))),
+        ("getBool", OPENVR_FNTABLE_CALLTYPE(openvr_bool, c_char_p, c_char_p, POINTER(EVRSettingsError))),
+        ("getInt32", OPENVR_FNTABLE_CALLTYPE(c_int32, c_char_p, c_char_p, POINTER(EVRSettingsError))),
+        ("getFloat", OPENVR_FNTABLE_CALLTYPE(c_float, c_char_p, c_char_p, POINTER(EVRSettingsError))),
+        ("getString", OPENVR_FNTABLE_CALLTYPE(None, c_char_p, c_char_p, c_char_p, c_uint32, POINTER(EVRSettingsError))),
         ("removeSection", OPENVR_FNTABLE_CALLTYPE(None, c_char_p, POINTER(EVRSettingsError))),
         ("removeKeyInSection", OPENVR_FNTABLE_CALLTYPE(None, c_char_p, c_char_p, POINTER(EVRSettingsError))),
     ]
@@ -4264,23 +4346,11 @@ class IVRSettings(object):
         result = fn(bForce, byref(peError))
         return result, peError
 
-    def getBool(self, pchSection, pchSettingsKey, bDefaultValue):
-        fn = self.function_table.getBool
-        peError = EVRSettingsError()
-        result = fn(pchSection, pchSettingsKey, bDefaultValue, byref(peError))
-        return result, peError
-
     def setBool(self, pchSection, pchSettingsKey, bValue):
         fn = self.function_table.setBool
         peError = EVRSettingsError()
         fn(pchSection, pchSettingsKey, bValue, byref(peError))
         return peError
-
-    def getInt32(self, pchSection, pchSettingsKey, nDefaultValue):
-        fn = self.function_table.getInt32
-        peError = EVRSettingsError()
-        result = fn(pchSection, pchSettingsKey, nDefaultValue, byref(peError))
-        return result, peError
 
     def setInt32(self, pchSection, pchSettingsKey, nValue):
         fn = self.function_table.setInt32
@@ -4288,28 +4358,45 @@ class IVRSettings(object):
         fn(pchSection, pchSettingsKey, nValue, byref(peError))
         return peError
 
-    def getFloat(self, pchSection, pchSettingsKey, flDefaultValue):
-        fn = self.function_table.getFloat
-        peError = EVRSettingsError()
-        result = fn(pchSection, pchSettingsKey, flDefaultValue, byref(peError))
-        return result, peError
-
     def setFloat(self, pchSection, pchSettingsKey, flValue):
         fn = self.function_table.setFloat
         peError = EVRSettingsError()
         fn(pchSection, pchSettingsKey, flValue, byref(peError))
         return peError
 
-    def getString(self, pchSection, pchSettingsKey, pchValue, unValueLen, pchDefaultValue):
-        fn = self.function_table.getString
-        peError = EVRSettingsError()
-        fn(pchSection, pchSettingsKey, pchValue, unValueLen, pchDefaultValue, byref(peError))
-        return peError
-
     def setString(self, pchSection, pchSettingsKey, pchValue):
         fn = self.function_table.setString
         peError = EVRSettingsError()
         fn(pchSection, pchSettingsKey, pchValue, byref(peError))
+        return peError
+
+    def getBool(self, pchSection, pchSettingsKey):
+        """
+        Users of the system need to provide a proper default in default.vrsettings in the resources/settings/ directory
+        of either the runtime or the driver_xxx directory. Otherwise the default will be false, 0, 0.0 or ""
+        """
+
+        fn = self.function_table.getBool
+        peError = EVRSettingsError()
+        result = fn(pchSection, pchSettingsKey, byref(peError))
+        return result, peError
+
+    def getInt32(self, pchSection, pchSettingsKey):
+        fn = self.function_table.getInt32
+        peError = EVRSettingsError()
+        result = fn(pchSection, pchSettingsKey, byref(peError))
+        return result, peError
+
+    def getFloat(self, pchSection, pchSettingsKey):
+        fn = self.function_table.getFloat
+        peError = EVRSettingsError()
+        result = fn(pchSection, pchSettingsKey, byref(peError))
+        return result, peError
+
+    def getString(self, pchSection, pchSettingsKey, pchValue, unValueLen):
+        fn = self.function_table.getString
+        peError = EVRSettingsError()
+        fn(pchSection, pchSettingsKey, pchValue, unValueLen, byref(peError))
         return peError
 
     def removeSection(self, pchSection):
