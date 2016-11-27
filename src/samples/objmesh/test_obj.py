@@ -41,6 +41,11 @@ class Vec3(object):
         result /= rhs
         return result
 
+    def __div__(self, rhs):
+        result = Vec3(self)
+        result /= rhs
+        return result
+
     def __getitem__(self, index):
         return self._data[index]
 
@@ -50,6 +55,11 @@ class Vec3(object):
         return self
             
     def __itruediv__(self, rhs):
+        for i in range(3):
+            self._data[i] /= rhs
+        return self
+
+    def __idiv__(self, rhs):
         for i in range(3):
             self._data[i] /= rhs
         return self
