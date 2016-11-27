@@ -8,7 +8,7 @@ import collections
 from numpy.linalg import inv
 import itertools
 from textwrap import dedent
-from ctypes import cast, c_float, c_void_p
+from ctypes import cast, c_float, c_void_p, sizeof
 
 from OpenGL.GL import *  # @UnusedWildImport # this comment squelches an IDE warning
 # from OpenGL.GL import GL_FLOAT, GL_ELEMENT_ARRAY_BUFFER, GL_FRAGMENT_SHADER, GL_TRIANGLES, GL_UNSIGNED_INT, GL_VERTEX_SHADER
