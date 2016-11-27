@@ -62,7 +62,6 @@ class VkQueue_T(ctypes.Structure):
 ### Expose constants ###
 ########################
 
-k_unTrackingStringSize = 32
 k_unMaxDriverDebugResponseSize = 32768
 k_unTrackedDeviceIndex_Hmd = 0
 k_unMaxTrackedDeviceCount = 16
@@ -72,7 +71,7 @@ k_unMaxPropertyStringSize = 32768
 k_unControllerStateAxisCount = 5
 k_ulOverlayHandleInvalid = 0
 k_unScreenshotHandleInvalid = 0
-IVRSystem_Version = b"IVRSystem_012"
+IVRSystem_Version = b"IVRSystem_014"
 IVRExtendedDisplay_Version = b"IVRExtendedDisplay_001"
 IVRTrackedCamera_Version = b"IVRTrackedCamera_003"
 k_unMaxApplicationKeyLength = 128
@@ -81,10 +80,11 @@ k_pch_MimeType_GameTheater = b"vr/game_theater"
 IVRApplications_Version = b"IVRApplications_006"
 IVRChaperone_Version = b"IVRChaperone_003"
 IVRChaperoneSetup_Version = b"IVRChaperoneSetup_005"
-IVRCompositor_Version = b"IVRCompositor_016"
+IVRCompositor_Version = b"IVRCompositor_018"
 k_unVROverlayMaxKeyLength = 128
 k_unVROverlayMaxNameLength = 128
 k_unMaxOverlayCount = 64
+k_unMaxOverlayIntersectionMaskPrimitivesCount = 32
 IVROverlay_Version = b"IVROverlay_013"
 k_pch_Controller_Component_GDC2015 = b"gdc2015"
 k_pch_Controller_Component_Base = b"base"
@@ -109,9 +109,9 @@ k_pch_SteamVR_SendSystemButtonToAllApps_Bool = b"sendSystemButtonToAllApps"
 k_pch_SteamVR_LogLevel_Int32 = b"loglevel"
 k_pch_SteamVR_IPD_Float = b"ipd"
 k_pch_SteamVR_Background_String = b"background"
+k_pch_SteamVR_BackgroundUseDomeProjection_Bool = b"backgroundUseDomeProjection"
 k_pch_SteamVR_BackgroundCameraHeight_Float = b"backgroundCameraHeight"
 k_pch_SteamVR_BackgroundDomeRadius_Float = b"backgroundDomeRadius"
-k_pch_SteamVR_Environment_String = b"environment"
 k_pch_SteamVR_GridColor_String = b"gridColor"
 k_pch_SteamVR_PlayAreaColor_String = b"playAreaColor"
 k_pch_SteamVR_ShowStage_Bool = b"showStage"
@@ -124,7 +124,8 @@ k_pch_SteamVR_SpeakersForwardYawOffsetDegrees_Float = b"speakersForwardYawOffset
 k_pch_SteamVR_BaseStationPowerManagement_Bool = b"basestationPowerManagement"
 k_pch_SteamVR_NeverKillProcesses_Bool = b"neverKillProcesses"
 k_pch_SteamVR_RenderTargetMultiplier_Float = b"renderTargetMultiplier"
-k_pch_SteamVR_AllowReprojection_Bool = b"allowReprojection"
+k_pch_SteamVR_AllowAsyncReprojection_Bool = b"allowAsyncReprojection"
+k_pch_SteamVR_AllowReprojection_Bool = b"allowInterleavedReprojection"
 k_pch_SteamVR_ForceReprojection_Bool = b"forceReprojection"
 k_pch_SteamVR_ForceFadeOnBadTracking_Bool = b"forceFadeOnBadTracking"
 k_pch_SteamVR_DefaultMirrorView_Int32 = b"defaultMirrorView"
@@ -135,6 +136,7 @@ k_pch_SteamVR_EnableHomeApp = b"enableHomeApp"
 k_pch_SteamVR_SetInitialDefaultHomeApp = b"setInitialDefaultHomeApp"
 k_pch_SteamVR_CycleBackgroundImageTimeSec_Int32 = b"CycleBackgroundImageTimeSec"
 k_pch_SteamVR_RetailDemo_Bool = b"retailDemo"
+k_pch_SteamVR_IpdOffset_Float = b"ipdOffset"
 k_pch_Lighthouse_Section = b"driver_lighthouse"
 k_pch_Lighthouse_DisableIMU_Bool = b"disableimu"
 k_pch_Lighthouse_UseDisambiguation_String = b"usedisambiguation"
@@ -155,6 +157,7 @@ k_pch_Null_SecondsFromVsyncToPhotons_Float = b"secondsFromVsyncToPhotons"
 k_pch_Null_DisplayFrequency_Float = b"displayFrequency"
 k_pch_UserInterface_Section = b"userinterface"
 k_pch_UserInterface_StatusAlwaysOnTop_Bool = b"StatusAlwaysOnTop"
+k_pch_UserInterface_MinimizeToTray_Bool = b"MinimizeToTray"
 k_pch_UserInterface_Screenshots_Bool = b"screenshots"
 k_pch_UserInterface_ScreenshotType_Int = b"screenshotType"
 k_pch_Notifications_Section = b"notifications"
@@ -293,6 +296,7 @@ Prop_DeviceClass_Int32 = ENUM_VALUE_TYPE(1029)
 Prop_HasCamera_Bool = ENUM_VALUE_TYPE(1030)
 Prop_DriverVersion_String = ENUM_VALUE_TYPE(1031)
 Prop_Firmware_ForceUpdateRequired_Bool = ENUM_VALUE_TYPE(1032)
+Prop_ViveSystemButtonFixRequired_Bool = ENUM_VALUE_TYPE(1033)
 Prop_ReportsTimeSinceVSync_Bool = ENUM_VALUE_TYPE(2000)
 Prop_SecondsFromVsyncToPhotons_Float = ENUM_VALUE_TYPE(2001)
 Prop_DisplayFrequency_Float = ENUM_VALUE_TYPE(2002)
@@ -330,6 +334,7 @@ Prop_CameraCompatibilityMode_Int32 = ENUM_VALUE_TYPE(2033)
 Prop_ScreenshotHorizontalFieldOfViewDegrees_Float = ENUM_VALUE_TYPE(2034)
 Prop_ScreenshotVerticalFieldOfViewDegrees_Float = ENUM_VALUE_TYPE(2035)
 Prop_DisplaySuppressed_Bool = ENUM_VALUE_TYPE(2036)
+Prop_DisplayAllowNightMode_Bool = ENUM_VALUE_TYPE(2037)
 Prop_AttachedDeviceId_String = ENUM_VALUE_TYPE(3000)
 Prop_SupportedButtons_Uint64 = ENUM_VALUE_TYPE(3001)
 Prop_Axis0Type_Int32 = ENUM_VALUE_TYPE(3002)
@@ -525,6 +530,11 @@ VRMouseButton_Left = ENUM_VALUE_TYPE(1)
 VRMouseButton_Right = ENUM_VALUE_TYPE(2)
 VRMouseButton_Middle = ENUM_VALUE_TYPE(4)
 
+EHiddenAreaMeshType = ENUM_TYPE
+k_eHiddenAreaMesh_Standard = ENUM_VALUE_TYPE(0)
+k_eHiddenAreaMesh_Inverse = ENUM_VALUE_TYPE(1)
+k_eHiddenAreaMesh_LineLoop = ENUM_VALUE_TYPE(2)
+
 EVRControllerAxisType = ENUM_TYPE
 k_eControllerAxis_None = ENUM_VALUE_TYPE(0)
 k_eControllerAxis_TrackPad = ENUM_VALUE_TYPE(1)
@@ -563,6 +573,8 @@ VROverlayError_InvalidTexture = ENUM_VALUE_TYPE(24)
 VROverlayError_UnableToLoadFile = ENUM_VALUE_TYPE(25)
 VROverlayError_KeyboardAlreadyInUse = ENUM_VALUE_TYPE(26)
 VROverlayError_NoNeighbor = ENUM_VALUE_TYPE(27)
+VROverlayError_TooManyMaskPrimitives = ENUM_VALUE_TYPE(29)
+VROverlayError_BadMaskPrimitive = ENUM_VALUE_TYPE(30)
 
 EVRApplicationType = ENUM_TYPE
 VRApplication_Other = ENUM_VALUE_TYPE(0)
@@ -775,6 +787,7 @@ VRCompositorError_TextureIsOnWrongDevice = ENUM_VALUE_TYPE(104)
 VRCompositorError_TextureUsesUnsupportedFormat = ENUM_VALUE_TYPE(105)
 VRCompositorError_SharedTexturesNotSupported = ENUM_VALUE_TYPE(106)
 VRCompositorError_IndexOutOfRange = ENUM_VALUE_TYPE(107)
+VRCompositorError_AlreadySubmitted = ENUM_VALUE_TYPE(108)
 
 VROverlayInputMethod = ENUM_TYPE
 VROverlayInputMethod_None = ENUM_VALUE_TYPE(0)
@@ -818,6 +831,10 @@ OverlayDirection_Down = ENUM_VALUE_TYPE(1)
 OverlayDirection_Left = ENUM_VALUE_TYPE(2)
 OverlayDirection_Right = ENUM_VALUE_TYPE(3)
 OverlayDirection_Count = ENUM_VALUE_TYPE(4)
+
+EVROverlayIntersectionMaskPrimitiveType = ENUM_TYPE
+OverlayIntersectionPrimitiveType_Rectangle = ENUM_VALUE_TYPE(0)
+OverlayIntersectionPrimitiveType_Circle = ENUM_VALUE_TYPE(1)
 
 EVRRenderModelError = ENUM_TYPE
 VRRenderModelError_None = ENUM_VALUE_TYPE(0)
@@ -1327,6 +1344,7 @@ class Compositor_FrameTiming(Structure):
         ("m_nSize", c_uint32),
         ("m_nFrameIndex", c_uint32),
         ("m_nNumFramePresents", c_uint32),
+        ("m_nNumMisPresented", c_uint32),
         ("m_nNumDroppedFrames", c_uint32),
         ("m_nReprojectionFlags", c_uint32),
         ("m_flSystemTimeInSeconds", c_double),
@@ -1389,6 +1407,23 @@ class VROverlayIntersectionResults_t(Structure):
         ("vNormal", HmdVector3_t),
         ("vUVs", HmdVector2_t),
         ("fDistance", c_float),
+    ]
+
+
+class IntersectionMaskRectangle_t(Structure):
+    _fields_ = [
+        ("m_flTopLeftX", c_float),
+        ("m_flTopLeftY", c_float),
+        ("m_flWidth", c_float),
+        ("m_flHeight", c_float),
+    ]
+
+
+class IntersectionMaskCircle_t(Structure):
+    _fields_ = [
+        ("m_flCenterX", c_float),
+        ("m_flCenterY", c_float),
+        ("m_flRadius", c_float),
     ]
 
 
@@ -1617,12 +1652,26 @@ class VREvent_t(Structure):
     ]
 
 
+class VROverlayIntersectionMaskPrimitive_Data_t(Union):
+    _fields_ = [
+        ("m_Rectangle", IntersectionMaskRectangle_t),
+        ("m_Circle", IntersectionMaskCircle_t),
+    ]
+
+
+class VROverlayIntersectionMaskPrimitive_t(Structure):
+    _fields_ = [
+        ("m_nPrimitiveType", EVROverlayIntersectionMaskPrimitiveType),
+        ("m_Primitive", VROverlayIntersectionMaskPrimitive_Data_t),
+    ]
+
+
 class IVRSystem_FnTable(Structure):
     _fields_ = [
         ("getRecommendedRenderTargetSize", OPENVR_FNTABLE_CALLTYPE(None, POINTER(c_uint32), POINTER(c_uint32))),
         ("getProjectionMatrix", OPENVR_FNTABLE_CALLTYPE(HmdMatrix44_t, EVREye, c_float, c_float, EGraphicsAPIConvention)),
         ("getProjectionRaw", OPENVR_FNTABLE_CALLTYPE(None, EVREye, POINTER(c_float), POINTER(c_float), POINTER(c_float), POINTER(c_float))),
-        ("computeDistortion", OPENVR_FNTABLE_CALLTYPE(DistortionCoordinates_t, EVREye, c_float, c_float)),
+        ("computeDistortion", OPENVR_FNTABLE_CALLTYPE(openvr_bool, EVREye, c_float, c_float, POINTER(DistortionCoordinates_t))),
         ("getEyeToHeadTransform", OPENVR_FNTABLE_CALLTYPE(HmdMatrix34_t, EVREye)),
         ("getTimeSinceLastVsync", OPENVR_FNTABLE_CALLTYPE(openvr_bool, POINTER(c_float), POINTER(c_uint64))),
         ("getD3D9AdapterIndex", OPENVR_FNTABLE_CALLTYPE(c_int32)),
@@ -1650,9 +1699,9 @@ class IVRSystem_FnTable(Structure):
         ("pollNextEvent", OPENVR_FNTABLE_CALLTYPE(openvr_bool, POINTER(VREvent_t), c_uint32)),
         ("pollNextEventWithPose", OPENVR_FNTABLE_CALLTYPE(openvr_bool, ETrackingUniverseOrigin, POINTER(VREvent_t), c_uint32, POINTER(TrackedDevicePose_t))),
         ("getEventTypeNameFromEnum", OPENVR_FNTABLE_CALLTYPE(c_char_p, EVREventType)),
-        ("getHiddenAreaMesh", OPENVR_FNTABLE_CALLTYPE(HiddenAreaMesh_t, EVREye)),
-        ("getControllerState", OPENVR_FNTABLE_CALLTYPE(openvr_bool, TrackedDeviceIndex_t, POINTER(VRControllerState_t))),
-        ("getControllerStateWithPose", OPENVR_FNTABLE_CALLTYPE(openvr_bool, ETrackingUniverseOrigin, TrackedDeviceIndex_t, POINTER(VRControllerState_t), POINTER(TrackedDevicePose_t))),
+        ("getHiddenAreaMesh", OPENVR_FNTABLE_CALLTYPE(HiddenAreaMesh_t, EVREye, EHiddenAreaMeshType)),
+        ("getControllerState", OPENVR_FNTABLE_CALLTYPE(openvr_bool, TrackedDeviceIndex_t, POINTER(VRControllerState_t), c_uint32)),
+        ("getControllerStateWithPose", OPENVR_FNTABLE_CALLTYPE(openvr_bool, ETrackingUniverseOrigin, TrackedDeviceIndex_t, POINTER(VRControllerState_t), c_uint32, POINTER(TrackedDevicePose_t))),
         ("triggerHapticPulse", OPENVR_FNTABLE_CALLTYPE(None, TrackedDeviceIndex_t, c_uint32, c_ushort)),
         ("getButtonIdNameFromEnum", OPENVR_FNTABLE_CALLTYPE(c_char_p, EVRButtonId)),
         ("getControllerAxisTypeNameFromEnum", OPENVR_FNTABLE_CALLTYPE(c_char_p, EVRControllerAxisType)),
@@ -1711,14 +1760,15 @@ class IVRSystem(object):
 
     def computeDistortion(self, eEye, fU, fV):
         """
-        Returns the result of the distortion function for the specified eye and input UVs. UVs go from 0,0 in 
+        Gets the result of the distortion function for the specified eye and input UVs. UVs go from 0,0 in 
         the upper left of that eye's viewport and 1,1 in the lower right of that eye's viewport.
-        Values may be NAN to indicate an error has occurred.
+        Returns true for success. Otherwise, returns false, and distortion coordinates are not suitable.
         """
 
         fn = self.function_table.computeDistortion
-        result = fn(eEye, fU, fV)
-        return result
+        pDistortionCoordinates = DistortionCoordinates_t()
+        result = fn(eEye, fU, fV, byref(pDistortionCoordinates))
+        return result, pDistortionCoordinates
 
     def getEyeToHeadTransform(self, eEye):
         """
@@ -1954,7 +2004,7 @@ class IVRSystem(object):
         """
         Returns a string property. If the device index is not valid or the property is not a string type this function will 
         return 0. Otherwise it returns the length of the number of bytes necessary to hold this string including the trailing
-        null. Strings will generally fit in buffers of k_unTrackingStringSize characters.
+        null. Strings will always fit in buffers of k_unMaxPropertyStringSize characters.
         """
 
         fn = self.function_table.getStringTrackedDeviceProperty
@@ -1987,6 +2037,7 @@ class IVRSystem(object):
         """
 
         fn = self.function_table.pollNextEvent
+        # TODO: Automate this manually converted method
         result = fn(byref(pEvent), sizeof(VREvent_t))
         return result != 0
 
@@ -2011,20 +2062,22 @@ class IVRSystem(object):
         result = fn(eType)
         return result
 
-    def getHiddenAreaMesh(self, eEye):
+    def getHiddenAreaMesh(self, eEye, type_):
         """
-        Returns the stencil mesh information for the current HMD. If this HMD does not have a stencil mesh the vertex data and count will be
-        NULL and 0 respectively. This mesh is meant to be rendered into the stencil buffer (or into the depth buffer setting nearz) before rendering
-        each eye's view. The pixels covered by this mesh will never be seen by the user after the lens distortion is applied and based on visibility to the panels.
-        This will improve perf by letting the GPU early-reject pixels the user will never see before running the pixel shader.
+        Returns the hidden area mesh for the current HMD. The pixels covered by this mesh will never be seen by the user after the lens distortion is
+        applied based on visibility to the panels. If this HMD does not have a hidden area mesh, the vertex data and count will be NULL and 0 respectively.
+        This mesh is meant to be rendered into the stencil buffer (or into the depth buffer setting nearz) before rendering each eye's view. 
+        This will improve performance by letting the GPU early-reject pixels the user will never see before running the pixel shader.
         NOTE: Render this mesh with backface culling disabled since the winding order of the vertices can be different per-HMD or per-eye.
+        Setting the bInverse argument to true will produce the visible area mesh that is commonly used in place of full-screen quads. The visible area mesh covers all of the pixels the hidden area mesh does not cover.
+        Setting the bLineLoop argument will return a line loop of vertices in HiddenAreaMesh_t->pVertexData with HiddenAreaMesh_t->unTriangleCount set to the number of vertices.
         """
 
         fn = self.function_table.getHiddenAreaMesh
-        result = fn(eEye)
+        result = fn(eEye, type_)
         return result
 
-    def getControllerState(self, unControllerDeviceIndex):
+    def getControllerState(self, unControllerDeviceIndex, unControllerStateSize):
         """
         Fills the supplied struct with the current state of the controller. Returns false if the controller index
         is invalid.
@@ -2032,10 +2085,10 @@ class IVRSystem(object):
 
         fn = self.function_table.getControllerState
         pControllerState = VRControllerState_t()
-        result = fn(unControllerDeviceIndex, byref(pControllerState))
+        result = fn(unControllerDeviceIndex, byref(pControllerState), unControllerStateSize)
         return result, pControllerState
 
-    def getControllerStateWithPose(self, eOrigin, unControllerDeviceIndex):
+    def getControllerStateWithPose(self, eOrigin, unControllerDeviceIndex, unControllerStateSize):
         """
         fills the supplied struct with the current state of the controller and the provided pose with the pose of 
         the controller when the controller state was updated most recently. Use this form if you need a precise controller
@@ -2045,7 +2098,7 @@ class IVRSystem(object):
         fn = self.function_table.getControllerStateWithPose
         pControllerState = VRControllerState_t()
         pTrackedDevicePose = TrackedDevicePose_t()
-        result = fn(eOrigin, unControllerDeviceIndex, byref(pControllerState), byref(pTrackedDevicePose))
+        result = fn(eOrigin, unControllerDeviceIndex, byref(pControllerState), unControllerStateSize, byref(pTrackedDevicePose))
         return result, pControllerState, pTrackedDevicePose
 
     def triggerHapticPulse(self, unControllerDeviceIndex, unAxisId, usDurationMicroSec):
@@ -2970,10 +3023,13 @@ class IVRCompositor_FnTable(Structure):
         ("clearLastSubmittedFrame", OPENVR_FNTABLE_CALLTYPE(None)),
         ("postPresentHandoff", OPENVR_FNTABLE_CALLTYPE(None)),
         ("getFrameTiming", OPENVR_FNTABLE_CALLTYPE(openvr_bool, POINTER(Compositor_FrameTiming), c_uint32)),
+        ("getFrameTimings", OPENVR_FNTABLE_CALLTYPE(c_uint32, POINTER(Compositor_FrameTiming), c_uint32)),
         ("getFrameTimeRemaining", OPENVR_FNTABLE_CALLTYPE(c_float)),
         ("getCumulativeStats", OPENVR_FNTABLE_CALLTYPE(None, POINTER(Compositor_CumulativeStats), c_uint32)),
         ("fadeToColor", OPENVR_FNTABLE_CALLTYPE(None, c_float, c_float, c_float, c_float, c_float, openvr_bool)),
+        ("getCurrentFadeColor", OPENVR_FNTABLE_CALLTYPE(HmdColor_t, openvr_bool)),
         ("fadeGrid", OPENVR_FNTABLE_CALLTYPE(None, c_float, openvr_bool)),
+        ("getCurrentGridAlpha", OPENVR_FNTABLE_CALLTYPE(c_float)),
         ("setSkyboxOverride", OPENVR_FNTABLE_CALLTYPE(EVRCompositorError, POINTER(Texture_t), c_uint32)),
         ("clearSkyboxOverride", OPENVR_FNTABLE_CALLTYPE(None)),
         ("compositorBringToFront", OPENVR_FNTABLE_CALLTYPE(None)),
@@ -3031,6 +3087,7 @@ class IVRCompositor(object):
         "Returns pose(s) to use to render scene (and optionally poses predicted two frames out for gameplay)."
 
         fn = self.function_table.waitGetPoses
+        # TODO: Automate this manual translation
         # Convert non-pointer python arguments to pointers
         if pRenderPoseArray is not None:
             pRenderPoseArray = byref(pRenderPoseArray[0])
@@ -3067,9 +3124,18 @@ class IVRCompositor(object):
         Submitting both frames to signal the driver to start processing, otherwise it may wait until the command buffer fills up, causing the app to miss frames.
         * OpenGL dirty state:
         glBindTexture
+        * Return codes:
+        - IsNotSceneApplication (make sure to call VR_Init with VRApplicaiton_Scene)
+        - DoNotHaveFocus (some other app has taken focus)
+        - TextureIsOnWrongDevice (application did not use proper AdapterIndex - see IVRSystem.GetDXGIOutputInfo)
+        - SharedTexturesNotSupported (application needs to call CreateDXGIFactory1 or later before creating DX device)
+        - TextureUsesUnsupportedFormat (scene textures must be compatible with DXGI sharing rules - e.g. uncompressed, no mips, etc.)
+        - InvalidTexture (usually means bad arguments passed in)
+        - AlreadySubmitted (app has submitted two left textures or two right textures in a single frame - i.e. before calling WaitGetPoses again)
         """
 
         fn = self.function_table.submit
+        # TODO: Automate this manual translation
         eError = fn(eEye, byref(pTexture), pBounds, nSubmitFlags)
         return eError
 
@@ -3105,6 +3171,17 @@ class IVRCompositor(object):
         result = fn(byref(pTiming), unFramesAgo)
         return result, pTiming
 
+    def getFrameTimings(self, nFrames):
+        """
+        Interface for copying a range of timing data.  Frames are returned in ascending order (oldest to newest) with the last being the most recent frame.
+        Only the first entry's m_nSize needs to be set, as the rest will be inferred from that.  Returns total number of entries filled out.
+        """
+
+        fn = self.function_table.getFrameTimings
+        pTiming = Compositor_FrameTiming()
+        result = fn(byref(pTiming), nFrames)
+        return result, pTiming
+
     def getFrameTimeRemaining(self):
         """
         Returns the time in seconds left in the current (as identified by FrameTiming's frameIndex) frame.
@@ -3133,11 +3210,25 @@ class IVRCompositor(object):
         fn = self.function_table.fadeToColor
         fn(fSeconds, fRed, fGreen, fBlue, fAlpha, bBackground)
 
+    def getCurrentFadeColor(self, bBackground):
+        "Get current fade color value."
+
+        fn = self.function_table.getCurrentFadeColor
+        result = fn(bBackground)
+        return result
+
     def fadeGrid(self, fSeconds, bFadeIn):
         "Fading the Grid in or out in fSeconds"
 
         fn = self.function_table.fadeGrid
         fn(fSeconds, bFadeIn)
+
+    def getCurrentGridAlpha(self):
+        "Get current alpha value of grid."
+
+        fn = self.function_table.getCurrentGridAlpha
+        result = fn()
+        return result
 
     def setSkyboxOverride(self, unTextureCount):
         """
@@ -3368,6 +3459,7 @@ class IVROverlay_FnTable(Structure):
         ("hideKeyboard", OPENVR_FNTABLE_CALLTYPE(None)),
         ("setKeyboardTransformAbsolute", OPENVR_FNTABLE_CALLTYPE(None, ETrackingUniverseOrigin, POINTER(HmdMatrix34_t))),
         ("setKeyboardPositionForOverlay", OPENVR_FNTABLE_CALLTYPE(None, VROverlayHandle_t, HmdRect2_t)),
+        ("setOverlayIntersectionMask", OPENVR_FNTABLE_CALLTYPE(EVROverlayError, VROverlayHandle_t, POINTER(VROverlayIntersectionMaskPrimitive_t), c_uint32, c_uint32)),
     ]
 
 
@@ -4026,6 +4118,17 @@ class IVROverlay(object):
         fn = self.function_table.setKeyboardPositionForOverlay
         fn(ulOverlayHandle, avoidRect)
 
+    def setOverlayIntersectionMask(self, ulOverlayHandle, unNumMaskPrimitives, unPrimitiveSize):
+        """
+        Sets a list of primitives to be used for controller ray intersection
+        typically the size of the underlying UI in pixels (not in world space).
+        """
+
+        fn = self.function_table.setOverlayIntersectionMask
+        pMaskPrimitives = VROverlayIntersectionMaskPrimitive_t()
+        result = fn(ulOverlayHandle, byref(pMaskPrimitives), unNumMaskPrimitives, unPrimitiveSize)
+        return result, pMaskPrimitives
+
 
 
 class IVRRenderModels_FnTable(Structure):
@@ -4078,6 +4181,7 @@ class IVRRenderModels(object):
         fn = self.function_table.loadRenderModel_Async
         ppRenderModel = POINTER(RenderModel_t)()
         result = fn(pchRenderModelName, byref(ppRenderModel))
+        # TODO: Automate this manual translation
         if ppRenderModel:
             model = ppRenderModel.contents
         else:
