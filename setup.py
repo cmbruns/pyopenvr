@@ -1,6 +1,6 @@
 #!/bin/env python
 
-from distutils.core import setup
+from setuptools import setup
 
 # Load module version from ovr/version.py
 exec(open('src/openvr/version.py').read())
