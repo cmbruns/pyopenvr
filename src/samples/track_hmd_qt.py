@@ -85,7 +85,7 @@ class MainWindow(QWidget):
         beacon_indices = []
         controller_indices = []
         
-        for i in xrange(len(self.poses)):       
+        for i in range(len(self.poses)):       
             
             device_class = vrsys.getTrackedDeviceClass(i)
             if device_class == openvr.TrackedDeviceClass_Invalid:
