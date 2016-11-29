@@ -12,7 +12,7 @@
 # SURFsara Visualization group
 import sys
 from PyQt4.QtGui import QApplication, QWidget, QPushButton, QVBoxLayout
-from PyQt4.QtCore import QUrl, QTimer
+from PyQt4.QtCore import QTimer
 from PyQt4.QtWebKit import QWebView
 from jinja2 import Environment, FileSystemLoader
 import openvr
