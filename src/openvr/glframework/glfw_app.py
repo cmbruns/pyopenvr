@@ -19,7 +19,23 @@ class GlfwApp(object):
         self.renderer = renderer
         self.title = title
         self._is_initialized = False # keep track of whether self.init_gl() has been called
-        self.window = None
+        
+        if not glfw.init():
+            raise Exception("GLFW Initialization error")
+        # Get OpenGL 4.1 context
+        glfw.window_hint(glfw.CONTEXT_VERSION_MAJOR, 4)
+        glfw.window_hint(glfw.CONTEXT_VERSION_MINOR, 1)
+        glfw.window_hint(glfw.OPENGL_PROFILE, glfw.OPENGL_CORE_PROFILE)
+        # Double buffered screen mirror stalls VR headset rendering,
+        # So use single-buffering
+        glfw.window_hint(glfw.DOUBLEBUFFER, False)
+        self.window = glfw.create_window(self.renderer.window_size[0], self.renderer.window_size[1], self.title, None, None)
+        if self.window is None:
+            glfw.terminate()
+            raise Exception("GLFW window creation error")
+        glfw.set_key_callback(self.window, self.key_callback)
+        glfw.make_context_current(self.window)
+        glfw.swap_interval(0)
 
     def __enter__(self):
         "setup for RAII using 'with' keyword"
@@ -32,21 +48,6 @@ class GlfwApp(object):
     def init_gl(self):
         if self._is_initialized:
             return # only initialize once
-        if not glfw.init():
-            raise Exception("GLFW Initialization error")
-        # Get OpenGL 4.1 context
-        glfw.window_hint(glfw.CONTEXT_VERSION_MAJOR, 4)
-        glfw.window_hint(glfw.CONTEXT_VERSION_MINOR, 1)
-        glfw.window_hint(glfw.OPENGL_PROFILE, glfw.OPENGL_CORE_PROFILE)
-        # Double buffered screen mirror stalls VR headset rendering,
-        # So use single-buffering
-        glfw.window_hint(glfw.DOUBLEBUFFER, False)
-        glfw.swap_interval(0)
-        self.window = glfw.create_window(self.renderer.window_size[0], self.renderer.window_size[1], self.title, None, None)
-        if self.window is None:
-            glfw.terminate()
-            raise Exception("GLFW window creation error")
-        glfw.set_key_callback(self.window, self.key_callback)
         glfw.make_context_current(self.window)
         if self.renderer is not None:
             self.renderer.init_gl()
