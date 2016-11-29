@@ -2,6 +2,7 @@
 /src/c_tests/build_cmake_vs2015
 /dist
 /build
+/src/openvr.egg-info
 /MANIFEST
 /.project
 /.pydevproject
