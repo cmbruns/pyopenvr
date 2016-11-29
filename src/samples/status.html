@@ -1,0 +1,109 @@
+<html>
+<head>
+</head>
+
+<style>
+td { 
+    font-family: "Courier New", Verdana;
+    font-size: 15px;
+}
+</style>
+
+<body>
+Coordinate system: +Y up, +X right, -Z going away from you
+
+<table>
+<tr>
+
+{% for pose in poses.values() %}
+
+<td style="background-color: #e0e0e0" >
+
+<table cellspacing=4 cellpadding=4>
+    <tr><td><b>{{pose.model_name}}</b>
+    <tr><td>
+        {% if pose.device_is_connected %}
+        <span style="color: green">Device connected</span>
+        {% else %}
+        <span style="color: red">Device not connected!</span>
+        {% endif %}
+    </tr>
+    <tr><td>
+        {% if pose.valid %}
+        <span style="color: green">Pose valid</span>
+        {% else %}
+        <span style="color: red">Pose not valid!</span>
+        {% endif %}
+    </tr>
+    <tr><td>{{ pose.tracking_result | format_tracking_result }}
+    </tr>
+</table>
+
+<p>
+
+<table cellspacing=4 cellpadding=4 border=0>
+    <tr>
+        <td>Velocity (m/s)
+        {% for i in range(3) %}
+        <td align='right'>{{pose.velocity[i] | format_velocity}}
+        {% endfor %}
+    </tr>
+    <tr>
+        <td>Angular velocity
+        {% for i in range(3) %}
+        <td align='right'>{{pose.angular_velocity[i] | format_velocity}}
+        {% endfor %}
+    </tr>
+</table>
+
+<p>
+
+<table cellspacing=4 cellpadding=4>
+    <tr><td colspan=3>&nbsp; <td>Trnsltn</tr>
+    {% for row in pose.d2a %}
+    <tr>
+        {% for value in row %}
+        <td align='right'>{{"%+6.3f" | format(value)}}
+        {% endfor %}
+    </tr>        
+    {% endfor %}
+    
+</table>
+
+{% endfor %}
+
+</tr>
+</table>
+
+<!-- Show area of 5x5m in 512x512 pixels, centered at origin -->
+{% set W = 512 %}
+{% set H = 512 %}
+{% set w = 4 %}
+{% set h = 4 %}
+<svg style="background-color: #e0e0e0" width="{{W}}" height="{{H}}">
+    <g transform="translate({{W/2}} {{W/2}}) scale({{W/w}} {{H/h}})">
+        <!-- Meter units at this point (including stroke width ;-)) -->
+        <!-- Origin (1x1m axis) -->
+        <line x1="-1" y1="0" x2="1" y2="0" style="stroke:rgb(255,0,0);stroke-width:0.01" />
+        <line x1="0" y1="-1" x2="0" y2="1" style="stroke:rgb(255,0,0);stroke-width:0.01" />
+        <text x="1" y="0.1" font-size="0.3" fill="red">X</text>
+        <text x="0.05" y="1.1" font-size="0.3" fill="red">Z</text>        
+        <!-- HMD -->
+        {% set m = poses[hmd_index].d2a %}
+        <g transform="matrix({{m[0][0]}} {{m[2][0]}} {{m[0][2]}} {{m[2][2]}} {{m[0][3]}} {{m[2][3]}})">
+            <polygon style="fill:rgb(0,0,255);stroke-width:0.02;stroke:rgb(0,0,0)" points="-0.09,-0.08 0.09,-0.08 0.09,0 0,-0.04 -0.09,0">            
+        </g>
+        {% for ctrl_index in controller_indices %}
+        {% set m = poses[ctrl_index].d2a %}
+        <g transform="matrix({{m[0][0]}} {{m[2][0]}} {{m[0][2]}} {{m[2][2]}} {{m[0][3]}} {{m[2][3]}}) scale(0.0001 0.0001)">
+            <g transform="translate(0,-1250) translate(25.796947,-272.02842)">
+                <path style="fill:rgb(0,0,255);stroke:black;stroke-width:0.02" d="m 32.324864,1661.4842 33.335034,-504.0661 10.10153,-37.3757 27.274122,-23.2335 45.45686,34.3452 36.3655,-25.2538 -1.01016,-44.4467 -101.015252,-110.10663 -54.54824,-23.23351 -53.55666,-7.07107 -53.55666,7.07107 -54.548238,23.23351 -101.01525,110.10663 -1.01016,44.4467 36.3655,25.2538 45.45686,-34.3452 27.27412,23.2335 10.10153,37.3757 30.304575,504.0661 20.212335,28.7893 39.42554,14.6472 37.869702,-12.6268 z"/>            
+            </g>
+        </g>
+        {% endfor %}
+    </g>
+</svg>
+
+</body>
+
+</html>
