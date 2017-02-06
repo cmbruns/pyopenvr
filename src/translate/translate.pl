@@ -411,6 +411,15 @@ class VkInstance_T(ctypes.Structure):
 class VkQueue_T(ctypes.Structure):
     pass
 
+
+# Forward declarations for Direct3D structures
+
+class ID3D12Resource(ctypes.Structure):
+    pass
+
+class ID3D12CommandQueue(ctypes.Structure):
+    pass
+
 EOF
 }
 
