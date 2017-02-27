@@ -2165,7 +2165,7 @@ class IVRSystem(object):
         result = fn(eEye, type_)
         return result
 
-    def getControllerState(self, unControllerDeviceIndex, unControllerStateSize):
+    def getControllerState(self, unControllerDeviceIndex, unControllerStateSize=sizeof(VRControllerState_t)):
         """
         Fills the supplied struct with the current state of the controller. Returns false if the controller index
         is invalid.
@@ -2176,7 +2176,7 @@ class IVRSystem(object):
         result = fn(unControllerDeviceIndex, byref(pControllerState), unControllerStateSize)
         return result, pControllerState
 
-    def getControllerStateWithPose(self, eOrigin, unControllerDeviceIndex, unControllerStateSize):
+    def getControllerStateWithPose(self, eOrigin, unControllerDeviceIndex, unControllerStateSize=sizeof(VRControllerState_t)):
         """
         fills the supplied struct with the current state of the controller and the provided pose with the pose of 
         the controller when the controller state was updated most recently. Use this form if you need a precise controller
