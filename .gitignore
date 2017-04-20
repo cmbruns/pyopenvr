@@ -1,5 +1,5 @@
 *.pyc
-/src/c_tests/build_cmake_vs2015
+/src/c_tests/build_cmake*
 /dist
 /build
 /src/openvr.egg-info

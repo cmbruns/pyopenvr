@@ -98,7 +98,7 @@ class OpenVrFramebuffer(object):
             self.texture.handle = self.resolve_texture_id
         else:
             self.texture.handle = self.texture_id
-        self.texture.eType = openvr.API_OpenGL
+        self.texture.eType = openvr.TextureType_OpenGL
         self.texture.eColorSpace = openvr.ColorSpace_Gamma
         
     def submit(self, eye):
@@ -157,12 +157,10 @@ class OpenVrGlRenderer(list):
         zFar = 500.0
         self.projection_left = numpy.asarray(matrixForOpenVrMatrix(self.vr_system.getProjectionMatrix(
                 openvr.Eye_Left, 
-                zNear, zFar, 
-                openvr.API_OpenGL)))
+                zNear, zFar)))
         self.projection_right = numpy.asarray(matrixForOpenVrMatrix(self.vr_system.getProjectionMatrix(
                 openvr.Eye_Right, 
-                zNear, zFar, 
-                openvr.API_OpenGL)))
+                zNear, zFar)))
         self.view_left = matrixForOpenVrMatrix(
                 self.vr_system.getEyeToHeadTransform(openvr.Eye_Left)).I # head_X_eye in Kane notation
         self.view_right = matrixForOpenVrMatrix(
