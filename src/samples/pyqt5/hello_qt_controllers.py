@@ -7,7 +7,9 @@ from openvr.gl_renderer import OpenVrGlRenderer
 from openvr.color_cube_actor import ColorCubeActor
 from openvr.tracked_devices_actor import TrackedDevicesActor
 
-'Toy PyQt5 application for use with "hello world" examples demonstrating pyopenvr'
+"""
+Toy PyQt5 application for use with "hello world" examples demonstrating pyopenvr
+"""
 
 
 if __name__ == "__main__":
