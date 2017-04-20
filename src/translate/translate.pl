@@ -821,6 +821,14 @@ EOF
 
                     $fn_name = lcfirst($fn_name); # first character lower case for python functions
 
+                    # exception for size parameter in GetControllerState
+                    # openvr 1.0.4 added a `uint32_t unControllerStateSize` to  `getControllerState`
+                    # and `getControllerStateWithPose`. We default it to `sizeof(VRControllerState_t)`
+                    # see https://github.com/cmbruns/pyopenvr/issues/27 for details
+                    # fix by https://github.com/daniel5gh
+                    foreach (@call_arg_names) {
+                        $_ =~ s/(unControllerStateSize)/$1=sizeof(VRControllerState_t)/;
+                    }
                     print "    def $fn_name(";
                     print join ", ", @call_arg_names;
                     print "):\n";
