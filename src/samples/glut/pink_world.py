@@ -73,7 +73,7 @@ class PinkWorld(object):
         # OpenVR texture data
         self.texture = openvr.Texture_t()
         self.texture.handle = self.texture_id
-        self.texture.eType = openvr.API_OpenGL
+        self.texture.eType = openvr.TextureType_OpenGL
         self.texture.eColorSpace = openvr.ColorSpace_Gamma 
    
     def __enter__(self):

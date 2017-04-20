@@ -11,9 +11,9 @@
 # Paul Melis (paul.melis@surfsara.nl)
 # SURFsara Visualization group
 import sys
-from PyQt4.QtGui import QApplication, QWidget, QPushButton, QVBoxLayout
-from PyQt4.QtCore import QTimer
-from PyQt4.QtWebKit import QWebView
+from PyQt5.QtWidgets import QApplication, QWidget, QPushButton, QVBoxLayout
+from PyQt5.QtCore import QTimer
+from PyQt5.QtWebEngineWidgets import QWebEngineView
 from jinja2 import Environment, FileSystemLoader
 import openvr
 
@@ -56,13 +56,13 @@ class MainWindow(QWidget):
         self.resize(1600, 940)
         self.setWindowTitle('OpenVR tracking data')
         
-        self.webview = QWebView()            
+        self.webview = QWebEngineView()
 
         self.button = QPushButton('Quit', self)
         self.button.clicked.connect(self.close)
         layout = QVBoxLayout(self)
         layout.setSpacing(0)
-        layout.setMargin(0)
+        # layout.setMargin(0)
         layout.addWidget(self.button)
         layout.addWidget(self.webview)
         

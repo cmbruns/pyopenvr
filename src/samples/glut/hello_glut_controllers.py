@@ -17,5 +17,5 @@ if __name__ == "__main__":
     controllers = TrackedDevicesActor(renderer.poses)
     controllers.show_controllers_only = False
     renderer.append(controllers)
-    with GlutApp(renderer, "Controller test") as glutApp:
+    with GlutApp(renderer, b"Controller test") as glutApp:
         glutApp.run_loop()
