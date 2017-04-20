@@ -5,7 +5,7 @@
 import numpy
 import time
 import collections
-from numpy.linalg import inv
+from numpy.linalg import inv, norm
 import itertools
 from textwrap import dedent
 from ctypes import cast, c_float, c_void_p, sizeof
@@ -18,194 +18,21 @@ from OpenGL.arrays import vbo
 
 import glfw
 import openvr
+
 from openvr.glframework.glfw_app import GlfwApp
 from openvr.gl_renderer import OpenVrGlRenderer
 from openvr.tracked_devices_actor import TrackedDevicesActor
+from openvr.glframework.glmatrix import pack
+import openvr.glframework.glmatrix as glmatrix
 
 
 """
 glfw programming example with colored mouse brain scene that can be closed by pressing ESCAPE.
 """
 
-class Vec3(object):
-    def __init__(self, value=(0.0, 0.0, 0.0,)):
-        self._data = list(value[0:3])
-    
-    def __add__(self, rhs):
-        result = Vec3(self)
-        result += rhs
-        return result
 
-    def __truediv__(self, rhs):
-        result = Vec3(self)
-        result /= rhs
-        return result
-
-    def __div__(self, rhs):
-        result = Vec3(self)
-        result /= rhs
-        return result
-
-    def __getitem__(self, index):
-        return self._data[index]
-
-    def __iadd__(self, rhs):
-        for i in range(3):
-            self._data[i] += rhs[i]
-        return self
-            
-    def __itruediv__(self, rhs):
-        for i in range(3):
-            self._data[i] /= rhs
-        return self
-
-    def __idiv__(self, rhs):
-        for i in range(3):
-            self._data[i] /= rhs
-        return self
-
-    def __imul__(self, rhs):
-        for i in range(3):
-            self._data[i] *= rhs
-        return self
-
-    def __isub__(self, rhs):
-        for i in range(3):
-            self._data[i] -= rhs[i]
-        return self
-    
-    def __len__(self):
-        return 3
-
-    def __mul__(self, rhs):
-        result = Vec3(self)
-        result *= rhs
-        return result
-
-    def __neg__(self):
-        result = Vec3()
-        for i in range(3):
-            result[i] = -self[i]
-        return result
-
-    def __pos__(self):
-        return self
-
-    def __rmul__(self, lhs):
-        result = Vec3(self)
-        result *= lhs # Assume multiplication is commutative...
-        return result
-    
-    def __setitem__(self, index, value):
-        self._data[index] = value
-
-    def __sub__(self, rhs):
-        result = Vec3(self)
-        result -= rhs
-        return result
-
-    def __str__(self):
-        return str(self._data)
-    
-    def dot(self, rhs):
-        result = 0.0
-        for i in range(3):
-            result += self[i] * rhs[i]
-        return result
-
-    def norm(self):
-        return self.norm_squared() ** 0.5
-            
-    def norm_squared(self):
-        return self.dot(self)
-
-
-class MyTransform(object):
-    "4x4 linear Transform for use by OpenGL"
-    def __init__(self, template=None):
-        if template is None:
-            self._m = numpy.identity(4, dtype=numpy.float32)
-        else:
-            self._m = numpy.array(template, dtype=numpy.float32)
-
-    def __add__(self, rhs):
-        return MyTransform(self._m + rhs)
-
-    def __getitem__(self, key):
-        return self._m[key]
-        
-    def __iadd__(self, rhs):
-        self._m += rhs
-
-    def __invert__(self):
-        return MyTransform(inv(self._m))
-
-    def __isub__(self, rhs):
-        self._m -= rhs
-
-    def __iter__(self):
-        return self._m.__iter__()
-
-    def __len__(self):
-        return len(self._m)
-
-    def __mul__(self, rhs):
-        "matrix multiplication"
-        return MyTransform(numpy.dot(self._m, rhs))
-    
-    def __neg__(self):
-        return MyTransform(-self._m)
-    
-    def __pos__(self):
-        return self
-    
-    def __radd__(self, lhs):
-        return MyTransform(self._m + lhs)
-
-    def __rmul__(self, lhs):
-        "matrix multiplication"
-        return MyTransform(numpy.dot(lhs, self._m))
-    
-    def __rsub__(self, lhs):
-        return MyTransform(lhs - self._m)
-
-    def __setitem__(self, key, value):
-        self._m[key] = value
-    
-    def __sub__(self, rhs):
-        return MyTransform(self._m - rhs)
-
-    @staticmethod
-    def fromOpenVrMatrix34(mat):
-        return MyTransform( 
-                ((mat.m[0][0], mat.m[1][0], mat.m[2][0], 0.0),
-                 (mat.m[0][1], mat.m[1][1], mat.m[2][1], 0.0), 
-                 (mat.m[0][2], mat.m[1][2], mat.m[2][2], 0.0), 
-                 (mat.m[0][3], mat.m[1][3], mat.m[2][3], 1.0),)
-                )
-
-    def pack(self):
-        "create a packed copy, ready for use by OpenGL calls"
-        return numpy.asarray(self._m, dtype=numpy.float32)
-        
-    @staticmethod
-    def scale(s):
-        return MyTransform( (
-                             (s, 0, 0, 0),
-                             (0, s, 0, 0),
-                             (0, 0, s, 0),
-                             (0, 0, 0, 1),) )
-    
-    @staticmethod
-    def translation(tvec):
-        return MyTransform( (
-                             (1, 0, 0, 0),
-                             (0, 1, 0, 0),
-                             (0, 0, 1, 0),
-                             (tvec[0], tvec[1], tvec[2], 1),) )
-    
-    def transpose(self):
-        return MyTransform(self._m.T)
+def Vec3(array):
+    return numpy.array(array[0:3], dtype=numpy.float32)
 
 
 # TODO - subdivide this example into
@@ -226,7 +53,7 @@ class ObjMesh(object):
         self.vertexPositions = None
         self.indexPositions = None
         # self.init_gl()
-        self.model_matrix = MyTransform()
+        self.model_matrix =glmatrix.identity()
 
     def _parse_line(self, line):
         fields = line.split()
@@ -350,8 +177,8 @@ class ObjMesh(object):
         # modelview0 = numpy.asarray(numpy.matrix(modelview0, dtype=numpy.float32))
         # print(modelview0[3,0])
         
-        glUniformMatrix4fv(4, 1, False, self.model_matrix.pack())
-        glUniformMatrix4fv(8, 1, False, MyTransform(modelview).pack())
+        glUniformMatrix4fv(4, 1, False, pack(self.model_matrix))
+        glUniformMatrix4fv(8, 1, False, pack(modelview))
         glBindVertexArray(self.vao)
         glDrawElements(GL_TRIANGLES, len(self.indexPositions), GL_UNSIGNED_INT, None)
         glBindVertexArray(0)
@@ -858,7 +685,7 @@ class SpatialInteractor(object):
                 else:
                     # print ("speed = %.3f meters per second" % self.speed)
                     dx = self.speed * dt * self.direction
-                    obj.model_matrix *= MyTransform.translation(dx)
+                    obj.model_matrix *=glmatrix.translate(dx)
         self.previous_update_time = time.time()
                 
         # Remember drag state
@@ -871,13 +698,13 @@ class SpatialInteractor(object):
             return
         history_size = min(history_size - 1, 50) # No more than ~500 ms history
         t1 = self.translation_history[-1][1]
-        dx = Vec3()
+        dx = Vec3([0,0,0])
         for i in range(history_size):
             x, t0 = self.translation_history[-i]
             dx += x
         dt = t1 - t0
         velocity = dx/dt;
-        self.speed = velocity.norm()
+        self.speed = norm(velocity)
         self.direction = velocity / self.speed;
         # print("direction = ", self.direction)
         # print("speed = ", self.speed, " meters per second")
@@ -912,7 +739,7 @@ class SpatialInteractor(object):
     def _compute_controllers_transform(self):
         tx1 = self.right_controller.check_drag(renderer.poses)
         tx2 = self.left_controller.check_drag(renderer.poses)
-        result = MyTransform()
+        result =glmatrix.identity()
         translation = None
         if tx1 is None and tx2 is None:
             result = None # No dragging this time
@@ -936,19 +763,19 @@ class SpatialInteractor(object):
             if mag0 > 0:
                 scale = pow(mag1/mag0, 0.5)
                 # print("%0.6f" % scale)
-                ts = MyTransform.scale(scale)
+                ts = glmatrix.scale(scale)
                 orig = 0.5 * (pos_left + pos_right - 0.5 * dpos_left - 0.5 * dpos_right)
-                to = MyTransform.translation(orig)
-                ts = ~to * ts * to
+                to = glmatrix.translate(orig)
+                ts = to.I * ts * to
                 result *= ts
             #
-            result *= MyTransform.translation(translation)
+            result *= glmatrix.translate(translation)
         elif tx1 is not None:
             translation = tx1
-            result *= MyTransform.translation(tx1)
+            result *= glmatrix.translate(tx1)
         else:
             translation = tx2
-            result *= MyTransform.translation(tx2)
+            result *= glmatrix.translate(tx2)
 
         if translation is not None:
             # Remember translation history

@@ -70,6 +70,14 @@ def rotate_z(angle):
             [0, 0, 0, 1]], dtype=numpy.float32).T
 
 
+def scale(s):
+    return numpy.matrix([
+                         (s, 0, 0, 0),
+                         (0, s, 0, 0),
+                         (0, 0, s, 0),
+                         (0, 0, 0, 1)], dtype=numpy.float32)
+
+
 def translate(xyz):
     x, y, z = xyz
     array = [
@@ -79,3 +87,5 @@ def translate(xyz):
             [0, 0, 0, 1]]
     mat = numpy.matrix(array, dtype=numpy.float32)
     return mat.T
+
+
