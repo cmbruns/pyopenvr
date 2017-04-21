@@ -31,8 +31,8 @@ glfw programming example with colored mouse brain scene that can be closed by pr
 """
 
 
-def Vec3(array):
-    return numpy.array(array[0:3], dtype=numpy.float32)
+def Vec3(xyz):
+    return numpy.array(xyz[0:3], dtype=numpy.float32)
 
 
 # TODO - subdivide this example into

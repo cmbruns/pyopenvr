@@ -60,6 +60,16 @@ def rotate_x(angle):
             [0, 0, 0, 1]], dtype=numpy.float32).T
 
 
+def rotate_y(angle):
+    s = math.sin(float(angle))
+    c = math.cos(float(angle))
+    return numpy.matrix([
+            [c, 0, s, 0],
+            [0, 1, 0, 0],
+            [-s, 0, c, 0],
+            [0, 0, 0, 1]], dtype=numpy.float32).T
+
+
 def rotate_z(angle):
     s = math.sin(float(angle))
     c = math.cos(float(angle))
@@ -70,11 +80,15 @@ def rotate_z(angle):
             [0, 0, 0, 1]], dtype=numpy.float32).T
 
 
-def scale(s):
+def scale(sx, sy=None, sz=None):
+    if sy is None:
+        sy = sx
+    if sz is None:
+        sz = sx
     return numpy.matrix([
-                         (s, 0, 0, 0),
-                         (0, s, 0, 0),
-                         (0, 0, s, 0),
+                         (sx, 0, 0, 0),
+                         (0, sy, 0, 0),
+                         (0, 0, sz, 0),
                          (0, 0, 0, 1)], dtype=numpy.float32)
 
 
