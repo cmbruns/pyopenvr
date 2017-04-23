@@ -33,8 +33,6 @@ def shader_substring(body, indent='', stack_frame=1):
     The unindenting allows you to type the shader code at a pleasing indent level
     in your python method, while still creating an unindented GLSL string at the end.
     """
-    for f in inspect.stack():
-        print(f)
     line_count = len(body.split('\n'))
     line_number = inspect.stack()[stack_frame].lineno + 1 - line_count
     return """\
