@@ -19,9 +19,28 @@ def shader_string(body, glsl_version='450 core'):
     line_number = inspect.currentframe().f_back.f_lineno + 1 - line_count
     return """\
 #version %s
+%s
+""" % (glsl_version, shader_substring(body, stack_frame=2))
+
+
+def shader_substring(body, indent='', stack_frame=1):
+    """
+    Call this method from a function that defines a literal shader string as the "body" argument.
+    Dresses up a shader string in two ways:
+        1) Insert #line number declaration
+        2) un-indents
+    The line number information can help debug glsl compile errors.
+    The unindenting allows you to type the shader code at a pleasing indent level
+    in your python method, while still creating an unindented GLSL string at the end.
+    """
+    for f in inspect.stack():
+        print(f)
+    line_count = len(body.split('\n'))
+    line_number = inspect.stack()[stack_frame].lineno + 1 - line_count
+    return """\
 #line %d
 %s
-""" % (glsl_version, line_number, textwrap.dedent(body)
+""" % (line_number, textwrap.indent(textwrap.dedent(body), indent)
        )
 
 
