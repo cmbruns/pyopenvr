@@ -3,7 +3,6 @@
 # file tracked_devices_actor.py
 
 import time
-from textwrap import dedent
 from ctypes import cast, c_float, c_void_p, sizeof
 
 import numpy
@@ -14,10 +13,12 @@ from OpenGL.GL.EXT.texture_filter_anisotropic import GL_TEXTURE_MAX_ANISOTROPY_E
 
 import openvr
 from openvr.gl_renderer import matrixForOpenVrMatrix
+from openvr.glframework import shader_string
 
 """
 Tracked item (controllers, lighthouses, etc) actor for "hello world" openvr apps
 """
+
 
 class TrackedDeviceMesh(object):
     def __init__(self, model_name):
@@ -139,11 +140,8 @@ class TrackedDevicesActor(object):
                 self.meshes[model_name] = TrackedDeviceMesh(model_name)
     
     def init_gl(self):
-        vertex_shader = compileShader(dedent(
-            """\
-            #version 450 core
-            #line 40
-            
+        vertex_shader = compileShader(
+            shader_string("""
             layout(location = 0) in vec3 in_Position;
             layout(location = 1) in vec3 in_Normal;
             layout(location = 2) in vec2 in_TexCoord;
@@ -164,11 +162,8 @@ class TrackedDevicesActor(object):
             }
             """), 
             GL_VERTEX_SHADER)
-        fragment_shader = compileShader(dedent(
-            """\
-            #version 450 core
-            #line 59
-            
+        fragment_shader = compileShader(
+            shader_string("""
             uniform sampler2D diffuse;
             in vec3 color;
             in vec2 fragTexCoord;

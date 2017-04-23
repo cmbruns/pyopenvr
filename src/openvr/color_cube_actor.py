@@ -7,6 +7,7 @@ from textwrap import dedent
 from OpenGL.GL import *  # @UnusedWildImport # this comment squelches an IDE warning
 from OpenGL.GL.shaders import compileShader, compileProgram
 
+from openvr.glframework import shader_string
 
 """
 Color cube for use in "hello world" openvr apps
@@ -28,13 +29,11 @@ class ColorCubeActor(object):
     
     def __init__(self):
         self.shader = 0
+        self.vao = None
     
     def init_gl(self):
-        vertex_shader = compileShader(dedent(
-            """\
-            #version 450 core
-            #line 36
-            
+        vertex_shader = compileShader(
+            shader_string("""
             // Adapted from @jherico's RiftDemo.py in pyovr
             
             layout(location = 0) uniform mat4 Projection = mat4(1);
@@ -87,11 +86,8 @@ class ColorCubeActor(object):
             }
             """), 
             GL_VERTEX_SHADER)
-        fragment_shader = compileShader(dedent(
-            """\
-            #version 450 core
-            #line 94
-            
+        fragment_shader = compileShader(
+            shader_string("""
             in vec3 _color;
             out vec4 FragColor;
             
