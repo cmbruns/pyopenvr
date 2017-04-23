@@ -56,7 +56,7 @@ class OpenVrFramebuffer(object):
         else:
             glRenderbufferStorage(GL_RENDERBUFFER, GL_DEPTH24_STENCIL8, self.width, self.height)
         glFramebufferRenderbuffer(GL_FRAMEBUFFER, GL_DEPTH_STENCIL_ATTACHMENT, GL_RENDERBUFFER, self.depth_buffer)
-        self.texture_id = glGenTextures(1)
+        self.texture_id = int(glGenTextures(1))
         if self.multisample > 0:
             glBindTexture(GL_TEXTURE_2D_MULTISAMPLE, self.texture_id)
             glTexImage2DMultisample(GL_TEXTURE_2D_MULTISAMPLE, self.multisample, GL_RGBA8, self.width, self.height, True)
@@ -78,7 +78,7 @@ class OpenVrFramebuffer(object):
         if self.multisample > 0:
             self.resolve_fb = glGenFramebuffers(1)
             glBindFramebuffer(GL_FRAMEBUFFER, self.resolve_fb)
-            self.resolve_texture_id = glGenTextures(1)
+            self.resolve_texture_id = int(glGenTextures(1))
             glBindTexture(GL_TEXTURE_2D, self.resolve_texture_id)
             glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR)
             glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR)

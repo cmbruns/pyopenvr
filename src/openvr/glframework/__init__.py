@@ -23,7 +23,7 @@ def shader_string(body, glsl_version='450 core'):
 """ % (glsl_version, shader_substring(body, stack_frame=2))
 
 
-def shader_substring(body, indent='', stack_frame=1):
+def shader_substring(body, stack_frame=1):
     """
     Call this method from a function that defines a literal shader string as the "body" argument.
     Dresses up a shader string in two ways:
@@ -34,12 +34,11 @@ def shader_substring(body, indent='', stack_frame=1):
     in your python method, while still creating an unindented GLSL string at the end.
     """
     line_count = len(body.splitlines(True))
-    line_number = inspect.stack()[stack_frame].lineno + 1 - line_count
+    line_number = inspect.stack()[stack_frame][2] + 1 - line_count
     return """\
 #line %d
 %s
-""" % (line_number, textwrap.indent(textwrap.dedent(body), indent)
-       )
+""" % (line_number, textwrap.dedent(body))
 
 
 if __name__ == "__main__":

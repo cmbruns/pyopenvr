@@ -112,5 +112,6 @@ class ColorCubeActor(object):
     def dispose_gl(self):
         glDeleteProgram(self.shader)
         self.shader = 0
-        glDeleteVertexArrays(1, (self.vao,))
+        if self.vao:
+            glDeleteVertexArrays(1, (self.vao,))
         self.vao = 0
