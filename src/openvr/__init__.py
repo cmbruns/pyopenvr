@@ -108,7 +108,7 @@ k_unVROverlayMaxKeyLength = 128
 k_unVROverlayMaxNameLength = 128
 k_unMaxOverlayCount = 64
 k_unMaxOverlayIntersectionMaskPrimitivesCount = 32
-IVROverlay_Version = b"IVROverlay_014"
+IVROverlay_Version = b"IVROverlay_016"
 k_pch_Controller_Component_GDC2015 = b"gdc2015"
 k_pch_Controller_Component_Base = b"base"
 k_pch_Controller_Component_Tip = b"tip"
@@ -125,7 +125,6 @@ k_pch_SteamVR_ForcedDriverKey_String = b"forcedDriver"
 k_pch_SteamVR_ForcedHmdKey_String = b"forcedHmd"
 k_pch_SteamVR_DisplayDebug_Bool = b"displayDebug"
 k_pch_SteamVR_DebugProcessPipe_String = b"debugProcessPipe"
-k_pch_SteamVR_EnableDistortion_Bool = b"enableDistortion"
 k_pch_SteamVR_DisplayDebugX_Int32 = b"displayDebugX"
 k_pch_SteamVR_DisplayDebugY_Int32 = b"displayDebugY"
 k_pch_SteamVR_SendSystemButtonToAllApps_Bool = b"sendSystemButtonToAllApps"
@@ -279,6 +278,7 @@ TrackedDeviceClass_HMD = ENUM_VALUE_TYPE(1)
 TrackedDeviceClass_Controller = ENUM_VALUE_TYPE(2)
 TrackedDeviceClass_GenericTracker = ENUM_VALUE_TYPE(3)
 TrackedDeviceClass_TrackingReference = ENUM_VALUE_TYPE(4)
+TrackedDeviceClass_DisplayRedirect = ENUM_VALUE_TYPE(5)
 
 ETrackedControllerRole = ENUM_TYPE
 TrackedControllerRole_Invalid = ENUM_VALUE_TYPE(0)
@@ -327,6 +327,7 @@ Prop_DriverVersion_String = ENUM_VALUE_TYPE(1031)
 Prop_Firmware_ForceUpdateRequired_Bool = ENUM_VALUE_TYPE(1032)
 Prop_ViveSystemButtonFixRequired_Bool = ENUM_VALUE_TYPE(1033)
 Prop_ParentDriver_Uint64 = ENUM_VALUE_TYPE(1034)
+Prop_ResourceRoot_String = ENUM_VALUE_TYPE(1035)
 Prop_ReportsTimeSinceVSync_Bool = ENUM_VALUE_TYPE(2000)
 Prop_SecondsFromVsyncToPhotons_Float = ENUM_VALUE_TYPE(2001)
 Prop_DisplayFrequency_Float = ENUM_VALUE_TYPE(2002)
@@ -369,7 +370,7 @@ Prop_DisplayMCImageWidth_Int32 = ENUM_VALUE_TYPE(2038)
 Prop_DisplayMCImageHeight_Int32 = ENUM_VALUE_TYPE(2039)
 Prop_DisplayMCImageNumChannels_Int32 = ENUM_VALUE_TYPE(2040)
 Prop_DisplayMCImageData_Binary = ENUM_VALUE_TYPE(2041)
-Prop_UsesDriverDirectMode_Bool = ENUM_VALUE_TYPE(2042)
+Prop_SecondsFromPhotonsToVblank_Float = ENUM_VALUE_TYPE(2042)
 Prop_AttachedDeviceId_String = ENUM_VALUE_TYPE(3000)
 Prop_SupportedButtons_Uint64 = ENUM_VALUE_TYPE(3001)
 Prop_Axis0Type_Int32 = ENUM_VALUE_TYPE(3002)
@@ -398,6 +399,11 @@ Prop_DisplayHiddenArea_Binary_Start = ENUM_VALUE_TYPE(5100)
 Prop_DisplayHiddenArea_Binary_End = ENUM_VALUE_TYPE(5150)
 Prop_UserConfigPath_String = ENUM_VALUE_TYPE(6000)
 Prop_InstallPath_String = ENUM_VALUE_TYPE(6001)
+Prop_HasDisplayComponent_Bool = ENUM_VALUE_TYPE(6002)
+Prop_HasControllerComponent_Bool = ENUM_VALUE_TYPE(6003)
+Prop_HasCameraComponent_Bool = ENUM_VALUE_TYPE(6004)
+Prop_HasDriverDirectModeComponent_Bool = ENUM_VALUE_TYPE(6005)
+Prop_HasVirtualDisplayComponent_Bool = ENUM_VALUE_TYPE(6006)
 Prop_VendorSpecific_Reserved_Start = ENUM_VALUE_TYPE(10000)
 Prop_VendorSpecific_Reserved_End = ENUM_VALUE_TYPE(10999)
 
@@ -527,6 +533,8 @@ VREvent_ApplicationTransitionNewAppStarted = ENUM_VALUE_TYPE(1302)
 VREvent_ApplicationListUpdated = ENUM_VALUE_TYPE(1303)
 VREvent_ApplicationMimeTypeLoad = ENUM_VALUE_TYPE(1304)
 VREvent_ApplicationTransitionNewAppLaunchComplete = ENUM_VALUE_TYPE(1305)
+VREvent_ProcessConnected = ENUM_VALUE_TYPE(1306)
+VREvent_ProcessDisconnected = ENUM_VALUE_TYPE(1307)
 VREvent_Compositor_MirrorWindowShown = ENUM_VALUE_TYPE(1400)
 VREvent_Compositor_MirrorWindowHidden = ENUM_VALUE_TYPE(1401)
 VREvent_Compositor_ChaperoneBoundsShown = ENUM_VALUE_TYPE(1410)
@@ -630,7 +638,8 @@ VRApplication_Background = ENUM_VALUE_TYPE(3)
 VRApplication_Utility = ENUM_VALUE_TYPE(4)
 VRApplication_VRMonitor = ENUM_VALUE_TYPE(5)
 VRApplication_SteamWatchdog = ENUM_VALUE_TYPE(6)
-VRApplication_Max = ENUM_VALUE_TYPE(7)
+VRApplication_Bootstrapper = ENUM_VALUE_TYPE(7)
+VRApplication_Max = ENUM_VALUE_TYPE(8)
 
 EVRFirmwareError = ENUM_TYPE
 VRFirmwareError_None = ENUM_VALUE_TYPE(0)
@@ -1536,8 +1545,6 @@ class RenderModel_Vertex_t(Structure):
 
 
 class RenderModel_TextureMap_t(Structure):
-    "A texture map for use on a render model"
-
     _fields_ = [
         ("unWidth", c_uint16),
         ("unHeight", c_uint16),
@@ -3541,6 +3548,7 @@ class IVROverlay_FnTable(Structure):
         ("getHighQualityOverlay", OPENVR_FNTABLE_CALLTYPE(VROverlayHandle_t)),
         ("getOverlayKey", OPENVR_FNTABLE_CALLTYPE(c_uint32, VROverlayHandle_t, c_char_p, c_uint32, POINTER(EVROverlayError))),
         ("getOverlayName", OPENVR_FNTABLE_CALLTYPE(c_uint32, VROverlayHandle_t, c_char_p, c_uint32, POINTER(EVROverlayError))),
+        ("setOverlayName", OPENVR_FNTABLE_CALLTYPE(EVROverlayError, VROverlayHandle_t, c_char_p)),
         ("getOverlayImageData", OPENVR_FNTABLE_CALLTYPE(EVROverlayError, VROverlayHandle_t, c_void_p, c_uint32, POINTER(c_uint32), POINTER(c_uint32))),
         ("getOverlayErrorNameFromEnum", OPENVR_FNTABLE_CALLTYPE(c_char_p, EVROverlayError)),
         ("setOverlayRenderingPid", OPENVR_FNTABLE_CALLTYPE(EVROverlayError, VROverlayHandle_t, c_uint32)),
@@ -3563,6 +3571,8 @@ class IVROverlay_FnTable(Structure):
         ("getOverlayTextureColorSpace", OPENVR_FNTABLE_CALLTYPE(EVROverlayError, VROverlayHandle_t, POINTER(EColorSpace))),
         ("setOverlayTextureBounds", OPENVR_FNTABLE_CALLTYPE(EVROverlayError, VROverlayHandle_t, POINTER(VRTextureBounds_t))),
         ("getOverlayTextureBounds", OPENVR_FNTABLE_CALLTYPE(EVROverlayError, VROverlayHandle_t, POINTER(VRTextureBounds_t))),
+        ("getOverlayRenderModel", OPENVR_FNTABLE_CALLTYPE(c_uint32, VROverlayHandle_t, c_char_p, c_uint32, POINTER(HmdColor_t), POINTER(EVROverlayError))),
+        ("setOverlayRenderModel", OPENVR_FNTABLE_CALLTYPE(EVROverlayError, VROverlayHandle_t, c_char_p, POINTER(HmdColor_t))),
         ("getOverlayTransformType", OPENVR_FNTABLE_CALLTYPE(EVROverlayError, VROverlayHandle_t, POINTER(VROverlayTransformType))),
         ("setOverlayTransformAbsolute", OPENVR_FNTABLE_CALLTYPE(EVROverlayError, VROverlayHandle_t, ETrackingUniverseOrigin, POINTER(HmdMatrix34_t))),
         ("getOverlayTransformAbsolute", OPENVR_FNTABLE_CALLTYPE(EVROverlayError, VROverlayHandle_t, POINTER(ETrackingUniverseOrigin), POINTER(HmdMatrix34_t))),
@@ -3570,6 +3580,8 @@ class IVROverlay_FnTable(Structure):
         ("getOverlayTransformTrackedDeviceRelative", OPENVR_FNTABLE_CALLTYPE(EVROverlayError, VROverlayHandle_t, POINTER(TrackedDeviceIndex_t), POINTER(HmdMatrix34_t))),
         ("setOverlayTransformTrackedDeviceComponent", OPENVR_FNTABLE_CALLTYPE(EVROverlayError, VROverlayHandle_t, TrackedDeviceIndex_t, c_char_p)),
         ("getOverlayTransformTrackedDeviceComponent", OPENVR_FNTABLE_CALLTYPE(EVROverlayError, VROverlayHandle_t, POINTER(TrackedDeviceIndex_t), c_char_p, c_uint32)),
+        ("getOverlayTransformOverlayRelative", OPENVR_FNTABLE_CALLTYPE(EVROverlayError, VROverlayHandle_t, POINTER(VROverlayHandle_t), POINTER(HmdMatrix34_t))),
+        ("setOverlayTransformOverlayRelative", OPENVR_FNTABLE_CALLTYPE(EVROverlayError, VROverlayHandle_t, VROverlayHandle_t, POINTER(HmdMatrix34_t))),
         ("showOverlay", OPENVR_FNTABLE_CALLTYPE(EVROverlayError, VROverlayHandle_t)),
         ("hideOverlay", OPENVR_FNTABLE_CALLTYPE(EVROverlayError, VROverlayHandle_t)),
         ("isOverlayVisible", OPENVR_FNTABLE_CALLTYPE(openvr_bool, VROverlayHandle_t)),
@@ -3633,12 +3645,12 @@ class IVROverlay(object):
         result = fn(pchOverlayKey, byref(pOverlayHandle))
         return result, pOverlayHandle
 
-    def createOverlay(self, pchOverlayKey, pchOverlayFriendlyName):
+    def createOverlay(self, pchOverlayKey, pchOverlayName):
         "Creates a new named overlay. All overlays start hidden and with default settings."
 
         fn = self.function_table.createOverlay
         pOverlayHandle = VROverlayHandle_t()
-        result = fn(pchOverlayKey, pchOverlayFriendlyName, byref(pOverlayHandle))
+        result = fn(pchOverlayKey, pchOverlayName, byref(pOverlayHandle))
         return result, pOverlayHandle
 
     def destroyOverlay(self, ulOverlayHandle):
@@ -3695,6 +3707,13 @@ class IVROverlay(object):
         pError = EVROverlayError()
         result = fn(ulOverlayHandle, pchValue, unBufferSize, byref(pError))
         return result, pError
+
+    def setOverlayName(self, ulOverlayHandle, pchName):
+        "set the name to use for this overlay"
+
+        fn = self.function_table.setOverlayName
+        result = fn(ulOverlayHandle, pchName)
+        return result
 
     def getOverlayImageData(self, ulOverlayHandle, pvBuffer, unBufferSize):
         """
@@ -3893,6 +3912,26 @@ class IVROverlay(object):
         result = fn(ulOverlayHandle, byref(pOverlayTextureBounds))
         return result, pOverlayTextureBounds
 
+    def getOverlayRenderModel(self, ulOverlayHandle, pchValue, unBufferSize):
+        "Gets render model to draw behind this overlay"
+
+        fn = self.function_table.getOverlayRenderModel
+        pColor = HmdColor_t()
+        pError = EVROverlayError()
+        result = fn(ulOverlayHandle, pchValue, unBufferSize, byref(pColor), byref(pError))
+        return result, pColor, pError
+
+    def setOverlayRenderModel(self, ulOverlayHandle, pchRenderModel):
+        """
+        Sets render model to draw behind this overlay and the vertex color to use, pass null for pColor to match the overlays vertex color. 
+        The model is scaled by the same amount as the overlay, with a default of 1m.
+        """
+
+        fn = self.function_table.setOverlayRenderModel
+        pColor = HmdColor_t()
+        result = fn(ulOverlayHandle, pchRenderModel, byref(pColor))
+        return result, pColor
+
     def getOverlayTransformType(self, ulOverlayHandle):
         "Returns the transform type of this overlay."
 
@@ -3952,6 +3991,23 @@ class IVROverlay(object):
         punDeviceIndex = TrackedDeviceIndex_t()
         result = fn(ulOverlayHandle, byref(punDeviceIndex), pchComponentName, unComponentNameSize)
         return result, punDeviceIndex
+
+    def getOverlayTransformOverlayRelative(self, ulOverlayHandle):
+        "Gets the transform if it is relative to another overlay. Returns an error if the transform is some other type."
+
+        fn = self.function_table.getOverlayTransformOverlayRelative
+        ulOverlayHandleParent = VROverlayHandle_t()
+        pmatParentOverlayToOverlayTransform = HmdMatrix34_t()
+        result = fn(ulOverlayHandle, byref(ulOverlayHandleParent), byref(pmatParentOverlayToOverlayTransform))
+        return result, ulOverlayHandleParent, pmatParentOverlayToOverlayTransform
+
+    def setOverlayTransformOverlayRelative(self, ulOverlayHandle, ulOverlayHandleParent):
+        "Sets the transform to relative to the transform of the specified overlay. This overlays visibility will also track the parents visibility"
+
+        fn = self.function_table.setOverlayTransformOverlayRelative
+        pmatParentOverlayToOverlayTransform = HmdMatrix34_t()
+        result = fn(ulOverlayHandle, ulOverlayHandleParent, byref(pmatParentOverlayToOverlayTransform))
+        return result, pmatParentOverlayToOverlayTransform
 
     def showOverlay(self, ulOverlayHandle):
         "Shows the VR overlay.  For dashboard overlays, only the Dashboard Manager is allowed to call this."
@@ -4735,7 +4791,7 @@ class IVRScreenshots(object):
          once SubmitScreenshot() is called.
          If Steam is not running, the paths will be in the user's
          documents folder under Documents\SteamVR\Screenshots.
-         Other VR applications can call this to initate a
+         Other VR applications can call this to initiate a
          screenshot outside of user control.
          The destination file names do not need an extension,
          will be replaced with the correct one for the format
@@ -4807,7 +4863,7 @@ class IVRScreenshots(object):
          submitted scene textures of the running application and
          write them into the preview image and a side-by-side file
          for the VR image.
-         This is similiar to request screenshot, but doesn't ever
+         This is similar to request screenshot, but doesn't ever
          talk to the application, just takes the shot and submits.
         """
 
@@ -4825,8 +4881,7 @@ class IVRScreenshots(object):
          function will display a notification to the user that the
          screenshot was taken. The paths should be full paths with
          extensions.
-         File paths should be absolute including
-         exntensions.
+         File paths should be absolute including extensions.
          screenshotHandle can be k_unScreenshotHandleInvalid if this
          was a new shot taking by the app to be saved and not
          initiated by a user (achievement earned or something)
@@ -4965,7 +5020,7 @@ _openvr.VR_GetVRInitErrorAsEnglishDescription.restype = c_char_p
 _openvr.VR_GetVRInitErrorAsEnglishDescription.argtypes = [EVRInitError]
 def getVRInitErrorAsEnglishDescription(error):
     """
-    Returns an english string for an EVRInitError. Applications should call VR_GetVRInitErrorAsSymbol instead and
+    Returns an English string for an EVRInitError. Applications should call VR_GetVRInitErrorAsSymbol instead and
     use that as a key to look up their own localized error message. This function may be called outside of VR_Init()/VR_Shutdown().
     """
     result =     _openvr.VR_GetVRInitErrorAsEnglishDescription(error)
