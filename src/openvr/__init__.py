@@ -71,6 +71,7 @@ class ID3D12CommandQueue(ctypes.Structure):
 ### Expose constants ###
 ########################
 
+k_nDriverNone = 4294967295
 k_unMaxDriverDebugResponseSize = 32768
 k_unTrackedDeviceIndex_Hmd = 0
 k_unMaxTrackedDeviceCount = 16
@@ -94,7 +95,7 @@ k_unMaxPropertyStringSize = 32768
 k_unControllerStateAxisCount = 5
 k_ulOverlayHandleInvalid = 0
 k_unScreenshotHandleInvalid = 0
-IVRSystem_Version = b"IVRSystem_015"
+IVRSystem_Version = b"IVRSystem_016"
 IVRExtendedDisplay_Version = b"IVRExtendedDisplay_001"
 IVRTrackedCamera_Version = b"IVRTrackedCamera_003"
 k_unMaxApplicationKeyLength = 128
@@ -145,7 +146,7 @@ k_pch_SteamVR_UsingSpeakers_Bool = b"usingSpeakers"
 k_pch_SteamVR_SpeakersForwardYawOffsetDegrees_Float = b"speakersForwardYawOffsetDegrees"
 k_pch_SteamVR_BaseStationPowerManagement_Bool = b"basestationPowerManagement"
 k_pch_SteamVR_NeverKillProcesses_Bool = b"neverKillProcesses"
-k_pch_SteamVR_RenderTargetMultiplier_Float = b"renderTargetMultiplier"
+k_pch_SteamVR_SupersampleScale_Float = b"supersampleScale"
 k_pch_SteamVR_AllowAsyncReprojection_Bool = b"allowAsyncReprojection"
 k_pch_SteamVR_AllowReprojection_Bool = b"allowInterleavedReprojection"
 k_pch_SteamVR_ForceReprojection_Bool = b"forceReprojection"
@@ -158,10 +159,10 @@ k_pch_SteamVR_StartCompositorFromAppLaunch_Bool = b"startCompositorFromAppLaunch
 k_pch_SteamVR_StartDashboardFromAppLaunch_Bool = b"startDashboardFromAppLaunch"
 k_pch_SteamVR_StartOverlayAppsFromDashboard_Bool = b"startOverlayAppsFromDashboard"
 k_pch_SteamVR_EnableHomeApp = b"enableHomeApp"
-k_pch_SteamVR_SetInitialDefaultHomeApp = b"setInitialDefaultHomeApp"
 k_pch_SteamVR_CycleBackgroundImageTimeSec_Int32 = b"CycleBackgroundImageTimeSec"
 k_pch_SteamVR_RetailDemo_Bool = b"retailDemo"
 k_pch_SteamVR_IpdOffset_Float = b"ipdOffset"
+k_pch_SteamVR_AllowSupersampleFiltering_Bool = b"allowSupersampleFiltering"
 k_pch_Lighthouse_Section = b"driver_lighthouse"
 k_pch_Lighthouse_DisableIMU_Bool = b"disableimu"
 k_pch_Lighthouse_UseDisambiguation_String = b"usedisambiguation"
@@ -201,6 +202,7 @@ k_pch_Perf_NotifyOnlyOnce_Bool = b"warnOnlyOnce"
 k_pch_Perf_AllowTimingStore_Bool = b"allowTimingStore"
 k_pch_Perf_SaveTimingsOnExit_Bool = b"saveTimingsOnExit"
 k_pch_Perf_TestData_Float = b"perfTestData"
+k_pch_Perf_LinuxGPUProfiling_Bool = b"linuxGPUProfiling"
 k_pch_CollisionBounds_Section = b"collisionBounds"
 k_pch_CollisionBounds_Style_Int32 = b"CollisionBoundsStyle"
 k_pch_CollisionBounds_GroundPerimeterOn_Bool = b"CollisionBoundsGroundPerimeterOn"
@@ -241,6 +243,7 @@ k_pch_modelskin_Section = b"modelskins"
 k_pch_Driver_Enable_Bool = b"enable"
 IVRScreenshots_Version = b"IVRScreenshots_001"
 IVRResources_Version = b"IVRResources_001"
+IVRDriverManager_Version = b"IVRDriverManager_001"
 
 #############################
 ### Expose enum constants ###
@@ -371,6 +374,9 @@ Prop_DisplayMCImageHeight_Int32 = ENUM_VALUE_TYPE(2039)
 Prop_DisplayMCImageNumChannels_Int32 = ENUM_VALUE_TYPE(2040)
 Prop_DisplayMCImageData_Binary = ENUM_VALUE_TYPE(2041)
 Prop_SecondsFromPhotonsToVblank_Float = ENUM_VALUE_TYPE(2042)
+Prop_DriverDirectModeSendsVsyncEvents_Bool = ENUM_VALUE_TYPE(2043)
+Prop_DisplayDebugMode_Bool = ENUM_VALUE_TYPE(2044)
+Prop_GraphicsAdapterLuid_Uint64 = ENUM_VALUE_TYPE(2045)
 Prop_AttachedDeviceId_String = ENUM_VALUE_TYPE(3000)
 Prop_SupportedButtons_Uint64 = ENUM_VALUE_TYPE(3001)
 Prop_Axis0Type_Int32 = ENUM_VALUE_TYPE(3002)
@@ -520,6 +526,7 @@ VREvent_ReprojectionSettingHasChanged = ENUM_VALUE_TYPE(852)
 VREvent_ModelSkinSettingsHaveChanged = ENUM_VALUE_TYPE(853)
 VREvent_EnvironmentSettingsHaveChanged = ENUM_VALUE_TYPE(854)
 VREvent_PowerSettingsHaveChanged = ENUM_VALUE_TYPE(855)
+VREvent_EnableHomeAppSettingsHaveChanged = ENUM_VALUE_TYPE(856)
 VREvent_StatusUpdate = ENUM_VALUE_TYPE(900)
 VREvent_MCImageUpdated = ENUM_VALUE_TYPE(1000)
 VREvent_FirmwareUpdateStarted = ENUM_VALUE_TYPE(1100)
@@ -691,6 +698,8 @@ VRInitError_Init_NotAvailableToWatchdogApps = ENUM_VALUE_TYPE(131)
 VRInitError_Init_WatchdogDisabledInSettings = ENUM_VALUE_TYPE(132)
 VRInitError_Init_VRDashboardNotFound = ENUM_VALUE_TYPE(133)
 VRInitError_Init_VRDashboardStartupFailed = ENUM_VALUE_TYPE(134)
+VRInitError_Init_VRHomeNotFound = ENUM_VALUE_TYPE(135)
+VRInitError_Init_VRHomeStartupFailed = ENUM_VALUE_TYPE(136)
 VRInitError_Driver_Failed = ENUM_VALUE_TYPE(200)
 VRInitError_Driver_Unknown = ENUM_VALUE_TYPE(201)
 VRInitError_Driver_HmdUnknown = ENUM_VALUE_TYPE(202)
@@ -717,6 +726,7 @@ VRInitError_Compositor_D3D11HardwareRequired = ENUM_VALUE_TYPE(401)
 VRInitError_Compositor_FirmwareRequiresUpdate = ENUM_VALUE_TYPE(402)
 VRInitError_Compositor_OverlayInitFailed = ENUM_VALUE_TYPE(403)
 VRInitError_Compositor_ScreenshotsInitFailed = ENUM_VALUE_TYPE(404)
+VRInitError_Compositor_UnableToCreateDevice = ENUM_VALUE_TYPE(405)
 VRInitError_VendorSpecific_UnableToConnectToOculusRuntime = ENUM_VALUE_TYPE(1000)
 VRInitError_VendorSpecific_HmdFound_CantOpenDevice = ENUM_VALUE_TYPE(1101)
 VRInitError_VendorSpecific_HmdFound_UnableToRequestConfigStart = ENUM_VALUE_TYPE(1102)
@@ -846,6 +856,7 @@ VRCompositorError_TextureUsesUnsupportedFormat = ENUM_VALUE_TYPE(105)
 VRCompositorError_SharedTexturesNotSupported = ENUM_VALUE_TYPE(106)
 VRCompositorError_IndexOutOfRange = ENUM_VALUE_TYPE(107)
 VRCompositorError_AlreadySubmitted = ENUM_VALUE_TYPE(108)
+VRCompositorError_InvalidBounds = ENUM_VALUE_TYPE(109)
 
 VROverlayInputMethod = ENUM_TYPE
 VROverlayInputMethod_None = ENUM_VALUE_TYPE(0)
@@ -971,6 +982,7 @@ glSharedTextureHandle_t = c_void_p
 glInt_t = c_int32
 glUInt_t = c_uint32
 SharedTextureHandle_t = c_uint64
+DriverId_t = c_uint32
 TrackedDeviceIndex_t = c_uint32
 PropertyContainerHandle_t = c_uint64
 PropertyTypeTag_t = c_uint32
@@ -1602,6 +1614,7 @@ class COpenVRContext(object):
         self.m_pVRApplications = None
         self.m_pVRTrackedCamera = None
         self.m_pVRScreenshots = None
+        self.m_pVRDriverManager = None
 
     def VRSystem(self):
         self.checkClear()
@@ -1675,6 +1688,12 @@ class COpenVRContext(object):
             self.m_pVRScreenshots = IVRScreenshots()
         return self.m_pVRScreenshots
 
+    def VRDriverManager(self):
+        self.checkClear()
+        if self.m_pVRDriverManager is None:
+            self.m_pVRDriverManager = IVRDriverManager()
+        return self.m_pVRDriverManager
+
 
 # Globals for context management
 _vr_token = None
@@ -1716,6 +1735,9 @@ def VRTrackedCamera():
 
 def VRScreenshots():
     return _internal_module_context.VRScreenshots()
+
+def VRDriverManager():
+    return _internal_module_context.VRDriverManager()
 
 class VREvent_Data_t(Union):
     _fields_ = [
@@ -1771,6 +1793,7 @@ class IVRSystem_FnTable(Structure):
         ("getTimeSinceLastVsync", OPENVR_FNTABLE_CALLTYPE(openvr_bool, POINTER(c_float), POINTER(c_uint64))),
         ("getD3D9AdapterIndex", OPENVR_FNTABLE_CALLTYPE(c_int32)),
         ("getDXGIOutputInfo", OPENVR_FNTABLE_CALLTYPE(None, POINTER(c_int32))),
+        ("getOutputDevice", OPENVR_FNTABLE_CALLTYPE(None, POINTER(c_uint64), ETextureType)),
         ("isDisplayOnDesktop", OPENVR_FNTABLE_CALLTYPE(openvr_bool)),
         ("setDisplayVisibility", OPENVR_FNTABLE_CALLTYPE(openvr_bool, openvr_bool)),
         ("getDeviceToAbsoluteTrackingPose", OPENVR_FNTABLE_CALLTYPE(None, ETrackingUniverseOrigin, c_float, POINTER(TrackedDevicePose_t), c_uint32)),
@@ -1912,6 +1935,27 @@ class IVRSystem(object):
         pnAdapterIndex = c_int32()
         fn(byref(pnAdapterIndex))
         return pnAdapterIndex.value
+
+    def getOutputDevice(self, textureType):
+        """
+        * Returns platform- and texture-type specific adapter identification so that applications and the
+        compositor are creating textures and swap chains on the same GPU. If an error occurs the device
+        will be set to 0.
+        [D3D10/11/12 Only (D3D9 Not Supported)]
+         Returns the adapter LUID that identifies the GPU attached to the HMD. The user should
+         enumerate all adapters using IDXGIFactory::EnumAdapters and IDXGIAdapter::GetDesc to find
+         the adapter with the matching LUID, or use IDXGIFactory4::EnumAdapterByLuid.
+         The discovered IDXGIAdapter should be used to create the device and swap chain.
+        [Vulkan Only]
+         Returns the vk::PhysicalDevice that should be used by the application.
+        [macOS Only]
+         Returns an id<MTLDevice> that should be used by the application.
+        """
+
+        fn = self.function_table.getOutputDevice
+        pnDevice = c_uint64()
+        fn(byref(pnDevice), textureType)
+        return pnDevice.value
 
     def isDisplayOnDesktop(self):
         "Use to determine if the headset display is part of the desktop (i.e. extended) or hidden (i.e. direct mode)."
@@ -4932,6 +4976,40 @@ class IVRResources(object):
 
         fn = self.function_table.getResourceFullPath
         result = fn(pchResourceName, pchResourceTypeDirectory, pchPathBuffer, unBufferLen)
+        return result
+
+
+
+class IVRDriverManager_FnTable(Structure):
+    _fields_ = [
+        ("getDriverCount", OPENVR_FNTABLE_CALLTYPE(c_uint32)),
+        ("getDriverName", OPENVR_FNTABLE_CALLTYPE(c_uint32, DriverId_t, c_char_p, c_uint32)),
+    ]
+
+
+class IVRDriverManager(object):
+    def __init__(self):
+        version_key = IVRDriverManager_Version
+        if not isInterfaceVersionValid(version_key):
+            _checkInitError(VRInitError_Init_InterfaceNotFound)
+        # Thank you lukexi https://github.com/lukexi/openvr-hs/blob/master/cbits/openvr_capi_helper.c#L9
+        fn_key = b"FnTable:" + version_key
+        fn_type = IVRDriverManager_FnTable
+        fn_table_ptr = cast(getGenericInterface(fn_key), POINTER(fn_type))
+        if fn_table_ptr is None:
+            raise OpenVRError("Error retrieving VR API for IVRDriverManager")
+        self.function_table = fn_table_ptr.contents
+
+    def getDriverCount(self):
+        fn = self.function_table.getDriverCount
+        result = fn()
+        return result
+
+    def getDriverName(self, nDriver, pchValue, unBufferSize):
+        "Returns the length of the number of bytes necessary to hold this string including the trailing null."
+
+        fn = self.function_table.getDriverName
+        result = fn(nDriver, pchValue, unBufferSize)
         return result
 
 
