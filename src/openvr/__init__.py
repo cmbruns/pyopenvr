@@ -34,8 +34,13 @@ else:
     else:
         raise ValueError("Libraries not available for this platform: " + platform.system())
 
-# Add current directory to PATH, so we can load the DLL from right here.
-os.environ['PATH'] += os.pathsep + os.path.dirname(__file__)
+# Load library
+if platform.system() == 'Windows':
+    # Add current directory to PATH, so we can load the DLL from right here.
+    os.environ['PATH'] += os.pathsep + os.path.dirname(__file__)
+else:
+    _openvr_lib_name = os.path.join(os.path.dirname(__file__), _openvr_lib_name)
+
 _openvr = cdll.LoadLibrary(_openvr_lib_name)
 
 # Function pointer table calling convention
