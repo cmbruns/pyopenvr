@@ -100,7 +100,7 @@ k_unMaxPropertyStringSize = 32768
 k_unControllerStateAxisCount = 5
 k_ulOverlayHandleInvalid = 0
 k_unScreenshotHandleInvalid = 0
-IVRSystem_Version = b"IVRSystem_016"
+IVRSystem_Version = b"IVRSystem_017"
 IVRExtendedDisplay_Version = b"IVRExtendedDisplay_001"
 IVRTrackedCamera_Version = b"IVRTrackedCamera_003"
 k_unMaxApplicationKeyLength = 128
@@ -109,7 +109,7 @@ k_pch_MimeType_GameTheater = b"vr/game_theater"
 IVRApplications_Version = b"IVRApplications_006"
 IVRChaperone_Version = b"IVRChaperone_003"
 IVRChaperoneSetup_Version = b"IVRChaperoneSetup_005"
-IVRCompositor_Version = b"IVRCompositor_020"
+IVRCompositor_Version = b"IVRCompositor_021"
 k_unVROverlayMaxKeyLength = 128
 k_unVROverlayMaxNameLength = 128
 k_unMaxOverlayCount = 64
@@ -168,6 +168,7 @@ k_pch_SteamVR_CycleBackgroundImageTimeSec_Int32 = b"CycleBackgroundImageTimeSec"
 k_pch_SteamVR_RetailDemo_Bool = b"retailDemo"
 k_pch_SteamVR_IpdOffset_Float = b"ipdOffset"
 k_pch_SteamVR_AllowSupersampleFiltering_Bool = b"allowSupersampleFiltering"
+k_pch_SteamVR_EnableLinuxVulkanAsync_Bool = b"enableLinuxVulkanAsync"
 k_pch_Lighthouse_Section = b"driver_lighthouse"
 k_pch_Lighthouse_DisableIMU_Bool = b"disableimu"
 k_pch_Lighthouse_UseDisambiguation_String = b"usedisambiguation"
@@ -241,6 +242,7 @@ k_pch_Power_TurnOffScreensTimeout_Float = b"turnOffScreensTimeout"
 k_pch_Power_TurnOffControllersTimeout_Float = b"turnOffControllersTimeout"
 k_pch_Power_ReturnToWatchdogTimeout_Float = b"returnToWatchdogTimeout"
 k_pch_Power_AutoLaunchSteamVROnButtonPress = b"autoLaunchSteamVROnButtonPress"
+k_pch_Power_PauseCompositorOnStandby_Bool = b"pauseCompositorOnStandby"
 k_pch_Dashboard_Section = b"dashboard"
 k_pch_Dashboard_EnableDashboard_Bool = b"enableDashboard"
 k_pch_Dashboard_ArcadeMode_Bool = b"arcadeMode"
@@ -382,6 +384,7 @@ Prop_SecondsFromPhotonsToVblank_Float = ENUM_VALUE_TYPE(2042)
 Prop_DriverDirectModeSendsVsyncEvents_Bool = ENUM_VALUE_TYPE(2043)
 Prop_DisplayDebugMode_Bool = ENUM_VALUE_TYPE(2044)
 Prop_GraphicsAdapterLuid_Uint64 = ENUM_VALUE_TYPE(2045)
+Prop_DriverProvidedChaperonePath_String = ENUM_VALUE_TYPE(2048)
 Prop_AttachedDeviceId_String = ENUM_VALUE_TYPE(3000)
 Prop_SupportedButtons_Uint64 = ENUM_VALUE_TYPE(3001)
 Prop_Axis0Type_Int32 = ENUM_VALUE_TYPE(3002)
@@ -437,6 +440,7 @@ Submit_Default = ENUM_VALUE_TYPE(0)
 Submit_LensDistortionAlreadyApplied = ENUM_VALUE_TYPE(1)
 Submit_GlRenderBuffer = ENUM_VALUE_TYPE(2)
 Submit_Reserved = ENUM_VALUE_TYPE(4)
+Submit_TextureWithPose = ENUM_VALUE_TYPE(8)
 
 EVRState = ENUM_TYPE
 VRState_Undefined = ENUM_VALUE_TYPE(-1)
@@ -463,6 +467,8 @@ VREvent_TrackedDeviceRoleChanged = ENUM_VALUE_TYPE(108)
 VREvent_WatchdogWakeUpRequested = ENUM_VALUE_TYPE(109)
 VREvent_LensDistortionChanged = ENUM_VALUE_TYPE(110)
 VREvent_PropertyChanged = ENUM_VALUE_TYPE(111)
+VREvent_WirelessDisconnect = ENUM_VALUE_TYPE(112)
+VREvent_WirelessReconnect = ENUM_VALUE_TYPE(113)
 VREvent_ButtonPress = ENUM_VALUE_TYPE(200)
 VREvent_ButtonUnpress = ENUM_VALUE_TYPE(201)
 VREvent_ButtonTouch = ENUM_VALUE_TYPE(202)
@@ -560,6 +566,7 @@ VREvent_PerformanceTest_EnableCapture = ENUM_VALUE_TYPE(1600)
 VREvent_PerformanceTest_DisableCapture = ENUM_VALUE_TYPE(1601)
 VREvent_PerformanceTest_FidelityLevel = ENUM_VALUE_TYPE(1602)
 VREvent_MessageOverlay_Closed = ENUM_VALUE_TYPE(1650)
+VREvent_MessageOverlayCloseRequested = ENUM_VALUE_TYPE(1651)
 VREvent_VendorSpecific_Reserved_Start = ENUM_VALUE_TYPE(10000)
 VREvent_VendorSpecific_Reserved_End = ENUM_VALUE_TYPE(19999)
 
@@ -705,6 +712,9 @@ VRInitError_Init_VRDashboardNotFound = ENUM_VALUE_TYPE(133)
 VRInitError_Init_VRDashboardStartupFailed = ENUM_VALUE_TYPE(134)
 VRInitError_Init_VRHomeNotFound = ENUM_VALUE_TYPE(135)
 VRInitError_Init_VRHomeStartupFailed = ENUM_VALUE_TYPE(136)
+VRInitError_Init_RebootingBusy = ENUM_VALUE_TYPE(137)
+VRInitError_Init_FirmwareUpdateBusy = ENUM_VALUE_TYPE(138)
+VRInitError_Init_FirmwareRecoveryBusy = ENUM_VALUE_TYPE(139)
 VRInitError_Driver_Failed = ENUM_VALUE_TYPE(200)
 VRInitError_Driver_Unknown = ENUM_VALUE_TYPE(201)
 VRInitError_Driver_HmdUnknown = ENUM_VALUE_TYPE(202)
@@ -802,6 +812,7 @@ VRApplicationError_LaunchInProgress = ENUM_VALUE_TYPE(111)
 VRApplicationError_OldApplicationQuitting = ENUM_VALUE_TYPE(112)
 VRApplicationError_TransitionAborted = ENUM_VALUE_TYPE(113)
 VRApplicationError_IsTemplate = ENUM_VALUE_TYPE(114)
+VRApplicationError_SteamVRIsExiting = ENUM_VALUE_TYPE(115)
 VRApplicationError_BufferTooSmall = ENUM_VALUE_TYPE(200)
 VRApplicationError_PropertyNotSet = ENUM_VALUE_TYPE(201)
 VRApplicationError_UnknownProperty = ENUM_VALUE_TYPE(202)
@@ -822,6 +833,7 @@ VRApplicationProperty_IsDashboardOverlay_Bool = ENUM_VALUE_TYPE(60)
 VRApplicationProperty_IsTemplate_Bool = ENUM_VALUE_TYPE(61)
 VRApplicationProperty_IsInstanced_Bool = ENUM_VALUE_TYPE(62)
 VRApplicationProperty_IsInternal_Bool = ENUM_VALUE_TYPE(63)
+VRApplicationProperty_WantsCompositorPauseInStandby_Bool = ENUM_VALUE_TYPE(64)
 VRApplicationProperty_LastLaunchTime_Uint64 = ENUM_VALUE_TYPE(70)
 
 EVRApplicationTransitionState = ENUM_TYPE
@@ -980,6 +992,9 @@ openvr_bool = c_ubyte
 
 PropertyContainerHandle_t = c_uint64
 PropertyTypeTag_t = c_uint32
+VRActionHandle_t = c_uint64
+VRActionSetHandle_t = c_uint64
+VRInputOriginHandle_t = c_uint64
 TrackedDeviceIndex_t = c_uint32
 VRNotificationId = c_uint32
 VROverlayHandle_t = c_uint64
@@ -1181,6 +1196,14 @@ class VRTextureBounds_t(Structure):
         ("vMin", c_float),
         ("uMax", c_float),
         ("vMax", c_float),
+    ]
+
+
+class VRTextureWithPose_t(Structure):
+    "Allows specifying pose used to render provided scene texture (if different from value returned by WaitGetPoses)."
+
+    _fields_ = [
+        ("mDeviceToAbsoluteTracking", HmdMatrix34_t),
     ]
 
 
@@ -1798,7 +1821,7 @@ class IVRSystem_FnTable(Structure):
         ("getTimeSinceLastVsync", OPENVR_FNTABLE_CALLTYPE(openvr_bool, POINTER(c_float), POINTER(c_uint64))),
         ("getD3D9AdapterIndex", OPENVR_FNTABLE_CALLTYPE(c_int32)),
         ("getDXGIOutputInfo", OPENVR_FNTABLE_CALLTYPE(None, POINTER(c_int32))),
-        ("getOutputDevice", OPENVR_FNTABLE_CALLTYPE(None, POINTER(c_uint64), ETextureType)),
+        ("getOutputDevice", OPENVR_FNTABLE_CALLTYPE(None, POINTER(c_uint64), ETextureType, POINTER(VkInstance_T))),
         ("isDisplayOnDesktop", OPENVR_FNTABLE_CALLTYPE(openvr_bool)),
         ("setDisplayVisibility", OPENVR_FNTABLE_CALLTYPE(openvr_bool, openvr_bool)),
         ("getDeviceToAbsoluteTrackingPose", OPENVR_FNTABLE_CALLTYPE(None, ETrackingUniverseOrigin, c_float, POINTER(TrackedDevicePose_t), c_uint32)),
@@ -1946,21 +1969,25 @@ class IVRSystem(object):
         * Returns platform- and texture-type specific adapter identification so that applications and the
         compositor are creating textures and swap chains on the same GPU. If an error occurs the device
         will be set to 0.
+        pInstance is an optional parameter that is required only when textureType is TextureType_Vulkan.
         [D3D10/11/12 Only (D3D9 Not Supported)]
          Returns the adapter LUID that identifies the GPU attached to the HMD. The user should
          enumerate all adapters using IDXGIFactory::EnumAdapters and IDXGIAdapter::GetDesc to find
          the adapter with the matching LUID, or use IDXGIFactory4::EnumAdapterByLuid.
          The discovered IDXGIAdapter should be used to create the device and swap chain.
         [Vulkan Only]
-         Returns the vk::PhysicalDevice that should be used by the application.
+         Returns the VkPhysicalDevice that should be used by the application.
+         pInstance must be the instance the application will use to query for the VkPhysicalDevice.  The application
+         must create the VkInstance with extensions returned by IVRCompositor::GetVulkanInstanceExtensionsRequired enabled.
         [macOS Only]
          Returns an id<MTLDevice> that should be used by the application.
         """
 
         fn = self.function_table.getOutputDevice
         pnDevice = c_uint64()
-        fn(byref(pnDevice), textureType)
-        return pnDevice.value
+        pInstance = VkInstance_T()
+        fn(byref(pnDevice), textureType, byref(pInstance))
+        return pnDevice.value, pInstance
 
     def isDisplayOnDesktop(self):
         "Use to determine if the headset display is part of the desktop (i.e. extended) or hidden (i.e. direct mode)."
@@ -3218,6 +3245,8 @@ class IVRCompositor_FnTable(Structure):
         ("unlockGLSharedTextureForAccess", OPENVR_FNTABLE_CALLTYPE(None, glSharedTextureHandle_t)),
         ("getVulkanInstanceExtensionsRequired", OPENVR_FNTABLE_CALLTYPE(c_uint32, c_char_p, c_uint32)),
         ("getVulkanDeviceExtensionsRequired", OPENVR_FNTABLE_CALLTYPE(c_uint32, POINTER(VkPhysicalDevice_T), c_char_p, c_uint32)),
+        ("setExplicitTimingMode", OPENVR_FNTABLE_CALLTYPE(None, openvr_bool)),
+        ("submitExplicitTimingData", OPENVR_FNTABLE_CALLTYPE(EVRCompositorError)),
     ]
 
 
@@ -3586,6 +3615,43 @@ class IVRCompositor(object):
         result = fn(byref(pPhysicalDevice), pchValue, unBufferSize)
         return result, pPhysicalDevice
 
+    def setExplicitTimingMode(self, bExplicitTimingMode):
+        """
+        [ Vulkan/D3D12 Only ]
+        There are two purposes for SetExplicitTimingMode:
+        1. To get a more accurate GPU timestamp for when the frame begins in Vulkan/D3D12 applications.
+        2. (Optional) To avoid having WaitGetPoses access the Vulkan queue so that the queue can be accessed from
+        another thread while WaitGetPoses is executing.
+        * More accurate GPU timestamp for the start of the frame is achieved by the application calling
+        SubmitExplicitTimingData immediately before its first submission to the Vulkan/D3D12 queue.
+        This is more accurate because normally this GPU timestamp is recorded during WaitGetPoses.  In D3D11, 
+        WaitGetPoses queues a GPU timestamp write, but it does not actually get submitted to the GPU until the 
+        application flushes.  By using SubmitExplicitTimingData, the timestamp is recorded at the same place for 
+        Vulkan/D3D12 as it is for D3D11, resulting in a more accurate GPU time measurement for the frame.
+        * Avoiding WaitGetPoses accessing the Vulkan queue can be achieved using SetExplicitTimingMode as well.  If this is desired,
+        the application *MUST* call PostPresentHandoff itself prior to WaitGetPoses.  If SetExplicitTimingMode is true and the
+        application calls PostPresentHandoff, then WaitGetPoses is guaranteed not to access the queue.  Note that PostPresentHandoff
+        and SubmitExplicitTimingData will access the queue, so only WaitGetPoses becomes safe for accessing the queue from another
+        thread.
+        """
+
+        fn = self.function_table.setExplicitTimingMode
+        fn(bExplicitTimingMode)
+
+    def submitExplicitTimingData(self):
+        """
+        [ Vulkan/D3D12 Only ]
+        Submit explicit timing data.  When SetExplicitTimingMode is true, this must be called immediately before
+        the application's first vkQueueSubmit (Vulkan) or ID3D12CommandQueue::ExecuteCommandLists (D3D12) of each frame.
+        This function will insert a GPU timestamp write just before the application starts its rendering.  This function
+        will perform a vkQueueSubmit on Vulkan so must not be done simultaneously with VkQueue operations on another thread.
+        Returns VRCompositorError_RequestFailed if SetExplicitTimingMode is not enabled.
+        """
+
+        fn = self.function_table.submitExplicitTimingData
+        result = fn()
+        return result
+
 
 
 class IVROverlay_FnTable(Structure):
@@ -3670,6 +3736,7 @@ class IVROverlay_FnTable(Structure):
         ("setOverlayIntersectionMask", OPENVR_FNTABLE_CALLTYPE(EVROverlayError, VROverlayHandle_t, POINTER(VROverlayIntersectionMaskPrimitive_t), c_uint32, c_uint32)),
         ("getOverlayFlags", OPENVR_FNTABLE_CALLTYPE(EVROverlayError, VROverlayHandle_t, POINTER(c_uint32))),
         ("showMessageOverlay", OPENVR_FNTABLE_CALLTYPE(VRMessageOverlayResponse, c_char_p, c_char_p, c_char_p, c_char_p, c_char_p, c_char_p)),
+        ("closeMessageOverlay", OPENVR_FNTABLE_CALLTYPE(None)),
     ]
 
 
@@ -4397,6 +4464,12 @@ class IVROverlay(object):
         result = fn(pchText, pchCaption, pchButton0Text, pchButton1Text, pchButton2Text, pchButton3Text)
         return result
 
+    def closeMessageOverlay(self):
+        "If the calling process owns the overlay and it's open, this will close it."
+
+        fn = self.function_table.closeMessageOverlay
+        fn()
+
 
 
 class IVRRenderModels_FnTable(Structure):
@@ -5044,7 +5117,7 @@ def init(applicationType):
     This path is to the "root" of the VR API install. That's the directory with
     the "drivers" directory and a platform (i.e. "win32") directory in it, not the directory with the DLL itself.
     """
-    initInternal(applicationType)
+    initInternal2(applicationType)
     # Retrieve "System" API
     return VRSystem()
 
@@ -5143,11 +5216,11 @@ def getInitToken():
     return result
 
 
-_openvr.VR_InitInternal.restype = c_uint32
-_openvr.VR_InitInternal.argtypes = [POINTER(EVRInitError), EVRApplicationType]
-def initInternal(eApplicationType):
+_openvr.VR_InitInternal2.restype = c_uint32
+_openvr.VR_InitInternal2.argtypes = [POINTER(EVRInitError), EVRApplicationType, c_char_p]
+def initInternal2(eApplicationType, pStartupInfo=None):
     error = EVRInitError()
-    result =     _openvr.VR_InitInternal(byref(error), eApplicationType)
+    result =     _openvr.VR_InitInternal2(byref(error), eApplicationType, pStartupInfo)
     _checkInitError(error.value)
     return result
 
