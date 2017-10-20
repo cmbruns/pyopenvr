@@ -1426,13 +1426,23 @@ class VRControllerAxis_t(Structure):
     ]
 
 
-class VRControllerState_t(Structure):
-    _fields_ = [
-        ("unPacketNum", c_uint32),
-        ("ulButtonPressed", c_uint64),
-        ("ulButtonTouched", c_uint64),
-        ("rAxis", VRControllerAxis_t * 5),
-    ]
+if sizeof(c_void_p) != 4 and platform.system() == 'Linux':
+    class VRControllerState_t(Structure):
+        _pack_ = 4
+        _fields_ = [
+            ("unPacketNum", c_uint32),
+            ("ulButtonPressed", c_uint64),
+            ("ulButtonTouched", c_uint64),
+            ("rAxis", VRControllerAxis_t * 5),
+        ]
+else:
+    class VRControllerState_t(Structure):
+        _fields_ = [
+            ("unPacketNum", c_uint32),
+            ("ulButtonPressed", c_uint64),
+            ("ulButtonTouched", c_uint64),
+            ("rAxis", VRControllerAxis_t * 5),
+        ]
 
 
 class Compositor_OverlaySettings(Structure):
