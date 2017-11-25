@@ -1425,7 +1425,8 @@ class VRControllerAxis_t(Structure):
         ("y", c_float),
     ]
 
-
+# TODO: Fix the generator of this file (translate/translate.pl) as
+# explained in https://github.com/cmbruns/pyopenvr/pull/42#issuecomment-346866490
 if sizeof(c_void_p) != 4 and platform.system() == 'Linux':
     class VRControllerState_t(Structure):
         _pack_ = 4
