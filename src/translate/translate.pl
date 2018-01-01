@@ -391,6 +391,8 @@ sub write_preamble
 import os
 import platform
 import ctypes
+# Several explicit imports to keep pycharm happier
+from ctypes import byref, POINTER, sizeof, Structure, Union
 from ctypes import *
 
 from .version import __version__
