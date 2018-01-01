@@ -18,6 +18,7 @@ $in_pointer_arguments{"IVRSystem::PollNextEvent::pEvent"} = "";
 
 my %in_pointer_arguments_as_pointers = ();  # passed as pointer type
 $in_pointer_arguments_as_pointers{"IVRCompositor::Submit::pBounds"} = "";
+$in_pointer_arguments_as_pointers{"IVROverlay::SetOverlayDualAnalogTransform::vCenter"} = "";  # todo: revisit this after Valve corrects capi header
 
 my %default_argument_values = ();
 $default_argument_values{"IVRCompositor::Submit::pBounds"} = "None";
@@ -1053,7 +1054,7 @@ sub translate_type {
     # $type =~ s/\bVR//g;
 
     # translate pointer type "*"
-    while ($type =~ m/^([^\*]+\S)\s*\*(.*)$/) { # HmdStruct* -> POINTER(HmdStruct)
+    while ($type =~ m/^([^\*]+\S)\s*[\*&](.*)$/) { # HmdStruct* -> POINTER(HmdStruct)
        $type = "POINTER($1)$2";
     }
     # translate pointer type "ptr"

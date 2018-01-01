@@ -3782,7 +3782,7 @@ class IVROverlay_FnTable(Structure):
         ("setGamepadFocusOverlay", OPENVR_FNTABLE_CALLTYPE(EVROverlayError, VROverlayHandle_t)),
         ("setOverlayNeighbor", OPENVR_FNTABLE_CALLTYPE(EVROverlayError, EOverlayDirection, VROverlayHandle_t, VROverlayHandle_t)),
         ("moveGamepadFocusToNeighbor", OPENVR_FNTABLE_CALLTYPE(EVROverlayError, EOverlayDirection, VROverlayHandle_t)),
-        ("setOverlayDualAnalogTransform", OPENVR_FNTABLE_CALLTYPE(EVROverlayError, VROverlayHandle_t, EDualAnalogWhich, HmdVector2_t &, c_float)),
+        ("setOverlayDualAnalogTransform", OPENVR_FNTABLE_CALLTYPE(EVROverlayError, VROverlayHandle_t, EDualAnalogWhich, POINTER(HmdVector2_t), c_float)),
         ("getOverlayDualAnalogTransform", OPENVR_FNTABLE_CALLTYPE(EVROverlayError, VROverlayHandle_t, EDualAnalogWhich, POINTER(HmdVector2_t), POINTER(c_float))),
         ("setOverlayTexture", OPENVR_FNTABLE_CALLTYPE(EVROverlayError, VROverlayHandle_t, POINTER(Texture_t))),
         ("clearOverlayTexture", OPENVR_FNTABLE_CALLTYPE(EVROverlayError, VROverlayHandle_t)),
