@@ -1,8 +1,8 @@
 #!/bin/env python
 
-# Python bindings for OpenVR API version 0.9.20
+# Python bindings for OpenVR API version 1.0.11
 # from https://github.com/ValveSoftware/openvr
-# Created May 7, 2016 Christopher Bruns
+# Created Jan 1, 2018 Christopher Bruns
 
 import os
 import platform
@@ -79,7 +79,7 @@ class ID3D12CommandQueue(ctypes.Structure):
 k_nDriverNone = 4294967295
 k_unMaxDriverDebugResponseSize = 32768
 k_unTrackedDeviceIndex_Hmd = 0
-k_unMaxTrackedDeviceCount = 16
+k_unMaxTrackedDeviceCount = 64
 k_unTrackedDeviceIndexOther = 4294967294
 k_unTrackedDeviceIndexInvalid = 4294967295
 k_ulInvalidPropertyContainer = 0
@@ -94,6 +94,10 @@ k_unHmdMatrix44PropertyTag = 21
 k_unHmdVector3PropertyTag = 22
 k_unHmdVector4PropertyTag = 23
 k_unHiddenAreaPropertyTag = 30
+k_unPathHandleInfoTag = 31
+k_unActionPropertyTag = 32
+k_unInputValuePropertyTag = 33
+k_unWildcardPropertyTag = 34
 k_unOpenVRInternalReserved_Start = 1000
 k_unOpenVRInternalReserved_End = 10000
 k_unMaxPropertyStringSize = 32768
@@ -109,12 +113,12 @@ k_pch_MimeType_GameTheater = b"vr/game_theater"
 IVRApplications_Version = b"IVRApplications_006"
 IVRChaperone_Version = b"IVRChaperone_003"
 IVRChaperoneSetup_Version = b"IVRChaperoneSetup_005"
-IVRCompositor_Version = b"IVRCompositor_021"
+IVRCompositor_Version = b"IVRCompositor_022"
 k_unVROverlayMaxKeyLength = 128
 k_unVROverlayMaxNameLength = 128
 k_unMaxOverlayCount = 64
 k_unMaxOverlayIntersectionMaskPrimitivesCount = 32
-IVROverlay_Version = b"IVROverlay_016"
+IVROverlay_Version = b"IVROverlay_017"
 k_pch_Controller_Component_GDC2015 = b"gdc2015"
 k_pch_Controller_Component_Base = b"base"
 k_pch_Controller_Component_Tip = b"tip"
@@ -169,12 +173,14 @@ k_pch_SteamVR_RetailDemo_Bool = b"retailDemo"
 k_pch_SteamVR_IpdOffset_Float = b"ipdOffset"
 k_pch_SteamVR_AllowSupersampleFiltering_Bool = b"allowSupersampleFiltering"
 k_pch_SteamVR_EnableLinuxVulkanAsync_Bool = b"enableLinuxVulkanAsync"
+k_pch_SteamVR_HaveStartedTutorialForNativeChaperoneDriver_Bool = b"haveStartedTutorialForNativeChaperoneDriver"
 k_pch_Lighthouse_Section = b"driver_lighthouse"
 k_pch_Lighthouse_DisableIMU_Bool = b"disableimu"
 k_pch_Lighthouse_UseDisambiguation_String = b"usedisambiguation"
 k_pch_Lighthouse_DisambiguationDebug_Int32 = b"disambiguationdebug"
 k_pch_Lighthouse_PrimaryBasestation_Int32 = b"primarybasestation"
 k_pch_Lighthouse_DBHistory_Bool = b"dbhistory"
+k_pch_Lighthouse_EnableBluetooth_Bool = b"enableBluetooth"
 k_pch_Null_Section = b"driver_null"
 k_pch_Null_SerialNumber_String = b"serialNumber"
 k_pch_Null_ModelNumber_String = b"modelNumber"
@@ -338,6 +344,8 @@ Prop_Firmware_ForceUpdateRequired_Bool = ENUM_VALUE_TYPE(1032)
 Prop_ViveSystemButtonFixRequired_Bool = ENUM_VALUE_TYPE(1033)
 Prop_ParentDriver_Uint64 = ENUM_VALUE_TYPE(1034)
 Prop_ResourceRoot_String = ENUM_VALUE_TYPE(1035)
+Prop_RegisteredDeviceType_String = ENUM_VALUE_TYPE(1036)
+Prop_InputProfileName_String = ENUM_VALUE_TYPE(1037)
 Prop_ReportsTimeSinceVSync_Bool = ENUM_VALUE_TYPE(2000)
 Prop_SecondsFromVsyncToPhotons_Float = ENUM_VALUE_TYPE(2001)
 Prop_DisplayFrequency_Float = ENUM_VALUE_TYPE(2002)
@@ -385,6 +393,12 @@ Prop_DriverDirectModeSendsVsyncEvents_Bool = ENUM_VALUE_TYPE(2043)
 Prop_DisplayDebugMode_Bool = ENUM_VALUE_TYPE(2044)
 Prop_GraphicsAdapterLuid_Uint64 = ENUM_VALUE_TYPE(2045)
 Prop_DriverProvidedChaperonePath_String = ENUM_VALUE_TYPE(2048)
+Prop_ExpectedTrackingReferenceCount_Int32 = ENUM_VALUE_TYPE(2049)
+Prop_ExpectedControllerCount_Int32 = ENUM_VALUE_TYPE(2050)
+Prop_NamedIconPathControllerLeftDeviceOff_String = ENUM_VALUE_TYPE(2051)
+Prop_NamedIconPathControllerRightDeviceOff_String = ENUM_VALUE_TYPE(2052)
+Prop_NamedIconPathTrackingReferenceDeviceOff_String = ENUM_VALUE_TYPE(2053)
+Prop_DoNotApplyPrediction_Bool = ENUM_VALUE_TYPE(2054)
 Prop_AttachedDeviceId_String = ENUM_VALUE_TYPE(3000)
 Prop_SupportedButtons_Uint64 = ENUM_VALUE_TYPE(3001)
 Prop_Axis0Type_Int32 = ENUM_VALUE_TYPE(3002)
@@ -411,6 +425,7 @@ Prop_NamedIconPathDeviceStandby_String = ENUM_VALUE_TYPE(5007)
 Prop_NamedIconPathDeviceAlertLow_String = ENUM_VALUE_TYPE(5008)
 Prop_DisplayHiddenArea_Binary_Start = ENUM_VALUE_TYPE(5100)
 Prop_DisplayHiddenArea_Binary_End = ENUM_VALUE_TYPE(5150)
+Prop_ParentContainer = ENUM_VALUE_TYPE(5151)
 Prop_UserConfigPath_String = ENUM_VALUE_TYPE(6000)
 Prop_InstallPath_String = ENUM_VALUE_TYPE(6001)
 Prop_HasDisplayComponent_Bool = ENUM_VALUE_TYPE(6002)
@@ -434,6 +449,7 @@ TrackedProp_StringExceedsMaximumLength = ENUM_VALUE_TYPE(8)
 TrackedProp_NotYetAvailable = ENUM_VALUE_TYPE(9)
 TrackedProp_PermissionDenied = ENUM_VALUE_TYPE(10)
 TrackedProp_InvalidOperation = ENUM_VALUE_TYPE(11)
+TrackedProp_CannotWriteToWildcards = ENUM_VALUE_TYPE(12)
 
 EVRSubmitFlags = ENUM_TYPE
 Submit_Default = ENUM_VALUE_TYPE(0)
@@ -473,6 +489,14 @@ VREvent_ButtonPress = ENUM_VALUE_TYPE(200)
 VREvent_ButtonUnpress = ENUM_VALUE_TYPE(201)
 VREvent_ButtonTouch = ENUM_VALUE_TYPE(202)
 VREvent_ButtonUntouch = ENUM_VALUE_TYPE(203)
+VREvent_DualAnalog_Press = ENUM_VALUE_TYPE(250)
+VREvent_DualAnalog_Unpress = ENUM_VALUE_TYPE(251)
+VREvent_DualAnalog_Touch = ENUM_VALUE_TYPE(252)
+VREvent_DualAnalog_Untouch = ENUM_VALUE_TYPE(253)
+VREvent_DualAnalog_Move = ENUM_VALUE_TYPE(254)
+VREvent_DualAnalog_ModeSwitch1 = ENUM_VALUE_TYPE(255)
+VREvent_DualAnalog_ModeSwitch2 = ENUM_VALUE_TYPE(256)
+VREvent_DualAnalog_Cancel = ENUM_VALUE_TYPE(257)
 VREvent_MouseMove = ENUM_VALUE_TYPE(300)
 VREvent_MouseButtonDown = ENUM_VALUE_TYPE(301)
 VREvent_MouseButtonUp = ENUM_VALUE_TYPE(302)
@@ -491,6 +515,8 @@ VREvent_InputFocusChanged = ENUM_VALUE_TYPE(406)
 VREvent_SceneApplicationSecondaryRenderingStarted = ENUM_VALUE_TYPE(407)
 VREvent_HideRenderModels = ENUM_VALUE_TYPE(410)
 VREvent_ShowRenderModels = ENUM_VALUE_TYPE(411)
+VREvent_ConsoleOpened = ENUM_VALUE_TYPE(420)
+VREvent_ConsoleClosed = ENUM_VALUE_TYPE(421)
 VREvent_OverlayShown = ENUM_VALUE_TYPE(500)
 VREvent_OverlayHidden = ENUM_VALUE_TYPE(501)
 VREvent_DashboardActivated = ENUM_VALUE_TYPE(502)
@@ -538,6 +564,14 @@ VREvent_ModelSkinSettingsHaveChanged = ENUM_VALUE_TYPE(853)
 VREvent_EnvironmentSettingsHaveChanged = ENUM_VALUE_TYPE(854)
 VREvent_PowerSettingsHaveChanged = ENUM_VALUE_TYPE(855)
 VREvent_EnableHomeAppSettingsHaveChanged = ENUM_VALUE_TYPE(856)
+VREvent_SteamVRSectionSettingChanged = ENUM_VALUE_TYPE(857)
+VREvent_LighthouseSectionSettingChanged = ENUM_VALUE_TYPE(858)
+VREvent_NullSectionSettingChanged = ENUM_VALUE_TYPE(859)
+VREvent_UserInterfaceSectionSettingChanged = ENUM_VALUE_TYPE(860)
+VREvent_NotificationsSectionSettingChanged = ENUM_VALUE_TYPE(861)
+VREvent_KeyboardSectionSettingChanged = ENUM_VALUE_TYPE(862)
+VREvent_PerfSectionSettingChanged = ENUM_VALUE_TYPE(863)
+VREvent_DashboardSectionSettingChanged = ENUM_VALUE_TYPE(864)
 VREvent_StatusUpdate = ENUM_VALUE_TYPE(900)
 VREvent_MCImageUpdated = ENUM_VALUE_TYPE(1000)
 VREvent_FirmwareUpdateStarted = ENUM_VALUE_TYPE(1100)
@@ -601,6 +635,10 @@ EVRMouseButton = ENUM_TYPE
 VRMouseButton_Left = ENUM_VALUE_TYPE(1)
 VRMouseButton_Right = ENUM_VALUE_TYPE(2)
 VRMouseButton_Middle = ENUM_VALUE_TYPE(4)
+
+EDualAnalogWhich = ENUM_TYPE
+k_EDualAnalog_Left = ENUM_VALUE_TYPE(0)
+k_EDualAnalog_Right = ENUM_VALUE_TYPE(1)
 
 EHiddenAreaMeshType = ENUM_TYPE
 k_eHiddenAreaMesh_Standard = ENUM_VALUE_TYPE(0)
@@ -715,6 +753,7 @@ VRInitError_Init_VRHomeStartupFailed = ENUM_VALUE_TYPE(136)
 VRInitError_Init_RebootingBusy = ENUM_VALUE_TYPE(137)
 VRInitError_Init_FirmwareUpdateBusy = ENUM_VALUE_TYPE(138)
 VRInitError_Init_FirmwareRecoveryBusy = ENUM_VALUE_TYPE(139)
+VRInitError_Init_USBServiceBusy = ENUM_VALUE_TYPE(140)
 VRInitError_Driver_Failed = ENUM_VALUE_TYPE(200)
 VRInitError_Driver_Unknown = ENUM_VALUE_TYPE(201)
 VRInitError_Driver_HmdUnknown = ENUM_VALUE_TYPE(202)
@@ -743,6 +782,7 @@ VRInitError_Compositor_OverlayInitFailed = ENUM_VALUE_TYPE(403)
 VRInitError_Compositor_ScreenshotsInitFailed = ENUM_VALUE_TYPE(404)
 VRInitError_Compositor_UnableToCreateDevice = ENUM_VALUE_TYPE(405)
 VRInitError_VendorSpecific_UnableToConnectToOculusRuntime = ENUM_VALUE_TYPE(1000)
+VRInitError_VendorSpecific_WindowsNotInDevMode = ENUM_VALUE_TYPE(1001)
 VRInitError_VendorSpecific_HmdFound_CantOpenDevice = ENUM_VALUE_TYPE(1101)
 VRInitError_VendorSpecific_HmdFound_UnableToRequestConfigStart = ENUM_VALUE_TYPE(1102)
 VRInitError_VendorSpecific_HmdFound_NoStoredConfig = ENUM_VALUE_TYPE(1103)
@@ -829,6 +869,8 @@ VRApplicationProperty_Description_String = ENUM_VALUE_TYPE(50)
 VRApplicationProperty_NewsURL_String = ENUM_VALUE_TYPE(51)
 VRApplicationProperty_ImagePath_String = ENUM_VALUE_TYPE(52)
 VRApplicationProperty_Source_String = ENUM_VALUE_TYPE(53)
+VRApplicationProperty_ActionManifestPath_String = ENUM_VALUE_TYPE(54)
+VRApplicationProperty_ActionBindingPath_String = ENUM_VALUE_TYPE(55)
 VRApplicationProperty_IsDashboardOverlay_Bool = ENUM_VALUE_TYPE(60)
 VRApplicationProperty_IsTemplate_Bool = ENUM_VALUE_TYPE(61)
 VRApplicationProperty_IsInstanced_Bool = ENUM_VALUE_TYPE(62)
@@ -875,9 +917,15 @@ VRCompositorError_IndexOutOfRange = ENUM_VALUE_TYPE(107)
 VRCompositorError_AlreadySubmitted = ENUM_VALUE_TYPE(108)
 VRCompositorError_InvalidBounds = ENUM_VALUE_TYPE(109)
 
+EVRCompositorTimingMode = ENUM_TYPE
+VRCompositorTimingMode_Implicit = ENUM_VALUE_TYPE(0)
+VRCompositorTimingMode_Explicit_RuntimePerformsPostPresentHandoff = ENUM_VALUE_TYPE(1)
+VRCompositorTimingMode_Explicit_ApplicationPerformsPostPresentHandoff = ENUM_VALUE_TYPE(2)
+
 VROverlayInputMethod = ENUM_TYPE
 VROverlayInputMethod_None = ENUM_VALUE_TYPE(0)
 VROverlayInputMethod_Mouse = ENUM_VALUE_TYPE(1)
+VROverlayInputMethod_DualAnalog = ENUM_VALUE_TYPE(2)
 
 VROverlayTransformType = ENUM_TYPE
 VROverlayTransform_Absolute = ENUM_VALUE_TYPE(0)
@@ -994,7 +1042,7 @@ PropertyContainerHandle_t = c_uint64
 PropertyTypeTag_t = c_uint32
 VRActionHandle_t = c_uint64
 VRActionSetHandle_t = c_uint64
-VRInputOriginHandle_t = c_uint64
+VRInputValueHandle_t = c_uint64
 TrackedDeviceIndex_t = c_uint32
 VRNotificationId = c_uint32
 VROverlayHandle_t = c_uint64
@@ -1271,7 +1319,8 @@ class VREvent_Scroll_t(Structure):
 class VREvent_TouchPadMove_t(Structure):
     """
     when in mouse input mode you can receive data from the touchpad, these events are only sent if the users finger
-    is on the touchpad (or just released from it)
+    is on the touchpad (or just released from it). These events are sent to overlays with the VROverlayFlags_SendVRTouchpadEvents
+    flag set.
     """
 
     _fields_ = [
@@ -1402,6 +1451,16 @@ class VREvent_Property_t(Structure):
     ]
 
 
+class VREvent_DualAnalog_t(Structure):
+    _fields_ = [
+        ("x", c_float),
+        ("y", c_float),
+        ("transformedX", c_float),
+        ("transformedY", c_float),
+        ("which", EDualAnalogWhich),
+    ]
+
+
 class HiddenAreaMesh_t(Structure):
     """
     The mesh to draw into the stencil (or depth) buffer to perform 
@@ -1464,6 +1523,18 @@ class CameraVideoStreamFrameHeader_t(Structure):
         ("nBytesPerPixel", c_uint32),
         ("nFrameSequence", c_uint32),
         ("standingTrackedDevicePose", TrackedDevicePose_t),
+    ]
+
+
+class DriverDirectMode_FrameTiming(Structure):
+    "Frame timing data provided by direct mode drivers."
+
+    _fields_ = [
+        ("m_nSize", c_uint32),
+        ("m_nNumFramePresents", c_uint32),
+        ("m_nNumMisPresented", c_uint32),
+        ("m_nNumDroppedFrames", c_uint32),
+        ("m_nReprojectionFlags", c_uint32),
     ]
 
 
@@ -2208,7 +2279,6 @@ class IVRSystem(object):
         """
 
         fn = self.function_table.pollNextEvent
-        # TODO: Automate this manually converted method
         result = fn(byref(pEvent), sizeof(VREvent_t))
         return result != 0
 
@@ -3245,7 +3315,7 @@ class IVRCompositor_FnTable(Structure):
         ("unlockGLSharedTextureForAccess", OPENVR_FNTABLE_CALLTYPE(None, glSharedTextureHandle_t)),
         ("getVulkanInstanceExtensionsRequired", OPENVR_FNTABLE_CALLTYPE(c_uint32, c_char_p, c_uint32)),
         ("getVulkanDeviceExtensionsRequired", OPENVR_FNTABLE_CALLTYPE(c_uint32, POINTER(VkPhysicalDevice_T), c_char_p, c_uint32)),
-        ("setExplicitTimingMode", OPENVR_FNTABLE_CALLTYPE(None, openvr_bool)),
+        ("setExplicitTimingMode", OPENVR_FNTABLE_CALLTYPE(None, EVRCompositorTimingMode)),
         ("submitExplicitTimingData", OPENVR_FNTABLE_CALLTYPE(EVRCompositorError)),
     ]
 
@@ -3337,9 +3407,8 @@ class IVRCompositor(object):
         """
 
         fn = self.function_table.submit
-        # TODO: Automate this manual translation
-        eError = fn(eEye, byref(pTexture), pBounds, nSubmitFlags)
-        return eError
+        result = fn(eEye, byref(pTexture), pBounds, nSubmitFlags)
+        return result
 
     def clearLastSubmittedFrame(self):
         """
@@ -3615,7 +3684,7 @@ class IVRCompositor(object):
         result = fn(byref(pPhysicalDevice), pchValue, unBufferSize)
         return result, pPhysicalDevice
 
-    def setExplicitTimingMode(self, bExplicitTimingMode):
+    def setExplicitTimingMode(self, eTimingMode):
         """
         [ Vulkan/D3D12 Only ]
         There are two purposes for SetExplicitTimingMode:
@@ -3629,14 +3698,14 @@ class IVRCompositor(object):
         application flushes.  By using SubmitExplicitTimingData, the timestamp is recorded at the same place for 
         Vulkan/D3D12 as it is for D3D11, resulting in a more accurate GPU time measurement for the frame.
         * Avoiding WaitGetPoses accessing the Vulkan queue can be achieved using SetExplicitTimingMode as well.  If this is desired,
-        the application *MUST* call PostPresentHandoff itself prior to WaitGetPoses.  If SetExplicitTimingMode is true and the
-        application calls PostPresentHandoff, then WaitGetPoses is guaranteed not to access the queue.  Note that PostPresentHandoff
+        the application should set the timing mode to Explicit_ApplicationPerformsPostPresentHandoff and *MUST* call PostPresentHandoff
+        itself. If these conditions are met, then WaitGetPoses is guaranteed not to access the queue.  Note that PostPresentHandoff
         and SubmitExplicitTimingData will access the queue, so only WaitGetPoses becomes safe for accessing the queue from another
         thread.
         """
 
         fn = self.function_table.setExplicitTimingMode
-        fn(bExplicitTimingMode)
+        fn(eTimingMode)
 
     def submitExplicitTimingData(self):
         """
@@ -3713,6 +3782,8 @@ class IVROverlay_FnTable(Structure):
         ("setGamepadFocusOverlay", OPENVR_FNTABLE_CALLTYPE(EVROverlayError, VROverlayHandle_t)),
         ("setOverlayNeighbor", OPENVR_FNTABLE_CALLTYPE(EVROverlayError, EOverlayDirection, VROverlayHandle_t, VROverlayHandle_t)),
         ("moveGamepadFocusToNeighbor", OPENVR_FNTABLE_CALLTYPE(EVROverlayError, EOverlayDirection, VROverlayHandle_t)),
+        ("setOverlayDualAnalogTransform", OPENVR_FNTABLE_CALLTYPE(EVROverlayError, VROverlayHandle_t, EDualAnalogWhich, HmdVector2_t &, c_float)),
+        ("getOverlayDualAnalogTransform", OPENVR_FNTABLE_CALLTYPE(EVROverlayError, VROverlayHandle_t, EDualAnalogWhich, POINTER(HmdVector2_t), POINTER(c_float))),
         ("setOverlayTexture", OPENVR_FNTABLE_CALLTYPE(EVROverlayError, VROverlayHandle_t, POINTER(Texture_t))),
         ("clearOverlayTexture", OPENVR_FNTABLE_CALLTYPE(EVROverlayError, VROverlayHandle_t)),
         ("setOverlayRaw", OPENVR_FNTABLE_CALLTYPE(EVROverlayError, VROverlayHandle_t, c_void_p, c_uint32, c_uint32, c_uint32)),
@@ -4271,6 +4342,22 @@ class IVROverlay(object):
         result = fn(eDirection, ulFrom)
         return result
 
+    def setOverlayDualAnalogTransform(self, ulOverlay, eWhich, vCenter, fRadius):
+        "Sets the analog input to Dual Analog coordinate scale for the specified overlay."
+
+        fn = self.function_table.setOverlayDualAnalogTransform
+        result = fn(ulOverlay, eWhich, vCenter, fRadius)
+        return result
+
+    def getOverlayDualAnalogTransform(self, ulOverlay, eWhich):
+        "Gets the analog input to Dual Analog coordinate scale for the specified overlay."
+
+        fn = self.function_table.getOverlayDualAnalogTransform
+        pvCenter = HmdVector2_t()
+        pfRadius = c_float()
+        result = fn(ulOverlay, eWhich, byref(pvCenter), byref(pfRadius))
+        return result, pvCenter, pfRadius.value
+
     def setOverlayTexture(self, ulOverlayHandle):
         """
         Texture to draw for the overlay. This function can only be called by the overlay's creator or renderer process (see SetOverlayRenderingPid) .
@@ -4522,12 +4609,11 @@ class IVRRenderModels(object):
         fn = self.function_table.loadRenderModel_Async
         ppRenderModel = POINTER(RenderModel_t)()
         result = fn(pchRenderModelName, byref(ppRenderModel))
-        # TODO: Automate this manual translation
         if ppRenderModel:
-            model = ppRenderModel.contents
+            ppRenderModel = ppRenderModel.contents
         else:
-            model = None
-        return result, model
+            ppRenderModel = None
+        return result, ppRenderModel
 
     def freeRenderModel(self):
         """
@@ -5108,7 +5194,7 @@ def _checkInitError(error):
 
 # Copying VR_Init inline implementation from https://github.com/ValveSoftware/openvr/blob/master/headers/openvr.h
 # and from https://github.com/phr00t/jMonkeyVR/blob/master/src/jmevr/input/OpenVR.java
-def init(applicationType):
+def init(applicationType, pStartupInfo=None):
     """
     Finds the active installation of the VR API and initializes it. The provided path must be absolute
     or relative to the current working directory. These are the local install versions of the equivalent
@@ -5117,7 +5203,7 @@ def init(applicationType):
     This path is to the "root" of the VR API install. That's the directory with
     the "drivers" directory and a platform (i.e. "win32") directory in it, not the directory with the DLL itself.
     """
-    initInternal2(applicationType)
+    initInternal2(applicationType, pStartupInfo)
     # Retrieve "System" API
     return VRSystem()
 

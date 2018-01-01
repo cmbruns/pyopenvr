@@ -3,11 +3,34 @@
 use warnings;
 use strict;
 
+
+
 # Usually pointer arguments are assumed to be return values.
-# So here we create a special exception for in/out array arguments
+# So here we create a special exceptions for in/out array arguments
 my %inout_array_arguments = ();
 $inout_array_arguments{"GetDeviceToAbsoluteTrackingPose"} = ["pTrackedDevicePoseArray","unTrackedDevicePoseArrayCount"];
 # print $inout_array_arguments{"GetDeviceToAbsoluteTrackingPose"}[1], "\n";
+
+# ... and for input pointer values
+my %in_pointer_arguments = ();  # passed as pointee type
+$in_pointer_arguments{"IVRCompositor::Submit::pTexture"} = "";
+$in_pointer_arguments{"IVRSystem::PollNextEvent::pEvent"} = "";
+
+my %in_pointer_arguments_as_pointers = ();  # passed as pointer type
+$in_pointer_arguments_as_pointers{"IVRCompositor::Submit::pBounds"} = "";
+
+my %default_argument_values = ();
+$default_argument_values{"IVRCompositor::Submit::pBounds"} = "None";
+$default_argument_values{"IVRCompositor::Submit::nSubmitFlags"} = "Submit_Default";
+$default_argument_values{"VR_InitInternal2::pStartupInfo"} = "None";
+
+# Some arguments are supposed to pass the size of certain types. Isn't that just computable?
+my %size_arguments = ();
+$size_arguments{"IVRSystem::PollNextEvent::uncbVREvent"} = "sizeof(VREvent_t)";
+
+my %custom_return_statements = ();
+$custom_return_statements{"IVRSystem::PollNextEvent"} = "return result != 0";
+
 
 my $header_file = "openvr_capi.h";
 open my $header_fh, "<", $header_file or die;
@@ -165,7 +188,7 @@ def _checkInitError(error):
 
 # Copying VR_Init inline implementation from https://github.com/ValveSoftware/openvr/blob/master/headers/openvr.h
 # and from https://github.com/phr00t/jMonkeyVR/blob/master/src/jmevr/input/OpenVR.java
-def init(applicationType):
+def init(applicationType, pStartupInfo=None):
     """
     Finds the active installation of the VR API and initializes it. The provided path must be absolute
     or relative to the current working directory. These are the local install versions of the equivalent
@@ -174,7 +197,7 @@ def init(applicationType):
     This path is to the "root" of the VR API install. That's the directory with
     the "drivers" directory and a platform (i.e. "win32") directory in it, not the directory with the DLL itself.
     """
-    initInternal(applicationType)
+    initInternal2(applicationType, pStartupInfo)
     # Retrieve "System" API
     return VRSystem()
 
@@ -266,7 +289,13 @@ EOF
                 $arg_name = "byref($arg_name)";
             }
             else {
-                push @py_arg_names, $arg_name;
+                my $arg_key = "${fn_name}::${arg_name}";
+                # print $arg_key, "\n";
+                my $call_arg_name = $arg_name;
+                if (exists $default_argument_values{$arg_key}) {
+                    $call_arg_name = $arg_name."=".$default_argument_values{$arg_key};
+                }
+                push @py_arg_names, $call_arg_name;
             }
 
             push @arg_types, $arg_type;
@@ -354,9 +383,9 @@ sub write_preamble
     print <<EOF;
 #!/bin/env python
 
-# Python bindings for OpenVR API version 0.9.20
+# Python bindings for OpenVR API version 1.0.11
 # from https://github.com/ValveSoftware/openvr
-# Created May 7, 2016 Christopher Bruns
+# Created Jan 1, 2018 Christopher Bruns
 
 import os
 import platform
@@ -388,8 +417,13 @@ else:
     else:
         raise ValueError("Libraries not available for this platform: " + platform.system())
 
-# Add current directory to PATH, so we can load the DLL from right here.
-os.environ['PATH'] += os.pathsep + os.path.dirname(__file__)
+# Load library
+if platform.system() == 'Windows':
+    # Add current directory to PATH, so we can load the DLL from right here.
+    os.environ['PATH'] += os.pathsep + os.path.dirname(__file__)
+else:
+    _openvr_lib_name = os.path.join(os.path.dirname(__file__), _openvr_lib_name)
+
 _openvr = cdll.LoadLibrary(_openvr_lib_name)
 
 # Function pointer table calling convention
@@ -779,6 +813,7 @@ EOF
                         push @return_arg_names, "result";
                     }
 
+                    my $fn_key = "${interface_name}::${fn_name}";
 
                     foreach my $arg (split ",", $fn_args0) {
                         die unless $arg =~ m/^\s*(.*)\s+(\S+)\s*$/;
@@ -790,9 +825,29 @@ EOF
 
                         $arg_type = translate_type($arg_type);
                         push @arg_types, $arg_type;
+
+                        my $arg_key = "${fn_key}::${arg_name}";
+                        my $call_arg_name = $arg_name;
+                        if (exists $default_argument_values{$arg_key}) {
+                            my $def = $default_argument_values{$arg_key};
+                            $call_arg_name = "${arg_name}=${def}";
+                        }
+
+                        # print $arg_key, "\n";
                         if (defined $array_arg_name and $arg_name eq $array_arg_name) {
                             push @internal_arg_names, $arg_name;
                             push @return_arg_names, $arg_name;
+                        }
+                        elsif (exists $in_pointer_arguments{$arg_key}) {
+                            push @internal_arg_names, "byref($arg_name)";
+                            push @call_arg_names, $call_arg_name;
+                        }
+                        elsif (exists $in_pointer_arguments_as_pointers{$arg_key}) {
+                            push @internal_arg_names, $arg_name;
+                            push @call_arg_names, $call_arg_name;
+                        }
+                        elsif (exists $size_arguments{$arg_key}) {
+                            push @internal_arg_names, $size_arguments{$arg_key};
                         }
                         # Pointer arguments are assumed to be OUTPUT arguments at this point
                         elsif ($arg_type =~ m/^POINTER\((.*)\)/) {
@@ -810,7 +865,7 @@ EOF
                         }
                         else {
                             push @internal_arg_names, $arg_name;
-                            push @call_arg_names, $arg_name;
+                            push @call_arg_names, $call_arg_name;
                         }
 
                     }
@@ -862,7 +917,23 @@ EOF
                     print "fn(";
                     print join ", ", @internal_arg_names;
                     print ")\n";
-                    if ($#return_arg_names >= 0) {
+
+                    # Hack for IVRRenderModels.loadRenderModel_Async
+                    if ($interface_name eq "IVRRenderModels" and $fn_name eq "loadRenderModel_Async")
+                    {
+                        # Dereference the pointer return value
+                        print "        if ppRenderModel:\n";
+                        print "            ppRenderModel = ppRenderModel.contents\n";
+                        print "        else:\n";
+                        print "            ppRenderModel = None\n";
+                    }
+
+                    if (exists $custom_return_statements{$fn_key}) {
+                        print "        ";
+                        print $custom_return_statements{$fn_key};
+                        print "\n";
+                    }
+                    elsif ($#return_arg_names >= 0) {
                         print "        return ";
                         print join ", ", @return_arg_names;
                         print "\n";
