@@ -24,11 +24,14 @@ class TrackedDeviceMesh(object):
     def __init__(self, model_name):
         """This constructor must only be called with a live OpenGL context"""
         self.model_name = model_name
-        self.is_loaded = False
+        self.model_is_loaded = False
+        self.texture_is_loaded = False
         self.vao = None
-        self._try_load()
+        self.vbo = None
+        self._try_load_model()
+        self.vertexPositions = None
 
-    def _try_load(self):
+    def _try_load_model(self):
         error, model = openvr.VRRenderModels().loadRenderModel_Async(self.model_name)
         if error == openvr.VRRenderModelError_Loading:
             return
@@ -69,12 +72,15 @@ class TrackedDeviceMesh(object):
         GL.glEnableVertexAttribArray(2)
         GL.glVertexAttribPointer(2, 2, GL.GL_FLOAT, False, 8 * fsize, cast(6 * fsize, c_void_p))
         GL.glBindVertexArray(0)
+        self.model = model
+        self.model_is_loaded = True
+        self._try_load_texture()
+
+    def _try_load_texture(self):
         # Surface texture
-        while True:
-            error, texture_map = openvr.VRRenderModels().loadTexture_Async(model.diffuseTextureId)
-            if error != openvr.VRRenderModelError_Loading:
-                break
-            time.sleep(1)
+        error, texture_map = openvr.VRRenderModels().loadTexture_Async(self.model.diffuseTextureId)
+        if error == openvr.VRRenderModelError_Loading:
+            return
         self.texture_map = texture_map.contents
         self.diffuse_texture = GL.glGenTextures(1)
         GL.glBindTexture(GL.GL_TEXTURE_2D, self.diffuse_texture)
@@ -89,11 +95,14 @@ class TrackedDeviceMesh(object):
         fLargest = GL.glGetFloatv(GL_MAX_TEXTURE_MAX_ANISOTROPY_EXT)
         GL.glTexParameterf(GL.GL_TEXTURE_2D, GL_TEXTURE_MAX_ANISOTROPY_EXT, fLargest)
         GL.glBindTexture(GL.GL_TEXTURE_2D, 0)
-        self.is_loaded = True
+        self.texture_is_loaded = True
 
     def display_gl(self, modelview, projection, pose):
-        if not self.is_loaded:
-            self._try_load()
+        if not self.model_is_loaded:
+            self._try_load_model()
+            return
+        if not self.texture_is_loaded:
+            self._try_load_texture()
             return
         controller_X_room = pose.mDeviceToAbsoluteTracking
         controller_X_room = matrixForOpenVrMatrix(controller_X_room)
@@ -113,9 +122,12 @@ class TrackedDeviceMesh(object):
         if self.vao is not None:
             GL.glDeleteVertexArrays(1, (self.vao,))
             self.vao = None
-        self.vbo = 0
-        self.vertexPositions.delete()
-        self.indexPositions.delete()
+        self.vbo = None
+        if self.vertexPositions is not None:
+            self.vertexPositions.delete()
+            self.vertexPositions = None
+            self.indexPositions.delete()
+            self.indexPositions = None
 
 
 class TrackedDevicesActor(object):

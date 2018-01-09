@@ -22,15 +22,14 @@ def matrixForOpenVrMatrix(mat):
                  (mat.m[0][2], mat.m[1][2], mat.m[2][2], mat.m[3][2]), 
                  (mat.m[0][3], mat.m[1][3], mat.m[2][3], mat.m[3][3]),)
             , numpy.float32)
-        return result
     elif len(mat.m) == 3: # HmdMatrix34_t?
         result = numpy.matrix(
                 ((mat.m[0][0], mat.m[1][0], mat.m[2][0], 0.0),
                  (mat.m[0][1], mat.m[1][1], mat.m[2][1], 0.0), 
                  (mat.m[0][2], mat.m[1][2], mat.m[2][2], 0.0), 
                  (mat.m[0][3], mat.m[1][3], mat.m[2][3], 1.0),)
-            , numpy.float32)  
-        return result
+            , numpy.float32)
+    return result
 
 
 class OpenVrFramebuffer(object):
