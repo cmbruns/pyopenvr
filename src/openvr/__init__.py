@@ -100,13 +100,14 @@ k_unPathHandleInfoTag = 31
 k_unActionPropertyTag = 32
 k_unInputValuePropertyTag = 33
 k_unWildcardPropertyTag = 34
+k_unHapticVibrationPropertyTag = 35
 k_unOpenVRInternalReserved_Start = 1000
 k_unOpenVRInternalReserved_End = 10000
 k_unMaxPropertyStringSize = 32768
 k_unControllerStateAxisCount = 5
 k_ulOverlayHandleInvalid = 0
 k_unScreenshotHandleInvalid = 0
-IVRSystem_Version = b"IVRSystem_017"
+IVRSystem_Version = b"IVRSystem_019"
 IVRExtendedDisplay_Version = b"IVRExtendedDisplay_001"
 IVRTrackedCamera_Version = b"IVRTrackedCamera_003"
 k_unMaxApplicationKeyLength = 128
@@ -120,7 +121,7 @@ k_unVROverlayMaxKeyLength = 128
 k_unVROverlayMaxNameLength = 128
 k_unMaxOverlayCount = 64
 k_unMaxOverlayIntersectionMaskPrimitivesCount = 32
-IVROverlay_Version = b"IVROverlay_017"
+IVROverlay_Version = b"IVROverlay_018"
 k_pch_Controller_Component_GDC2015 = b"gdc2015"
 k_pch_Controller_Component_Base = b"base"
 k_pch_Controller_Component_Tip = b"tip"
@@ -175,9 +176,12 @@ k_pch_SteamVR_RetailDemo_Bool = b"retailDemo"
 k_pch_SteamVR_IpdOffset_Float = b"ipdOffset"
 k_pch_SteamVR_AllowSupersampleFiltering_Bool = b"allowSupersampleFiltering"
 k_pch_SteamVR_EnableLinuxVulkanAsync_Bool = b"enableLinuxVulkanAsync"
+k_pch_SteamVR_AllowDisplayLockedMode_Bool = b"allowDisplayLockedMode"
 k_pch_SteamVR_HaveStartedTutorialForNativeChaperoneDriver_Bool = b"haveStartedTutorialForNativeChaperoneDriver"
+k_pch_SteamVR_ForceWindows32bitVRMonitor = b"forceWindows32BitVRMonitor"
 k_pch_Lighthouse_Section = b"driver_lighthouse"
 k_pch_Lighthouse_DisableIMU_Bool = b"disableimu"
+k_pch_Lighthouse_DisableIMUExceptHMD_Bool = b"disableimuexcepthmd"
 k_pch_Lighthouse_UseDisambiguation_String = b"usedisambiguation"
 k_pch_Lighthouse_DisambiguationDebug_Int32 = b"disambiguationdebug"
 k_pch_Lighthouse_PrimaryBasestation_Int32 = b"primarybasestation"
@@ -347,7 +351,7 @@ Prop_ViveSystemButtonFixRequired_Bool = ENUM_VALUE_TYPE(1033)
 Prop_ParentDriver_Uint64 = ENUM_VALUE_TYPE(1034)
 Prop_ResourceRoot_String = ENUM_VALUE_TYPE(1035)
 Prop_RegisteredDeviceType_String = ENUM_VALUE_TYPE(1036)
-Prop_InputProfileName_String = ENUM_VALUE_TYPE(1037)
+Prop_InputProfilePath_String = ENUM_VALUE_TYPE(1037)
 Prop_ReportsTimeSinceVSync_Bool = ENUM_VALUE_TYPE(2000)
 Prop_SecondsFromVsyncToPhotons_Float = ENUM_VALUE_TYPE(2001)
 Prop_DisplayFrequency_Float = ENUM_VALUE_TYPE(2002)
@@ -401,6 +405,10 @@ Prop_NamedIconPathControllerLeftDeviceOff_String = ENUM_VALUE_TYPE(2051)
 Prop_NamedIconPathControllerRightDeviceOff_String = ENUM_VALUE_TYPE(2052)
 Prop_NamedIconPathTrackingReferenceDeviceOff_String = ENUM_VALUE_TYPE(2053)
 Prop_DoNotApplyPrediction_Bool = ENUM_VALUE_TYPE(2054)
+Prop_CameraToHeadTransforms_Matrix34_Array = ENUM_VALUE_TYPE(2055)
+Prop_DriverIsDrawingControllers_Bool = ENUM_VALUE_TYPE(2057)
+Prop_DriverRequestsApplicationPause_Bool = ENUM_VALUE_TYPE(2058)
+Prop_DriverRequestsReducedRendering_Bool = ENUM_VALUE_TYPE(2059)
 Prop_AttachedDeviceId_String = ENUM_VALUE_TYPE(3000)
 Prop_SupportedButtons_Uint64 = ENUM_VALUE_TYPE(3001)
 Prop_Axis0Type_Int32 = ENUM_VALUE_TYPE(3002)
@@ -435,8 +443,11 @@ Prop_HasControllerComponent_Bool = ENUM_VALUE_TYPE(6003)
 Prop_HasCameraComponent_Bool = ENUM_VALUE_TYPE(6004)
 Prop_HasDriverDirectModeComponent_Bool = ENUM_VALUE_TYPE(6005)
 Prop_HasVirtualDisplayComponent_Bool = ENUM_VALUE_TYPE(6006)
+Prop_ControllerType_String = ENUM_VALUE_TYPE(7000)
+Prop_LegacyInputProfile_String = ENUM_VALUE_TYPE(7001)
 Prop_VendorSpecific_Reserved_Start = ENUM_VALUE_TYPE(10000)
 Prop_VendorSpecific_Reserved_End = ENUM_VALUE_TYPE(10999)
+Prop_TrackedDeviceProperty_Max = ENUM_VALUE_TYPE(1000000)
 
 ETrackedPropertyError = ENUM_TYPE
 TrackedProp_Success = ENUM_VALUE_TYPE(0)
@@ -459,6 +470,7 @@ Submit_LensDistortionAlreadyApplied = ENUM_VALUE_TYPE(1)
 Submit_GlRenderBuffer = ENUM_VALUE_TYPE(2)
 Submit_Reserved = ENUM_VALUE_TYPE(4)
 Submit_TextureWithPose = ENUM_VALUE_TYPE(8)
+Submit_TextureWithDepth = ENUM_VALUE_TYPE(16)
 
 EVRState = ENUM_TYPE
 VRState_Undefined = ENUM_VALUE_TYPE(-1)
@@ -574,7 +586,9 @@ VREvent_NotificationsSectionSettingChanged = ENUM_VALUE_TYPE(861)
 VREvent_KeyboardSectionSettingChanged = ENUM_VALUE_TYPE(862)
 VREvent_PerfSectionSettingChanged = ENUM_VALUE_TYPE(863)
 VREvent_DashboardSectionSettingChanged = ENUM_VALUE_TYPE(864)
+VREvent_WebInterfaceSectionSettingChanged = ENUM_VALUE_TYPE(865)
 VREvent_StatusUpdate = ENUM_VALUE_TYPE(900)
+VREvent_WebInterface_InstallDriverCompleted = ENUM_VALUE_TYPE(950)
 VREvent_MCImageUpdated = ENUM_VALUE_TYPE(1000)
 VREvent_FirmwareUpdateStarted = ENUM_VALUE_TYPE(1100)
 VREvent_FirmwareUpdateFinished = ENUM_VALUE_TYPE(1101)
@@ -603,6 +617,7 @@ VREvent_PerformanceTest_DisableCapture = ENUM_VALUE_TYPE(1601)
 VREvent_PerformanceTest_FidelityLevel = ENUM_VALUE_TYPE(1602)
 VREvent_MessageOverlay_Closed = ENUM_VALUE_TYPE(1650)
 VREvent_MessageOverlayCloseRequested = ENUM_VALUE_TYPE(1651)
+VREvent_Input_HapticVibration = ENUM_VALUE_TYPE(1700)
 VREvent_VendorSpecific_Reserved_Start = ENUM_VALUE_TYPE(10000)
 VREvent_VendorSpecific_Reserved_End = ENUM_VALUE_TYPE(19999)
 
@@ -641,6 +656,18 @@ VRMouseButton_Middle = ENUM_VALUE_TYPE(4)
 EDualAnalogWhich = ENUM_TYPE
 k_EDualAnalog_Left = ENUM_VALUE_TYPE(0)
 k_EDualAnalog_Right = ENUM_VALUE_TYPE(1)
+
+EVRInputError = ENUM_TYPE
+VRInputError_None = ENUM_VALUE_TYPE(0)
+VRInputError_NameNotFound = ENUM_VALUE_TYPE(1)
+VRInputError_WrongType = ENUM_VALUE_TYPE(2)
+VRInputError_InvalidHandle = ENUM_VALUE_TYPE(3)
+VRInputError_InvalidParam = ENUM_VALUE_TYPE(4)
+VRInputError_NoSteam = ENUM_VALUE_TYPE(5)
+VRInputError_MaxCapacityReached = ENUM_VALUE_TYPE(6)
+VRInputError_IPCError = ENUM_VALUE_TYPE(7)
+VRInputError_NoActiveActionSet = ENUM_VALUE_TYPE(8)
+VRInputError_InvalidDevice = ENUM_VALUE_TYPE(9)
 
 EHiddenAreaMeshType = ENUM_TYPE
 k_eHiddenAreaMesh_Standard = ENUM_VALUE_TYPE(0)
@@ -688,6 +715,9 @@ VROverlayError_KeyboardAlreadyInUse = ENUM_VALUE_TYPE(26)
 VROverlayError_NoNeighbor = ENUM_VALUE_TYPE(27)
 VROverlayError_TooManyMaskPrimitives = ENUM_VALUE_TYPE(29)
 VROverlayError_BadMaskPrimitive = ENUM_VALUE_TYPE(30)
+VROverlayError_TextureAlreadyLocked = ENUM_VALUE_TYPE(31)
+VROverlayError_TextureLockCapacityReached = ENUM_VALUE_TYPE(32)
+VROverlayError_TextureNotLocked = ENUM_VALUE_TYPE(33)
 
 EVRApplicationType = ENUM_TYPE
 VRApplication_Other = ENUM_VALUE_TYPE(0)
@@ -871,8 +901,7 @@ VRApplicationProperty_Description_String = ENUM_VALUE_TYPE(50)
 VRApplicationProperty_NewsURL_String = ENUM_VALUE_TYPE(51)
 VRApplicationProperty_ImagePath_String = ENUM_VALUE_TYPE(52)
 VRApplicationProperty_Source_String = ENUM_VALUE_TYPE(53)
-VRApplicationProperty_ActionManifestPath_String = ENUM_VALUE_TYPE(54)
-VRApplicationProperty_ActionBindingPath_String = ENUM_VALUE_TYPE(55)
+VRApplicationProperty_ActionManifestURL_String = ENUM_VALUE_TYPE(54)
 VRApplicationProperty_IsDashboardOverlay_Bool = ENUM_VALUE_TYPE(60)
 VRApplicationProperty_IsTemplate_Bool = ENUM_VALUE_TYPE(61)
 VRApplicationProperty_IsInstanced_Bool = ENUM_VALUE_TYPE(62)
@@ -1130,7 +1159,7 @@ class HmdMatrix34_t(_MatrixMixin, Structure):
     right-handed system
     +y is up
     +x is to the right
-    -z is going away from you
+    -z is forward
     Distance unit is  meters
     """
 
@@ -1254,6 +1283,26 @@ class VRTextureWithPose_t(Structure):
 
     _fields_ = [
         ("mDeviceToAbsoluteTracking", HmdMatrix34_t),
+    ]
+
+
+class VRTextureDepthInfo_t(Structure):
+    _fields_ = [
+        ("handle", c_void_p),
+        ("mProjection", HmdMatrix44_t),
+        ("vRange", HmdVector2_t),
+    ]
+
+
+class VRTextureWithDepth_t(Structure):
+    _fields_ = [
+        ("depth", VRTextureDepthInfo_t),
+    ]
+
+
+class VRTextureWithPoseAndDepth_t(Structure):
+    _fields_ = [
+        ("depth", VRTextureDepthInfo_t),
     ]
 
 
@@ -1460,6 +1509,16 @@ class VREvent_DualAnalog_t(Structure):
         ("transformedX", c_float),
         ("transformedY", c_float),
         ("which", EDualAnalogWhich),
+    ]
+
+
+class VREvent_HapticVibration_t(Structure):
+    _fields_ = [
+        ("containerHandle", c_uint64),
+        ("componentHandle", c_uint64),
+        ("fDurationSeconds", c_float),
+        ("fFrequency", c_float),
+        ("fAmplitude", c_float),
     ]
 
 
@@ -1913,6 +1972,7 @@ class IVRSystem_FnTable(Structure):
         ("getInt32TrackedDeviceProperty", OPENVR_FNTABLE_CALLTYPE(c_int32, TrackedDeviceIndex_t, ETrackedDeviceProperty, POINTER(ETrackedPropertyError))),
         ("getUint64TrackedDeviceProperty", OPENVR_FNTABLE_CALLTYPE(c_uint64, TrackedDeviceIndex_t, ETrackedDeviceProperty, POINTER(ETrackedPropertyError))),
         ("getMatrix34TrackedDeviceProperty", OPENVR_FNTABLE_CALLTYPE(HmdMatrix34_t, TrackedDeviceIndex_t, ETrackedDeviceProperty, POINTER(ETrackedPropertyError))),
+        ("getArrayTrackedDeviceProperty", OPENVR_FNTABLE_CALLTYPE(c_uint32, TrackedDeviceIndex_t, ETrackedDeviceProperty, PropertyTypeTag_t, c_void_p, c_uint32, POINTER(ETrackedPropertyError))),
         ("getStringTrackedDeviceProperty", OPENVR_FNTABLE_CALLTYPE(c_uint32, TrackedDeviceIndex_t, ETrackedDeviceProperty, c_char_p, c_uint32, POINTER(ETrackedPropertyError))),
         ("getPropErrorNameFromEnum", OPENVR_FNTABLE_CALLTYPE(c_char_p, ETrackedPropertyError)),
         ("pollNextEvent", OPENVR_FNTABLE_CALLTYPE(openvr_bool, POINTER(VREvent_t), c_uint32)),
@@ -1924,9 +1984,10 @@ class IVRSystem_FnTable(Structure):
         ("triggerHapticPulse", OPENVR_FNTABLE_CALLTYPE(None, TrackedDeviceIndex_t, c_uint32, c_ushort)),
         ("getButtonIdNameFromEnum", OPENVR_FNTABLE_CALLTYPE(c_char_p, EVRButtonId)),
         ("getControllerAxisTypeNameFromEnum", OPENVR_FNTABLE_CALLTYPE(c_char_p, EVRControllerAxisType)),
-        ("captureInputFocus", OPENVR_FNTABLE_CALLTYPE(openvr_bool)),
-        ("releaseInputFocus", OPENVR_FNTABLE_CALLTYPE(None)),
-        ("isInputFocusCapturedByAnotherProcess", OPENVR_FNTABLE_CALLTYPE(openvr_bool)),
+        ("isInputAvailable", OPENVR_FNTABLE_CALLTYPE(openvr_bool)),
+        ("isSteamVRDrawingControllers", OPENVR_FNTABLE_CALLTYPE(openvr_bool)),
+        ("shouldApplicationPause", OPENVR_FNTABLE_CALLTYPE(openvr_bool)),
+        ("shouldApplicationReduceRenderingWork", OPENVR_FNTABLE_CALLTYPE(openvr_bool)),
         ("driverDebugRequest", OPENVR_FNTABLE_CALLTYPE(c_uint32, TrackedDeviceIndex_t, c_char_p, c_char_p, c_uint32)),
         ("performFirmwareUpdate", OPENVR_FNTABLE_CALLTYPE(EVRFirmwareError, TrackedDeviceIndex_t)),
         ("acknowledgeQuit_Exiting", OPENVR_FNTABLE_CALLTYPE(None)),
@@ -2053,7 +2114,12 @@ class IVRSystem(object):
          pInstance must be the instance the application will use to query for the VkPhysicalDevice.  The application
          must create the VkInstance with extensions returned by IVRCompositor::GetVulkanInstanceExtensionsRequired enabled.
         [macOS Only]
-         Returns an id<MTLDevice> that should be used by the application.
+         For TextureType_IOSurface returns the id<MTLDevice> that should be used by the application.
+         On 10.13+ for TextureType_OpenGL returns the 'registryId' of the renderer which should be used
+          by the application. See Apple Technical Q&A QA1168 for information on enumerating GL Renderers, and the
+          new kCGLRPRegistryIDLow and kCGLRPRegistryIDHigh CGLRendererProperty values in the 10.13 SDK.
+         Pre 10.13 for TextureType_OpenGL returns 0, as there is no dependable way to correlate the HMDs MTLDevice
+          with a GL Renderer.
         """
 
         fn = self.function_table.getOutputDevice
@@ -2244,6 +2310,18 @@ class IVRSystem(object):
         result = fn(unDeviceIndex, prop, byref(pError))
         return result, pError
 
+    def getArrayTrackedDeviceProperty(self, unDeviceIndex, prop, propType, pBuffer, unBufferSize):
+        """
+        Returns an array of one type of property. If the device index is not valid or the property is not a single value or an array of the specified type,
+        this function will return 0. Otherwise it returns the number of bytes necessary to hold the array of properties. If unBufferSize is
+        greater than the returned size and pBuffer is non-NULL, pBuffer is filled with the contents of array of properties.
+        """
+
+        fn = self.function_table.getArrayTrackedDeviceProperty
+        pError = ETrackedPropertyError()
+        result = fn(unDeviceIndex, prop, propType, pBuffer, unBufferSize, byref(pError))
+        return result, pError
+
     def getStringTrackedDeviceProperty(self, unDeviceIndex, prop):
         """
         Returns a string property. If the device index is not valid or the property is not a string type this function will 
@@ -2367,30 +2445,43 @@ class IVRSystem(object):
         result = fn(eAxisType)
         return result
 
-    def captureInputFocus(self):
+    def isInputAvailable(self):
         """
-        Tells OpenVR that this process wants exclusive access to controller button states and button events. Other apps will be notified that 
-        they have lost input focus with a VREvent_InputFocusCaptured event. Returns false if input focus could not be captured for
-        some reason.
+        Returns true if this application is receiving input from the system. This would return false if 
+        system-related functionality is consuming the input stream.
         """
 
-        fn = self.function_table.captureInputFocus
+        fn = self.function_table.isInputAvailable
         result = fn()
         return result
 
-    def releaseInputFocus(self):
+    def isSteamVRDrawingControllers(self):
         """
-        Tells OpenVR that this process no longer wants exclusive access to button states and button events. Other apps will be notified 
-        that input focus has been released with a VREvent_InputFocusReleased event.
+        Returns true SteamVR is drawing controllers on top of the application. Applications should consider
+        not drawing anything attached to the user's hands in this case.
         """
 
-        fn = self.function_table.releaseInputFocus
-        fn()
+        fn = self.function_table.isSteamVRDrawingControllers
+        result = fn()
+        return result
 
-    def isInputFocusCapturedByAnotherProcess(self):
-        "Returns true if input focus is captured by another process."
+    def shouldApplicationPause(self):
+        """
+        Returns true if the user has put SteamVR into a mode that is distracting them from the application.
+        For applications where this is appropriate, the application should pause ongoing activity.
+        """
 
-        fn = self.function_table.isInputFocusCapturedByAnotherProcess
+        fn = self.function_table.shouldApplicationPause
+        result = fn()
+        return result
+
+    def shouldApplicationReduceRenderingWork(self):
+        """
+        Returns true if SteamVR is doing significant rendering work and the game should do what it can to reduce
+        its own workload. One common way to do this is to reduce the size of the render target provided for each eye.
+        """
+
+        fn = self.function_table.shouldApplicationReduceRenderingWork
         result = fn()
         return result
 
@@ -3778,7 +3869,6 @@ class IVROverlay_FnTable(Structure):
         ("getOverlayMouseScale", OPENVR_FNTABLE_CALLTYPE(EVROverlayError, VROverlayHandle_t, POINTER(HmdVector2_t))),
         ("setOverlayMouseScale", OPENVR_FNTABLE_CALLTYPE(EVROverlayError, VROverlayHandle_t, POINTER(HmdVector2_t))),
         ("computeOverlayIntersection", OPENVR_FNTABLE_CALLTYPE(openvr_bool, VROverlayHandle_t, POINTER(VROverlayIntersectionParams_t), POINTER(VROverlayIntersectionResults_t))),
-        ("handleControllerOverlayInteractionAsMouse", OPENVR_FNTABLE_CALLTYPE(openvr_bool, VROverlayHandle_t, TrackedDeviceIndex_t)),
         ("isHoverTargetOverlay", OPENVR_FNTABLE_CALLTYPE(openvr_bool, VROverlayHandle_t)),
         ("getGamepadFocusOverlay", OPENVR_FNTABLE_CALLTYPE(VROverlayHandle_t)),
         ("setGamepadFocusOverlay", OPENVR_FNTABLE_CALLTYPE(EVROverlayError, VROverlayHandle_t)),
@@ -4286,18 +4376,6 @@ class IVROverlay(object):
         pResults = VROverlayIntersectionResults_t()
         result = fn(ulOverlayHandle, byref(pParams), byref(pResults))
         return result, pParams, pResults
-
-    def handleControllerOverlayInteractionAsMouse(self, ulOverlayHandle, unControllerDeviceIndex):
-        """
-        Processes mouse input from the specified controller as though it were a mouse pointed at a compositor overlay with the
-        specified settings. The controller is treated like a laser pointer on the -z axis. The point where the laser pointer would
-        intersect with the overlay is the mouse position, the trigger is left mouse, and the track pad is right mouse. 
-        * Return true if the controller is pointed at the overlay and an event was generated.
-        """
-
-        fn = self.function_table.handleControllerOverlayInteractionAsMouse
-        result = fn(ulOverlayHandle, unControllerDeviceIndex)
-        return result
 
     def isHoverTargetOverlay(self, ulOverlayHandle):
         """
