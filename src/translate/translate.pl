@@ -15,6 +15,9 @@ $inout_array_arguments{"GetDeviceToAbsoluteTrackingPose"} = ["pTrackedDevicePose
 my %in_pointer_arguments = ();  # passed as pointee type
 $in_pointer_arguments{"IVRCompositor::Submit::pTexture"} = "";
 $in_pointer_arguments{"IVRSystem::PollNextEvent::pEvent"} = "";
+# https://github.com/cmbruns/pyopenvr/issues/44
+$in_pointer_arguments{"IVROverlay::SetOverlayTransformTrackedDeviceRelative::pmatTrackingOriginToOverlayTransform"} = "";
+$in_pointer_arguments{"IVROverlay::SetOverlayTransformAbsolute::pmatTrackedDeviceToOverlayTransform"} = "";
 
 my %in_pointer_arguments_as_pointers = ();  # passed as pointer type
 $in_pointer_arguments_as_pointers{"IVRCompositor::Submit::pBounds"} = "";

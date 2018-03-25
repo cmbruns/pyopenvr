@@ -86,6 +86,7 @@ k_unTrackedDeviceIndexOther = 4294967294
 k_unTrackedDeviceIndexInvalid = 4294967295
 k_ulInvalidPropertyContainer = 0
 k_unInvalidPropertyTag = 0
+k_ulInvalidDriverHandle = 0
 k_unFloatPropertyTag = 1
 k_unInt32PropertyTag = 2
 k_unUint64PropertyTag = 3
@@ -179,6 +180,7 @@ k_pch_SteamVR_EnableLinuxVulkanAsync_Bool = b"enableLinuxVulkanAsync"
 k_pch_SteamVR_AllowDisplayLockedMode_Bool = b"allowDisplayLockedMode"
 k_pch_SteamVR_HaveStartedTutorialForNativeChaperoneDriver_Bool = b"haveStartedTutorialForNativeChaperoneDriver"
 k_pch_SteamVR_ForceWindows32bitVRMonitor = b"forceWindows32BitVRMonitor"
+k_pch_SteamVR_DebugInput = b"debugInput"
 k_pch_Lighthouse_Section = b"driver_lighthouse"
 k_pch_Lighthouse_DisableIMU_Bool = b"disableimu"
 k_pch_Lighthouse_DisableIMUExceptHMD_Bool = b"disableimuexcepthmd"
@@ -187,6 +189,7 @@ k_pch_Lighthouse_DisambiguationDebug_Int32 = b"disambiguationdebug"
 k_pch_Lighthouse_PrimaryBasestation_Int32 = b"primarybasestation"
 k_pch_Lighthouse_DBHistory_Bool = b"dbhistory"
 k_pch_Lighthouse_EnableBluetooth_Bool = b"enableBluetooth"
+k_pch_Lighthouse_PowerManagedBaseStations_String = b"PowerManagedBaseStations"
 k_pch_Null_Section = b"driver_null"
 k_pch_Null_SerialNumber_String = b"serialNumber"
 k_pch_Null_ModelNumber_String = b"modelNumber"
@@ -258,8 +261,11 @@ k_pch_Power_PauseCompositorOnStandby_Bool = b"pauseCompositorOnStandby"
 k_pch_Dashboard_Section = b"dashboard"
 k_pch_Dashboard_EnableDashboard_Bool = b"enableDashboard"
 k_pch_Dashboard_ArcadeMode_Bool = b"arcadeMode"
+k_pch_Dashboard_EnableWebUI = b"webUI"
 k_pch_modelskin_Section = b"modelskins"
 k_pch_Driver_Enable_Bool = b"enable"
+k_pch_WebInterface_Section = b"WebInterface"
+k_pch_WebInterface_WebPort_String = b"WebPort"
 IVRScreenshots_Version = b"IVRScreenshots_001"
 IVRResources_Version = b"IVRResources_001"
 IVRDriverManager_Version = b"IVRDriverManager_001"
@@ -281,6 +287,7 @@ TextureType_OpenGL = ENUM_VALUE_TYPE(1)
 TextureType_Vulkan = ENUM_VALUE_TYPE(2)
 TextureType_IOSurface = ENUM_VALUE_TYPE(3)
 TextureType_DirectX12 = ENUM_VALUE_TYPE(4)
+TextureType_DXGISharedHandle = ENUM_VALUE_TYPE(5)
 
 EColorSpace = ENUM_TYPE
 ColorSpace_Auto = ENUM_VALUE_TYPE(0)
@@ -306,6 +313,7 @@ ETrackedControllerRole = ENUM_TYPE
 TrackedControllerRole_Invalid = ENUM_VALUE_TYPE(0)
 TrackedControllerRole_LeftHand = ENUM_VALUE_TYPE(1)
 TrackedControllerRole_RightHand = ENUM_VALUE_TYPE(2)
+TrackedControllerRole_OptOut = ENUM_VALUE_TYPE(3)
 
 ETrackingUniverseOrigin = ENUM_TYPE
 TrackingUniverseSeated = ENUM_VALUE_TYPE(0)
@@ -352,6 +360,7 @@ Prop_ParentDriver_Uint64 = ENUM_VALUE_TYPE(1034)
 Prop_ResourceRoot_String = ENUM_VALUE_TYPE(1035)
 Prop_RegisteredDeviceType_String = ENUM_VALUE_TYPE(1036)
 Prop_InputProfilePath_String = ENUM_VALUE_TYPE(1037)
+Prop_NeverTracked_Bool = ENUM_VALUE_TYPE(1038)
 Prop_ReportsTimeSinceVSync_Bool = ENUM_VALUE_TYPE(2000)
 Prop_SecondsFromVsyncToPhotons_Float = ENUM_VALUE_TYPE(2001)
 Prop_DisplayFrequency_Float = ENUM_VALUE_TYPE(2002)
@@ -406,9 +415,13 @@ Prop_NamedIconPathControllerRightDeviceOff_String = ENUM_VALUE_TYPE(2052)
 Prop_NamedIconPathTrackingReferenceDeviceOff_String = ENUM_VALUE_TYPE(2053)
 Prop_DoNotApplyPrediction_Bool = ENUM_VALUE_TYPE(2054)
 Prop_CameraToHeadTransforms_Matrix34_Array = ENUM_VALUE_TYPE(2055)
+Prop_DistortionMeshResolution_Int32 = ENUM_VALUE_TYPE(2056)
 Prop_DriverIsDrawingControllers_Bool = ENUM_VALUE_TYPE(2057)
 Prop_DriverRequestsApplicationPause_Bool = ENUM_VALUE_TYPE(2058)
 Prop_DriverRequestsReducedRendering_Bool = ENUM_VALUE_TYPE(2059)
+Prop_MinimumIpdStepMeters_Float = ENUM_VALUE_TYPE(2060)
+Prop_AudioBridgeFirmwareVersion_Uint64 = ENUM_VALUE_TYPE(2061)
+Prop_ImageBridgeFirmwareVersion_Uint64 = ENUM_VALUE_TYPE(2062)
 Prop_AttachedDeviceId_String = ENUM_VALUE_TYPE(3000)
 Prop_SupportedButtons_Uint64 = ENUM_VALUE_TYPE(3001)
 Prop_Axis0Type_Int32 = ENUM_VALUE_TYPE(3002)
@@ -527,6 +540,7 @@ VREvent_SceneApplicationChanged = ENUM_VALUE_TYPE(404)
 VREvent_SceneFocusChanged = ENUM_VALUE_TYPE(405)
 VREvent_InputFocusChanged = ENUM_VALUE_TYPE(406)
 VREvent_SceneApplicationSecondaryRenderingStarted = ENUM_VALUE_TYPE(407)
+VREvent_SceneApplicationUsingWrongGraphicsAdapter = ENUM_VALUE_TYPE(408)
 VREvent_HideRenderModels = ENUM_VALUE_TYPE(410)
 VREvent_ShowRenderModels = ENUM_VALUE_TYPE(411)
 VREvent_ConsoleOpened = ENUM_VALUE_TYPE(420)
@@ -545,17 +559,18 @@ VREvent_HideKeyboard = ENUM_VALUE_TYPE(510)
 VREvent_OverlayGamepadFocusGained = ENUM_VALUE_TYPE(511)
 VREvent_OverlayGamepadFocusLost = ENUM_VALUE_TYPE(512)
 VREvent_OverlaySharedTextureChanged = ENUM_VALUE_TYPE(513)
-VREvent_DashboardGuideButtonDown = ENUM_VALUE_TYPE(514)
-VREvent_DashboardGuideButtonUp = ENUM_VALUE_TYPE(515)
 VREvent_ScreenshotTriggered = ENUM_VALUE_TYPE(516)
 VREvent_ImageFailed = ENUM_VALUE_TYPE(517)
 VREvent_DashboardOverlayCreated = ENUM_VALUE_TYPE(518)
+VREvent_SwitchGamepadFocus = ENUM_VALUE_TYPE(519)
 VREvent_RequestScreenshot = ENUM_VALUE_TYPE(520)
 VREvent_ScreenshotTaken = ENUM_VALUE_TYPE(521)
 VREvent_ScreenshotFailed = ENUM_VALUE_TYPE(522)
 VREvent_SubmitScreenshotToDashboard = ENUM_VALUE_TYPE(523)
 VREvent_ScreenshotProgressToDashboard = ENUM_VALUE_TYPE(524)
 VREvent_PrimaryDashboardDeviceChanged = ENUM_VALUE_TYPE(525)
+VREvent_RoomViewShown = ENUM_VALUE_TYPE(526)
+VREvent_RoomViewHidden = ENUM_VALUE_TYPE(527)
 VREvent_Notification_Shown = ENUM_VALUE_TYPE(600)
 VREvent_Notification_Hidden = ENUM_VALUE_TYPE(601)
 VREvent_Notification_BeginInteraction = ENUM_VALUE_TYPE(602)
@@ -786,6 +801,7 @@ VRInitError_Init_RebootingBusy = ENUM_VALUE_TYPE(137)
 VRInitError_Init_FirmwareUpdateBusy = ENUM_VALUE_TYPE(138)
 VRInitError_Init_FirmwareRecoveryBusy = ENUM_VALUE_TYPE(139)
 VRInitError_Init_USBServiceBusy = ENUM_VALUE_TYPE(140)
+VRInitError_Init_VRWebHelperStartupFailed = ENUM_VALUE_TYPE(141)
 VRInitError_Driver_Failed = ENUM_VALUE_TYPE(200)
 VRInitError_Driver_Unknown = ENUM_VALUE_TYPE(201)
 VRInitError_Driver_HmdUnknown = ENUM_VALUE_TYPE(202)
@@ -1085,6 +1101,7 @@ DriverId_t = c_uint32
 TrackedDeviceIndex_t = c_uint32
 PropertyContainerHandle_t = c_uint64
 PropertyTypeTag_t = c_uint32
+DriverHandle_t = PropertyContainerHandle_t
 VROverlayHandle_t = c_uint64
 TrackedCameraHandle_t = c_uint64
 ScreenshotHandle_t = c_uint32
@@ -1447,6 +1464,8 @@ class VREvent_Reserved_t(Structure):
     _fields_ = [
         ("reserved0", c_uint64),
         ("reserved1", c_uint64),
+        ("reserved2", c_uint64),
+        ("reserved3", c_uint64),
     ]
 
 
@@ -4230,13 +4249,12 @@ class IVROverlay(object):
         result = fn(ulOverlayHandle, byref(peTransformType))
         return result, peTransformType
 
-    def setOverlayTransformAbsolute(self, ulOverlayHandle, eTrackingOrigin):
+    def setOverlayTransformAbsolute(self, ulOverlayHandle, eTrackingOrigin, pmatTrackingOriginToOverlayTransform):
         "Sets the transform to absolute tracking origin."
 
         fn = self.function_table.setOverlayTransformAbsolute
-        pmatTrackingOriginToOverlayTransform = HmdMatrix34_t()
         result = fn(ulOverlayHandle, eTrackingOrigin, byref(pmatTrackingOriginToOverlayTransform))
-        return result, pmatTrackingOriginToOverlayTransform
+        return result
 
     def getOverlayTransformAbsolute(self, ulOverlayHandle):
         "Gets the transform if it is absolute. Returns an error if the transform is some other type."
@@ -4247,13 +4265,12 @@ class IVROverlay(object):
         result = fn(ulOverlayHandle, byref(peTrackingOrigin), byref(pmatTrackingOriginToOverlayTransform))
         return result, peTrackingOrigin, pmatTrackingOriginToOverlayTransform
 
-    def setOverlayTransformTrackedDeviceRelative(self, ulOverlayHandle, unTrackedDevice):
+    def setOverlayTransformTrackedDeviceRelative(self, ulOverlayHandle, unTrackedDevice, pmatTrackedDeviceToOverlayTransform):
         "Sets the transform to relative to the transform of the specified tracked device."
 
         fn = self.function_table.setOverlayTransformTrackedDeviceRelative
-        pmatTrackedDeviceToOverlayTransform = HmdMatrix34_t()
         result = fn(ulOverlayHandle, unTrackedDevice, byref(pmatTrackedDeviceToOverlayTransform))
-        return result, pmatTrackedDeviceToOverlayTransform
+        return result
 
     def getOverlayTransformTrackedDeviceRelative(self, ulOverlayHandle):
         "Gets the transform if it is relative to a tracked device. Returns an error if the transform is some other type."
@@ -5239,6 +5256,7 @@ class IVRDriverManager_FnTable(Structure):
     _fields_ = [
         ("getDriverCount", OPENVR_FNTABLE_CALLTYPE(c_uint32)),
         ("getDriverName", OPENVR_FNTABLE_CALLTYPE(c_uint32, DriverId_t, c_char_p, c_uint32)),
+        ("getDriverHandle", OPENVR_FNTABLE_CALLTYPE(DriverHandle_t, c_char_p)),
     ]
 
 
@@ -5265,6 +5283,11 @@ class IVRDriverManager(object):
 
         fn = self.function_table.getDriverName
         result = fn(nDriver, pchValue, unBufferSize)
+        return result
+
+    def getDriverHandle(self, pchDriverName):
+        fn = self.function_table.getDriverHandle
+        result = fn(pchDriverName)
         return result
 
 
