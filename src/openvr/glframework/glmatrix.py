@@ -36,14 +36,6 @@ def identity():
             [0, 0, 0, 1]], dtype=numpy.float32)
 
 
-def ortho(l, r, b, t, n, f):
-    return numpy.matrix([
-            [2.0/(r-l), 0, 0, -(r+l)/(r-l)],
-            [0, 2.0/(t-b), 0, -(t+b)/(t-b)],
-            [0, 0, -2.0/(f-n), -(f+n)/(f-n)],
-            [0, 0, 0, 1]], dtype=numpy.float32).T
-
-
 def perspective(fov_y, aspect, z_near, z_far):
     f_h = math.tan(fov_y / 2.0 / 180.0 * math.pi) * z_near
     f_w = f_h * aspect

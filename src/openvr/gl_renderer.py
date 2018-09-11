@@ -138,7 +138,8 @@ class OpenVrGlRenderer(list):
             except TypeError:
                 self.append(actor)
         self.do_mirror = False
-        self.multisample = multisample      
+        self.multisample = multisample
+        self.compositor = None
 
     def init_gl(self):
         "allocate OpenGL resources"
