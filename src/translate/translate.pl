@@ -167,7 +167,7 @@ sub print_docstring
         print "\n", $indent, '"""', "\n\n";
     }
     else {
-        print $indent, "\"$lines[0]\"\n\n";
+        print $indent, "\"\"\"$lines[0]\"\"\"\n\n";
     }
 
 }
@@ -394,15 +394,13 @@ sub write_preamble
 import os
 import platform
 import ctypes
-# Several explicit imports to keep pycharm happier
-from ctypes import byref, POINTER, sizeof, Structure, Union
 from ctypes import *
 
 from .version import __version__
 
-####################################################################
-### Load OpenVR shared library, so we can access it using ctypes ###
-####################################################################
+################################################################
+# Load OpenVR shared library, so we can access it using ctypes #
+################################################################
 
 # Detect 32-bit vs 64-bit python
 # Detect platform
@@ -437,25 +435,29 @@ if platform.system() == 'Windows':
     OPENVR_FNTABLE_CALLTYPE = WINFUNCTYPE # __stdcall in openvr_capi.h
 else:
     OPENVR_FNTABLE_CALLTYPE = CFUNCTYPE # __cdecl
-    
+
+
 # Forward declarations for Vulkan structures
 class VkDevice_T(ctypes.Structure):
     pass
-    
+
+
 class VkPhysicalDevice_T(ctypes.Structure):
     pass
 
+
 class VkInstance_T(ctypes.Structure):
     pass
+
 
 class VkQueue_T(ctypes.Structure):
     pass
 
 
 # Forward declarations for Direct3D structures
-
 class ID3D12Resource(ctypes.Structure):
     pass
+
 
 class ID3D12CommandQueue(ctypes.Structure):
     pass
@@ -467,9 +469,9 @@ sub translate_typedefs {
     my $header_string = shift;
     print <<EOF;
 
-#######################
-### Expose Typedefs ###
-#######################
+###################
+# Expose Typedefs #
+###################
 
 # Use c_ubyte instead of c_char, for better compatibility with Python True/False
 openvr_bool = c_ubyte
@@ -499,9 +501,9 @@ sub translate_enums {
 
     print <<EOF;
 
-#############################
-### Expose enum constants ###
-#############################
+#########################
+# Expose enum constants #
+#########################
 
 ENUM_TYPE = c_uint32
 ENUM_VALUE_TYPE = int
@@ -561,9 +563,10 @@ sub translate_structs {
 
     print <<EOF;
 
-######################
-### Expose classes ###
-######################
+##################
+# Expose classes #
+##################
+
 
 class OpenVRError(RuntimeError):
     """
@@ -1009,12 +1012,12 @@ EOF
 _vr_token = None
 _internal_module_context = COpenVRContext()
 
-
 EOF
 
 	# enumerate global accessors for each interface class type
 	foreach my $cls_name (@context_classes) {
 		print <<EOF;
+
 def ${cls_name}():
     return _internal_module_context.${cls_name}()
 

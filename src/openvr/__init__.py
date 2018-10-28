@@ -7,15 +7,13 @@
 import os
 import platform
 import ctypes
-# Several explicit imports to keep pycharm happier
-from ctypes import byref, POINTER, sizeof, Structure, Union
 from ctypes import *
 
 from .version import __version__
 
-####################################################################
-### Load OpenVR shared library, so we can access it using ctypes ###
-####################################################################
+################################################################
+# Load OpenVR shared library, so we can access it using ctypes #
+################################################################
 
 # Detect 32-bit vs 64-bit python
 # Detect platform
@@ -50,25 +48,29 @@ if platform.system() == 'Windows':
     OPENVR_FNTABLE_CALLTYPE = WINFUNCTYPE # __stdcall in openvr_capi.h
 else:
     OPENVR_FNTABLE_CALLTYPE = CFUNCTYPE # __cdecl
-    
+
+
 # Forward declarations for Vulkan structures
 class VkDevice_T(ctypes.Structure):
     pass
-    
+
+
 class VkPhysicalDevice_T(ctypes.Structure):
     pass
 
+
 class VkInstance_T(ctypes.Structure):
     pass
+
 
 class VkQueue_T(ctypes.Structure):
     pass
 
 
 # Forward declarations for Direct3D structures
-
 class ID3D12Resource(ctypes.Structure):
     pass
+
 
 class ID3D12CommandQueue(ctypes.Structure):
     pass
@@ -304,9 +306,9 @@ IVRIOBuffer_Version = b"IVRIOBuffer_001"
 k_ulInvalidSpatialAnchorHandle = 0
 IVRSpatialAnchors_Version = b"IVRSpatialAnchors_001"
 
-#############################
-### Expose enum constants ###
-#############################
+#########################
+# Expose enum constants #
+#########################
 
 ENUM_TYPE = c_uint32
 ENUM_VALUE_TYPE = int
@@ -1226,9 +1228,9 @@ IOBufferMode_Write = ENUM_VALUE_TYPE(2)
 IOBufferMode_Create = ENUM_VALUE_TYPE(512)
 
 
-#######################
-### Expose Typedefs ###
-#######################
+###################
+# Expose Typedefs #
+###################
 
 # Use c_ubyte instead of c_char, for better compatibility with Python True/False
 openvr_bool = c_ubyte
@@ -1278,9 +1280,10 @@ VRFirmwareError = EVRFirmwareError
 VRCompositorError = EVRCompositorError
 VRScreenshotsError = EVRScreenshotError
 
-######################
-### Expose classes ###
-######################
+##################
+# Expose classes #
+##################
+
 
 class OpenVRError(RuntimeError):
     """
@@ -1438,7 +1441,7 @@ class Texture_t(Structure):
 
 
 class TrackedDevicePose_t(Structure):
-    "describes a single pose for a tracked object"
+    """describes a single pose for a tracked object"""
 
     _fields_ = [
         ("mDeviceToAbsoluteTracking", HmdMatrix34_t),
@@ -1465,7 +1468,7 @@ class VRTextureBounds_t(Structure):
 
 
 class VRTextureWithPose_t(Structure):
-    "Allows specifying pose used to render provided scene texture (if different from value returned by WaitGetPoses)."
+    """Allows specifying pose used to render provided scene texture (if different from value returned by WaitGetPoses)."""
 
     _fields_ = [
         ("mDeviceToAbsoluteTracking", HmdMatrix34_t),
@@ -1527,7 +1530,7 @@ class D3D12TextureData_t(Structure):
 
 
 class VREvent_Controller_t(Structure):
-    "used for controller button events"
+    """used for controller button events"""
 
     _fields_ = [
         ("button", c_uint32),
@@ -1535,7 +1538,7 @@ class VREvent_Controller_t(Structure):
 
 
 class VREvent_Mouse_t(Structure):
-    "used for simulated mouse events in overlay space"
+    """used for simulated mouse events in overlay space"""
 
     _fields_ = [
         ("x", c_float),
@@ -1545,7 +1548,7 @@ class VREvent_Mouse_t(Structure):
 
 
 class VREvent_Scroll_t(Structure):
-    "used for simulated mouse wheel scroll in overlay space"
+    """used for simulated mouse wheel scroll in overlay space"""
 
     _fields_ = [
         ("xdelta", c_float),
@@ -1572,7 +1575,7 @@ class VREvent_TouchPadMove_t(Structure):
 
 
 class VREvent_Notification_t(Structure):
-    "notification related events. Details will still change at this point"
+    """notification related events. Details will still change at this point"""
 
     _fields_ = [
         ("ulUserValue", c_uint64),
@@ -1581,7 +1584,7 @@ class VREvent_Notification_t(Structure):
 
 
 class VREvent_Process_t(Structure):
-    "Used for events about processes"
+    """Used for events about processes"""
 
     _fields_ = [
         ("pid", c_uint32),
@@ -1591,7 +1594,7 @@ class VREvent_Process_t(Structure):
 
 
 class VREvent_Overlay_t(Structure):
-    "Used for a few events about overlays"
+    """Used for a few events about overlays"""
 
     _fields_ = [
         ("overlayHandle", c_uint64),
@@ -1600,7 +1603,7 @@ class VREvent_Overlay_t(Structure):
 
 
 class VREvent_Status_t(Structure):
-    "Used for a few events about overlays"
+    """Used for a few events about overlays"""
 
     _fields_ = [
         ("statusState", c_uint32),
@@ -1608,7 +1611,7 @@ class VREvent_Status_t(Structure):
 
 
 class VREvent_Keyboard_t(Structure):
-    "Used for keyboard events"
+    """Used for keyboard events"""
 
     _fields_ = [
         ("cNewInput", c_char * 8),
@@ -1630,7 +1633,7 @@ class VREvent_Chaperone_t(Structure):
 
 
 class VREvent_Reserved_t(Structure):
-    "Not actually used for any events"
+    """Not actually used for any events"""
 
     _fields_ = [
         ("reserved0", c_uint64),
@@ -1758,7 +1761,7 @@ class HiddenAreaMesh_t(Structure):
 
 
 class VRControllerAxis_t(Structure):
-    "contains information about one axis on the controller"
+    """contains information about one axis on the controller"""
 
     _fields_ = [
         ("x", c_float),
@@ -1788,7 +1791,7 @@ else:
 
 
 class Compositor_OverlaySettings(Structure):
-    "Allows the application to customize how the overlay appears in the compositor"
+    """Allows the application to customize how the overlay appears in the compositor"""
 
     _fields_ = [
         ("size", c_uint32),
@@ -1809,7 +1812,7 @@ class Compositor_OverlaySettings(Structure):
 
 
 class VRBoneTransform_t(Structure):
-    "Holds the transform for a single bone"
+    """Holds the transform for a single bone"""
 
     _fields_ = [
         ("position", HmdVector4_t),
@@ -1830,7 +1833,7 @@ class CameraVideoStreamFrameHeader_t(Structure):
 
 
 class DriverDirectMode_FrameTiming(Structure):
-    "Frame timing data provided by direct mode drivers."
+    """Frame timing data provided by direct mode drivers."""
 
     _fields_ = [
         ("m_nSize", c_uint32),
@@ -1858,7 +1861,7 @@ class AppOverrideKeys_t(Structure):
 
 
 class Compositor_FrameTiming(Structure):
-    "Provides a single frame's timing information to the app"
+    """Provides a single frame's timing information to the app"""
 
     _fields_ = [
         ("m_nSize", c_uint32),
@@ -1950,7 +1953,7 @@ class IntersectionMaskCircle_t(Structure):
 
 
 class RenderModel_ComponentState_t(Structure):
-    "Describes state information about a render-model component, including transforms and other dynamic properties"
+    """Describes state information about a render-model component, including transforms and other dynamic properties"""
 
     _fields_ = [
         ("mTrackingToComponentRenderModel", HmdMatrix34_t),
@@ -1960,7 +1963,7 @@ class RenderModel_ComponentState_t(Structure):
 
 
 class RenderModel_Vertex_t(Structure):
-    "A single vertex in a render model"
+    """A single vertex in a render model"""
 
     _fields_ = [
         ("vPosition", HmdVector3_t),
@@ -1994,7 +1997,7 @@ class RenderModel_ControllerMode_State_t(Structure):
 
 
 class NotificationBitmap_t(Structure):
-    "Used for passing graphic data"
+    """Used for passing graphic data"""
 
     _fields_ = [
         ("m_pImageData", c_void_p),
@@ -2207,47 +2210,62 @@ _internal_module_context = COpenVRContext()
 def VRSystem():
     return _internal_module_context.VRSystem()
 
+
 def VRChaperone():
     return _internal_module_context.VRChaperone()
+
 
 def VRChaperoneSetup():
     return _internal_module_context.VRChaperoneSetup()
 
+
 def VRCompositor():
     return _internal_module_context.VRCompositor()
+
 
 def VROverlay():
     return _internal_module_context.VROverlay()
 
+
 def VRResources():
     return _internal_module_context.VRResources()
+
 
 def VRRenderModels():
     return _internal_module_context.VRRenderModels()
 
+
 def VRExtendedDisplay():
     return _internal_module_context.VRExtendedDisplay()
+
 
 def VRSettings():
     return _internal_module_context.VRSettings()
 
+
 def VRApplications():
     return _internal_module_context.VRApplications()
+
 
 def VRTrackedCamera():
     return _internal_module_context.VRTrackedCamera()
 
+
 def VRScreenshots():
     return _internal_module_context.VRScreenshots()
+
 
 def VRDriverManager():
     return _internal_module_context.VRDriverManager()
 
+
 def VRInput():
     return _internal_module_context.VRInput()
 
+
 def VRIOBuffer():
     return _internal_module_context.VRIOBuffer()
+
 
 def VRSpatialAnchors():
     return _internal_module_context.VRSpatialAnchors()
@@ -2386,7 +2404,7 @@ class IVRSystem(object):
         self.function_table = fn_table_ptr.contents
 
     def getRecommendedRenderTargetSize(self):
-        "Suggested size for the intermediate render target that the distortion pulls from."
+        """Suggested size for the intermediate render target that the distortion pulls from."""
 
         fn = self.function_table.getRecommendedRenderTargetSize
         pnWidth = c_uint32()
@@ -2395,7 +2413,7 @@ class IVRSystem(object):
         return pnWidth.value, pnHeight.value
 
     def getProjectionMatrix(self, eEye, fNearZ, fFarZ):
-        "The projection matrix for the specified eye"
+        """The projection matrix for the specified eye"""
 
         fn = self.function_table.getProjectionMatrix
         result = fn(eEye, fNearZ, fFarZ)
@@ -2506,14 +2524,14 @@ class IVRSystem(object):
         return pnDevice.value, pInstance
 
     def isDisplayOnDesktop(self):
-        "Use to determine if the headset display is part of the desktop (i.e. extended) or hidden (i.e. direct mode)."
+        """Use to determine if the headset display is part of the desktop (i.e. extended) or hidden (i.e. direct mode)."""
 
         fn = self.function_table.isDisplayOnDesktop
         result = fn()
         return result
 
     def setDisplayVisibility(self, bIsVisibleOnDesktop):
-        "Set the display visibility (true = extended, false = direct mode).  Return value of true indicates that the change was successful."
+        """Set the display visibility (true = extended, false = direct mode).  Return value of true indicates that the change was successful."""
 
         fn = self.function_table.setDisplayVisibility
         result = fn(bIsVisibleOnDesktop)
@@ -2593,7 +2611,7 @@ class IVRSystem(object):
         return result, punTrackedDeviceIndexArray
 
     def getTrackedDeviceActivityLevel(self, unDeviceId):
-        "Returns the level of activity on the device."
+        """Returns the level of activity on the device."""
 
         fn = self.function_table.getTrackedDeviceActivityLevel
         result = fn(unDeviceId)
@@ -2613,14 +2631,14 @@ class IVRSystem(object):
         return pOutputPose, pTrackedDevicePose, pTransform
 
     def getTrackedDeviceIndexForControllerRole(self, unDeviceType):
-        "Returns the device index associated with a specific role, for example the left hand or the right hand. This function is deprecated in favor of the new IVRInput system."
+        """Returns the device index associated with a specific role, for example the left hand or the right hand. This function is deprecated in favor of the new IVRInput system."""
 
         fn = self.function_table.getTrackedDeviceIndexForControllerRole
         result = fn(unDeviceType)
         return result
 
     def getControllerRoleForTrackedDeviceIndex(self, unDeviceIndex):
-        "Returns the controller type associated with a device index. This function is deprecated in favor of the new IVRInput system."
+        """Returns the controller type associated with a device index. This function is deprecated in favor of the new IVRInput system."""
 
         fn = self.function_table.getControllerRoleForTrackedDeviceIndex
         result = fn(unDeviceIndex)
@@ -2641,14 +2659,14 @@ class IVRSystem(object):
         return result
 
     def isTrackedDeviceConnected(self, unDeviceIndex):
-        "Returns true if there is a device connected in this slot."
+        """Returns true if there is a device connected in this slot."""
 
         fn = self.function_table.isTrackedDeviceConnected
         result = fn(unDeviceIndex)
         return result
 
     def getBoolTrackedDeviceProperty(self, unDeviceIndex, prop):
-        "Returns a bool property. If the device index is not valid or the property is not a bool type this function will return false."
+        """Returns a bool property. If the device index is not valid or the property is not a bool type this function will return false."""
 
         fn = self.function_table.getBoolTrackedDeviceProperty
         pError = ETrackedPropertyError()
@@ -2656,7 +2674,7 @@ class IVRSystem(object):
         return result, pError
 
     def getFloatTrackedDeviceProperty(self, unDeviceIndex, prop):
-        "Returns a float property. If the device index is not valid or the property is not a float type this function will return 0."
+        """Returns a float property. If the device index is not valid or the property is not a float type this function will return 0."""
 
         fn = self.function_table.getFloatTrackedDeviceProperty
         pError = ETrackedPropertyError()
@@ -2664,7 +2682,7 @@ class IVRSystem(object):
         return result, pError
 
     def getInt32TrackedDeviceProperty(self, unDeviceIndex, prop):
-        "Returns an int property. If the device index is not valid or the property is not a int type this function will return 0."
+        """Returns an int property. If the device index is not valid or the property is not a int type this function will return 0."""
 
         fn = self.function_table.getInt32TrackedDeviceProperty
         pError = ETrackedPropertyError()
@@ -2672,7 +2690,7 @@ class IVRSystem(object):
         return result, pError
 
     def getUint64TrackedDeviceProperty(self, unDeviceIndex, prop):
-        "Returns a uint64 property. If the device index is not valid or the property is not a uint64 type this function will return 0."
+        """Returns a uint64 property. If the device index is not valid or the property is not a uint64 type this function will return 0."""
 
         fn = self.function_table.getUint64TrackedDeviceProperty
         pError = ETrackedPropertyError()
@@ -2680,7 +2698,7 @@ class IVRSystem(object):
         return result, pError
 
     def getMatrix34TrackedDeviceProperty(self, unDeviceIndex, prop):
-        "Returns a matrix property. If the device index is not valid or the property is not a matrix type, this function will return identity."
+        """Returns a matrix property. If the device index is not valid or the property is not a matrix type, this function will return identity."""
 
         fn = self.function_table.getMatrix34TrackedDeviceProperty
         pError = ETrackedPropertyError()
@@ -2754,7 +2772,7 @@ class IVRSystem(object):
         return result, pEvent, pTrackedDevicePose
 
     def getEventTypeNameFromEnum(self, eType):
-        "returns the name of an EVREvent enum value"
+        """returns the name of an EVREvent enum value"""
 
         fn = self.function_table.getEventTypeNameFromEnum
         result = fn(eType)
@@ -2809,14 +2827,14 @@ class IVRSystem(object):
         fn(unControllerDeviceIndex, unAxisId, usDurationMicroSec)
 
     def getButtonIdNameFromEnum(self, eButtonId):
-        "returns the name of an EVRButtonId enum value. This function is deprecated in favor of the new IVRInput system."
+        """returns the name of an EVRButtonId enum value. This function is deprecated in favor of the new IVRInput system."""
 
         fn = self.function_table.getButtonIdNameFromEnum
         result = fn(eButtonId)
         return result
 
     def getControllerAxisTypeNameFromEnum(self, eAxisType):
-        "returns the name of an EVRControllerAxisType enum value. This function is deprecated in favor of the new IVRInput system."
+        """returns the name of an EVRControllerAxisType enum value. This function is deprecated in favor of the new IVRInput system."""
 
         fn = self.function_table.getControllerAxisTypeNameFromEnum
         result = fn(eAxisType)
@@ -2934,7 +2952,7 @@ class IVRExtendedDisplay(object):
         self.function_table = fn_table_ptr.contents
 
     def getWindowBounds(self):
-        "Size and position that the window needs to be on the VR display."
+        """Size and position that the window needs to be on the VR display."""
 
         fn = self.function_table.getWindowBounds
         pnX = c_int32()
@@ -2945,7 +2963,7 @@ class IVRExtendedDisplay(object):
         return pnX.value, pnY.value, pnWidth.value, pnHeight.value
 
     def getEyeOutputViewport(self, eEye):
-        "Gets the viewport in the frame buffer to draw the output of the distortion into"
+        """Gets the viewport in the frame buffer to draw the output of the distortion into"""
 
         fn = self.function_table.getEyeOutputViewport
         pnX = c_uint32()
@@ -3001,14 +3019,14 @@ class IVRTrackedCamera(object):
         self.function_table = fn_table_ptr.contents
 
     def getCameraErrorNameFromEnum(self, eCameraError):
-        "Returns a string for an error"
+        """Returns a string for an error"""
 
         fn = self.function_table.getCameraErrorNameFromEnum
         result = fn(eCameraError)
         return result
 
     def hasCamera(self, nDeviceIndex):
-        "For convenience, same as tracked property request Prop_HasCamera_Bool"
+        """For convenience, same as tracked property request Prop_HasCamera_Bool"""
 
         fn = self.function_table.hasCamera
         pHasCamera = openvr_bool()
@@ -3016,7 +3034,7 @@ class IVRTrackedCamera(object):
         return result, pHasCamera
 
     def getCameraFrameSize(self, nDeviceIndex, eFrameType):
-        "Gets size of the image frame."
+        """Gets size of the image frame."""
 
         fn = self.function_table.getCameraFrameSize
         pnWidth = c_uint32()
@@ -3071,7 +3089,7 @@ class IVRTrackedCamera(object):
         return result, pFrameHeader
 
     def getVideoStreamTextureSize(self, nDeviceIndex, eFrameType):
-        "Gets size of the image frame."
+        """Gets size of the image frame."""
 
         fn = self.function_table.getVideoStreamTextureSize
         pTextureBounds = VRTextureBounds_t()
@@ -3097,7 +3115,7 @@ class IVRTrackedCamera(object):
         return result, ppD3D11ShaderResourceView.value, pFrameHeader
 
     def getVideoStreamTextureGL(self, hTrackedCamera, eFrameType, nFrameHeaderSize):
-        "Access a shared GL texture for the specified tracked camera stream"
+        """Access a shared GL texture for the specified tracked camera stream"""
 
         fn = self.function_table.getVideoStreamTextureGL
         pglTextureId = glUInt_t()
@@ -3172,21 +3190,21 @@ class IVRApplications(object):
         return result
 
     def removeApplicationManifest(self, pchApplicationManifestFullPath):
-        "Removes an application manifest from the list to load when building the list of installed applications."
+        """Removes an application manifest from the list to load when building the list of installed applications."""
 
         fn = self.function_table.removeApplicationManifest
         result = fn(pchApplicationManifestFullPath)
         return result
 
     def isApplicationInstalled(self, pchAppKey):
-        "Returns true if an application is installed"
+        """Returns true if an application is installed"""
 
         fn = self.function_table.isApplicationInstalled
         result = fn(pchAppKey)
         return result
 
     def getApplicationCount(self):
-        "Returns the number of applications available in the list"
+        """Returns the number of applications available in the list"""
 
         fn = self.function_table.getApplicationCount
         result = fn()
@@ -3235,7 +3253,7 @@ class IVRApplications(object):
         return result, pKeys
 
     def launchApplicationFromMimeType(self, pchMimeType, pchArgs):
-        "launches the application currently associated with this mime type and passes it the option args, typically the filename or object name of the item being launched"
+        """launches the application currently associated with this mime type and passes it the option args, typically the filename or object name of the item being launched"""
 
         fn = self.function_table.launchApplicationFromMimeType
         result = fn(pchMimeType, pchArgs)
@@ -3252,7 +3270,7 @@ class IVRApplications(object):
         return result
 
     def cancelApplicationLaunch(self, pchAppKey):
-        "Cancel a pending launch for an application"
+        """Cancel a pending launch for an application"""
 
         fn = self.function_table.cancelApplicationLaunch
         result = fn(pchAppKey)
@@ -3271,21 +3289,21 @@ class IVRApplications(object):
         return result
 
     def getApplicationProcessId(self, pchAppKey):
-        "Returns the process ID for an application. Return 0 if the application was not found or is not running."
+        """Returns the process ID for an application. Return 0 if the application was not found or is not running."""
 
         fn = self.function_table.getApplicationProcessId
         result = fn(pchAppKey)
         return result
 
     def getApplicationsErrorNameFromEnum(self, error):
-        "Returns a string for an applications error"
+        """Returns a string for an applications error"""
 
         fn = self.function_table.getApplicationsErrorNameFromEnum
         result = fn(error)
         return result
 
     def getApplicationPropertyString(self, pchAppKey, eProperty, pchPropertyValueBuffer, unPropertyValueBufferLen):
-        "Returns a value for an application property. The required buffer size to fit this value will be returned."
+        """Returns a value for an application property. The required buffer size to fit this value will be returned."""
 
         fn = self.function_table.getApplicationPropertyString
         peError = EVRApplicationError()
@@ -3293,7 +3311,7 @@ class IVRApplications(object):
         return result, peError
 
     def getApplicationPropertyBool(self, pchAppKey, eProperty):
-        "Returns a bool value for an application property. Returns false in all error cases."
+        """Returns a bool value for an application property. Returns false in all error cases."""
 
         fn = self.function_table.getApplicationPropertyBool
         peError = EVRApplicationError()
@@ -3301,7 +3319,7 @@ class IVRApplications(object):
         return result, peError
 
     def getApplicationPropertyUint64(self, pchAppKey, eProperty):
-        "Returns a uint64 value for an application property. Returns 0 in all error cases."
+        """Returns a uint64 value for an application property. Returns 0 in all error cases."""
 
         fn = self.function_table.getApplicationPropertyUint64
         peError = EVRApplicationError()
@@ -3309,63 +3327,63 @@ class IVRApplications(object):
         return result, peError
 
     def setApplicationAutoLaunch(self, pchAppKey, bAutoLaunch):
-        "Sets the application auto-launch flag. This is only valid for applications which return true for VRApplicationProperty_IsDashboardOverlay_Bool."
+        """Sets the application auto-launch flag. This is only valid for applications which return true for VRApplicationProperty_IsDashboardOverlay_Bool."""
 
         fn = self.function_table.setApplicationAutoLaunch
         result = fn(pchAppKey, bAutoLaunch)
         return result
 
     def getApplicationAutoLaunch(self, pchAppKey):
-        "Gets the application auto-launch flag. This is only valid for applications which return true for VRApplicationProperty_IsDashboardOverlay_Bool."
+        """Gets the application auto-launch flag. This is only valid for applications which return true for VRApplicationProperty_IsDashboardOverlay_Bool."""
 
         fn = self.function_table.getApplicationAutoLaunch
         result = fn(pchAppKey)
         return result
 
     def setDefaultApplicationForMimeType(self, pchAppKey, pchMimeType):
-        "Adds this mime-type to the list of supported mime types for this application"
+        """Adds this mime-type to the list of supported mime types for this application"""
 
         fn = self.function_table.setDefaultApplicationForMimeType
         result = fn(pchAppKey, pchMimeType)
         return result
 
     def getDefaultApplicationForMimeType(self, pchMimeType, pchAppKeyBuffer, unAppKeyBufferLen):
-        "return the app key that will open this mime type"
+        """return the app key that will open this mime type"""
 
         fn = self.function_table.getDefaultApplicationForMimeType
         result = fn(pchMimeType, pchAppKeyBuffer, unAppKeyBufferLen)
         return result
 
     def getApplicationSupportedMimeTypes(self, pchAppKey, pchMimeTypesBuffer, unMimeTypesBuffer):
-        "Get the list of supported mime types for this application, comma-delimited"
+        """Get the list of supported mime types for this application, comma-delimited"""
 
         fn = self.function_table.getApplicationSupportedMimeTypes
         result = fn(pchAppKey, pchMimeTypesBuffer, unMimeTypesBuffer)
         return result
 
     def getApplicationsThatSupportMimeType(self, pchMimeType, pchAppKeysThatSupportBuffer, unAppKeysThatSupportBuffer):
-        "Get the list of app-keys that support this mime type, comma-delimited, the return value is number of bytes you need to return the full string"
+        """Get the list of app-keys that support this mime type, comma-delimited, the return value is number of bytes you need to return the full string"""
 
         fn = self.function_table.getApplicationsThatSupportMimeType
         result = fn(pchMimeType, pchAppKeysThatSupportBuffer, unAppKeysThatSupportBuffer)
         return result
 
     def getApplicationLaunchArguments(self, unHandle, pchArgs, unArgs):
-        "Get the args list from an app launch that had the process already running, you call this when you get a VREvent_ApplicationMimeTypeLoad"
+        """Get the args list from an app launch that had the process already running, you call this when you get a VREvent_ApplicationMimeTypeLoad"""
 
         fn = self.function_table.getApplicationLaunchArguments
         result = fn(unHandle, pchArgs, unArgs)
         return result
 
     def getStartingApplication(self, pchAppKeyBuffer, unAppKeyBufferLen):
-        "Returns the app key for the application that is starting up"
+        """Returns the app key for the application that is starting up"""
 
         fn = self.function_table.getStartingApplication
         result = fn(pchAppKeyBuffer, unAppKeyBufferLen)
         return result
 
     def getTransitionState(self):
-        "Returns the application transition state"
+        """Returns the application transition state"""
 
         fn = self.function_table.getTransitionState
         result = fn()
@@ -3388,14 +3406,14 @@ class IVRApplications(object):
         return result
 
     def getApplicationsTransitionStateNameFromEnum(self, state):
-        "Returns a string for an application transition state"
+        """Returns a string for an application transition state"""
 
         fn = self.function_table.getApplicationsTransitionStateNameFromEnum
         result = fn(state)
         return result
 
     def isQuitUserPromptRequested(self):
-        "Returns true if the outgoing scene app has requested a save prompt before exiting"
+        """Returns true if the outgoing scene app has requested a save prompt before exiting"""
 
         fn = self.function_table.isQuitUserPromptRequested
         result = fn()
@@ -3461,7 +3479,7 @@ class IVRChaperone(object):
         self.function_table = fn_table_ptr.contents
 
     def getCalibrationState(self):
-        "Get the current state of Chaperone calibration. This state can change at any time during a session due to physical base station changes."
+        """Get the current state of Chaperone calibration. This state can change at any time during a session due to physical base station changes."""
 
         fn = self.function_table.getCalibrationState
         result = fn()
@@ -3495,19 +3513,19 @@ class IVRChaperone(object):
         return result, rect
 
     def reloadInfo(self):
-        "Reload Chaperone data from the .vrchap file on disk."
+        """Reload Chaperone data from the .vrchap file on disk."""
 
         fn = self.function_table.reloadInfo
         fn()
 
     def setSceneColor(self, color):
-        "Optionally give the chaperone system a hit about the color and brightness in the scene"
+        """Optionally give the chaperone system a hit about the color and brightness in the scene"""
 
         fn = self.function_table.setSceneColor
         fn(color)
 
     def getBoundsColor(self, nNumOutputColors, flCollisionBoundsFadeDistance):
-        "Get the current chaperone bounds draw color and brightness"
+        """Get the current chaperone bounds draw color and brightness"""
 
         fn = self.function_table.getBoundsColor
         pOutputColorArray = HmdColor_t()
@@ -3516,14 +3534,14 @@ class IVRChaperone(object):
         return pOutputColorArray, pOutputCameraColor
 
     def areBoundsVisible(self):
-        "Determine whether the bounds are showing right now"
+        """Determine whether the bounds are showing right now"""
 
         fn = self.function_table.areBoundsVisible
         result = fn()
         return result
 
     def forceBoundsVisible(self, bForce):
-        "Force the bounds to show, mostly for utilities"
+        """Force the bounds to show, mostly for utilities"""
 
         fn = self.function_table.forceBoundsVisible
         fn(bForce)
@@ -3576,7 +3594,7 @@ class IVRChaperoneSetup(object):
         self.function_table = fn_table_ptr.contents
 
     def commitWorkingCopy(self, configFile):
-        "Saves the current working copy to disk"
+        """Saves the current working copy to disk"""
 
         fn = self.function_table.commitWorkingCopy
         result = fn(configFile)
@@ -3644,7 +3662,7 @@ class IVRChaperoneSetup(object):
         return result, pQuadsBuffer, punQuadsCount.value
 
     def getWorkingSeatedZeroPoseToRawTrackingPose(self):
-        "Returns the preferred seated position from the working copy."
+        """Returns the preferred seated position from the working copy."""
 
         fn = self.function_table.getWorkingSeatedZeroPoseToRawTrackingPose
         pmatSeatedZeroPoseToRawTrackingPose = HmdMatrix34_t()
@@ -3652,7 +3670,7 @@ class IVRChaperoneSetup(object):
         return result, pmatSeatedZeroPoseToRawTrackingPose
 
     def getWorkingStandingZeroPoseToRawTrackingPose(self):
-        "Returns the standing origin from the working copy."
+        """Returns the standing origin from the working copy."""
 
         fn = self.function_table.getWorkingStandingZeroPoseToRawTrackingPose
         pmatStandingZeroPoseToRawTrackingPose = HmdMatrix34_t()
@@ -3660,13 +3678,13 @@ class IVRChaperoneSetup(object):
         return result, pmatStandingZeroPoseToRawTrackingPose
 
     def setWorkingPlayAreaSize(self, sizeX, sizeZ):
-        "Sets the Play Area in the working copy."
+        """Sets the Play Area in the working copy."""
 
         fn = self.function_table.setWorkingPlayAreaSize
         fn(sizeX, sizeZ)
 
     def setWorkingCollisionBoundsInfo(self, unQuadsCount):
-        "Sets the Collision Bounds in the working copy."
+        """Sets the Collision Bounds in the working copy."""
 
         fn = self.function_table.setWorkingCollisionBoundsInfo
         pQuadsBuffer = HmdQuad_t()
@@ -3674,7 +3692,7 @@ class IVRChaperoneSetup(object):
         return pQuadsBuffer
 
     def setWorkingSeatedZeroPoseToRawTrackingPose(self):
-        "Sets the preferred seated position in the working copy."
+        """Sets the preferred seated position in the working copy."""
 
         fn = self.function_table.setWorkingSeatedZeroPoseToRawTrackingPose
         pMatSeatedZeroPoseToRawTrackingPose = HmdMatrix34_t()
@@ -3682,7 +3700,7 @@ class IVRChaperoneSetup(object):
         return pMatSeatedZeroPoseToRawTrackingPose
 
     def setWorkingStandingZeroPoseToRawTrackingPose(self):
-        "Sets the preferred standing position in the working copy."
+        """Sets the preferred standing position in the working copy."""
 
         fn = self.function_table.setWorkingStandingZeroPoseToRawTrackingPose
         pMatStandingZeroPoseToRawTrackingPose = HmdMatrix34_t()
@@ -3690,13 +3708,13 @@ class IVRChaperoneSetup(object):
         return pMatStandingZeroPoseToRawTrackingPose
 
     def reloadFromDisk(self, configFile):
-        "Tear everything down and reload it from the file on disk"
+        """Tear everything down and reload it from the file on disk"""
 
         fn = self.function_table.reloadFromDisk
         fn(configFile)
 
     def getLiveSeatedZeroPoseToRawTrackingPose(self):
-        "Returns the preferred seated position."
+        """Returns the preferred seated position."""
 
         fn = self.function_table.getLiveSeatedZeroPoseToRawTrackingPose
         pmatSeatedZeroPoseToRawTrackingPose = HmdMatrix34_t()
@@ -3791,7 +3809,7 @@ class IVRCompositor_FnTable(Structure):
 
 
 class IVRCompositor(object):
-    "Allows the application to interact with the compositor"
+    """Allows the application to interact with the compositor"""
 
     def __init__(self):
         version_key = IVRCompositor_Version
@@ -3806,13 +3824,13 @@ class IVRCompositor(object):
         self.function_table = fn_table_ptr.contents
 
     def setTrackingSpace(self, eOrigin):
-        "Sets tracking space returned by WaitGetPoses"
+        """Sets tracking space returned by WaitGetPoses"""
 
         fn = self.function_table.setTrackingSpace
         fn(eOrigin)
 
     def getTrackingSpace(self):
-        "Gets current tracking space returned by WaitGetPoses"
+        """Gets current tracking space returned by WaitGetPoses"""
 
         fn = self.function_table.getTrackingSpace
         result = fn()
@@ -3839,7 +3857,7 @@ class IVRCompositor(object):
         return result
 
     def getLastPoses(self, unRenderPoseArrayCount, unGamePoseArrayCount):
-        "Get the last set of poses returned by WaitGetPoses."
+        """Get the last set of poses returned by WaitGetPoses."""
 
         fn = self.function_table.getLastPoses
         pRenderPoseArray = TrackedDevicePose_t()
@@ -3934,7 +3952,7 @@ class IVRCompositor(object):
         return result
 
     def getCumulativeStats(self, nStatsSizeInBytes):
-        "Fills out stats accumulated for the last connected application.  Pass in sizeof( Compositor_CumulativeStats ) as second parameter."
+        """Fills out stats accumulated for the last connected application.  Pass in sizeof( Compositor_CumulativeStats ) as second parameter."""
 
         fn = self.function_table.getCumulativeStats
         pStats = Compositor_CumulativeStats()
@@ -3952,20 +3970,20 @@ class IVRCompositor(object):
         fn(fSeconds, fRed, fGreen, fBlue, fAlpha, bBackground)
 
     def getCurrentFadeColor(self, bBackground):
-        "Get current fade color value."
+        """Get current fade color value."""
 
         fn = self.function_table.getCurrentFadeColor
         result = fn(bBackground)
         return result
 
     def fadeGrid(self, fSeconds, bFadeIn):
-        "Fading the Grid in or out in fSeconds"
+        """Fading the Grid in or out in fSeconds"""
 
         fn = self.function_table.fadeGrid
         fn(fSeconds, bFadeIn)
 
     def getCurrentGridAlpha(self):
-        "Get current alpha value of grid."
+        """Get current alpha value of grid."""
 
         fn = self.function_table.getCurrentGridAlpha
         result = fn()
@@ -3984,7 +4002,7 @@ class IVRCompositor(object):
         return result, pTextures
 
     def clearSkyboxOverride(self):
-        "Resets compositor skybox back to defaults."
+        """Resets compositor skybox back to defaults."""
 
         fn = self.function_table.clearSkyboxOverride
         fn()
@@ -3999,7 +4017,7 @@ class IVRCompositor(object):
         fn()
 
     def compositorGoToBack(self):
-        "Pushes the compositor window to the back. This is useful for allowing other applications to draw directly to the HMD."
+        """Pushes the compositor window to the back. This is useful for allowing other applications to draw directly to the HMD."""
 
         fn = self.function_table.compositorGoToBack
         fn()
@@ -4014,14 +4032,14 @@ class IVRCompositor(object):
         fn()
 
     def isFullscreen(self):
-        "Return whether the compositor is fullscreen"
+        """Return whether the compositor is fullscreen"""
 
         fn = self.function_table.isFullscreen
         result = fn()
         return result
 
     def getCurrentSceneFocusProcess(self):
-        "Returns the process ID of the process that is currently rendering the scene"
+        """Returns the process ID of the process that is currently rendering the scene"""
 
         fn = self.function_table.getCurrentSceneFocusProcess
         result = fn()
@@ -4038,58 +4056,58 @@ class IVRCompositor(object):
         return result
 
     def canRenderScene(self):
-        "Returns true if the current process has the scene focus"
+        """Returns true if the current process has the scene focus"""
 
         fn = self.function_table.canRenderScene
         result = fn()
         return result
 
     def showMirrorWindow(self):
-        "Creates a window on the primary monitor to display what is being shown in the headset."
+        """Creates a window on the primary monitor to display what is being shown in the headset."""
 
         fn = self.function_table.showMirrorWindow
         fn()
 
     def hideMirrorWindow(self):
-        "Closes the mirror window."
+        """Closes the mirror window."""
 
         fn = self.function_table.hideMirrorWindow
         fn()
 
     def isMirrorWindowVisible(self):
-        "Returns true if the mirror window is shown."
+        """Returns true if the mirror window is shown."""
 
         fn = self.function_table.isMirrorWindowVisible
         result = fn()
         return result
 
     def compositorDumpImages(self):
-        "Writes back buffer and stereo left/right pair from the application to a 'screenshots' folder in the SteamVR runtime root."
+        """Writes back buffer and stereo left/right pair from the application to a 'screenshots' folder in the SteamVR runtime root."""
 
         fn = self.function_table.compositorDumpImages
         fn()
 
     def shouldAppRenderWithLowResources(self):
-        "Let an app know it should be rendering with low resources."
+        """Let an app know it should be rendering with low resources."""
 
         fn = self.function_table.shouldAppRenderWithLowResources
         result = fn()
         return result
 
     def forceInterleavedReprojectionOn(self, bOverride):
-        "Override interleaved reprojection logic to force on."
+        """Override interleaved reprojection logic to force on."""
 
         fn = self.function_table.forceInterleavedReprojectionOn
         fn(bOverride)
 
     def forceReconnectProcess(self):
-        "Force reconnecting to the compositor process."
+        """Force reconnecting to the compositor process."""
 
         fn = self.function_table.forceReconnectProcess
         fn()
 
     def suspendRendering(self, bSuspend):
-        "Temporarily suspends rendering (useful for finer control over scene transitions)."
+        """Temporarily suspends rendering (useful for finer control over scene transitions)."""
 
         fn = self.function_table.suspendRendering
         fn(bSuspend)
@@ -4110,7 +4128,7 @@ class IVRCompositor(object):
         fn(pD3D11ShaderResourceView)
 
     def getMirrorTextureGL(self, eEye):
-        "Access to mirror textures from OpenGL."
+        """Access to mirror textures from OpenGL."""
 
         fn = self.function_table.getMirrorTextureGL
         pglTextureId = glUInt_t()
@@ -4294,7 +4312,7 @@ class IVROverlay(object):
         self.function_table = fn_table_ptr.contents
 
     def findOverlay(self, pchOverlayKey):
-        "Finds an existing overlay with the specified key."
+        """Finds an existing overlay with the specified key."""
 
         fn = self.function_table.findOverlay
         pOverlayHandle = VROverlayHandle_t()
@@ -4302,7 +4320,7 @@ class IVROverlay(object):
         return result, pOverlayHandle
 
     def createOverlay(self, pchOverlayKey, pchOverlayName):
-        "Creates a new named overlay. All overlays start hidden and with default settings."
+        """Creates a new named overlay. All overlays start hidden and with default settings."""
 
         fn = self.function_table.createOverlay
         pOverlayHandle = VROverlayHandle_t()
@@ -4365,7 +4383,7 @@ class IVROverlay(object):
         return result, pError
 
     def setOverlayName(self, ulOverlayHandle, pchName):
-        "set the name to use for this overlay"
+        """set the name to use for this overlay"""
 
         fn = self.function_table.setOverlayName
         result = fn(ulOverlayHandle, pchName)
@@ -4404,21 +4422,21 @@ class IVROverlay(object):
         return result
 
     def getOverlayRenderingPid(self, ulOverlayHandle):
-        "Gets the pid that is allowed to render to this overlay"
+        """Gets the pid that is allowed to render to this overlay"""
 
         fn = self.function_table.getOverlayRenderingPid
         result = fn(ulOverlayHandle)
         return result
 
     def setOverlayFlag(self, ulOverlayHandle, eOverlayFlag, bEnabled):
-        "Specify flag setting for a given overlay"
+        """Specify flag setting for a given overlay"""
 
         fn = self.function_table.setOverlayFlag
         result = fn(ulOverlayHandle, eOverlayFlag, bEnabled)
         return result
 
     def getOverlayFlag(self, ulOverlayHandle, eOverlayFlag):
-        "Sets flag setting for a given overlay"
+        """Sets flag setting for a given overlay"""
 
         fn = self.function_table.getOverlayFlag
         pbEnabled = openvr_bool()
@@ -4426,14 +4444,14 @@ class IVROverlay(object):
         return result, pbEnabled
 
     def setOverlayColor(self, ulOverlayHandle, fRed, fGreen, fBlue):
-        "Sets the color tint of the overlay quad. Use 0.0 to 1.0 per channel."
+        """Sets the color tint of the overlay quad. Use 0.0 to 1.0 per channel."""
 
         fn = self.function_table.setOverlayColor
         result = fn(ulOverlayHandle, fRed, fGreen, fBlue)
         return result
 
     def getOverlayColor(self, ulOverlayHandle):
-        "Gets the color tint of the overlay quad."
+        """Gets the color tint of the overlay quad."""
 
         fn = self.function_table.getOverlayColor
         pfRed = c_float()
@@ -4443,14 +4461,14 @@ class IVROverlay(object):
         return result, pfRed.value, pfGreen.value, pfBlue.value
 
     def setOverlayAlpha(self, ulOverlayHandle, fAlpha):
-        "Sets the alpha of the overlay quad. Use 1.0 for 100 percent opacity to 0.0 for 0 percent opacity."
+        """Sets the alpha of the overlay quad. Use 1.0 for 100 percent opacity to 0.0 for 0 percent opacity."""
 
         fn = self.function_table.setOverlayAlpha
         result = fn(ulOverlayHandle, fAlpha)
         return result
 
     def getOverlayAlpha(self, ulOverlayHandle):
-        "Gets the alpha of the overlay quad. By default overlays are rendering at 100 percent alpha (1.0)."
+        """Gets the alpha of the overlay quad. By default overlays are rendering at 100 percent alpha (1.0)."""
 
         fn = self.function_table.getOverlayAlpha
         pfAlpha = c_float()
@@ -4468,7 +4486,7 @@ class IVROverlay(object):
         return result
 
     def getOverlayTexelAspect(self, ulOverlayHandle):
-        "Gets the aspect ratio of the texels in the overlay. Defaults to 1.0"
+        """Gets the aspect ratio of the texels in the overlay. Defaults to 1.0"""
 
         fn = self.function_table.getOverlayTexelAspect
         pfTexelAspect = c_float()
@@ -4490,7 +4508,7 @@ class IVROverlay(object):
         return result
 
     def getOverlaySortOrder(self, ulOverlayHandle):
-        "Gets the sort order of the overlay. See SetOverlaySortOrder for how this works."
+        """Gets the sort order of the overlay. See SetOverlaySortOrder for how this works."""
 
         fn = self.function_table.getOverlaySortOrder
         punSortOrder = c_uint32()
@@ -4498,14 +4516,14 @@ class IVROverlay(object):
         return result, punSortOrder.value
 
     def setOverlayWidthInMeters(self, ulOverlayHandle, fWidthInMeters):
-        "Sets the width of the overlay quad in meters. By default overlays are rendered on a quad that is 1 meter across"
+        """Sets the width of the overlay quad in meters. By default overlays are rendered on a quad that is 1 meter across"""
 
         fn = self.function_table.setOverlayWidthInMeters
         result = fn(ulOverlayHandle, fWidthInMeters)
         return result
 
     def getOverlayWidthInMeters(self, ulOverlayHandle):
-        "Returns the width of the overlay quad in meters. By default overlays are rendered on a quad that is 1 meter across"
+        """Returns the width of the overlay quad in meters. By default overlays are rendered on a quad that is 1 meter across"""
 
         fn = self.function_table.getOverlayWidthInMeters
         pfWidthInMeters = c_float()
@@ -4545,7 +4563,7 @@ class IVROverlay(object):
         return result
 
     def getOverlayTextureColorSpace(self, ulOverlayHandle):
-        "Gets the overlay's current colorspace setting."
+        """Gets the overlay's current colorspace setting."""
 
         fn = self.function_table.getOverlayTextureColorSpace
         peTextureColorSpace = EColorSpace()
@@ -4553,7 +4571,7 @@ class IVROverlay(object):
         return result, peTextureColorSpace
 
     def setOverlayTextureBounds(self, ulOverlayHandle):
-        "Sets the part of the texture to use for the overlay. UV Min is the upper left corner and UV Max is the lower right corner."
+        """Sets the part of the texture to use for the overlay. UV Min is the upper left corner and UV Max is the lower right corner."""
 
         fn = self.function_table.setOverlayTextureBounds
         pOverlayTextureBounds = VRTextureBounds_t()
@@ -4561,7 +4579,7 @@ class IVROverlay(object):
         return result, pOverlayTextureBounds
 
     def getOverlayTextureBounds(self, ulOverlayHandle):
-        "Gets the part of the texture to use for the overlay. UV Min is the upper left corner and UV Max is the lower right corner."
+        """Gets the part of the texture to use for the overlay. UV Min is the upper left corner and UV Max is the lower right corner."""
 
         fn = self.function_table.getOverlayTextureBounds
         pOverlayTextureBounds = VRTextureBounds_t()
@@ -4569,7 +4587,7 @@ class IVROverlay(object):
         return result, pOverlayTextureBounds
 
     def getOverlayRenderModel(self, ulOverlayHandle, pchValue, unBufferSize):
-        "Gets render model to draw behind this overlay"
+        """Gets render model to draw behind this overlay"""
 
         fn = self.function_table.getOverlayRenderModel
         pColor = HmdColor_t()
@@ -4589,7 +4607,7 @@ class IVROverlay(object):
         return result, pColor
 
     def getOverlayTransformType(self, ulOverlayHandle):
-        "Returns the transform type of this overlay."
+        """Returns the transform type of this overlay."""
 
         fn = self.function_table.getOverlayTransformType
         peTransformType = VROverlayTransformType()
@@ -4597,7 +4615,7 @@ class IVROverlay(object):
         return result, peTransformType
 
     def setOverlayTransformAbsolute(self, ulOverlayHandle, eTrackingOrigin):
-        "Sets the transform to absolute tracking origin."
+        """Sets the transform to absolute tracking origin."""
 
         fn = self.function_table.setOverlayTransformAbsolute
         pmatTrackingOriginToOverlayTransform = HmdMatrix34_t()
@@ -4605,7 +4623,7 @@ class IVROverlay(object):
         return result, pmatTrackingOriginToOverlayTransform
 
     def getOverlayTransformAbsolute(self, ulOverlayHandle):
-        "Gets the transform if it is absolute. Returns an error if the transform is some other type."
+        """Gets the transform if it is absolute. Returns an error if the transform is some other type."""
 
         fn = self.function_table.getOverlayTransformAbsolute
         peTrackingOrigin = ETrackingUniverseOrigin()
@@ -4614,7 +4632,7 @@ class IVROverlay(object):
         return result, peTrackingOrigin, pmatTrackingOriginToOverlayTransform
 
     def setOverlayTransformTrackedDeviceRelative(self, ulOverlayHandle, unTrackedDevice):
-        "Sets the transform to relative to the transform of the specified tracked device."
+        """Sets the transform to relative to the transform of the specified tracked device."""
 
         fn = self.function_table.setOverlayTransformTrackedDeviceRelative
         pmatTrackedDeviceToOverlayTransform = HmdMatrix34_t()
@@ -4622,7 +4640,7 @@ class IVROverlay(object):
         return result, pmatTrackedDeviceToOverlayTransform
 
     def getOverlayTransformTrackedDeviceRelative(self, ulOverlayHandle):
-        "Gets the transform if it is relative to a tracked device. Returns an error if the transform is some other type."
+        """Gets the transform if it is relative to a tracked device. Returns an error if the transform is some other type."""
 
         fn = self.function_table.getOverlayTransformTrackedDeviceRelative
         punTrackedDevice = TrackedDeviceIndex_t()
@@ -4641,7 +4659,7 @@ class IVROverlay(object):
         return result
 
     def getOverlayTransformTrackedDeviceComponent(self, ulOverlayHandle, pchComponentName, unComponentNameSize):
-        "Gets the transform information when the overlay is rendering on a component."
+        """Gets the transform information when the overlay is rendering on a component."""
 
         fn = self.function_table.getOverlayTransformTrackedDeviceComponent
         punDeviceIndex = TrackedDeviceIndex_t()
@@ -4649,7 +4667,7 @@ class IVROverlay(object):
         return result, punDeviceIndex
 
     def getOverlayTransformOverlayRelative(self, ulOverlayHandle):
-        "Gets the transform if it is relative to another overlay. Returns an error if the transform is some other type."
+        """Gets the transform if it is relative to another overlay. Returns an error if the transform is some other type."""
 
         fn = self.function_table.getOverlayTransformOverlayRelative
         ulOverlayHandleParent = VROverlayHandle_t()
@@ -4658,7 +4676,7 @@ class IVROverlay(object):
         return result, ulOverlayHandleParent, pmatParentOverlayToOverlayTransform
 
     def setOverlayTransformOverlayRelative(self, ulOverlayHandle, ulOverlayHandleParent):
-        "Sets the transform to relative to the transform of the specified overlay. This overlays visibility will also track the parents visibility"
+        """Sets the transform to relative to the transform of the specified overlay. This overlays visibility will also track the parents visibility"""
 
         fn = self.function_table.setOverlayTransformOverlayRelative
         pmatParentOverlayToOverlayTransform = HmdMatrix34_t()
@@ -4666,28 +4684,28 @@ class IVROverlay(object):
         return result, pmatParentOverlayToOverlayTransform
 
     def showOverlay(self, ulOverlayHandle):
-        "Shows the VR overlay.  For dashboard overlays, only the Dashboard Manager is allowed to call this."
+        """Shows the VR overlay.  For dashboard overlays, only the Dashboard Manager is allowed to call this."""
 
         fn = self.function_table.showOverlay
         result = fn(ulOverlayHandle)
         return result
 
     def hideOverlay(self, ulOverlayHandle):
-        "Hides the VR overlay.  For dashboard overlays, only the Dashboard Manager is allowed to call this."
+        """Hides the VR overlay.  For dashboard overlays, only the Dashboard Manager is allowed to call this."""
 
         fn = self.function_table.hideOverlay
         result = fn(ulOverlayHandle)
         return result
 
     def isOverlayVisible(self, ulOverlayHandle):
-        "Returns true if the overlay is visible."
+        """Returns true if the overlay is visible."""
 
         fn = self.function_table.isOverlayVisible
         result = fn(ulOverlayHandle)
         return result
 
     def getTransformForOverlayCoordinates(self, ulOverlayHandle, eTrackingOrigin, coordinatesInOverlay):
-        "Get the transform in 3d space associated with a specific 2d point in the overlay's coordinate space (where 0,0 is the lower left). -Z points out of the overlay"
+        """Get the transform in 3d space associated with a specific 2d point in the overlay's coordinate space (where 0,0 is the lower left). -Z points out of the overlay"""
 
         fn = self.function_table.getTransformForOverlayCoordinates
         pmatTransform = HmdMatrix34_t()
@@ -4706,7 +4724,7 @@ class IVROverlay(object):
         return result, pEvent
 
     def getOverlayInputMethod(self, ulOverlayHandle):
-        "Returns the current input settings for the specified overlay."
+        """Returns the current input settings for the specified overlay."""
 
         fn = self.function_table.getOverlayInputMethod
         peInputMethod = VROverlayInputMethod()
@@ -4714,7 +4732,7 @@ class IVROverlay(object):
         return result, peInputMethod
 
     def setOverlayInputMethod(self, ulOverlayHandle, eInputMethod):
-        "Sets the input settings for the specified overlay."
+        """Sets the input settings for the specified overlay."""
 
         fn = self.function_table.setOverlayInputMethod
         result = fn(ulOverlayHandle, eInputMethod)
@@ -4765,14 +4783,14 @@ class IVROverlay(object):
         return result
 
     def getGamepadFocusOverlay(self):
-        "Returns the current Gamepad focus overlay"
+        """Returns the current Gamepad focus overlay"""
 
         fn = self.function_table.getGamepadFocusOverlay
         result = fn()
         return result
 
     def setGamepadFocusOverlay(self, ulNewFocusOverlay):
-        "Sets the current Gamepad focus overlay"
+        """Sets the current Gamepad focus overlay"""
 
         fn = self.function_table.setGamepadFocusOverlay
         result = fn(ulNewFocusOverlay)
@@ -4800,14 +4818,14 @@ class IVROverlay(object):
         return result
 
     def setOverlayDualAnalogTransform(self, ulOverlay, eWhich, vCenter, fRadius):
-        "Sets the analog input to Dual Analog coordinate scale for the specified overlay."
+        """Sets the analog input to Dual Analog coordinate scale for the specified overlay."""
 
         fn = self.function_table.setOverlayDualAnalogTransform
         result = fn(ulOverlay, eWhich, vCenter, fRadius)
         return result
 
     def getOverlayDualAnalogTransform(self, ulOverlay, eWhich):
-        "Gets the analog input to Dual Analog coordinate scale for the specified overlay."
+        """Gets the analog input to Dual Analog coordinate scale for the specified overlay."""
 
         fn = self.function_table.getOverlayDualAnalogTransform
         pvCenter = HmdVector2_t()
@@ -4828,7 +4846,7 @@ class IVROverlay(object):
         return result, pTexture
 
     def clearOverlayTexture(self, ulOverlayHandle):
-        "Use this to tell the overlay system to release the texture set for this overlay."
+        """Use this to tell the overlay system to release the texture set for this overlay."""
 
         fn = self.function_table.clearOverlayTexture
         result = fn(ulOverlayHandle)
@@ -4886,7 +4904,7 @@ class IVROverlay(object):
         return result
 
     def getOverlayTextureSize(self, ulOverlayHandle):
-        "Get the size of the overlay texture"
+        """Get the size of the overlay texture"""
 
         fn = self.function_table.getOverlayTextureSize
         pWidth = c_uint32()
@@ -4895,7 +4913,7 @@ class IVROverlay(object):
         return result, pWidth.value, pHeight.value
 
     def createDashboardOverlay(self, pchOverlayKey, pchOverlayFriendlyName):
-        "Creates a dashboard overlay and returns its handle"
+        """Creates a dashboard overlay and returns its handle"""
 
         fn = self.function_table.createDashboardOverlay
         pMainHandle = VROverlayHandle_t()
@@ -4904,28 +4922,28 @@ class IVROverlay(object):
         return result, pMainHandle, pThumbnailHandle
 
     def isDashboardVisible(self):
-        "Returns true if the dashboard is visible"
+        """Returns true if the dashboard is visible"""
 
         fn = self.function_table.isDashboardVisible
         result = fn()
         return result
 
     def isActiveDashboardOverlay(self, ulOverlayHandle):
-        "returns true if the dashboard is visible and the specified overlay is the active system Overlay"
+        """returns true if the dashboard is visible and the specified overlay is the active system Overlay"""
 
         fn = self.function_table.isActiveDashboardOverlay
         result = fn(ulOverlayHandle)
         return result
 
     def setDashboardOverlaySceneProcess(self, ulOverlayHandle, unProcessId):
-        "Sets the dashboard overlay to only appear when the specified process ID has scene focus"
+        """Sets the dashboard overlay to only appear when the specified process ID has scene focus"""
 
         fn = self.function_table.setDashboardOverlaySceneProcess
         result = fn(ulOverlayHandle, unProcessId)
         return result
 
     def getDashboardOverlaySceneProcess(self, ulOverlayHandle):
-        "Gets the process ID that this dashboard overlay requires to have scene focus"
+        """Gets the process ID that this dashboard overlay requires to have scene focus"""
 
         fn = self.function_table.getDashboardOverlaySceneProcess
         punProcessId = c_uint32()
@@ -4933,20 +4951,20 @@ class IVROverlay(object):
         return result, punProcessId.value
 
     def showDashboard(self, pchOverlayToShow):
-        "Shows the dashboard."
+        """Shows the dashboard."""
 
         fn = self.function_table.showDashboard
         fn(pchOverlayToShow)
 
     def getPrimaryDashboardDevice(self):
-        "Returns the tracked device that has the laser pointer in the dashboard"
+        """Returns the tracked device that has the laser pointer in the dashboard"""
 
         fn = self.function_table.getPrimaryDashboardDevice
         result = fn()
         return result
 
     def showKeyboard(self, eInputMode, eLineInputMode, pchDescription, unCharMax, pchExistingText, bUseMinimalMode, uUserValue):
-        "Show the virtual keyboard to accept input"
+        """Show the virtual keyboard to accept input"""
 
         fn = self.function_table.showKeyboard
         result = fn(eInputMode, eLineInputMode, pchDescription, unCharMax, pchExistingText, bUseMinimalMode, uUserValue)
@@ -4958,20 +4976,20 @@ class IVROverlay(object):
         return result
 
     def getKeyboardText(self, pchText, cchText):
-        "Get the text that was entered into the text input"
+        """Get the text that was entered into the text input"""
 
         fn = self.function_table.getKeyboardText
         result = fn(pchText, cchText)
         return result
 
     def hideKeyboard(self):
-        "Hide the virtual keyboard"
+        """Hide the virtual keyboard"""
 
         fn = self.function_table.hideKeyboard
         fn()
 
     def setKeyboardTransformAbsolute(self, eTrackingOrigin):
-        "Set the position of the keyboard in world space"
+        """Set the position of the keyboard in world space"""
 
         fn = self.function_table.setKeyboardTransformAbsolute
         pmatTrackingOriginToKeyboardTransform = HmdMatrix34_t()
@@ -4979,7 +4997,7 @@ class IVROverlay(object):
         return pmatTrackingOriginToKeyboardTransform
 
     def setKeyboardPositionForOverlay(self, ulOverlayHandle, avoidRect):
-        "Set the position of the keyboard in overlay space by telling it to avoid a rectangle in the overlay. Rectangle coords have (0,0) in the bottom left"
+        """Set the position of the keyboard in overlay space by telling it to avoid a rectangle in the overlay. Rectangle coords have (0,0) in the bottom left"""
 
         fn = self.function_table.setKeyboardPositionForOverlay
         fn(ulOverlayHandle, avoidRect)
@@ -5002,14 +5020,14 @@ class IVROverlay(object):
         return result, pFlags.value
 
     def showMessageOverlay(self, pchText, pchCaption, pchButton0Text, pchButton1Text, pchButton2Text, pchButton3Text):
-        "Show the message overlay. This will block and return you a result."
+        """Show the message overlay. This will block and return you a result."""
 
         fn = self.function_table.showMessageOverlay
         result = fn(pchText, pchCaption, pchButton0Text, pchButton1Text, pchButton2Text, pchButton3Text)
         return result
 
     def closeMessageOverlay(self):
-        "If the calling process owns the overlay and it's open, this will close it."
+        """If the calling process owns the overlay and it's open, this will close it."""
 
         fn = self.function_table.closeMessageOverlay
         fn()
@@ -5085,7 +5103,7 @@ class IVRRenderModels(object):
         return pRenderModel
 
     def loadTexture_Async(self, textureId):
-        "Loads and returns a texture for use in the application."
+        """Loads and returns a texture for use in the application."""
 
         fn = self.function_table.loadTexture_Async
         ppTexture = POINTER(RenderModel_TextureMap_t)()
@@ -5104,7 +5122,7 @@ class IVRRenderModels(object):
         return pTexture
 
     def loadTextureD3D11_Async(self, textureId, pD3D11Device):
-        "Creates a D3D11 texture and loads data into it."
+        """Creates a D3D11 texture and loads data into it."""
 
         fn = self.function_table.loadTextureD3D11_Async
         ppD3D11Texture2D = c_void_p()
@@ -5112,14 +5130,14 @@ class IVRRenderModels(object):
         return result, ppD3D11Texture2D.value
 
     def loadIntoTextureD3D11_Async(self, textureId, pDstTexture):
-        "Helper function to copy the bits into an existing texture."
+        """Helper function to copy the bits into an existing texture."""
 
         fn = self.function_table.loadIntoTextureD3D11_Async
         result = fn(textureId, pDstTexture)
         return result
 
     def freeTextureD3D11(self, pD3D11Texture2D):
-        "Use this to free textures created with LoadTextureD3D11_Async instead of calling Release on them."
+        """Use this to free textures created with LoadTextureD3D11_Async instead of calling Release on them."""
 
         fn = self.function_table.freeTextureD3D11
         fn(pD3D11Texture2D)
@@ -5136,7 +5154,7 @@ class IVRRenderModels(object):
         return result
 
     def getRenderModelCount(self):
-        "Returns the number of available render models."
+        """Returns the number of available render models."""
 
         fn = self.function_table.getRenderModelCount
         result = fn()
@@ -5208,7 +5226,7 @@ class IVRRenderModels(object):
         return result, pState, pComponentState
 
     def getComponentState(self, pchRenderModelName, pchComponentName):
-        "This version of GetComponentState takes a controller state block instead of an action origin. This function is deprecated. You should use the new input system and GetComponentStateForDevicePath instead."
+        """This version of GetComponentState takes a controller state block instead of an action origin. This function is deprecated. You should use the new input system and GetComponentStateForDevicePath instead."""
 
         fn = self.function_table.getComponentState
         pControllerState = VRControllerState_t()
@@ -5218,14 +5236,14 @@ class IVRRenderModels(object):
         return result, pControllerState, pState, pComponentState
 
     def renderModelHasComponent(self, pchRenderModelName, pchComponentName):
-        "Returns true if the render model has a component with the specified name"
+        """Returns true if the render model has a component with the specified name"""
 
         fn = self.function_table.renderModelHasComponent
         result = fn(pchRenderModelName, pchComponentName)
         return result
 
     def getRenderModelThumbnailURL(self, pchRenderModelName, pchThumbnailURL, unThumbnailURLLen):
-        "Returns the URL of the thumbnail image for this rendermodel"
+        """Returns the URL of the thumbnail image for this rendermodel"""
 
         fn = self.function_table.getRenderModelThumbnailURL
         peError = EVRRenderModelError()
@@ -5245,7 +5263,7 @@ class IVRRenderModels(object):
         return result, peError
 
     def getRenderModelErrorNameFromEnum(self, error):
-        "Returns a string for a render model error"
+        """Returns a string for a render model error"""
 
         fn = self.function_table.getRenderModelErrorNameFromEnum
         result = fn(error)
@@ -5293,7 +5311,7 @@ class IVRNotifications(object):
         return result, pImage, pNotificationId
 
     def removeNotification(self, notificationId):
-        "Destroy a notification, hiding it first if it currently shown to the user."
+        """Destroy a notification, hiding it first if it currently shown to the user."""
 
         fn = self.function_table.removeNotification
         result = fn(notificationId)
@@ -5337,7 +5355,7 @@ class IVRSettings(object):
         return result
 
     def sync(self, bForce):
-        "Returns true if file sync occurred (force or settings dirty)"
+        """Returns true if file sync occurred (force or settings dirty)"""
 
         fn = self.function_table.sync
         peError = EVRSettingsError()
@@ -5424,7 +5442,7 @@ class IVRScreenshots_FnTable(Structure):
 
 
 class IVRScreenshots(object):
-    "Allows the application to generate screenshots"
+    """Allows the application to generate screenshots"""
 
     def __init__(self):
         version_key = IVRScreenshots_Version
@@ -5638,7 +5656,7 @@ class IVRDriverManager(object):
         return result
 
     def getDriverName(self, nDriver, pchValue, unBufferSize):
-        "Returns the length of the number of bytes necessary to hold this string including the trailing null."
+        """Returns the length of the number of bytes necessary to hold this string including the trailing null."""
 
         fn = self.function_table.getDriverName
         result = fn(nDriver, pchValue, unBufferSize)
@@ -5700,7 +5718,7 @@ class IVRInput(object):
         return result
 
     def getActionSetHandle(self, pchActionSetName):
-        "Returns a handle for an action set. This handle is used for all performance-sensitive calls."
+        """Returns a handle for an action set. This handle is used for all performance-sensitive calls."""
 
         fn = self.function_table.getActionSetHandle
         pHandle = VRActionSetHandle_t()
@@ -5708,7 +5726,7 @@ class IVRInput(object):
         return result, pHandle
 
     def getActionHandle(self, pchActionName):
-        "Returns a handle for an action. This handle is used for all performance-sensitive calls."
+        """Returns a handle for an action. This handle is used for all performance-sensitive calls."""
 
         fn = self.function_table.getActionHandle
         pHandle = VRActionHandle_t()
@@ -5716,7 +5734,7 @@ class IVRInput(object):
         return result, pHandle
 
     def getInputSourceHandle(self, pchInputSourcePath):
-        "Returns a handle for any path in the input system. E.g. /user/hand/right"
+        """Returns a handle for any path in the input system. E.g. /user/hand/right"""
 
         fn = self.function_table.getInputSourceHandle
         pHandle = VRInputValueHandle_t()
@@ -5757,7 +5775,7 @@ class IVRInput(object):
         return result, pActionData
 
     def getPoseActionData(self, action, eOrigin, fPredictedSecondsFromNow, unActionDataSize, ulRestrictToDevice):
-        "Reads the state of a pose action given its handle."
+        """Reads the state of a pose action given its handle."""
 
         fn = self.function_table.getPoseActionData
         pActionData = InputPoseActionData_t()
@@ -5765,7 +5783,7 @@ class IVRInput(object):
         return result, pActionData
 
     def getSkeletalActionData(self, action, unActionDataSize, ulRestrictToDevice):
-        "Reads the state of a skeletal action given its handle."
+        """Reads the state of a skeletal action given its handle."""
 
         fn = self.function_table.getSkeletalActionData
         pActionData = InputSkeletalActionData_t()
@@ -5773,7 +5791,7 @@ class IVRInput(object):
         return result, pActionData
 
     def getSkeletalBoneData(self, action, eTransformSpace, eMotionRange, unTransformArrayCount, ulRestrictToDevice):
-        "Reads the state of the skeletal bone data associated with this action and copies it into the given buffer."
+        """Reads the state of the skeletal bone data associated with this action and copies it into the given buffer."""
 
         fn = self.function_table.getSkeletalBoneData
         pTransformArray = VRBoneTransform_t()
@@ -5793,7 +5811,7 @@ class IVRInput(object):
         return result, punRequiredCompressedSize.value
 
     def decompressSkeletalBoneData(self, pvCompressedBuffer, unCompressedBufferSize, unTransformArrayCount):
-        "Turns a compressed buffer from GetSkeletalBoneDataCompressed and turns it back into a bone transform array."
+        """Turns a compressed buffer from GetSkeletalBoneDataCompressed and turns it back into a bone transform array."""
 
         fn = self.function_table.decompressSkeletalBoneData
         peTransformSpace = EVRSkeletalTransformSpace()
@@ -5802,14 +5820,14 @@ class IVRInput(object):
         return result, peTransformSpace, pTransformArray
 
     def triggerHapticVibrationAction(self, action, fStartSecondsFromNow, fDurationSeconds, fFrequency, fAmplitude, ulRestrictToDevice):
-        "Triggers a haptic event as described by the specified action"
+        """Triggers a haptic event as described by the specified action"""
 
         fn = self.function_table.triggerHapticVibrationAction
         result = fn(action, fStartSecondsFromNow, fDurationSeconds, fFrequency, fAmplitude, ulRestrictToDevice)
         return result
 
     def getActionOrigins(self, actionSetHandle, digitalActionHandle, originOutCount):
-        "Retrieve origin handles for an action"
+        """Retrieve origin handles for an action"""
 
         fn = self.function_table.getActionOrigins
         originsOut = VRInputValueHandle_t()
@@ -5817,14 +5835,14 @@ class IVRInput(object):
         return result, originsOut
 
     def getOriginLocalizedName(self, origin, pchNameArray, unNameArraySize):
-        "Retrieves the name of the origin in the current language"
+        """Retrieves the name of the origin in the current language"""
 
         fn = self.function_table.getOriginLocalizedName
         result = fn(origin, pchNameArray, unNameArraySize)
         return result
 
     def getOriginTrackedDeviceInfo(self, origin, unOriginInfoSize):
-        "Retrieves useful information for the origin of this action"
+        """Retrieves useful information for the origin of this action"""
 
         fn = self.function_table.getOriginTrackedDeviceInfo
         pOriginInfo = InputOriginInfo_t()
@@ -5832,14 +5850,14 @@ class IVRInput(object):
         return result, pOriginInfo
 
     def showActionOrigins(self, actionSetHandle, ulActionHandle):
-        "Shows the current binding for the action in-headset"
+        """Shows the current binding for the action in-headset"""
 
         fn = self.function_table.showActionOrigins
         result = fn(actionSetHandle, ulActionHandle)
         return result
 
     def showBindingsForActionSet(self, unSizeOfVRSelectedActionSet_t, unSetCount, originToHighlight):
-        "Shows the current binding all the actions in the specified action sets"
+        """Shows the current binding all the actions in the specified action sets"""
 
         fn = self.function_table.showBindingsForActionSet
         pSets = VRActiveActionSet_t()
@@ -5878,7 +5896,7 @@ class IVRIOBuffer(object):
         self.function_table = fn_table_ptr.contents
 
     def open(self, pchPath, mode, unElementSize, unElements):
-        "opens an existing or creates a new IOBuffer of unSize bytes"
+        """opens an existing or creates a new IOBuffer of unSize bytes"""
 
         fn = self.function_table.open
         pulBuffer = IOBufferHandle_t()
@@ -5886,14 +5904,14 @@ class IVRIOBuffer(object):
         return result, pulBuffer
 
     def close(self, ulBuffer):
-        "closes a previously opened or created buffer"
+        """closes a previously opened or created buffer"""
 
         fn = self.function_table.close
         result = fn(ulBuffer)
         return result
 
     def read(self, ulBuffer, pDst, unBytes):
-        "reads up to unBytes from buffer into *pDst, returning number of bytes read in *punRead"
+        """reads up to unBytes from buffer into *pDst, returning number of bytes read in *punRead"""
 
         fn = self.function_table.read
         punRead = c_uint32()
@@ -5901,14 +5919,14 @@ class IVRIOBuffer(object):
         return result, punRead.value
 
     def write(self, ulBuffer, pSrc, unBytes):
-        "writes unBytes of data from *pSrc into a buffer."
+        """writes unBytes of data from *pSrc into a buffer."""
 
         fn = self.function_table.write
         result = fn(ulBuffer, pSrc, unBytes)
         return result
 
     def propertyContainer(self, ulBuffer):
-        "retrieves the property container of an buffer."
+        """retrieves the property container of an buffer."""
 
         fn = self.function_table.propertyContainer
         result = fn(ulBuffer)
