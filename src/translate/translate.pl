@@ -362,9 +362,9 @@ sub translate_constants
 {
     print <<EOF;
 
-########################
-### Expose constants ###
-########################
+####################
+# Expose constants #
+####################
 
 EOF
     my $header_string = shift;
@@ -432,9 +432,9 @@ _openvr = cdll.LoadLibrary(_openvr_lib_name)
 
 # Function pointer table calling convention
 if platform.system() == 'Windows':
-    OPENVR_FNTABLE_CALLTYPE = WINFUNCTYPE # __stdcall in openvr_capi.h
+    OPENVR_FNTABLE_CALLTYPE = WINFUNCTYPE  # __stdcall in openvr_capi.h
 else:
-    OPENVR_FNTABLE_CALLTYPE = CFUNCTYPE # __cdecl
+    OPENVR_FNTABLE_CALLTYPE = CFUNCTYPE  # __cdecl
 
 
 # Forward declarations for Vulkan structures
@@ -477,6 +477,7 @@ sub translate_typedefs {
 openvr_bool = c_ubyte
 
 EOF
+    my %defined_typedefs = ();
     while ($header_string =~ m/
         typedef\s+ # typedef keyword
         (\S[^;{}]*\S) # existing type name
@@ -491,8 +492,12 @@ EOF
             next; # skip bool definition, in favor of hard-coded version above
         }
 
+        # Avoid multiple definitions of the same type
+        next if exists $defined_typedefs{$new_type};
+
         $original_type = translate_type($original_type);
         print "$new_type = $original_type\n";
+        $defined_typedefs{$new_type} = 1;
     }
 }
 

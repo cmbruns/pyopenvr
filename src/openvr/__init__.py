@@ -45,9 +45,9 @@ _openvr = cdll.LoadLibrary(_openvr_lib_name)
 
 # Function pointer table calling convention
 if platform.system() == 'Windows':
-    OPENVR_FNTABLE_CALLTYPE = WINFUNCTYPE # __stdcall in openvr_capi.h
+    OPENVR_FNTABLE_CALLTYPE = WINFUNCTYPE  # __stdcall in openvr_capi.h
 else:
-    OPENVR_FNTABLE_CALLTYPE = CFUNCTYPE # __cdecl
+    OPENVR_FNTABLE_CALLTYPE = CFUNCTYPE  # __cdecl
 
 
 # Forward declarations for Vulkan structures
@@ -76,9 +76,9 @@ class ID3D12CommandQueue(ctypes.Structure):
     pass
 
 
-########################
-### Expose constants ###
-########################
+####################
+# Expose constants #
+####################
 
 k_nDriverNone = 4294967295
 k_unMaxDriverDebugResponseSize = 32768
@@ -1249,20 +1249,12 @@ glInt_t = c_int32
 glUInt_t = c_uint32
 SharedTextureHandle_t = c_uint64
 DriverId_t = c_uint32
-TrackedDeviceIndex_t = c_uint32
 WebConsoleHandle_t = c_uint64
-PropertyContainerHandle_t = c_uint64
-PropertyTypeTag_t = c_uint32
 DriverHandle_t = PropertyContainerHandle_t
-VRActionHandle_t = c_uint64
-VRActionSetHandle_t = c_uint64
-VRInputValueHandle_t = c_uint64
-VROverlayHandle_t = c_uint64
 TrackedCameraHandle_t = c_uint64
 ScreenshotHandle_t = c_uint32
 VRComponentProperties = c_uint32
 TextureID_t = c_int32
-VRNotificationId = c_uint32
 IOBufferHandle_t = c_uint64
 HmdError = EVRInitError
 Hmd_Eye = EVREye
