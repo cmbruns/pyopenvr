@@ -102,15 +102,21 @@ k_unActionPropertyTag = 32
 k_unInputValuePropertyTag = 33
 k_unWildcardPropertyTag = 34
 k_unHapticVibrationPropertyTag = 35
+k_unSkeletonPropertyTag = 36
+k_unSpatialAnchorPosePropertyTag = 40
+k_unJsonPropertyTag = 41
 k_unOpenVRInternalReserved_Start = 1000
 k_unOpenVRInternalReserved_End = 10000
 k_unMaxPropertyStringSize = 32768
+k_ulInvalidActionHandle = 0
+k_ulInvalidActionSetHandle = 0
+k_ulInvalidInputValueHandle = 0
 k_unControllerStateAxisCount = 5
 k_ulOverlayHandleInvalid = 0
 k_unScreenshotHandleInvalid = 0
 IVRSystem_Version = b"IVRSystem_019"
 IVRExtendedDisplay_Version = b"IVRExtendedDisplay_001"
-IVRTrackedCamera_Version = b"IVRTrackedCamera_003"
+IVRTrackedCamera_Version = b"IVRTrackedCamera_004"
 k_unMaxApplicationKeyLength = 128
 k_pch_MimeType_HomeApp = b"vr/home"
 k_pch_MimeType_GameTheater = b"vr/game_theater"
@@ -128,7 +134,7 @@ k_pch_Controller_Component_Base = b"base"
 k_pch_Controller_Component_Tip = b"tip"
 k_pch_Controller_Component_HandGrip = b"handgrip"
 k_pch_Controller_Component_Status = b"status"
-IVRRenderModels_Version = b"IVRRenderModels_005"
+IVRRenderModels_Version = b"IVRRenderModels_006"
 k_unNotificationTextMaxSize = 256
 IVRNotifications_Version = b"IVRNotifications_002"
 k_unMaxSettingsKeyLength = 128
@@ -160,13 +166,15 @@ k_pch_SteamVR_SpeakersForwardYawOffsetDegrees_Float = b"speakersForwardYawOffset
 k_pch_SteamVR_BaseStationPowerManagement_Bool = b"basestationPowerManagement"
 k_pch_SteamVR_NeverKillProcesses_Bool = b"neverKillProcesses"
 k_pch_SteamVR_SupersampleScale_Float = b"supersampleScale"
+k_pch_SteamVR_MaxRecommendedResolution_Int32 = b"maxRecommendedResolution"
 k_pch_SteamVR_AllowAsyncReprojection_Bool = b"allowAsyncReprojection"
 k_pch_SteamVR_AllowReprojection_Bool = b"allowInterleavedReprojection"
 k_pch_SteamVR_ForceReprojection_Bool = b"forceReprojection"
 k_pch_SteamVR_ForceFadeOnBadTracking_Bool = b"forceFadeOnBadTracking"
-k_pch_SteamVR_DefaultMirrorView_Int32 = b"defaultMirrorView"
+k_pch_SteamVR_DefaultMirrorView_Int32 = b"mirrorView"
 k_pch_SteamVR_ShowMirrorView_Bool = b"showMirrorView"
 k_pch_SteamVR_MirrorViewGeometry_String = b"mirrorViewGeometry"
+k_pch_SteamVR_MirrorViewGeometryMaximized_String = b"mirrorViewGeometryMaximized"
 k_pch_SteamVR_StartMonitorFromAppLaunch = b"startMonitorFromAppLaunch"
 k_pch_SteamVR_StartCompositorFromAppLaunch_Bool = b"startCompositorFromAppLaunch"
 k_pch_SteamVR_StartDashboardFromAppLaunch_Bool = b"startDashboardFromAppLaunch"
@@ -176,11 +184,16 @@ k_pch_SteamVR_CycleBackgroundImageTimeSec_Int32 = b"CycleBackgroundImageTimeSec"
 k_pch_SteamVR_RetailDemo_Bool = b"retailDemo"
 k_pch_SteamVR_IpdOffset_Float = b"ipdOffset"
 k_pch_SteamVR_AllowSupersampleFiltering_Bool = b"allowSupersampleFiltering"
+k_pch_SteamVR_SupersampleManualOverride_Bool = b"supersampleManualOverride"
 k_pch_SteamVR_EnableLinuxVulkanAsync_Bool = b"enableLinuxVulkanAsync"
 k_pch_SteamVR_AllowDisplayLockedMode_Bool = b"allowDisplayLockedMode"
 k_pch_SteamVR_HaveStartedTutorialForNativeChaperoneDriver_Bool = b"haveStartedTutorialForNativeChaperoneDriver"
 k_pch_SteamVR_ForceWindows32bitVRMonitor = b"forceWindows32BitVRMonitor"
 k_pch_SteamVR_DebugInput = b"debugInput"
+k_pch_SteamVR_LegacyInputRebinding = b"legacyInputRebinding"
+k_pch_SteamVR_DebugInputBinding = b"debugInputBinding"
+k_pch_SteamVR_InputBindingUIBlock = b"inputBindingUI"
+k_pch_SteamVR_RenderCameraMode = b"renderCameraMode"
 k_pch_Lighthouse_Section = b"driver_lighthouse"
 k_pch_Lighthouse_DisableIMU_Bool = b"disableimu"
 k_pch_Lighthouse_DisableIMUExceptHMD_Bool = b"disableimuexcepthmd"
@@ -190,6 +203,7 @@ k_pch_Lighthouse_PrimaryBasestation_Int32 = b"primarybasestation"
 k_pch_Lighthouse_DBHistory_Bool = b"dbhistory"
 k_pch_Lighthouse_EnableBluetooth_Bool = b"enableBluetooth"
 k_pch_Lighthouse_PowerManagedBaseStations_String = b"PowerManagedBaseStations"
+k_pch_Lighthouse_EnableImuFallback_Bool = b"enableImuFallback"
 k_pch_Null_Section = b"driver_null"
 k_pch_Null_SerialNumber_String = b"serialNumber"
 k_pch_Null_ModelNumber_String = b"modelNumber"
@@ -204,6 +218,7 @@ k_pch_Null_DisplayFrequency_Float = b"displayFrequency"
 k_pch_UserInterface_Section = b"userinterface"
 k_pch_UserInterface_StatusAlwaysOnTop_Bool = b"StatusAlwaysOnTop"
 k_pch_UserInterface_MinimizeToTray_Bool = b"MinimizeToTray"
+k_pch_UserInterface_HidePopupsWhenStatusMinimized_Bool = b"HidePopupsWhenStatusMinimized"
 k_pch_UserInterface_Screenshots_Bool = b"screenshots"
 k_pch_UserInterface_ScreenshotType_Int = b"screenshotType"
 k_pch_Notifications_Section = b"notifications"
@@ -217,9 +232,7 @@ k_pch_Keyboard_OffsetRightX = b"OffsetRightX"
 k_pch_Keyboard_OffsetY = b"OffsetY"
 k_pch_Keyboard_Smoothing = b"Smoothing"
 k_pch_Perf_Section = b"perfcheck"
-k_pch_Perf_HeuristicActive_Bool = b"heuristicActive"
-k_pch_Perf_NotifyInHMD_Bool = b"warnInHMD"
-k_pch_Perf_NotifyOnlyOnce_Bool = b"warnOnlyOnce"
+k_pch_Perf_PerfGraphInHMD_Bool = b"perfGraphInHMD"
 k_pch_Perf_AllowTimingStore_Bool = b"allowTimingStore"
 k_pch_Perf_SaveTimingsOnExit_Bool = b"saveTimingsOnExit"
 k_pch_Perf_TestData_Float = b"perfTestData"
@@ -244,6 +257,7 @@ k_pch_Camera_BoundsColorGammaG_Int32 = b"cameraBoundsColorGammaG"
 k_pch_Camera_BoundsColorGammaB_Int32 = b"cameraBoundsColorGammaB"
 k_pch_Camera_BoundsColorGammaA_Int32 = b"cameraBoundsColorGammaA"
 k_pch_Camera_BoundsStrength_Int32 = b"cameraBoundsStrength"
+k_pch_Camera_RoomViewMode_Int32 = b"cameraRoomViewMode"
 k_pch_audio_Section = b"audio"
 k_pch_audio_OnPlaybackDevice_String = b"onPlaybackDevice"
 k_pch_audio_OnRecordDevice_String = b"onRecordDevice"
@@ -262,13 +276,33 @@ k_pch_Dashboard_Section = b"dashboard"
 k_pch_Dashboard_EnableDashboard_Bool = b"enableDashboard"
 k_pch_Dashboard_ArcadeMode_Bool = b"arcadeMode"
 k_pch_Dashboard_EnableWebUI = b"webUI"
+k_pch_Dashboard_EnableWebUIDevTools = b"webUIDevTools"
+k_pch_Dashboard_EnableWebUIDashboardReplacement = b"webUIDashboard"
 k_pch_modelskin_Section = b"modelskins"
 k_pch_Driver_Enable_Bool = b"enable"
 k_pch_WebInterface_Section = b"WebInterface"
+k_pch_WebInterface_WebEnable_Bool = b"WebEnable"
 k_pch_WebInterface_WebPort_String = b"WebPort"
+k_pch_VRWebHelper_Section = b"VRWebHelper"
+k_pch_VRWebHelper_DebuggerEnabled_Bool = b"DebuggerEnabled"
+k_pch_VRWebHelper_DebuggerPort_Int32 = b"DebuggerPort"
+k_pch_TrackingOverride_Section = b"TrackingOverrides"
+k_pch_App_BindingAutosaveURLSuffix_String = b"AutosaveURL"
+k_pch_App_BindingCurrentURLSuffix_String = b"CurrentURL"
+k_pch_App_NeedToUpdateAutosaveSuffix_Bool = b"NeedToUpdateAutosave"
+k_pch_App_ActionManifestURL_String = b"ActionManifestURL"
+k_pch_Trackers_Section = b"trackers"
 IVRScreenshots_Version = b"IVRScreenshots_001"
 IVRResources_Version = b"IVRResources_001"
 IVRDriverManager_Version = b"IVRDriverManager_001"
+k_unMaxActionNameLength = 64
+k_unMaxActionSetNameLength = 64
+k_unMaxActionOriginCount = 16
+IVRInput_Version = b"IVRInput_004"
+k_ulInvalidIOBufferHandle = 0
+IVRIOBuffer_Version = b"IVRIOBuffer_001"
+k_ulInvalidSpatialAnchorHandle = 0
+IVRSpatialAnchors_Version = b"IVRSpatialAnchors_001"
 
 #############################
 ### Expose enum constants ###
@@ -282,12 +316,14 @@ Eye_Left = ENUM_VALUE_TYPE(0)
 Eye_Right = ENUM_VALUE_TYPE(1)
 
 ETextureType = ENUM_TYPE
+TextureType_Invalid = ENUM_VALUE_TYPE(-1)
 TextureType_DirectX = ENUM_VALUE_TYPE(0)
 TextureType_OpenGL = ENUM_VALUE_TYPE(1)
 TextureType_Vulkan = ENUM_VALUE_TYPE(2)
 TextureType_IOSurface = ENUM_VALUE_TYPE(3)
 TextureType_DirectX12 = ENUM_VALUE_TYPE(4)
 TextureType_DXGISharedHandle = ENUM_VALUE_TYPE(5)
+TextureType_Metal = ENUM_VALUE_TYPE(6)
 
 EColorSpace = ENUM_TYPE
 ColorSpace_Auto = ENUM_VALUE_TYPE(0)
@@ -300,6 +336,7 @@ TrackingResult_Calibrating_InProgress = ENUM_VALUE_TYPE(100)
 TrackingResult_Calibrating_OutOfRange = ENUM_VALUE_TYPE(101)
 TrackingResult_Running_OK = ENUM_VALUE_TYPE(200)
 TrackingResult_Running_OutOfRange = ENUM_VALUE_TYPE(201)
+TrackingResult_Fallback_RotationOnly = ENUM_VALUE_TYPE(300)
 
 ETrackedDeviceClass = ENUM_TYPE
 TrackedDeviceClass_Invalid = ENUM_VALUE_TYPE(0)
@@ -308,12 +345,14 @@ TrackedDeviceClass_Controller = ENUM_VALUE_TYPE(2)
 TrackedDeviceClass_GenericTracker = ENUM_VALUE_TYPE(3)
 TrackedDeviceClass_TrackingReference = ENUM_VALUE_TYPE(4)
 TrackedDeviceClass_DisplayRedirect = ENUM_VALUE_TYPE(5)
+TrackedDeviceClass_Max = ENUM_VALUE_TYPE(6)
 
 ETrackedControllerRole = ENUM_TYPE
 TrackedControllerRole_Invalid = ENUM_VALUE_TYPE(0)
 TrackedControllerRole_LeftHand = ENUM_VALUE_TYPE(1)
 TrackedControllerRole_RightHand = ENUM_VALUE_TYPE(2)
 TrackedControllerRole_OptOut = ENUM_VALUE_TYPE(3)
+TrackedControllerRole_Max = ENUM_VALUE_TYPE(4)
 
 ETrackingUniverseOrigin = ENUM_TYPE
 TrackingUniverseSeated = ENUM_VALUE_TYPE(0)
@@ -361,6 +400,9 @@ Prop_ResourceRoot_String = ENUM_VALUE_TYPE(1035)
 Prop_RegisteredDeviceType_String = ENUM_VALUE_TYPE(1036)
 Prop_InputProfilePath_String = ENUM_VALUE_TYPE(1037)
 Prop_NeverTracked_Bool = ENUM_VALUE_TYPE(1038)
+Prop_NumCameras_Int32 = ENUM_VALUE_TYPE(1039)
+Prop_CameraFrameLayout_Int32 = ENUM_VALUE_TYPE(1040)
+Prop_CameraStreamFormat_Int32 = ENUM_VALUE_TYPE(1041)
 Prop_ReportsTimeSinceVSync_Bool = ENUM_VALUE_TYPE(2000)
 Prop_SecondsFromVsyncToPhotons_Float = ENUM_VALUE_TYPE(2001)
 Prop_DisplayFrequency_Float = ENUM_VALUE_TYPE(2002)
@@ -422,6 +464,21 @@ Prop_DriverRequestsReducedRendering_Bool = ENUM_VALUE_TYPE(2059)
 Prop_MinimumIpdStepMeters_Float = ENUM_VALUE_TYPE(2060)
 Prop_AudioBridgeFirmwareVersion_Uint64 = ENUM_VALUE_TYPE(2061)
 Prop_ImageBridgeFirmwareVersion_Uint64 = ENUM_VALUE_TYPE(2062)
+Prop_ImuToHeadTransform_Matrix34 = ENUM_VALUE_TYPE(2063)
+Prop_ImuFactoryGyroBias_Vector3 = ENUM_VALUE_TYPE(2064)
+Prop_ImuFactoryGyroScale_Vector3 = ENUM_VALUE_TYPE(2065)
+Prop_ImuFactoryAccelerometerBias_Vector3 = ENUM_VALUE_TYPE(2066)
+Prop_ImuFactoryAccelerometerScale_Vector3 = ENUM_VALUE_TYPE(2067)
+Prop_ConfigurationIncludesLighthouse20Features_Bool = ENUM_VALUE_TYPE(2069)
+Prop_DriverRequestedMuraCorrectionMode_Int32 = ENUM_VALUE_TYPE(2200)
+Prop_DriverRequestedMuraFeather_InnerLeft_Int32 = ENUM_VALUE_TYPE(2201)
+Prop_DriverRequestedMuraFeather_InnerRight_Int32 = ENUM_VALUE_TYPE(2202)
+Prop_DriverRequestedMuraFeather_InnerTop_Int32 = ENUM_VALUE_TYPE(2203)
+Prop_DriverRequestedMuraFeather_InnerBottom_Int32 = ENUM_VALUE_TYPE(2204)
+Prop_DriverRequestedMuraFeather_OuterLeft_Int32 = ENUM_VALUE_TYPE(2205)
+Prop_DriverRequestedMuraFeather_OuterRight_Int32 = ENUM_VALUE_TYPE(2206)
+Prop_DriverRequestedMuraFeather_OuterTop_Int32 = ENUM_VALUE_TYPE(2207)
+Prop_DriverRequestedMuraFeather_OuterBottom_Int32 = ENUM_VALUE_TYPE(2208)
 Prop_AttachedDeviceId_String = ENUM_VALUE_TYPE(3000)
 Prop_SupportedButtons_Uint64 = ENUM_VALUE_TYPE(3001)
 Prop_Axis0Type_Int32 = ENUM_VALUE_TYPE(3002)
@@ -456,8 +513,10 @@ Prop_HasControllerComponent_Bool = ENUM_VALUE_TYPE(6003)
 Prop_HasCameraComponent_Bool = ENUM_VALUE_TYPE(6004)
 Prop_HasDriverDirectModeComponent_Bool = ENUM_VALUE_TYPE(6005)
 Prop_HasVirtualDisplayComponent_Bool = ENUM_VALUE_TYPE(6006)
+Prop_HasSpatialAnchorsSupport_Bool = ENUM_VALUE_TYPE(6007)
 Prop_ControllerType_String = ENUM_VALUE_TYPE(7000)
 Prop_LegacyInputProfile_String = ENUM_VALUE_TYPE(7001)
+Prop_ControllerHandSelectionPriority_Int32 = ENUM_VALUE_TYPE(7002)
 Prop_VendorSpecific_Reserved_Start = ENUM_VALUE_TYPE(10000)
 Prop_VendorSpecific_Reserved_End = ENUM_VALUE_TYPE(10999)
 Prop_TrackedDeviceProperty_Max = ENUM_VALUE_TYPE(1000000)
@@ -476,6 +535,7 @@ TrackedProp_NotYetAvailable = ENUM_VALUE_TYPE(9)
 TrackedProp_PermissionDenied = ENUM_VALUE_TYPE(10)
 TrackedProp_InvalidOperation = ENUM_VALUE_TYPE(11)
 TrackedProp_CannotWriteToWildcards = ENUM_VALUE_TYPE(12)
+TrackedProp_IPCReadFailure = ENUM_VALUE_TYPE(13)
 
 EVRSubmitFlags = ENUM_TYPE
 Submit_Default = ENUM_VALUE_TYPE(0)
@@ -541,6 +601,7 @@ VREvent_SceneFocusChanged = ENUM_VALUE_TYPE(405)
 VREvent_InputFocusChanged = ENUM_VALUE_TYPE(406)
 VREvent_SceneApplicationSecondaryRenderingStarted = ENUM_VALUE_TYPE(407)
 VREvent_SceneApplicationUsingWrongGraphicsAdapter = ENUM_VALUE_TYPE(408)
+VREvent_ActionBindingReloaded = ENUM_VALUE_TYPE(409)
 VREvent_HideRenderModels = ENUM_VALUE_TYPE(410)
 VREvent_ShowRenderModels = ENUM_VALUE_TYPE(411)
 VREvent_ConsoleOpened = ENUM_VALUE_TYPE(420)
@@ -602,6 +663,7 @@ VREvent_KeyboardSectionSettingChanged = ENUM_VALUE_TYPE(862)
 VREvent_PerfSectionSettingChanged = ENUM_VALUE_TYPE(863)
 VREvent_DashboardSectionSettingChanged = ENUM_VALUE_TYPE(864)
 VREvent_WebInterfaceSectionSettingChanged = ENUM_VALUE_TYPE(865)
+VREvent_TrackersSectionSettingChanged = ENUM_VALUE_TYPE(866)
 VREvent_StatusUpdate = ENUM_VALUE_TYPE(900)
 VREvent_WebInterface_InstallDriverCompleted = ENUM_VALUE_TYPE(950)
 VREvent_MCImageUpdated = ENUM_VALUE_TYPE(1000)
@@ -633,6 +695,15 @@ VREvent_PerformanceTest_FidelityLevel = ENUM_VALUE_TYPE(1602)
 VREvent_MessageOverlay_Closed = ENUM_VALUE_TYPE(1650)
 VREvent_MessageOverlayCloseRequested = ENUM_VALUE_TYPE(1651)
 VREvent_Input_HapticVibration = ENUM_VALUE_TYPE(1700)
+VREvent_Input_BindingLoadFailed = ENUM_VALUE_TYPE(1701)
+VREvent_Input_BindingLoadSuccessful = ENUM_VALUE_TYPE(1702)
+VREvent_Input_ActionManifestReloaded = ENUM_VALUE_TYPE(1703)
+VREvent_Input_ActionManifestLoadFailed = ENUM_VALUE_TYPE(1704)
+VREvent_Input_TrackerActivated = ENUM_VALUE_TYPE(1706)
+VREvent_SpatialAnchors_PoseUpdated = ENUM_VALUE_TYPE(1800)
+VREvent_SpatialAnchors_DescriptorUpdated = ENUM_VALUE_TYPE(1801)
+VREvent_SpatialAnchors_RequestPoseUpdate = ENUM_VALUE_TYPE(1802)
+VREvent_SpatialAnchors_RequestDescriptorUpdate = ENUM_VALUE_TYPE(1803)
 VREvent_VendorSpecific_Reserved_Start = ENUM_VALUE_TYPE(10000)
 VREvent_VendorSpecific_Reserved_End = ENUM_VALUE_TYPE(19999)
 
@@ -661,6 +732,9 @@ k_EButton_Axis4 = ENUM_VALUE_TYPE(36)
 k_EButton_SteamVR_Touchpad = ENUM_VALUE_TYPE(32)
 k_EButton_SteamVR_Trigger = ENUM_VALUE_TYPE(33)
 k_EButton_Dashboard_Back = ENUM_VALUE_TYPE(2)
+k_EButton_Knuckles_A = ENUM_VALUE_TYPE(2)
+k_EButton_Knuckles_B = ENUM_VALUE_TYPE(1)
+k_EButton_Knuckles_JoyStick = ENUM_VALUE_TYPE(35)
 k_EButton_Max = ENUM_VALUE_TYPE(64)
 
 EVRMouseButton = ENUM_TYPE
@@ -683,6 +757,29 @@ VRInputError_MaxCapacityReached = ENUM_VALUE_TYPE(6)
 VRInputError_IPCError = ENUM_VALUE_TYPE(7)
 VRInputError_NoActiveActionSet = ENUM_VALUE_TYPE(8)
 VRInputError_InvalidDevice = ENUM_VALUE_TYPE(9)
+VRInputError_InvalidSkeleton = ENUM_VALUE_TYPE(10)
+VRInputError_InvalidBoneCount = ENUM_VALUE_TYPE(11)
+VRInputError_InvalidCompressedData = ENUM_VALUE_TYPE(12)
+VRInputError_NoData = ENUM_VALUE_TYPE(13)
+VRInputError_BufferTooSmall = ENUM_VALUE_TYPE(14)
+VRInputError_MismatchedActionManifest = ENUM_VALUE_TYPE(15)
+VRInputError_MissingSkeletonData = ENUM_VALUE_TYPE(16)
+
+EVRSpatialAnchorError = ENUM_TYPE
+VRSpatialAnchorError_Success = ENUM_VALUE_TYPE(0)
+VRSpatialAnchorError_Internal = ENUM_VALUE_TYPE(1)
+VRSpatialAnchorError_UnknownHandle = ENUM_VALUE_TYPE(2)
+VRSpatialAnchorError_ArrayTooSmall = ENUM_VALUE_TYPE(3)
+VRSpatialAnchorError_InvalidDescriptorChar = ENUM_VALUE_TYPE(4)
+VRSpatialAnchorError_NotYetAvailable = ENUM_VALUE_TYPE(5)
+VRSpatialAnchorError_NotAvailableInThisUniverse = ENUM_VALUE_TYPE(6)
+VRSpatialAnchorError_PermanentlyUnavailable = ENUM_VALUE_TYPE(7)
+VRSpatialAnchorError_WrongDriver = ENUM_VALUE_TYPE(8)
+VRSpatialAnchorError_DescriptorTooLong = ENUM_VALUE_TYPE(9)
+VRSpatialAnchorError_Unknown = ENUM_VALUE_TYPE(10)
+VRSpatialAnchorError_NoRoomCalibration = ENUM_VALUE_TYPE(11)
+VRSpatialAnchorError_InvalidArgument = ENUM_VALUE_TYPE(12)
+VRSpatialAnchorError_UnknownDriver = ENUM_VALUE_TYPE(13)
 
 EHiddenAreaMeshType = ENUM_TYPE
 k_eHiddenAreaMesh_Standard = ENUM_VALUE_TYPE(0)
@@ -757,6 +854,10 @@ VRNotificationError_NotificationQueueFull = ENUM_VALUE_TYPE(101)
 VRNotificationError_InvalidOverlayHandle = ENUM_VALUE_TYPE(102)
 VRNotificationError_SystemWithUserValueAlreadyExists = ENUM_VALUE_TYPE(103)
 
+EVRSkeletalMotionRange = ENUM_TYPE
+VRSkeletalMotionRange_WithController = ENUM_VALUE_TYPE(0)
+VRSkeletalMotionRange_WithoutController = ENUM_VALUE_TYPE(1)
+
 EVRInitError = ENUM_TYPE
 VRInitError_None = ENUM_VALUE_TYPE(0)
 VRInitError_Unknown = ENUM_VALUE_TYPE(1)
@@ -802,6 +903,7 @@ VRInitError_Init_FirmwareUpdateBusy = ENUM_VALUE_TYPE(138)
 VRInitError_Init_FirmwareRecoveryBusy = ENUM_VALUE_TYPE(139)
 VRInitError_Init_USBServiceBusy = ENUM_VALUE_TYPE(140)
 VRInitError_Init_VRWebHelperStartupFailed = ENUM_VALUE_TYPE(141)
+VRInitError_Init_TrackerManagerInitFailed = ENUM_VALUE_TYPE(142)
 VRInitError_Driver_Failed = ENUM_VALUE_TYPE(200)
 VRInitError_Driver_Unknown = ENUM_VALUE_TYPE(201)
 VRInitError_Driver_HmdUnknown = ENUM_VALUE_TYPE(202)
@@ -877,11 +979,34 @@ VRTrackedCameraError_NoFrameAvailable = ENUM_VALUE_TYPE(113)
 VRTrackedCameraError_InvalidArgument = ENUM_VALUE_TYPE(114)
 VRTrackedCameraError_InvalidFrameBufferSize = ENUM_VALUE_TYPE(115)
 
+EVRTrackedCameraFrameLayout = ENUM_TYPE
+Mono = ENUM_VALUE_TYPE(1)
+Stereo = ENUM_VALUE_TYPE(2)
+VerticalLayout = ENUM_VALUE_TYPE(16)
+HorizontalLayout = ENUM_VALUE_TYPE(32)
+
 EVRTrackedCameraFrameType = ENUM_TYPE
 VRTrackedCameraFrameType_Distorted = ENUM_VALUE_TYPE(0)
 VRTrackedCameraFrameType_Undistorted = ENUM_VALUE_TYPE(1)
 VRTrackedCameraFrameType_MaximumUndistorted = ENUM_VALUE_TYPE(2)
 MAX_CAMERA_FRAME_TYPES = ENUM_VALUE_TYPE(3)
+
+EVSync = ENUM_TYPE
+VSync_None = ENUM_VALUE_TYPE(0)
+VSync_WaitRender = ENUM_VALUE_TYPE(1)
+VSync_NoWaitRender = ENUM_VALUE_TYPE(2)
+
+EVRMuraCorrectionMode = ENUM_TYPE
+Default = ENUM_VALUE_TYPE(0)
+NoCorrection = ENUM_VALUE_TYPE(1)
+
+Imu_OffScaleFlags = ENUM_TYPE
+OffScale_AccelX = ENUM_VALUE_TYPE(1)
+OffScale_AccelY = ENUM_VALUE_TYPE(2)
+OffScale_AccelZ = ENUM_VALUE_TYPE(4)
+OffScale_GyroX = ENUM_VALUE_TYPE(8)
+OffScale_GyroY = ENUM_VALUE_TYPE(16)
+OffScale_GyroZ = ENUM_VALUE_TYPE(32)
 
 EVRApplicationError = ENUM_TYPE
 VRApplicationError_None = ENUM_VALUE_TYPE(0)
@@ -1077,6 +1202,29 @@ VRScreenshotError_NotFound = ENUM_VALUE_TYPE(101)
 VRScreenshotError_BufferTooSmall = ENUM_VALUE_TYPE(102)
 VRScreenshotError_ScreenshotAlreadyInProgress = ENUM_VALUE_TYPE(108)
 
+EVRSkeletalTransformSpace = ENUM_TYPE
+VRSkeletalTransformSpace_Model = ENUM_VALUE_TYPE(0)
+VRSkeletalTransformSpace_Parent = ENUM_VALUE_TYPE(1)
+VRSkeletalTransformSpace_Additive = ENUM_VALUE_TYPE(2)
+
+EVRInputFilterCancelType = ENUM_TYPE
+VRInputFilterCancel_Timers = ENUM_VALUE_TYPE(0)
+VRInputFilterCancel_Momentum = ENUM_VALUE_TYPE(1)
+
+EIOBufferError = ENUM_TYPE
+IOBuffer_Success = ENUM_VALUE_TYPE(0)
+IOBuffer_OperationFailed = ENUM_VALUE_TYPE(100)
+IOBuffer_InvalidHandle = ENUM_VALUE_TYPE(101)
+IOBuffer_InvalidArgument = ENUM_VALUE_TYPE(102)
+IOBuffer_PathExists = ENUM_VALUE_TYPE(103)
+IOBuffer_PathDoesNotExist = ENUM_VALUE_TYPE(104)
+IOBuffer_Permission = ENUM_VALUE_TYPE(105)
+
+EIOBufferMode = ENUM_TYPE
+IOBufferMode_Read = ENUM_VALUE_TYPE(1)
+IOBufferMode_Write = ENUM_VALUE_TYPE(2)
+IOBufferMode_Create = ENUM_VALUE_TYPE(512)
+
 
 #######################
 ### Expose Typedefs ###
@@ -1093,21 +1241,27 @@ VRInputValueHandle_t = c_uint64
 TrackedDeviceIndex_t = c_uint32
 VRNotificationId = c_uint32
 VROverlayHandle_t = c_uint64
+SpatialAnchorHandle_t = c_uint32
 glSharedTextureHandle_t = c_void_p
 glInt_t = c_int32
 glUInt_t = c_uint32
 SharedTextureHandle_t = c_uint64
 DriverId_t = c_uint32
 TrackedDeviceIndex_t = c_uint32
+WebConsoleHandle_t = c_uint64
 PropertyContainerHandle_t = c_uint64
 PropertyTypeTag_t = c_uint32
 DriverHandle_t = PropertyContainerHandle_t
+VRActionHandle_t = c_uint64
+VRActionSetHandle_t = c_uint64
+VRInputValueHandle_t = c_uint64
 VROverlayHandle_t = c_uint64
 TrackedCameraHandle_t = c_uint64
 ScreenshotHandle_t = c_uint32
 VRComponentProperties = c_uint32
 TextureID_t = c_int32
 VRNotificationId = c_uint32
+IOBufferHandle_t = c_uint64
 HmdError = EVRInitError
 Hmd_Eye = EVREye
 ColorSpace = EColorSpace
@@ -1185,6 +1339,12 @@ class HmdMatrix34_t(_MatrixMixin, Structure):
     ]
 
 
+class HmdMatrix33_t(_MatrixMixin, Structure):
+    _fields_ = [
+        ("m", (c_float * 3) * 3),
+    ]
+
+
 class HmdMatrix44_t(_MatrixMixin, Structure):
     _fields_ = [
         ("m", (c_float * 4) * 4),
@@ -1221,6 +1381,15 @@ class HmdQuaternion_t(Structure):
         ("x", c_double),
         ("y", c_double),
         ("z", c_double),
+    ]
+
+
+class HmdQuaternionf_t(Structure):
+    _fields_ = [
+        ("w", c_float),
+        ("x", c_float),
+        ("y", c_float),
+        ("z", c_float),
     ]
 
 
@@ -1326,7 +1495,8 @@ class VRTextureWithPoseAndDepth_t(Structure):
 class VRVulkanTextureData_t(Structure):
     """
     Data required for passing Vulkan textures to IVRCompositor::Submit.
-    Be sure to call OpenVR_Shutdown before destroying these resources.
+    Be sure to call OpenVR_Shutdown before destroying these resources. 
+    Please see https://github.com/ValveSoftware/openvr/wiki/Vulkan for Vulkan-specific documentation
     """
 
     _fields_ = [
@@ -1425,6 +1595,7 @@ class VREvent_Overlay_t(Structure):
 
     _fields_ = [
         ("overlayHandle", c_uint64),
+        ("devicePath", c_uint64),
     ]
 
 
@@ -1440,7 +1611,7 @@ class VREvent_Keyboard_t(Structure):
     "Used for keyboard events"
 
     _fields_ = [
-        ("cNewInput", c_char_p * 8),
+        ("cNewInput", c_char * 8),
         ("uUserValue", c_uint64),
     ]
 
@@ -1541,6 +1712,36 @@ class VREvent_HapticVibration_t(Structure):
     ]
 
 
+class VREvent_WebConsole_t(Structure):
+    _fields_ = [
+        ("webConsoleHandle", WebConsoleHandle_t),
+    ]
+
+
+class VREvent_InputBindingLoad_t(Structure):
+    _fields_ = [
+        ("ulAppContainer", PropertyContainerHandle_t),
+        ("pathMessage", c_uint64),
+        ("pathUrl", c_uint64),
+        ("pathControllerType", c_uint64),
+    ]
+
+
+class VREvent_InputActionManifestLoad_t(Structure):
+    _fields_ = [
+        ("pathAppKey", c_uint64),
+        ("pathMessage", c_uint64),
+        ("pathMessageParam", c_uint64),
+        ("pathManifestPath", c_uint64),
+    ]
+
+
+class VREvent_SpatialAnchor_t(Structure):
+    _fields_ = [
+        ("unHandle", SpatialAnchorHandle_t),
+    ]
+
+
 class HiddenAreaMesh_t(Structure):
     """
     The mesh to draw into the stencil (or depth) buffer to perform 
@@ -1585,6 +1786,7 @@ else:
         ]
 
 
+
 class Compositor_OverlaySettings(Structure):
     "Allows the application to customize how the overlay appears in the compositor"
 
@@ -1606,6 +1808,15 @@ class Compositor_OverlaySettings(Structure):
     ]
 
 
+class VRBoneTransform_t(Structure):
+    "Holds the transform for a single bone"
+
+    _fields_ = [
+        ("position", HmdVector4_t),
+        ("orientation", HmdQuaternionf_t),
+    ]
+
+
 class CameraVideoStreamFrameHeader_t(Structure):
     _fields_ = [
         ("eFrameType", EVRTrackedCameraFrameType),
@@ -1614,6 +1825,7 @@ class CameraVideoStreamFrameHeader_t(Structure):
         ("nBytesPerPixel", c_uint32),
         ("nFrameSequence", c_uint32),
         ("standingTrackedDevicePose", TrackedDevicePose_t),
+        ("ulFrameExposureTime", c_uint64),
     ]
 
 
@@ -1626,6 +1838,15 @@ class DriverDirectMode_FrameTiming(Structure):
         ("m_nNumMisPresented", c_uint32),
         ("m_nNumDroppedFrames", c_uint32),
         ("m_nReprojectionFlags", c_uint32),
+    ]
+
+
+class ImuSample_t(Structure):
+    _fields_ = [
+        ("fSampleTime", c_double),
+        ("vAccel", HmdVector3d_t),
+        ("vGyro", HmdVector3d_t),
+        ("unOffScaleFlags", c_uint32),
     ]
 
 
@@ -1664,6 +1885,8 @@ class Compositor_FrameTiming(Structure):
         ("m_flCompositorUpdateEndMs", c_float),
         ("m_flCompositorRenderStartMs", c_float),
         ("m_HmdPose", TrackedDevicePose_t),
+        ("m_nNumVSyncsReadyForUse", c_uint32),
+        ("m_nNumVSyncsToFirstView", c_uint32),
     ]
 
 
@@ -1781,6 +2004,76 @@ class NotificationBitmap_t(Structure):
     ]
 
 
+class CVRSettingHelper(Structure):
+    _fields_ = [
+        ("m_pSettings", POINTER(c_int)),
+    ]
+
+
+class InputAnalogActionData_t(Structure):
+    _fields_ = [
+        ("bActive", openvr_bool),
+        ("activeOrigin", VRInputValueHandle_t),
+        ("x", c_float),
+        ("y", c_float),
+        ("z", c_float),
+        ("deltaX", c_float),
+        ("deltaY", c_float),
+        ("deltaZ", c_float),
+        ("fUpdateTime", c_float),
+    ]
+
+
+class InputDigitalActionData_t(Structure):
+    _fields_ = [
+        ("bActive", openvr_bool),
+        ("activeOrigin", VRInputValueHandle_t),
+        ("bState", openvr_bool),
+        ("bChanged", openvr_bool),
+        ("fUpdateTime", c_float),
+    ]
+
+
+class InputPoseActionData_t(Structure):
+    _fields_ = [
+        ("bActive", openvr_bool),
+        ("activeOrigin", VRInputValueHandle_t),
+        ("pose", TrackedDevicePose_t),
+    ]
+
+
+class InputSkeletalActionData_t(Structure):
+    _fields_ = [
+        ("bActive", openvr_bool),
+        ("activeOrigin", VRInputValueHandle_t),
+        ("boneCount", c_uint32),
+    ]
+
+
+class InputOriginInfo_t(Structure):
+    _fields_ = [
+        ("devicePath", VRInputValueHandle_t),
+        ("trackedDeviceIndex", TrackedDeviceIndex_t),
+        ("rchRenderModelComponentName", c_char * 128),
+    ]
+
+
+class VRActiveActionSet_t(Structure):
+    _fields_ = [
+        ("ulActionSet", VRActionSetHandle_t),
+        ("ulRestrictedToDevice", VRInputValueHandle_t),
+        ("ulSecondaryActionSet", VRActionSetHandle_t),
+        ("unPadding", c_uint32),
+        ("nPriority", c_int32),
+    ]
+
+
+class SpatialAnchorPose_t(Structure):
+    _fields_ = [
+        ("mAnchorToAbsoluteTracking", HmdMatrix34_t),
+    ]
+
+
 class COpenVRContext(object):
     def __init__(self):
         self.clear()
@@ -1805,6 +2098,9 @@ class COpenVRContext(object):
         self.m_pVRTrackedCamera = None
         self.m_pVRScreenshots = None
         self.m_pVRDriverManager = None
+        self.m_pVRInput = None
+        self.m_pVRIOBuffer = None
+        self.m_pVRSpatialAnchors = None
 
     def VRSystem(self):
         self.checkClear()
@@ -1884,6 +2180,24 @@ class COpenVRContext(object):
             self.m_pVRDriverManager = IVRDriverManager()
         return self.m_pVRDriverManager
 
+    def VRInput(self):
+        self.checkClear()
+        if self.m_pVRInput is None:
+            self.m_pVRInput = IVRInput()
+        return self.m_pVRInput
+
+    def VRIOBuffer(self):
+        self.checkClear()
+        if self.m_pVRIOBuffer is None:
+            self.m_pVRIOBuffer = IVRIOBuffer()
+        return self.m_pVRIOBuffer
+
+    def VRSpatialAnchors(self):
+        self.checkClear()
+        if self.m_pVRSpatialAnchors is None:
+            self.m_pVRSpatialAnchors = IVRSpatialAnchors()
+        return self.m_pVRSpatialAnchors
+
 
 # Globals for context management
 _vr_token = None
@@ -1929,6 +2243,15 @@ def VRScreenshots():
 def VRDriverManager():
     return _internal_module_context.VRDriverManager()
 
+def VRInput():
+    return _internal_module_context.VRInput()
+
+def VRIOBuffer():
+    return _internal_module_context.VRIOBuffer()
+
+def VRSpatialAnchors():
+    return _internal_module_context.VRSpatialAnchors()
+
 class VREvent_Data_t(Union):
     _fields_ = [
         ("reserved", VREvent_Reserved_t),
@@ -1945,6 +2268,18 @@ class VREvent_Data_t(Union):
         ("performanceTest", VREvent_PerformanceTest_t),
         ("touchPadMove", VREvent_TouchPadMove_t),
         ("seatedZeroPoseReset", VREvent_SeatedZeroPoseReset_t),
+        ("screenshot", VREvent_Screenshot_t),
+        ("screenshotProgress", VREvent_ScreenshotProgress_t),
+        ("applicationLaunch", VREvent_ApplicationLaunch_t),
+        ("cameraSurface", VREvent_EditingCameraSurface_t),
+        ("messageOverlay", VREvent_MessageOverlay_t),
+        ("property", VREvent_Property_t),
+        ("dualAnalog", VREvent_DualAnalog_t),
+        ("hapticVibration", VREvent_HapticVibration_t),
+        ("webConsole", VREvent_WebConsole_t),
+        ("inputBinding", VREvent_InputBindingLoad_t),
+        ("actionManifest", VREvent_InputActionManifestLoad_t),
+        ("spatialAnchor", VREvent_SpatialAnchor_t),
     ]
 
 
@@ -2266,14 +2601,14 @@ class IVRSystem(object):
         return pOutputPose, pTrackedDevicePose, pTransform
 
     def getTrackedDeviceIndexForControllerRole(self, unDeviceType):
-        "Returns the device index associated with a specific role, for example the left hand or the right hand."
+        "Returns the device index associated with a specific role, for example the left hand or the right hand. This function is deprecated in favor of the new IVRInput system."
 
         fn = self.function_table.getTrackedDeviceIndexForControllerRole
         result = fn(unDeviceType)
         return result
 
     def getControllerRoleForTrackedDeviceIndex(self, unDeviceIndex):
-        "Returns the controller type associated with a device index."
+        "Returns the controller type associated with a device index. This function is deprecated in favor of the new IVRInput system."
 
         fn = self.function_table.getControllerRoleForTrackedDeviceIndex
         result = fn(unDeviceIndex)
@@ -2431,7 +2766,7 @@ class IVRSystem(object):
     def getControllerState(self, unControllerDeviceIndex, unControllerStateSize=sizeof(VRControllerState_t)):
         """
         Fills the supplied struct with the current state of the controller. Returns false if the controller index
-        is invalid.
+        is invalid. This function is deprecated in favor of the new IVRInput system.
         """
 
         fn = self.function_table.getControllerState
@@ -2443,7 +2778,7 @@ class IVRSystem(object):
         """
         fills the supplied struct with the current state of the controller and the provided pose with the pose of 
         the controller when the controller state was updated most recently. Use this form if you need a precise controller
-        pose as input to your application when the user presses or releases a button.
+        pose as input to your application when the user presses or releases a button. This function is deprecated in favor of the new IVRInput system.
         """
 
         fn = self.function_table.getControllerStateWithPose
@@ -2455,21 +2790,21 @@ class IVRSystem(object):
     def triggerHapticPulse(self, unControllerDeviceIndex, unAxisId, usDurationMicroSec):
         """
         Trigger a single haptic pulse on a controller. After this call the application may not trigger another haptic pulse on this controller
-        and axis combination for 5ms.
+        and axis combination for 5ms. This function is deprecated in favor of the new IVRInput system.
         """
 
         fn = self.function_table.triggerHapticPulse
         fn(unControllerDeviceIndex, unAxisId, usDurationMicroSec)
 
     def getButtonIdNameFromEnum(self, eButtonId):
-        "returns the name of an EVRButtonId enum value"
+        "returns the name of an EVRButtonId enum value. This function is deprecated in favor of the new IVRInput system."
 
         fn = self.function_table.getButtonIdNameFromEnum
         result = fn(eButtonId)
         return result
 
     def getControllerAxisTypeNameFromEnum(self, eAxisType):
-        "returns the name of an EVRControllerAxisType enum value"
+        "returns the name of an EVRControllerAxisType enum value. This function is deprecated in favor of the new IVRInput system."
 
         fn = self.function_table.getControllerAxisTypeNameFromEnum
         result = fn(eAxisType)
@@ -3717,7 +4052,7 @@ class IVRCompositor(object):
         return result
 
     def compositorDumpImages(self):
-        "Writes all images that the compositor knows about (including overlays) to a 'screenshots' folder in the SteamVR runtime root."
+        "Writes back buffer and stereo left/right pair from the application to a 'screenshots' folder in the SteamVR runtime root."
 
         fn = self.function_table.compositorDumpImages
         fn()
@@ -4249,12 +4584,13 @@ class IVROverlay(object):
         result = fn(ulOverlayHandle, byref(peTransformType))
         return result, peTransformType
 
-    def setOverlayTransformAbsolute(self, ulOverlayHandle, eTrackingOrigin, pmatTrackingOriginToOverlayTransform):
+    def setOverlayTransformAbsolute(self, ulOverlayHandle, eTrackingOrigin):
         "Sets the transform to absolute tracking origin."
 
         fn = self.function_table.setOverlayTransformAbsolute
+        pmatTrackingOriginToOverlayTransform = HmdMatrix34_t()
         result = fn(ulOverlayHandle, eTrackingOrigin, byref(pmatTrackingOriginToOverlayTransform))
-        return result
+        return result, pmatTrackingOriginToOverlayTransform
 
     def getOverlayTransformAbsolute(self, ulOverlayHandle):
         "Gets the transform if it is absolute. Returns an error if the transform is some other type."
@@ -4265,12 +4601,13 @@ class IVROverlay(object):
         result = fn(ulOverlayHandle, byref(peTrackingOrigin), byref(pmatTrackingOriginToOverlayTransform))
         return result, peTrackingOrigin, pmatTrackingOriginToOverlayTransform
 
-    def setOverlayTransformTrackedDeviceRelative(self, ulOverlayHandle, unTrackedDevice, pmatTrackedDeviceToOverlayTransform):
+    def setOverlayTransformTrackedDeviceRelative(self, ulOverlayHandle, unTrackedDevice):
         "Sets the transform to relative to the transform of the specified tracked device."
 
         fn = self.function_table.setOverlayTransformTrackedDeviceRelative
+        pmatTrackedDeviceToOverlayTransform = HmdMatrix34_t()
         result = fn(ulOverlayHandle, unTrackedDevice, byref(pmatTrackedDeviceToOverlayTransform))
-        return result
+        return result, pmatTrackedDeviceToOverlayTransform
 
     def getOverlayTransformTrackedDeviceRelative(self, ulOverlayHandle):
         "Gets the transform if it is relative to a tracked device. Returns an error if the transform is some other type."
@@ -4682,6 +5019,7 @@ class IVRRenderModels_FnTable(Structure):
         ("getComponentName", OPENVR_FNTABLE_CALLTYPE(c_uint32, c_char_p, c_uint32, c_char_p, c_uint32)),
         ("getComponentButtonMask", OPENVR_FNTABLE_CALLTYPE(c_uint64, c_char_p, c_char_p)),
         ("getComponentRenderModelName", OPENVR_FNTABLE_CALLTYPE(c_uint32, c_char_p, c_char_p, c_char_p, c_uint32)),
+        ("getComponentStateForDevicePath", OPENVR_FNTABLE_CALLTYPE(openvr_bool, c_char_p, c_char_p, VRInputValueHandle_t, POINTER(RenderModel_ControllerMode_State_t), POINTER(RenderModel_ComponentState_t))),
         ("getComponentState", OPENVR_FNTABLE_CALLTYPE(openvr_bool, c_char_p, c_char_p, POINTER(VRControllerState_t), POINTER(RenderModel_ControllerMode_State_t), POINTER(RenderModel_ComponentState_t))),
         ("renderModelHasComponent", OPENVR_FNTABLE_CALLTYPE(openvr_bool, c_char_p, c_char_p)),
         ("getRenderModelThumbnailURL", OPENVR_FNTABLE_CALLTYPE(c_uint32, c_char_p, c_char_p, c_uint32, POINTER(EVRRenderModelError))),
@@ -4841,7 +5179,7 @@ class IVRRenderModels(object):
         result = fn(pchRenderModelName, pchComponentName, pchComponentRenderModelName, unComponentRenderModelNameLen)
         return result
 
-    def getComponentState(self, pchRenderModelName, pchComponentName):
+    def getComponentStateForDevicePath(self, pchRenderModelName, pchComponentName, devicePath):
         """
         Use this to query information about the component, as a function of the controller state.
         * For dynamic controller components (ex: trigger) values will reflect component motions
@@ -4850,6 +5188,15 @@ class IVRRenderModels(object):
         Otherwise, return true
         Note: For dynamic objects, visibility may be dynamic. (I.e., true/false will be returned based on controller state and controller mode state )
         """
+
+        fn = self.function_table.getComponentStateForDevicePath
+        pState = RenderModel_ControllerMode_State_t()
+        pComponentState = RenderModel_ComponentState_t()
+        result = fn(pchRenderModelName, pchComponentName, devicePath, byref(pState), byref(pComponentState))
+        return result, pState, pComponentState
+
+    def getComponentState(self, pchRenderModelName, pchComponentName):
+        "This version of GetComponentState takes a controller state block instead of an action origin. This function is deprecated. You should use the new input system and GetComponentStateForDevicePath instead."
 
         fn = self.function_table.getComponentState
         pControllerState = VRControllerState_t()
@@ -5289,6 +5636,356 @@ class IVRDriverManager(object):
         fn = self.function_table.getDriverHandle
         result = fn(pchDriverName)
         return result
+
+
+
+class IVRInput_FnTable(Structure):
+    _fields_ = [
+        ("setActionManifestPath", OPENVR_FNTABLE_CALLTYPE(EVRInputError, c_char_p)),
+        ("getActionSetHandle", OPENVR_FNTABLE_CALLTYPE(EVRInputError, c_char_p, POINTER(VRActionSetHandle_t))),
+        ("getActionHandle", OPENVR_FNTABLE_CALLTYPE(EVRInputError, c_char_p, POINTER(VRActionHandle_t))),
+        ("getInputSourceHandle", OPENVR_FNTABLE_CALLTYPE(EVRInputError, c_char_p, POINTER(VRInputValueHandle_t))),
+        ("updateActionState", OPENVR_FNTABLE_CALLTYPE(EVRInputError, POINTER(VRActiveActionSet_t), c_uint32, c_uint32)),
+        ("getDigitalActionData", OPENVR_FNTABLE_CALLTYPE(EVRInputError, VRActionHandle_t, POINTER(InputDigitalActionData_t), c_uint32, VRInputValueHandle_t)),
+        ("getAnalogActionData", OPENVR_FNTABLE_CALLTYPE(EVRInputError, VRActionHandle_t, POINTER(InputAnalogActionData_t), c_uint32, VRInputValueHandle_t)),
+        ("getPoseActionData", OPENVR_FNTABLE_CALLTYPE(EVRInputError, VRActionHandle_t, ETrackingUniverseOrigin, c_float, POINTER(InputPoseActionData_t), c_uint32, VRInputValueHandle_t)),
+        ("getSkeletalActionData", OPENVR_FNTABLE_CALLTYPE(EVRInputError, VRActionHandle_t, POINTER(InputSkeletalActionData_t), c_uint32, VRInputValueHandle_t)),
+        ("getSkeletalBoneData", OPENVR_FNTABLE_CALLTYPE(EVRInputError, VRActionHandle_t, EVRSkeletalTransformSpace, EVRSkeletalMotionRange, POINTER(VRBoneTransform_t), c_uint32, VRInputValueHandle_t)),
+        ("getSkeletalBoneDataCompressed", OPENVR_FNTABLE_CALLTYPE(EVRInputError, VRActionHandle_t, EVRSkeletalTransformSpace, EVRSkeletalMotionRange, c_void_p, c_uint32, POINTER(c_uint32), VRInputValueHandle_t)),
+        ("decompressSkeletalBoneData", OPENVR_FNTABLE_CALLTYPE(EVRInputError, c_void_p, c_uint32, POINTER(EVRSkeletalTransformSpace), POINTER(VRBoneTransform_t), c_uint32)),
+        ("triggerHapticVibrationAction", OPENVR_FNTABLE_CALLTYPE(EVRInputError, VRActionHandle_t, c_float, c_float, c_float, c_float, VRInputValueHandle_t)),
+        ("getActionOrigins", OPENVR_FNTABLE_CALLTYPE(EVRInputError, VRActionSetHandle_t, VRActionHandle_t, POINTER(VRInputValueHandle_t), c_uint32)),
+        ("getOriginLocalizedName", OPENVR_FNTABLE_CALLTYPE(EVRInputError, VRInputValueHandle_t, c_char_p, c_uint32)),
+        ("getOriginTrackedDeviceInfo", OPENVR_FNTABLE_CALLTYPE(EVRInputError, VRInputValueHandle_t, POINTER(InputOriginInfo_t), c_uint32)),
+        ("showActionOrigins", OPENVR_FNTABLE_CALLTYPE(EVRInputError, VRActionSetHandle_t, VRActionHandle_t)),
+        ("showBindingsForActionSet", OPENVR_FNTABLE_CALLTYPE(EVRInputError, POINTER(VRActiveActionSet_t), c_uint32, c_uint32, VRInputValueHandle_t)),
+    ]
+
+
+class IVRInput(object):
+    def __init__(self):
+        version_key = IVRInput_Version
+        if not isInterfaceVersionValid(version_key):
+            _checkInitError(VRInitError_Init_InterfaceNotFound)
+        # Thank you lukexi https://github.com/lukexi/openvr-hs/blob/master/cbits/openvr_capi_helper.c#L9
+        fn_key = b"FnTable:" + version_key
+        fn_type = IVRInput_FnTable
+        fn_table_ptr = cast(getGenericInterface(fn_key), POINTER(fn_type))
+        if fn_table_ptr is None:
+            raise OpenVRError("Error retrieving VR API for IVRInput")
+        self.function_table = fn_table_ptr.contents
+
+    def setActionManifestPath(self, pchActionManifestPath):
+        """
+        Sets the path to the action manifest JSON file that is used by this application. If this information
+        was set on the Steam partner site, calls to this function are ignored. If the Steam partner site
+        setting and the path provided by this call are different, VRInputError_MismatchedActionManifest is returned. 
+        This call must be made before the first call to UpdateActionState or IVRSystem::PollNextEvent.
+        """
+
+        fn = self.function_table.setActionManifestPath
+        result = fn(pchActionManifestPath)
+        return result
+
+    def getActionSetHandle(self, pchActionSetName):
+        "Returns a handle for an action set. This handle is used for all performance-sensitive calls."
+
+        fn = self.function_table.getActionSetHandle
+        pHandle = VRActionSetHandle_t()
+        result = fn(pchActionSetName, byref(pHandle))
+        return result, pHandle
+
+    def getActionHandle(self, pchActionName):
+        "Returns a handle for an action. This handle is used for all performance-sensitive calls."
+
+        fn = self.function_table.getActionHandle
+        pHandle = VRActionHandle_t()
+        result = fn(pchActionName, byref(pHandle))
+        return result, pHandle
+
+    def getInputSourceHandle(self, pchInputSourcePath):
+        "Returns a handle for any path in the input system. E.g. /user/hand/right"
+
+        fn = self.function_table.getInputSourceHandle
+        pHandle = VRInputValueHandle_t()
+        result = fn(pchInputSourcePath, byref(pHandle))
+        return result, pHandle
+
+    def updateActionState(self, unSizeOfVRSelectedActionSet_t, unSetCount):
+        """
+        Reads the current state into all actions. After this call, the results of Get*Action calls 
+        will be the same until the next call to UpdateActionState.
+        """
+
+        fn = self.function_table.updateActionState
+        pSets = VRActiveActionSet_t()
+        result = fn(byref(pSets), unSizeOfVRSelectedActionSet_t, unSetCount)
+        return result, pSets
+
+    def getDigitalActionData(self, action, unActionDataSize, ulRestrictToDevice):
+        """
+        Reads the state of a digital action given its handle. This will return VRInputError_WrongType if the type of
+        action is something other than digital
+        """
+
+        fn = self.function_table.getDigitalActionData
+        pActionData = InputDigitalActionData_t()
+        result = fn(action, byref(pActionData), unActionDataSize, ulRestrictToDevice)
+        return result, pActionData
+
+    def getAnalogActionData(self, action, unActionDataSize, ulRestrictToDevice):
+        """
+        Reads the state of an analog action given its handle. This will return VRInputError_WrongType if the type of
+        action is something other than analog
+        """
+
+        fn = self.function_table.getAnalogActionData
+        pActionData = InputAnalogActionData_t()
+        result = fn(action, byref(pActionData), unActionDataSize, ulRestrictToDevice)
+        return result, pActionData
+
+    def getPoseActionData(self, action, eOrigin, fPredictedSecondsFromNow, unActionDataSize, ulRestrictToDevice):
+        "Reads the state of a pose action given its handle."
+
+        fn = self.function_table.getPoseActionData
+        pActionData = InputPoseActionData_t()
+        result = fn(action, eOrigin, fPredictedSecondsFromNow, byref(pActionData), unActionDataSize, ulRestrictToDevice)
+        return result, pActionData
+
+    def getSkeletalActionData(self, action, unActionDataSize, ulRestrictToDevice):
+        "Reads the state of a skeletal action given its handle."
+
+        fn = self.function_table.getSkeletalActionData
+        pActionData = InputSkeletalActionData_t()
+        result = fn(action, byref(pActionData), unActionDataSize, ulRestrictToDevice)
+        return result, pActionData
+
+    def getSkeletalBoneData(self, action, eTransformSpace, eMotionRange, unTransformArrayCount, ulRestrictToDevice):
+        "Reads the state of the skeletal bone data associated with this action and copies it into the given buffer."
+
+        fn = self.function_table.getSkeletalBoneData
+        pTransformArray = VRBoneTransform_t()
+        result = fn(action, eTransformSpace, eMotionRange, byref(pTransformArray), unTransformArrayCount, ulRestrictToDevice)
+        return result, pTransformArray
+
+    def getSkeletalBoneDataCompressed(self, action, eTransformSpace, eMotionRange, pvCompressedData, unCompressedSize, ulRestrictToDevice):
+        """
+        Reads the state of the skeletal bone data in a compressed form that is suitable for
+        sending over the network. The required buffer size will never exceed ( sizeof(VR_BoneTransform_t)*boneCount + 2).
+        Usually the size will be much smaller.
+        """
+
+        fn = self.function_table.getSkeletalBoneDataCompressed
+        punRequiredCompressedSize = c_uint32()
+        result = fn(action, eTransformSpace, eMotionRange, pvCompressedData, unCompressedSize, byref(punRequiredCompressedSize), ulRestrictToDevice)
+        return result, punRequiredCompressedSize.value
+
+    def decompressSkeletalBoneData(self, pvCompressedBuffer, unCompressedBufferSize, unTransformArrayCount):
+        "Turns a compressed buffer from GetSkeletalBoneDataCompressed and turns it back into a bone transform array."
+
+        fn = self.function_table.decompressSkeletalBoneData
+        peTransformSpace = EVRSkeletalTransformSpace()
+        pTransformArray = VRBoneTransform_t()
+        result = fn(pvCompressedBuffer, unCompressedBufferSize, byref(peTransformSpace), byref(pTransformArray), unTransformArrayCount)
+        return result, peTransformSpace, pTransformArray
+
+    def triggerHapticVibrationAction(self, action, fStartSecondsFromNow, fDurationSeconds, fFrequency, fAmplitude, ulRestrictToDevice):
+        "Triggers a haptic event as described by the specified action"
+
+        fn = self.function_table.triggerHapticVibrationAction
+        result = fn(action, fStartSecondsFromNow, fDurationSeconds, fFrequency, fAmplitude, ulRestrictToDevice)
+        return result
+
+    def getActionOrigins(self, actionSetHandle, digitalActionHandle, originOutCount):
+        "Retrieve origin handles for an action"
+
+        fn = self.function_table.getActionOrigins
+        originsOut = VRInputValueHandle_t()
+        result = fn(actionSetHandle, digitalActionHandle, byref(originsOut), originOutCount)
+        return result, originsOut
+
+    def getOriginLocalizedName(self, origin, pchNameArray, unNameArraySize):
+        "Retrieves the name of the origin in the current language"
+
+        fn = self.function_table.getOriginLocalizedName
+        result = fn(origin, pchNameArray, unNameArraySize)
+        return result
+
+    def getOriginTrackedDeviceInfo(self, origin, unOriginInfoSize):
+        "Retrieves useful information for the origin of this action"
+
+        fn = self.function_table.getOriginTrackedDeviceInfo
+        pOriginInfo = InputOriginInfo_t()
+        result = fn(origin, byref(pOriginInfo), unOriginInfoSize)
+        return result, pOriginInfo
+
+    def showActionOrigins(self, actionSetHandle, ulActionHandle):
+        "Shows the current binding for the action in-headset"
+
+        fn = self.function_table.showActionOrigins
+        result = fn(actionSetHandle, ulActionHandle)
+        return result
+
+    def showBindingsForActionSet(self, unSizeOfVRSelectedActionSet_t, unSetCount, originToHighlight):
+        "Shows the current binding all the actions in the specified action sets"
+
+        fn = self.function_table.showBindingsForActionSet
+        pSets = VRActiveActionSet_t()
+        result = fn(byref(pSets), unSizeOfVRSelectedActionSet_t, unSetCount, originToHighlight)
+        return result, pSets
+
+
+
+class IVRIOBuffer_FnTable(Structure):
+    _fields_ = [
+        ("open", OPENVR_FNTABLE_CALLTYPE(EIOBufferError, c_char_p, EIOBufferMode, c_uint32, c_uint32, POINTER(IOBufferHandle_t))),
+        ("close", OPENVR_FNTABLE_CALLTYPE(EIOBufferError, IOBufferHandle_t)),
+        ("read", OPENVR_FNTABLE_CALLTYPE(EIOBufferError, IOBufferHandle_t, c_void_p, c_uint32, POINTER(c_uint32))),
+        ("write", OPENVR_FNTABLE_CALLTYPE(EIOBufferError, IOBufferHandle_t, c_void_p, c_uint32)),
+        ("propertyContainer", OPENVR_FNTABLE_CALLTYPE(PropertyContainerHandle_t, IOBufferHandle_t)),
+    ]
+
+
+class IVRIOBuffer(object):
+    """
+    ----------------------------------------------------------------------------------------------
+    Purpose:
+    ----------------------------------------------------------------------------------------------
+    """
+
+    def __init__(self):
+        version_key = IVRIOBuffer_Version
+        if not isInterfaceVersionValid(version_key):
+            _checkInitError(VRInitError_Init_InterfaceNotFound)
+        # Thank you lukexi https://github.com/lukexi/openvr-hs/blob/master/cbits/openvr_capi_helper.c#L9
+        fn_key = b"FnTable:" + version_key
+        fn_type = IVRIOBuffer_FnTable
+        fn_table_ptr = cast(getGenericInterface(fn_key), POINTER(fn_type))
+        if fn_table_ptr is None:
+            raise OpenVRError("Error retrieving VR API for IVRIOBuffer")
+        self.function_table = fn_table_ptr.contents
+
+    def open(self, pchPath, mode, unElementSize, unElements):
+        "opens an existing or creates a new IOBuffer of unSize bytes"
+
+        fn = self.function_table.open
+        pulBuffer = IOBufferHandle_t()
+        result = fn(pchPath, mode, unElementSize, unElements, byref(pulBuffer))
+        return result, pulBuffer
+
+    def close(self, ulBuffer):
+        "closes a previously opened or created buffer"
+
+        fn = self.function_table.close
+        result = fn(ulBuffer)
+        return result
+
+    def read(self, ulBuffer, pDst, unBytes):
+        "reads up to unBytes from buffer into *pDst, returning number of bytes read in *punRead"
+
+        fn = self.function_table.read
+        punRead = c_uint32()
+        result = fn(ulBuffer, pDst, unBytes, byref(punRead))
+        return result, punRead.value
+
+    def write(self, ulBuffer, pSrc, unBytes):
+        "writes unBytes of data from *pSrc into a buffer."
+
+        fn = self.function_table.write
+        result = fn(ulBuffer, pSrc, unBytes)
+        return result
+
+    def propertyContainer(self, ulBuffer):
+        "retrieves the property container of an buffer."
+
+        fn = self.function_table.propertyContainer
+        result = fn(ulBuffer)
+        return result
+
+
+
+class IVRSpatialAnchors_FnTable(Structure):
+    _fields_ = [
+        ("createSpatialAnchorFromDescriptor", OPENVR_FNTABLE_CALLTYPE(EVRSpatialAnchorError, c_char_p, POINTER(SpatialAnchorHandle_t))),
+        ("createSpatialAnchorFromPose", OPENVR_FNTABLE_CALLTYPE(EVRSpatialAnchorError, TrackedDeviceIndex_t, ETrackingUniverseOrigin, POINTER(SpatialAnchorPose_t), POINTER(SpatialAnchorHandle_t))),
+        ("getSpatialAnchorPose", OPENVR_FNTABLE_CALLTYPE(EVRSpatialAnchorError, SpatialAnchorHandle_t, ETrackingUniverseOrigin, POINTER(SpatialAnchorPose_t))),
+        ("getSpatialAnchorDescriptor", OPENVR_FNTABLE_CALLTYPE(EVRSpatialAnchorError, SpatialAnchorHandle_t, c_char_p, POINTER(c_uint32))),
+    ]
+
+
+class IVRSpatialAnchors(object):
+    def __init__(self):
+        version_key = IVRSpatialAnchors_Version
+        if not isInterfaceVersionValid(version_key):
+            _checkInitError(VRInitError_Init_InterfaceNotFound)
+        # Thank you lukexi https://github.com/lukexi/openvr-hs/blob/master/cbits/openvr_capi_helper.c#L9
+        fn_key = b"FnTable:" + version_key
+        fn_type = IVRSpatialAnchors_FnTable
+        fn_table_ptr = cast(getGenericInterface(fn_key), POINTER(fn_type))
+        if fn_table_ptr is None:
+            raise OpenVRError("Error retrieving VR API for IVRSpatialAnchors")
+        self.function_table = fn_table_ptr.contents
+
+    def createSpatialAnchorFromDescriptor(self, pchDescriptor):
+        """
+        Returns a handle for an spatial anchor described by "descriptor".  On success, pHandle
+        will contain a handle valid for this session.  Caller can wait for an event or occasionally
+        poll GetSpatialAnchorPose() to find the virtual coordinate associated with this anchor.
+        """
+
+        fn = self.function_table.createSpatialAnchorFromDescriptor
+        pHandleOut = SpatialAnchorHandle_t()
+        result = fn(pchDescriptor, byref(pHandleOut))
+        return result, pHandleOut
+
+    def createSpatialAnchorFromPose(self, unDeviceIndex, eOrigin):
+        """
+        Returns a handle for an new spatial anchor at pPose.  On success, pHandle
+        will contain a handle valid for this session.  Caller can wait for an event or occasionally
+        poll GetSpatialAnchorDescriptor() to find the permanent descriptor for this pose.
+        The result of GetSpatialAnchorPose() may evolve from this initial position if the driver chooses
+        to update it.
+        The anchor will be associated with the driver that provides unDeviceIndex, and the driver may use that specific
+        device as a hint for how to best create the anchor.
+        The eOrigin must match whatever tracking origin you are working in (seated/standing/raw).
+        This should be called when the user is close to (and ideally looking at/interacting with) the target physical
+        location.  At that moment, the driver will have the most information about how to recover that physical point
+        in the future, and the quality of the anchor (when the descriptor is re-used) will be highest.
+        The caller may decide to apply offsets from this initial pose, but is advised to stay relatively close to the 
+        original pose location for highest fidelity.
+        """
+
+        fn = self.function_table.createSpatialAnchorFromPose
+        pPose = SpatialAnchorPose_t()
+        pHandleOut = SpatialAnchorHandle_t()
+        result = fn(unDeviceIndex, eOrigin, byref(pPose), byref(pHandleOut))
+        return result, pPose, pHandleOut
+
+    def getSpatialAnchorPose(self, unHandle, eOrigin):
+        """
+        Get the pose for a given handle.  This is intended to be cheap enough to call every frame (or fairly often)
+        so that the driver can refine this position when it has more information available.
+        """
+
+        fn = self.function_table.getSpatialAnchorPose
+        pPoseOut = SpatialAnchorPose_t()
+        result = fn(unHandle, eOrigin, byref(pPoseOut))
+        return result, pPoseOut
+
+    def getSpatialAnchorDescriptor(self, unHandle, pchDescriptorOut):
+        """
+        Get the descriptor for a given handle.  This will be empty for handles where the driver has not
+        yet built a descriptor.  It will be the application-supplied descriptor for previously saved anchors
+        that the application is requesting poses for.  If the driver has called UpdateSpatialAnchorDescriptor()
+        already in this session, it will be the descriptor provided by the driver.
+        Returns true if the descriptor fits into the buffer, else false.  Buffer size should be at least
+        k_unMaxSpatialAnchorDescriptorSize.
+        """
+
+        fn = self.function_table.getSpatialAnchorDescriptor
+        punDescriptorBufferLenInOut = c_uint32()
+        result = fn(unHandle, pchDescriptorOut, byref(punDescriptorBufferLenInOut))
+        return result, punDescriptorBufferLenInOut.value
 
 
 
