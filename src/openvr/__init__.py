@@ -2283,15 +2283,27 @@ class VREvent_Data_t(Union):
     ]
 
 
-class VREvent_t(Structure):
-    "An event posted by the server to all running applications"
-
-    _fields_ = [
-        ("eventType", c_uint32),
-        ("trackedDeviceIndex", TrackedDeviceIndex_t),
-        ("eventAgeSeconds", c_float),
-        ("data", VREvent_Data_t),
-    ]
+# TODO: Fix the generator of this file (translate/translate.pl) as
+# explained in https://github.com/cmbruns/pyopenvr/pull/42#issuecomment-346866490
+if sizeof(c_void_p) != 4 and platform.system() == 'Linux':
+    class VREvent_t(Structure):
+        "An event posted by the server to all running applications"
+        _pack_ = 4
+        _fields_ = [
+            ("eventType", c_uint32),
+            ("trackedDeviceIndex", TrackedDeviceIndex_t),
+            ("eventAgeSeconds", c_float),
+            ("data", VREvent_Data_t),
+        ]
+else:
+    class VREvent_t(Structure):
+        "An event posted by the server to all running applications"
+        _fields_ = [
+            ("eventType", c_uint32),
+            ("trackedDeviceIndex", TrackedDeviceIndex_t),
+            ("eventAgeSeconds", c_float),
+            ("data", VREvent_Data_t),
+        ]
 
 
 class VROverlayIntersectionMaskPrimitive_Data_t(Union):
