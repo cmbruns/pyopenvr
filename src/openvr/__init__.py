@@ -119,6 +119,7 @@ k_unHapticVibrationPropertyTag = 35
 k_unSkeletonPropertyTag = 36
 k_unSpatialAnchorPosePropertyTag = 40
 k_unJsonPropertyTag = 41
+k_unActiveActionSetPropertyTag = 42
 k_unOpenVRInternalReserved_Start = 1000
 k_unOpenVRInternalReserved_End = 10000
 k_unMaxPropertyStringSize = 32768
@@ -201,13 +202,14 @@ k_pch_SteamVR_AllowDisplayLockedMode_Bool = b"allowDisplayLockedMode"
 k_pch_SteamVR_HaveStartedTutorialForNativeChaperoneDriver_Bool = b"haveStartedTutorialForNativeChaperoneDriver"
 k_pch_SteamVR_ForceWindows32bitVRMonitor = b"forceWindows32BitVRMonitor"
 k_pch_SteamVR_DebugInput = b"debugInput"
-k_pch_SteamVR_LegacyInputRebinding = b"legacyInputRebinding"
 k_pch_SteamVR_DebugInputBinding = b"debugInputBinding"
 k_pch_SteamVR_InputBindingUIBlock = b"inputBindingUI"
 k_pch_SteamVR_RenderCameraMode = b"renderCameraMode"
 k_pch_SteamVR_EnableSharedResourceJournaling = b"enableSharedResourceJournaling"
 k_pch_SteamVR_EnableSafeMode = b"enableSafeMode"
 k_pch_SteamVR_PreferredRefreshRate = b"preferredRefreshRate"
+k_pch_SteamVR_LastVersionNotice = b"lastVersionNotice"
+k_pch_SteamVR_LastVersionNoticeDate = b"lastVersionNoticeDate"
 k_pch_DirectMode_Section = b"direct_mode"
 k_pch_DirectMode_Enable_Bool = b"enable"
 k_pch_DirectMode_Count_Int32 = b"count"
@@ -310,12 +312,12 @@ k_pch_TrackingOverride_Section = b"TrackingOverrides"
 k_pch_App_BindingAutosaveURLSuffix_String = b"AutosaveURL"
 k_pch_App_BindingCurrentURLSuffix_String = b"CurrentURL"
 k_pch_App_NeedToUpdateAutosaveSuffix_Bool = b"NeedToUpdateAutosave"
-k_pch_App_ActionManifestURL_String = b"ActionManifestURL"
 k_pch_Trackers_Section = b"trackers"
 k_pch_DesktopUI_Section = b"DesktopUI"
 k_pch_LastKnown_Section = b"LastKnown"
 k_pch_LastKnown_HMDManufacturer_String = b"HMDManufacturer"
 k_pch_LastKnown_HMDModel_String = b"HMDModel"
+k_pch_DismissedWarnings_Section = b"DismissedWarnings"
 IVRScreenshots_Version = b"IVRScreenshots_001"
 IVRResources_Version = b"IVRResources_001"
 IVRDriverManager_Version = b"IVRDriverManager_001"
@@ -325,7 +327,7 @@ k_unMaxActionOriginCount = 16
 k_unMaxBoneNameLength = 32
 IVRInput_Version = b"IVRInput_005"
 k_ulInvalidIOBufferHandle = 0
-IVRIOBuffer_Version = b"IVRIOBuffer_001"
+IVRIOBuffer_Version = b"IVRIOBuffer_002"
 k_ulInvalidSpatialAnchorHandle = 0
 IVRSpatialAnchors_Version = b"IVRSpatialAnchors_001"
 
@@ -385,6 +387,12 @@ TrackingUniverseSeated = ENUM_VALUE_TYPE(0)
 TrackingUniverseStanding = ENUM_VALUE_TYPE(1)
 TrackingUniverseRawAndUncalibrated = ENUM_VALUE_TYPE(2)
 
+EAdditionalRadioFeatures = ENUM_TYPE
+AdditionalRadioFeatures_None = ENUM_VALUE_TYPE(0)
+AdditionalRadioFeatures_HTCLinkBox = ENUM_VALUE_TYPE(1)
+AdditionalRadioFeatures_InternalDongle = ENUM_VALUE_TYPE(2)
+AdditionalRadioFeatures_ExternalDongle = ENUM_VALUE_TYPE(4)
+
 ETrackedDeviceProperty = ENUM_TYPE
 Prop_Invalid = ENUM_VALUE_TYPE(0)
 Prop_TrackingSystemName_String = ENUM_VALUE_TYPE(1000)
@@ -431,6 +439,7 @@ Prop_CameraFrameLayout_Int32 = ENUM_VALUE_TYPE(1040)
 Prop_CameraStreamFormat_Int32 = ENUM_VALUE_TYPE(1041)
 Prop_AdditionalDeviceSettingsPath_String = ENUM_VALUE_TYPE(1042)
 Prop_Identifiable_Bool = ENUM_VALUE_TYPE(1043)
+Prop_BootloaderVersion_Uint64 = ENUM_VALUE_TYPE(1044)
 Prop_ReportsTimeSinceVSync_Bool = ENUM_VALUE_TYPE(2000)
 Prop_SecondsFromVsyncToPhotons_Float = ENUM_VALUE_TYPE(2001)
 Prop_DisplayFrequency_Float = ENUM_VALUE_TYPE(2002)
@@ -498,6 +507,11 @@ Prop_ImuFactoryGyroScale_Vector3 = ENUM_VALUE_TYPE(2065)
 Prop_ImuFactoryAccelerometerBias_Vector3 = ENUM_VALUE_TYPE(2066)
 Prop_ImuFactoryAccelerometerScale_Vector3 = ENUM_VALUE_TYPE(2067)
 Prop_ConfigurationIncludesLighthouse20Features_Bool = ENUM_VALUE_TYPE(2069)
+Prop_AdditionalRadioFeatures_Uint64 = ENUM_VALUE_TYPE(2070)
+Prop_CameraWhiteBalance_Vector4_Array = ENUM_VALUE_TYPE(2071)
+Prop_CameraDistortionFunction_Int32_Array = ENUM_VALUE_TYPE(2072)
+Prop_CameraDistortionCoefficients_Float_Array = ENUM_VALUE_TYPE(2073)
+Prop_ExpectedControllerType_String = ENUM_VALUE_TYPE(2074)
 Prop_DriverRequestedMuraCorrectionMode_Int32 = ENUM_VALUE_TYPE(2200)
 Prop_DriverRequestedMuraFeather_InnerLeft_Int32 = ENUM_VALUE_TYPE(2201)
 Prop_DriverRequestedMuraFeather_InnerRight_Int32 = ENUM_VALUE_TYPE(2202)
@@ -617,10 +631,11 @@ VREvent_MouseButtonDown = ENUM_VALUE_TYPE(301)
 VREvent_MouseButtonUp = ENUM_VALUE_TYPE(302)
 VREvent_FocusEnter = ENUM_VALUE_TYPE(303)
 VREvent_FocusLeave = ENUM_VALUE_TYPE(304)
-VREvent_Scroll = ENUM_VALUE_TYPE(305)
+VREvent_ScrollDiscrete = ENUM_VALUE_TYPE(305)
 VREvent_TouchPadMove = ENUM_VALUE_TYPE(306)
 VREvent_OverlayFocusChanged = ENUM_VALUE_TYPE(307)
 VREvent_ReloadOverlays = ENUM_VALUE_TYPE(308)
+VREvent_ScrollSmooth = ENUM_VALUE_TYPE(309)
 VREvent_InputFocusCaptured = ENUM_VALUE_TYPE(400)
 VREvent_InputFocusReleased = ENUM_VALUE_TYPE(401)
 VREvent_SceneFocusLost = ENUM_VALUE_TYPE(402)
@@ -696,6 +711,7 @@ VREvent_DashboardSectionSettingChanged = ENUM_VALUE_TYPE(864)
 VREvent_WebInterfaceSectionSettingChanged = ENUM_VALUE_TYPE(865)
 VREvent_TrackersSectionSettingChanged = ENUM_VALUE_TYPE(866)
 VREvent_LastKnownSectionSettingChanged = ENUM_VALUE_TYPE(867)
+VREvent_DismissedWarningsSectionSettingChanged = ENUM_VALUE_TYPE(868)
 VREvent_StatusUpdate = ENUM_VALUE_TYPE(900)
 VREvent_WebInterface_InstallDriverCompleted = ENUM_VALUE_TYPE(950)
 VREvent_MCImageUpdated = ENUM_VALUE_TYPE(1000)
@@ -733,6 +749,7 @@ VREvent_Input_ActionManifestReloaded = ENUM_VALUE_TYPE(1703)
 VREvent_Input_ActionManifestLoadFailed = ENUM_VALUE_TYPE(1704)
 VREvent_Input_ProgressUpdate = ENUM_VALUE_TYPE(1705)
 VREvent_Input_TrackerActivated = ENUM_VALUE_TYPE(1706)
+VREvent_Input_BindingsUpdated = ENUM_VALUE_TYPE(1707)
 VREvent_SpatialAnchors_PoseUpdated = ENUM_VALUE_TYPE(1800)
 VREvent_SpatialAnchors_DescriptorUpdated = ENUM_VALUE_TYPE(1801)
 VREvent_SpatialAnchors_RequestPoseUpdate = ENUM_VALUE_TYPE(1802)
@@ -783,6 +800,7 @@ EShowUIType = ENUM_TYPE
 ShowUI_ControllerBinding = ENUM_VALUE_TYPE(0)
 ShowUI_ManageTrackers = ENUM_VALUE_TYPE(1)
 ShowUI_QuickStart = ENUM_VALUE_TYPE(2)
+ShowUI_Pairing = ENUM_VALUE_TYPE(3)
 
 EVRInputError = ENUM_TYPE
 VRInputError_None = ENUM_VALUE_TYPE(0)
@@ -978,6 +996,85 @@ VRInitError_Compositor_FirmwareRequiresUpdate = ENUM_VALUE_TYPE(402)
 VRInitError_Compositor_OverlayInitFailed = ENUM_VALUE_TYPE(403)
 VRInitError_Compositor_ScreenshotsInitFailed = ENUM_VALUE_TYPE(404)
 VRInitError_Compositor_UnableToCreateDevice = ENUM_VALUE_TYPE(405)
+VRInitError_Compositor_SharedStateIsNull = ENUM_VALUE_TYPE(406)
+VRInitError_Compositor_NotificationManagerIsNull = ENUM_VALUE_TYPE(407)
+VRInitError_Compositor_ResourceManagerClientIsNull = ENUM_VALUE_TYPE(408)
+VRInitError_Compositor_MessageOverlaySharedStateInitFailure = ENUM_VALUE_TYPE(409)
+VRInitError_Compositor_PropertiesInterfaceIsNull = ENUM_VALUE_TYPE(410)
+VRInitError_Compositor_CreateFullscreenWindowFailed = ENUM_VALUE_TYPE(411)
+VRInitError_Compositor_SettingsInterfaceIsNull = ENUM_VALUE_TYPE(412)
+VRInitError_Compositor_FailedToShowWindow = ENUM_VALUE_TYPE(413)
+VRInitError_Compositor_DistortInterfaceIsNull = ENUM_VALUE_TYPE(414)
+VRInitError_Compositor_DisplayFrequencyFailure = ENUM_VALUE_TYPE(415)
+VRInitError_Compositor_RendererInitializationFailed = ENUM_VALUE_TYPE(416)
+VRInitError_Compositor_DXGIFactoryInterfaceIsNull = ENUM_VALUE_TYPE(417)
+VRInitError_Compositor_DXGIFactoryCreateFailed = ENUM_VALUE_TYPE(418)
+VRInitError_Compositor_DXGIFactoryQueryFailed = ENUM_VALUE_TYPE(419)
+VRInitError_Compositor_InvalidAdapterDesktop = ENUM_VALUE_TYPE(420)
+VRInitError_Compositor_InvalidHmdAttachment = ENUM_VALUE_TYPE(421)
+VRInitError_Compositor_InvalidOutputDesktop = ENUM_VALUE_TYPE(422)
+VRInitError_Compositor_InvalidDeviceProvided = ENUM_VALUE_TYPE(423)
+VRInitError_Compositor_D3D11RendererInitializationFailed = ENUM_VALUE_TYPE(424)
+VRInitError_Compositor_FailedToFindDisplayMode = ENUM_VALUE_TYPE(425)
+VRInitError_Compositor_FailedToCreateSwapChain = ENUM_VALUE_TYPE(426)
+VRInitError_Compositor_FailedToGetBackBuffer = ENUM_VALUE_TYPE(427)
+VRInitError_Compositor_FailedToCreateRenderTarget = ENUM_VALUE_TYPE(428)
+VRInitError_Compositor_FailedToCreateDXGI2SwapChain = ENUM_VALUE_TYPE(429)
+VRInitError_Compositor_FailedtoGetDXGI2BackBuffer = ENUM_VALUE_TYPE(430)
+VRInitError_Compositor_FailedToCreateDXGI2RenderTarget = ENUM_VALUE_TYPE(431)
+VRInitError_Compositor_FailedToGetDXGIDeviceInterface = ENUM_VALUE_TYPE(432)
+VRInitError_Compositor_SelectDisplayMode = ENUM_VALUE_TYPE(433)
+VRInitError_Compositor_FailedToCreateNvAPIRenderTargets = ENUM_VALUE_TYPE(434)
+VRInitError_Compositor_NvAPISetDisplayMode = ENUM_VALUE_TYPE(435)
+VRInitError_Compositor_FailedToCreateDirectModeDisplay = ENUM_VALUE_TYPE(436)
+VRInitError_Compositor_InvalidHmdPropertyContainer = ENUM_VALUE_TYPE(437)
+VRInitError_Compositor_UpdateDisplayFrequency = ENUM_VALUE_TYPE(438)
+VRInitError_Compositor_CreateRasterizerState = ENUM_VALUE_TYPE(439)
+VRInitError_Compositor_CreateWireframeRasterizerState = ENUM_VALUE_TYPE(440)
+VRInitError_Compositor_CreateSamplerState = ENUM_VALUE_TYPE(441)
+VRInitError_Compositor_CreateClampToBorderSamplerState = ENUM_VALUE_TYPE(442)
+VRInitError_Compositor_CreateAnisoSamplerState = ENUM_VALUE_TYPE(443)
+VRInitError_Compositor_CreateOverlaySamplerState = ENUM_VALUE_TYPE(444)
+VRInitError_Compositor_CreatePanoramaSamplerState = ENUM_VALUE_TYPE(445)
+VRInitError_Compositor_CreateFontSamplerState = ENUM_VALUE_TYPE(446)
+VRInitError_Compositor_CreateNoBlendState = ENUM_VALUE_TYPE(447)
+VRInitError_Compositor_CreateBlendState = ENUM_VALUE_TYPE(448)
+VRInitError_Compositor_CreateAlphaBlendState = ENUM_VALUE_TYPE(449)
+VRInitError_Compositor_CreateBlendStateMaskR = ENUM_VALUE_TYPE(450)
+VRInitError_Compositor_CreateBlendStateMaskG = ENUM_VALUE_TYPE(451)
+VRInitError_Compositor_CreateBlendStateMaskB = ENUM_VALUE_TYPE(452)
+VRInitError_Compositor_CreateDepthStencilState = ENUM_VALUE_TYPE(453)
+VRInitError_Compositor_CreateDepthStencilStateNoWrite = ENUM_VALUE_TYPE(454)
+VRInitError_Compositor_CreateDepthStencilStateNoDepth = ENUM_VALUE_TYPE(455)
+VRInitError_Compositor_CreateFlushTexture = ENUM_VALUE_TYPE(456)
+VRInitError_Compositor_CreateDistortionSurfaces = ENUM_VALUE_TYPE(457)
+VRInitError_Compositor_CreateConstantBuffer = ENUM_VALUE_TYPE(458)
+VRInitError_Compositor_CreateHmdPoseConstantBuffer = ENUM_VALUE_TYPE(459)
+VRInitError_Compositor_CreateHmdPoseStagingConstantBuffer = ENUM_VALUE_TYPE(460)
+VRInitError_Compositor_CreateSharedFrameInfoConstantBuffer = ENUM_VALUE_TYPE(461)
+VRInitError_Compositor_CreateOverlayConstantBuffer = ENUM_VALUE_TYPE(462)
+VRInitError_Compositor_CreateSceneTextureIndexConstantBuffer = ENUM_VALUE_TYPE(463)
+VRInitError_Compositor_CreateReadableSceneTextureIndexConstantBuffer = ENUM_VALUE_TYPE(464)
+VRInitError_Compositor_CreateLayerGraphicsTextureIndexConstantBuffer = ENUM_VALUE_TYPE(465)
+VRInitError_Compositor_CreateLayerComputeTextureIndexConstantBuffer = ENUM_VALUE_TYPE(466)
+VRInitError_Compositor_CreateLayerComputeSceneTextureIndexConstantBuffer = ENUM_VALUE_TYPE(467)
+VRInitError_Compositor_CreateComputeHmdPoseConstantBuffer = ENUM_VALUE_TYPE(468)
+VRInitError_Compositor_CreateGeomConstantBuffer = ENUM_VALUE_TYPE(469)
+VRInitError_Compositor_CreatePanelMaskConstantBuffer = ENUM_VALUE_TYPE(470)
+VRInitError_Compositor_CreatePixelSimUBO = ENUM_VALUE_TYPE(471)
+VRInitError_Compositor_CreateMSAARenderTextures = ENUM_VALUE_TYPE(472)
+VRInitError_Compositor_CreateResolveRenderTextures = ENUM_VALUE_TYPE(473)
+VRInitError_Compositor_CreateComputeResolveRenderTextures = ENUM_VALUE_TYPE(474)
+VRInitError_Compositor_CreateDriverDirectModeResolveTextures = ENUM_VALUE_TYPE(475)
+VRInitError_Compositor_OpenDriverDirectModeResolveTextures = ENUM_VALUE_TYPE(476)
+VRInitError_Compositor_CreateFallbackSyncTexture = ENUM_VALUE_TYPE(477)
+VRInitError_Compositor_ShareFallbackSyncTexture = ENUM_VALUE_TYPE(478)
+VRInitError_Compositor_CreateOverlayIndexBuffer = ENUM_VALUE_TYPE(479)
+VRInitError_Compositor_CreateOverlayVertextBuffer = ENUM_VALUE_TYPE(480)
+VRInitError_Compositor_CreateTextVertexBuffer = ENUM_VALUE_TYPE(481)
+VRInitError_Compositor_CreateTextIndexBuffer = ENUM_VALUE_TYPE(482)
+VRInitError_Compositor_CreateMirrorTextures = ENUM_VALUE_TYPE(483)
+VRInitError_Compositor_CreateLastFrameRenderTexture = ENUM_VALUE_TYPE(484)
 VRInitError_VendorSpecific_UnableToConnectToOculusRuntime = ENUM_VALUE_TYPE(1000)
 VRInitError_VendorSpecific_WindowsNotInDevMode = ENUM_VALUE_TYPE(1001)
 VRInitError_VendorSpecific_HmdFound_CantOpenDevice = ENUM_VALUE_TYPE(1101)
@@ -1041,7 +1138,7 @@ MAX_CAMERA_FRAME_TYPES = ENUM_VALUE_TYPE(3)
 EVRDistortionFunctionType = ENUM_TYPE
 VRDistortionFunctionType_None = ENUM_VALUE_TYPE(0)
 VRDistortionFunctionType_FTheta = ENUM_VALUE_TYPE(1)
-VRDistortionFucntionType_Extended_FTheta = ENUM_VALUE_TYPE(2)
+VRDistortionFunctionType_Extended_FTheta = ENUM_VALUE_TYPE(2)
 MAX_DISTORTION_FUNCTION_TYPES = ENUM_VALUE_TYPE(3)
 
 EVSync = ENUM_TYPE
@@ -1165,7 +1262,7 @@ VROverlayFlags_RGSS4X = ENUM_VALUE_TYPE(2)
 VROverlayFlags_NoDashboardTab = ENUM_VALUE_TYPE(3)
 VROverlayFlags_AcceptsGamepadEvents = ENUM_VALUE_TYPE(4)
 VROverlayFlags_ShowGamepadFocus = ENUM_VALUE_TYPE(5)
-VROverlayFlags_SendVRScrollEvents = ENUM_VALUE_TYPE(6)
+VROverlayFlags_SendVRDiscreteScrollEvents = ENUM_VALUE_TYPE(6)
 VROverlayFlags_SendVRTouchpadEvents = ENUM_VALUE_TYPE(7)
 VROverlayFlags_ShowTouchPadScrollWheel = ENUM_VALUE_TYPE(8)
 VROverlayFlags_TransferOwnershipToInternalProcess = ENUM_VALUE_TYPE(9)
@@ -1176,6 +1273,7 @@ VROverlayFlags_StereoPanorama = ENUM_VALUE_TYPE(13)
 VROverlayFlags_SortWithNonSceneOverlays = ENUM_VALUE_TYPE(14)
 VROverlayFlags_VisibleInDashboard = ENUM_VALUE_TYPE(15)
 VROverlayFlags_MakeOverlaysInteractiveIfVisible = ENUM_VALUE_TYPE(16)
+VROverlayFlags_SendVRSmoothScrollEvents = ENUM_VALUE_TYPE(17)
 
 VRMessageOverlayResponse = ENUM_TYPE
 ButtonPress_0 = ENUM_VALUE_TYPE(0)
@@ -1661,6 +1759,7 @@ class VREvent_Process_t(Structure):
         ("pid", c_uint32),
         ("oldPid", c_uint32),
         ("bForced", openvr_bool),
+        ("bConnectionLost", openvr_bool),
     ]
 
 
@@ -2190,6 +2289,7 @@ class COpenVRContext(object):
         self.m_pVRInput = None
         self.m_pVRIOBuffer = None
         self.m_pVRSpatialAnchors = None
+        self.m_pVRNotifications = None
 
     def VRSystem(self):
         self.checkClear()
@@ -2287,6 +2387,12 @@ class COpenVRContext(object):
             self.m_pVRSpatialAnchors = IVRSpatialAnchors()
         return self.m_pVRSpatialAnchors
 
+    def VRNotifications(self):
+        self.checkClear()
+        if self.m_pVRNotifications is None:
+            self.m_pVRNotifications = IVRNotifications()
+        return self.m_pVRNotifications
+
 
 # Globals for context management
 _vr_token = None
@@ -2355,6 +2461,10 @@ def VRIOBuffer():
 
 def VRSpatialAnchors():
     return _internal_module_context.VRSpatialAnchors()
+
+
+def VRNotifications():
+    return _internal_module_context.VRNotifications()
 
 class VREvent_Data_t(Union):
     _fields_ = [
@@ -6008,6 +6118,7 @@ class IVRIOBuffer_FnTable(Structure):
         ("read", OPENVR_FNTABLE_CALLTYPE(EIOBufferError, IOBufferHandle_t, c_void_p, c_uint32, POINTER(c_uint32))),
         ("write", OPENVR_FNTABLE_CALLTYPE(EIOBufferError, IOBufferHandle_t, c_void_p, c_uint32)),
         ("propertyContainer", OPENVR_FNTABLE_CALLTYPE(PropertyContainerHandle_t, IOBufferHandle_t)),
+        ("hasReaders", OPENVR_FNTABLE_CALLTYPE(openvr_bool, IOBufferHandle_t)),
     ]
 
 
@@ -6064,6 +6175,13 @@ class IVRIOBuffer(object):
         """retrieves the property container of an buffer."""
 
         fn = self.function_table.propertyContainer
+        result = fn(ulBuffer)
+        return result
+
+    def hasReaders(self, ulBuffer):
+        """inexpensively checks for readers to allow writers to fast-fail potentially expensive copies and writes."""
+
+        fn = self.function_table.hasReaders
         result = fn(ulBuffer)
         return result
 
