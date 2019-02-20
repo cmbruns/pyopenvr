@@ -3,7 +3,10 @@
 use warnings;
 use strict;
 
-
+# Use special packing for certain structs on Linux
+my %pack_hack_structs = ();
+$pack_hack_structs{"VRControllerState_t"} = "";
+$pack_hack_structs{"VREvent_t"} = "";
 
 # Usually pointer arguments are assumed to be return values.
 # So here we create a special exceptions for in/out array arguments
@@ -35,6 +38,7 @@ $size_arguments{"IVRSystem::PollNextEvent::uncbVREvent"} = "sizeof(VREvent_t)";
 my %custom_return_statements = ();
 $custom_return_statements{"IVRSystem::PollNextEvent"} = "return result != 0";
 
+open STDOUT, '>', "../openvr/__init__.py";
 
 my $header_file = "openvr_capi.h";
 open my $header_fh, "<", $header_file or die;
@@ -398,6 +402,16 @@ from ctypes import *
 
 from .version import __version__
 
+
+class Pack4Structure(Structure):
+    _pack_ = 4
+
+
+if sizeof(c_void_p) != 4 and platform.system() == 'Linux':
+    PackHackStructure = Pack4Structure
+else:
+    PackHackStructure = Structure
+
 ################################################################
 # Load OpenVR shared library, so we can access it using ctypes #
 ################################################################
@@ -652,7 +666,12 @@ EOF
 
         $base = ucfirst($base);
         if ($base eq "Struct") {
-            $base = "Structure";
+            if (exists $pack_hack_structs{$struct_name}) {
+                $base = "PackHackStructure"
+            }
+            else {
+                $base = "Structure";
+            }
         }
 
         $struct_name = translate_type($struct_name);
