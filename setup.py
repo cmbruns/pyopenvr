@@ -11,6 +11,7 @@ setup(
     author='Christopher Bruns and others',
     author_email='cmbruns@rotatingpenguin.com',
     description='Valve OpenVR SDK python bindings using ctypes',
+    long_description='Valve OpenVR SDK python bindings using ctypes',
     url='https://github.com/cmbruns/pyopenvr',
     download_url='https://github.com/cmbruns/pyopenvr/tarball/' + __version__,
     package_dir={'': 'src'},
