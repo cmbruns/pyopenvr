@@ -407,7 +407,7 @@ class Pack4Structure(Structure):
     _pack_ = 4
 
 
-if sizeof(c_void_p) != 4 and platform.system() == 'Linux':
+if sizeof(c_void_p) != 4 and platform.system() in ('Linux', 'Darwin'):
     PackHackStructure = Pack4Structure
 else:
     PackHackStructure = Structure
@@ -432,6 +432,8 @@ else:
         _openvr_lib_name = "libopenvr_api_64"
     elif platform.system() == 'Linux':
         _openvr_lib_name = "libopenvr_api_64.so"
+    elif platform.system() == 'Darwin':
+        _openvr_lib_name = "libopenvr_api_32.dylib"  # Universal 32-bit and 64-bit library.
     else:
         raise ValueError("Libraries not available for this platform: " + platform.system())
 
