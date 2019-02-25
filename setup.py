@@ -25,13 +25,25 @@ Intended Audience :: Developers
 License :: OSI Approved :: BSD License
 Operating System :: Microsoft :: Windows
 Operating System :: Microsoft :: Windows :: Windows 7
+Operating System :: Microsoft :: Windows :: Windows 10
 Operating System :: POSIX :: Linux
 Operating System :: MacOS :: MacOS X
 Programming Language :: Python :: 2.7
 Programming Language :: Python :: 3.5
+Programming Language :: Python :: 3.6
 Programming Language :: Python :: Implementation :: CPython
 Topic :: Multimedia :: Graphics :: 3D Rendering
 Topic :: Scientific/Engineering :: Visualization
 Development Status :: 4 - Beta
 """.splitlines(),
+    install_requires=[
+        'numpy',
+        'PyOpenGL',
+    ],
+    extras_require={
+        'glfw': ['glfw'],
+        'PyQt5': ['PyQt5'],
+        #'PySide': ['PySide'], # does not support past python 3.5
+        'wx': ['wxPython'],
+    }
 )
