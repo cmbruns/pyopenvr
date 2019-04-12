@@ -36,14 +36,13 @@ Topic :: Multimedia :: Graphics :: 3D Rendering
 Topic :: Scientific/Engineering :: Visualization
 Development Status :: 4 - Beta
 """.splitlines(),
-    install_requires=[
-        'numpy',
-        'PyOpenGL',
-    ],
+    install_requires=[],
     extras_require={
-        'glfw': ['glfw'],
-        'PyQt5': ['PyQt5'],
+        'all': ['numpy', 'PyOpenGL', 'glfw', 'PyQt5', 'jinja2', 'wxPython'],
+        'glfw': ['numpy', 'PyOpenGL', 'glfw'],
+        'opengl': ['numpy', 'PyOpenGL'],
+        'PyQt5': ['numpy', 'PyOpenGL', 'PyQt5', 'jinja2'],
         #'PySide': ['PySide'], # does not support past python 3.5
-        'wx': ['wxPython'],
+        'wx': ['numpy', 'PyOpenGL', 'wxPython'],
     }
 )
