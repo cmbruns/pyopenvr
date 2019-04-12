@@ -228,6 +228,7 @@ k_pch_Lighthouse_EnableBluetooth_Bool = b"enableBluetooth"
 k_pch_Lighthouse_PowerManagedBaseStations_String = b"PowerManagedBaseStations"
 k_pch_Lighthouse_PowerManagedBaseStations2_String = b"PowerManagedBaseStations2"
 k_pch_Lighthouse_EnableImuFallback_Bool = b"enableImuFallback"
+k_pch_Lighthouse_NewPairing_Bool = b"newPairing"
 k_pch_Null_Section = b"driver_null"
 k_pch_Null_SerialNumber_String = b"serialNumber"
 k_pch_Null_ModelNumber_String = b"modelNumber"
@@ -299,9 +300,10 @@ k_pch_Power_PauseCompositorOnStandby_Bool = b"pauseCompositorOnStandby"
 k_pch_Dashboard_Section = b"dashboard"
 k_pch_Dashboard_EnableDashboard_Bool = b"enableDashboard"
 k_pch_Dashboard_ArcadeMode_Bool = b"arcadeMode"
-k_pch_Dashboard_EnableWebUI = b"webUI"
-k_pch_Dashboard_EnableWebUIDevTools = b"webUIDevTools"
-k_pch_Dashboard_EnableWebUIDashboardReplacement = b"webUIDashboard"
+k_pch_Dashboard_UseWebDashboard = b"useWebDashboard"
+k_pch_Dashboard_UseWebSettings = b"useWebSettings"
+k_pch_Dashboard_UseWebIPD = b"useWebIPD"
+k_pch_Dashboard_UseWebPowerMenu = b"useWebPowerMenu"
 k_pch_modelskin_Section = b"modelskins"
 k_pch_Driver_Enable_Bool = b"enable"
 k_pch_WebInterface_Section = b"WebInterface"
@@ -442,6 +444,8 @@ Prop_CameraStreamFormat_Int32 = ENUM_VALUE_TYPE(1041)
 Prop_AdditionalDeviceSettingsPath_String = ENUM_VALUE_TYPE(1042)
 Prop_Identifiable_Bool = ENUM_VALUE_TYPE(1043)
 Prop_BootloaderVersion_Uint64 = ENUM_VALUE_TYPE(1044)
+Prop_AdditionalSystemReportData_String = ENUM_VALUE_TYPE(1045)
+Prop_CompositeFirmwareVersion_String = ENUM_VALUE_TYPE(1046)
 Prop_ReportsTimeSinceVSync_Bool = ENUM_VALUE_TYPE(2000)
 Prop_SecondsFromVsyncToPhotons_Float = ENUM_VALUE_TYPE(2001)
 Prop_DisplayFrequency_Float = ENUM_VALUE_TYPE(2002)
@@ -538,6 +542,8 @@ Prop_FieldOfViewBottomDegrees_Float = ENUM_VALUE_TYPE(4003)
 Prop_TrackingRangeMinimumMeters_Float = ENUM_VALUE_TYPE(4004)
 Prop_TrackingRangeMaximumMeters_Float = ENUM_VALUE_TYPE(4005)
 Prop_ModeLabel_String = ENUM_VALUE_TYPE(4006)
+Prop_CanWirelessIdentify_Bool = ENUM_VALUE_TYPE(4007)
+Prop_Nonce_Int32 = ENUM_VALUE_TYPE(4008)
 Prop_IconPathName_String = ENUM_VALUE_TYPE(5000)
 Prop_NamedIconPathDeviceOff_String = ENUM_VALUE_TYPE(5001)
 Prop_NamedIconPathDeviceSearching_String = ENUM_VALUE_TYPE(5002)
@@ -656,7 +662,6 @@ VREvent_OverlayShown = ENUM_VALUE_TYPE(500)
 VREvent_OverlayHidden = ENUM_VALUE_TYPE(501)
 VREvent_DashboardActivated = ENUM_VALUE_TYPE(502)
 VREvent_DashboardDeactivated = ENUM_VALUE_TYPE(503)
-VREvent_DashboardThumbSelected = ENUM_VALUE_TYPE(504)
 VREvent_DashboardRequested = ENUM_VALUE_TYPE(505)
 VREvent_ResetDashboard = ENUM_VALUE_TYPE(506)
 VREvent_RenderToast = ENUM_VALUE_TYPE(507)
@@ -679,6 +684,7 @@ VREvent_PrimaryDashboardDeviceChanged = ENUM_VALUE_TYPE(525)
 VREvent_RoomViewShown = ENUM_VALUE_TYPE(526)
 VREvent_RoomViewHidden = ENUM_VALUE_TYPE(527)
 VREvent_ShowUI = ENUM_VALUE_TYPE(528)
+VREvent_ShowDevTools = ENUM_VALUE_TYPE(529)
 VREvent_Notification_Shown = ENUM_VALUE_TYPE(600)
 VREvent_Notification_Hidden = ENUM_VALUE_TYPE(601)
 VREvent_Notification_BeginInteraction = ENUM_VALUE_TYPE(602)
@@ -688,6 +694,7 @@ VREvent_ProcessQuit = ENUM_VALUE_TYPE(701)
 VREvent_QuitAborted_UserPrompt = ENUM_VALUE_TYPE(702)
 VREvent_QuitAcknowledged = ENUM_VALUE_TYPE(703)
 VREvent_DriverRequestedQuit = ENUM_VALUE_TYPE(704)
+VREvent_RestartRequested = ENUM_VALUE_TYPE(705)
 VREvent_ChaperoneDataHasChanged = ENUM_VALUE_TYPE(800)
 VREvent_ChaperoneUniverseHasChanged = ENUM_VALUE_TYPE(801)
 VREvent_ChaperoneTempDataHasChanged = ENUM_VALUE_TYPE(802)
@@ -734,6 +741,11 @@ VREvent_Compositor_MirrorWindowShown = ENUM_VALUE_TYPE(1400)
 VREvent_Compositor_MirrorWindowHidden = ENUM_VALUE_TYPE(1401)
 VREvent_Compositor_ChaperoneBoundsShown = ENUM_VALUE_TYPE(1410)
 VREvent_Compositor_ChaperoneBoundsHidden = ENUM_VALUE_TYPE(1411)
+VREvent_Compositor_DisplayDisconnected = ENUM_VALUE_TYPE(1412)
+VREvent_Compositor_DisplayReconnected = ENUM_VALUE_TYPE(1413)
+VREvent_Compositor_HDCPError = ENUM_VALUE_TYPE(1414)
+VREvent_Compositor_ApplicationNotResponding = ENUM_VALUE_TYPE(1415)
+VREvent_Compositor_ApplicationResumed = ENUM_VALUE_TYPE(1416)
 VREvent_TrackedCamera_StartVideoStream = ENUM_VALUE_TYPE(1500)
 VREvent_TrackedCamera_StopVideoStream = ENUM_VALUE_TYPE(1501)
 VREvent_TrackedCamera_PauseVideoStream = ENUM_VALUE_TYPE(1502)
@@ -756,6 +768,7 @@ VREvent_SpatialAnchors_PoseUpdated = ENUM_VALUE_TYPE(1800)
 VREvent_SpatialAnchors_DescriptorUpdated = ENUM_VALUE_TYPE(1801)
 VREvent_SpatialAnchors_RequestPoseUpdate = ENUM_VALUE_TYPE(1802)
 VREvent_SpatialAnchors_RequestDescriptorUpdate = ENUM_VALUE_TYPE(1803)
+VREvent_SystemReport_Started = ENUM_VALUE_TYPE(1900)
 VREvent_VendorSpecific_Reserved_Start = ENUM_VALUE_TYPE(10000)
 VREvent_VendorSpecific_Reserved_End = ENUM_VALUE_TYPE(19999)
 
@@ -803,6 +816,14 @@ ShowUI_ControllerBinding = ENUM_VALUE_TYPE(0)
 ShowUI_ManageTrackers = ENUM_VALUE_TYPE(1)
 ShowUI_QuickStart = ENUM_VALUE_TYPE(2)
 ShowUI_Pairing = ENUM_VALUE_TYPE(3)
+ShowUI_Settings = ENUM_VALUE_TYPE(4)
+
+EHDCPError = ENUM_TYPE
+HDCPError_None = ENUM_VALUE_TYPE(0)
+HDCPError_LinkLost = ENUM_VALUE_TYPE(1)
+HDCPError_Tampered = ENUM_VALUE_TYPE(2)
+HDCPError_DeviceRevoked = ENUM_VALUE_TYPE(3)
+HDCPError_Unknown = ENUM_VALUE_TYPE(4)
 
 EVRInputError = ENUM_TYPE
 VRInputError_None = ENUM_VALUE_TYPE(0)
@@ -971,6 +992,7 @@ VRInitError_Init_FirmwareRecoveryBusy = ENUM_VALUE_TYPE(139)
 VRInitError_Init_USBServiceBusy = ENUM_VALUE_TYPE(140)
 VRInitError_Init_VRWebHelperStartupFailed = ENUM_VALUE_TYPE(141)
 VRInitError_Init_TrackerManagerInitFailed = ENUM_VALUE_TYPE(142)
+VRInitError_Init_AlreadyRunning = ENUM_VALUE_TYPE(143)
 VRInitError_Driver_Failed = ENUM_VALUE_TYPE(200)
 VRInitError_Driver_Unknown = ENUM_VALUE_TYPE(201)
 VRInitError_Driver_HmdUnknown = ENUM_VALUE_TYPE(202)
@@ -1093,6 +1115,7 @@ VRInitError_VendorSpecific_HmdFound_UserDataAddressRange = ENUM_VALUE_TYPE(1111)
 VRInitError_VendorSpecific_HmdFound_UserDataError = ENUM_VALUE_TYPE(1112)
 VRInitError_VendorSpecific_HmdFound_ConfigFailedSanityCheck = ENUM_VALUE_TYPE(1113)
 VRInitError_Steam_SteamInstallationNotFound = ENUM_VALUE_TYPE(2000)
+VRInitError_LastError = ENUM_VALUE_TYPE(2001)
 
 EVRScreenshotType = ENUM_TYPE
 VRScreenshotType_None = ENUM_VALUE_TYPE(0)
@@ -1719,12 +1742,13 @@ class VREvent_Mouse_t(Structure):
 
 
 class VREvent_Scroll_t(Structure):
-    """used for simulated mouse wheel scroll in overlay space"""
+    """used for simulated mouse wheel scroll"""
 
     _fields_ = [
         ("xdelta", c_float),
         ("ydelta", c_float),
-        ("repeatCount", c_uint32),
+        ("unused", c_uint32),
+        ("viewportscale", c_float),
     ]
 
 
@@ -1933,6 +1957,18 @@ class VREvent_ProgressUpdate_t(Structure):
 class VREvent_ShowUI_t(Structure):
     _fields_ = [
         ("eType", EShowUIType),
+    ]
+
+
+class VREvent_ShowDevTools_t(Structure):
+    _fields_ = [
+        ("nBrowserIdentifier", c_int32),
+    ]
+
+
+class VREvent_HDCPError_t(Structure):
+    _fields_ = [
+        ("eCode", EHDCPError),
     ]
 
 
@@ -5887,6 +5923,7 @@ class IVRInput_FnTable(Structure):
         ("getOriginTrackedDeviceInfo", OPENVR_FNTABLE_CALLTYPE(EVRInputError, VRInputValueHandle_t, POINTER(InputOriginInfo_t), c_uint32)),
         ("showActionOrigins", OPENVR_FNTABLE_CALLTYPE(EVRInputError, VRActionSetHandle_t, VRActionHandle_t)),
         ("showBindingsForActionSet", OPENVR_FNTABLE_CALLTYPE(EVRInputError, POINTER(VRActiveActionSet_t), c_uint32, c_uint32, VRInputValueHandle_t)),
+        ("isUsingLegacyInput", OPENVR_FNTABLE_CALLTYPE(openvr_bool)),
     ]
 
 
@@ -6110,6 +6147,13 @@ class IVRInput(object):
         pSets = VRActiveActionSet_t()
         result = fn(byref(pSets), unSizeOfVRSelectedActionSet_t, unSetCount, originToHighlight)
         return result, pSets
+
+    def isUsingLegacyInput(self):
+        """--------------- Legacy Input -------------------"""
+
+        fn = self.function_table.isUsingLegacyInput
+        result = fn()
+        return result
 
 
 
