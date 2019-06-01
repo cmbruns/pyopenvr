@@ -1,5 +1,5 @@
 # pyopenvr
-### Python bindings for Valve's OpenVR virtual reality SDK, located at https://github.com/ValveSoftware/openvr
+### Unofficial python bindings for Valve's OpenVR virtual reality SDK, located at https://github.com/ValveSoftware/openvr
 
 ## Installation
 - [ ] Install Python 2.7+ or 3.5+ https://www.python.org/download/
