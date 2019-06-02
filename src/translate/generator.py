@@ -25,14 +25,90 @@ class CTypesGenerator(object):
         for declaration in declarations:
             if isinstance(declaration, model.ConstantDeclaration):
                 print(declaration, file=file_out)
-        print('\n', file=file_out)
-        # TODO: enums next...
+
+        print('', file=file_out)
+        print(inspect.cleandoc('''
+            #########################
+            # Expose enum constants #
+            #########################
+            
+            ENUM_TYPE = c_uint32
+            ENUM_VALUE_TYPE = int
+        '''), file=file_out)
+        print('', file=file_out)
         for declaration in declarations:
-            if isinstance(declaration, model.StructureForwardDeclaration):
-                continue
-            if isinstance(declaration, model.ConstantDeclaration):
-                continue
-            print(declaration, file=file_out)
+            if isinstance(declaration, model.Enum):
+                print(declaration, file=file_out)
+                print('', file=file_out)
+
+        print('', file=file_out)
+        print(inspect.cleandoc('''
+            ###################
+            # Expose Typedefs #
+            ###################
+            
+            # Use c_ubyte instead of c_char, for better compatibility with Python True/False
+            openvr_bool = c_ubyte
+        '''), file=file_out)
+        print('', file=file_out)
+        for declaration in declarations:
+            if isinstance(declaration, model.Typedef):
+                print(declaration, file=file_out)
+
+        print('', file=file_out)
+        print(inspect.cleandoc('''
+            ##################
+            # Expose classes #
+            ##################
+            
+            
+            class OpenVRError(RuntimeError):
+                """
+                OpenVRError is a custom exception type for when OpenVR functions return a failure code.
+                Such a specific exception type allows more precise exception handling that does just raising Exception().
+                """
+                pass
+            
+            
+            # Methods to include in all openvr vector classes
+            class _VectorMixin(object):
+                def __init__(self, *args):
+                    self._setArray(self._getArray().__class__(*args))
+            
+                def _getArray(self):
+                    return self.v
+            
+                def _setArray(self, array):
+                    self.v[:] = array[:]
+            
+                def __getitem__(self, key):
+                    return self._getArray()[key]
+            
+                def __len__(self):
+                    return len(self._getArray())
+            
+                def __setitem__(self, key, value):
+                    self._getArray()[key] = value
+            
+                def __str__(self):
+                    return str(list(self))
+            
+            
+            class _MatrixMixin(_VectorMixin):
+                def _getArray(self):
+                    return self.m
+            
+                def _setArray(self, array):
+                    self.m[:] = array[:]
+            
+                def __str__(self):
+                    return str(list(list(e) for e in self))
+        '''), file=file_out)
+        print('\n', file=file_out)
+        for declaration in declarations:
+            if isinstance(declaration, model.Struct):
+                print(declaration, file=file_out)
+                print('\n', file=file_out)
 
     @staticmethod
     def write_preamble(file_out):
@@ -110,7 +186,7 @@ def main():
     generator = CTypesGenerator()
     generator.generate(
         declarations=declarations,
-        file_out=open('../openvr/__init__.py', 'w'),
+        file_out=open('../openvr/__init__.py', 'w', newline=None),
     )
 
 

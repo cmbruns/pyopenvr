@@ -2,11 +2,40 @@
 Parses translate header files to create a model of the code to be generated
 """
 
+import inspect
 import pkg_resources
 
 from clang.cindex import Index, CursorKind
 
 import translate.model as model
+
+
+def clean_comment(cursor):
+    docstring = cursor.raw_comment
+    if docstring is None:
+        return docstring
+    docstring = inspect.cleandoc(docstring)
+    docstring = docstring.replace('\r', '')
+    if docstring.startswith('//'):
+        docstring = docstring.replace('//', '  ')
+    elif docstring.startswith('/**'):
+        docstring = docstring.replace('/**', '   ')
+        docstring = docstring.replace('**/', '   ')
+        docstring.replace('\n  *', '\n   ')
+        docstring = docstring.replace('*/', '  ')
+        docstring = docstring.replace('\n*', '\n ')
+    elif docstring.startswith('/*'):
+        docstring = docstring.replace('/*', '  ')
+        docstring = docstring.replace('*/', '  ')
+        docstring = docstring.replace('\n *', '\n  ')
+        docstring = docstring.replace('\n*', '\n ')
+    else:
+        assert False
+    docstring = inspect.cleandoc(docstring.strip())
+    # flank multi-line comments with newlines
+    if '\n' in docstring:
+        docstring = f'\n{docstring}\n'
+    return docstring
 
 
 class Parser(object):
@@ -16,13 +45,27 @@ class Parser(object):
     def parse_enum(self, cursor):
         name = cursor.spelling
         enum = model.Enum(name=name)
+        next_value = 0
+        index = dict()
         for child in cursor.get_children():
             if child.kind == CursorKind.ENUM_CONSTANT_DECL:
                 values = list(child.get_children())
-                if len(values) == 1:
+                if len(values) > 0:
                     value = self.parse_literal(values[0])
-                    enum_const = model.EnumConstant(name=child.spelling, value=value)
-                    enum.add_constant(enum_const)
+                else:
+                    value = str(next_value)
+                enum_const = model.EnumConstant(name=child.spelling, value=value)
+                enum.add_constant(enum_const)
+                int_val = next_value
+                if str(value) in index:
+                    int_val = index[str(value)]  # reference to another enum value, e.g. 'k_EButton_Axis0'
+                else:
+                    try:
+                        int_val = int(eval(str(value)))
+                    except:
+                        pass  # I give up
+                index[str(child.spelling)] = int_val
+                next_value = int_val + 1
             else:
                 self.report_unparsed(child)
         self.items.append(enum)
@@ -50,7 +93,7 @@ class Parser(object):
         print(f'*** WARNING *** skipping function declaration {cursor.spelling}(...)')
 
     def parse_literal(self, cursor):
-        value = list(cursor.get_tokens())[-1].spelling
+        value = ''.join([str(t.spelling) for t in cursor.get_tokens()])
         if cursor.kind == CursorKind.STRING_LITERAL:
             value = 'b' + value  # Ensure byte string for compatibility
         return value
@@ -83,7 +126,7 @@ class Parser(object):
 
     def parse_struct(self, cursor):
         name = cursor.type.spelling
-        struct = model.Struct(name=name, docstring=cursor.brief_comment)
+        struct = model.Struct(name=name, docstring=clean_comment(cursor))
         for child in cursor.get_children():
             if child.kind == CursorKind.FIELD_DECL:
                 field = self.parse_field(child)
