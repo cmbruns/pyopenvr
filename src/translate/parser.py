@@ -166,6 +166,8 @@ class Parser(object):
         alias = cursor.spelling
         if len(children) == 1:
             original = children[0].spelling
+            if len(str(original)) < 1:
+                return
             item = model.Typedef(alias=alias, original=original, docstring=cursor.brief_comment)
             self.items.append(item)
 
