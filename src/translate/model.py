@@ -12,6 +12,40 @@ class Declaration(object):
         return f'{self.name}'
 
 
+class Class(Declaration):
+    def __init__(self, name, docstring=None):
+        super().__init__(name=name, docstring=docstring)
+        self.base = 'object'
+        self.methods = []
+
+    def __str__(self):
+        docstring = ''
+        if self.docstring:
+            docstring = textwrap.indent(f'\n"""{self.docstring}"""\n', ' '*16)
+        name = translate_type(self.name)
+        methods = 'pass'
+        if len(self.methods) > 0:
+            methods = '\n'
+            for method in self.methods:
+                methods += textwrap.indent(str(method), 16*' ') + '\n'
+        return inspect.cleandoc(f'''
+            class {name}({self.base}):{docstring}
+                def __init__(self):
+                    version_key = {name}_Version
+                    if not isInterfaceVersionValid(version_key):
+                        _checkInitError(VRInitError_Init_InterfaceNotFound)
+                    fn_key = b"FnTable:" + version_key
+                    fn_type = {name}_FnTable
+                    fn_table_ptr = cast(getGenericInterface(fn_key), POINTER(fn_type))
+                    if fn_table_ptr is None:
+                        raise OpenVRError("Error retrieving VR API for {name}")
+                    self.function_table = fn_table_ptr.contents\n{methods}
+        ''')
+
+    def add_method(self, method):
+        self.methods.append(method)
+
+
 class ConstantDeclaration(Declaration):
     def __init__(self, name, value, docstring=None):
         super().__init__(name=name, docstring=docstring)
@@ -46,6 +80,76 @@ class EnumConstant(Declaration):
 
     def __str__(self):
         return f'{self.name} = ENUM_VALUE_TYPE({self.value})'
+
+
+class Method(Declaration):
+    def __init__(self, name, type_=None, docstring=None):
+        super().__init__(name=name, docstring=docstring)
+        self.name = name
+        self.type = type_
+        self.parameters = []
+
+    def __str__(self):
+        docstring = ''
+        if self.docstring:
+            docstring = f'\n"""{self.docstring}"""\n'
+        all_params = []
+        in_params = ['self']
+        out_params = []
+        for p in self.parameters:
+            # is this an output parameter?
+            if p.type.endswith('*'):
+                out_params.append(p)
+                all_params.append(f'byref({p.name})')
+            else:
+                in_params.append(p.name)
+                all_params.append(p.name)
+        param_list1 = ', '.join(in_params)
+        param_list2 = ', '.join(all_params)
+        # pythonically downcase first letter of method name
+        method_name = self.name[0].lower() + self.name[1:]
+        if len(out_params) == 0:  # simple case: no output parameters
+            docstring = textwrap.indent(docstring, ' '*16)
+            return inspect.cleandoc(f'''
+            def {method_name}({param_list1}):{docstring}
+                fn = self.function_table.{method_name}
+                result = fn({param_list2})
+                return result
+            ''') + '\n'
+        result_list = []
+        fn_call = f'fn({param_list2})'
+        if not self.type == 'void':
+            result_list.append('result')
+            fn_call = f'result = fn({param_list2})'
+        out_decls = []
+        for op in out_params:
+            t = translate_type(op.type[:-1])
+            out_decls.append(f'{op.name} = {t}()')
+            # Pointers to primitive types return the .value member
+            s = op.name
+            t = translate_type(op.type)
+            if t.startswith('POINTER(c_'):
+                s += '.value'
+            result_list.append(s)
+        od = '\n' + '\n'.join(out_decls)
+        od = textwrap.indent(od, ' '*12)
+        docstring = textwrap.indent(docstring, ' '*12)
+        results = ', '.join(result_list)
+        return inspect.cleandoc(f'''
+        def {method_name}({param_list1}):{docstring}
+            fn = self.function_table.{method_name}{od}
+            {fn_call}
+            return {results}
+        ''') + '\n'
+
+    def add_parameter(self, parameter):
+        self.parameters.append(parameter)
+
+
+class Parameter(Declaration):
+    def __init__(self, name, type_, docstring=None):
+        super().__init__(name=name, docstring=docstring)
+        self.type = type_
 
 
 class Struct(Declaration):
@@ -94,7 +198,6 @@ class StructField(Declaration):
         self.type = type_
 
     def __str__(self):
-        foo = translate_type('void *')
         type_name = translate_type(self.type)
         return f'("{self.name}", {type_name}),'
 

@@ -42,6 +42,23 @@ class Parser(object):
     def __init__(self):
         self.items = []
 
+    def parse_class(self, cursor):
+        name = cursor.type.spelling
+        class_ = model.Class(name=name, docstring=clean_comment(cursor))
+        for child in cursor.get_children():
+            if child.kind == CursorKind.CXX_METHOD:
+                method = self.parse_method(child)
+                class_.add_method(method)
+            elif child.kind == CursorKind.CXX_ACCESS_SPEC_DECL:
+                continue  # no such thing in python
+            elif child.kind == CursorKind.FIELD_DECL:
+                print(f'*** WARNING *** skipping class member {cursor.spelling}::{child.spelling}')
+                continue
+            else:
+                self.report_unparsed(child)
+        # print(class_)
+        return class_
+
     def parse_enum(self, cursor):
         name = cursor.spelling
         enum = model.Enum(name=name)
@@ -98,6 +115,29 @@ class Parser(object):
             value = 'b' + value  # Ensure byte string for compatibility
         return value
 
+    def parse_method(self, cursor):
+        name = cursor.spelling
+        method = model.Method(name=name, type_=cursor.result_type.spelling, docstring=clean_comment(cursor))
+        for child in cursor.get_children():
+            if child.kind == CursorKind.PARM_DECL:
+                parameter = self.parse_parameter(child)
+                if parameter is not None:
+                    method.add_parameter(parameter)
+            else:
+                self.report_unparsed(child)
+        return method
+
+    def parse_parameter(self, cursor):
+        name = cursor.spelling
+        type_ = cursor.type.spelling
+        parameter = model.Parameter(name=name, type_=type_, docstring=clean_comment(cursor))
+        for child in cursor.get_children():
+            if child.kind == CursorKind.TYPE_REF:
+                pass  # OK, we expect one of these
+            else:
+                self.report_unparsed(child)
+        return parameter
+
     def parse_namespace(self, cursor):
         assert str(cursor.spelling) == 'vr'
         for child in cursor.get_children():
@@ -118,7 +158,7 @@ class Parser(object):
             elif child.kind == CursorKind.UNEXPOSED_DECL:
                 self.parse_unexposed_decl(child)
             elif child.kind == CursorKind.CLASS_DECL:
-                print(f'*** WARNING *** skipping class declaration {child.spelling}(...)')
+                self.items.append(self.parse_class(child))
             elif child.kind == CursorKind.CXX_METHOD:
                 print(f'*** WARNING *** skipping class method implementation {child.spelling}(...)')
             else:

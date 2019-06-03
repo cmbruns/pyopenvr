@@ -106,7 +106,7 @@ class CTypesGenerator(object):
         '''), file=file_out)
         print('\n', file=file_out)
         for declaration in declarations:
-            if isinstance(declaration, model.Struct):
+            if isinstance(declaration, model.Struct) or isinstance(declaration, model.Class):
                 print(declaration, file=file_out)
                 print('\n', file=file_out)
 
