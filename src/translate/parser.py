@@ -2,10 +2,11 @@
 Parses translate header files to create a model of the code to be generated
 """
 
+from enum import Enum
 import inspect
 import pkg_resources
 
-from clang.cindex import Index, CursorKind
+from clang.cindex import CursorKind, Index, TypeKind
 
 import translate.model as model
 
@@ -14,8 +15,9 @@ def clean_comment(cursor):
     docstring = cursor.raw_comment
     if docstring is None:
         return docstring
-    docstring = inspect.cleandoc(docstring)
     docstring = docstring.replace('\r', '')
+    docstring = docstring.replace('\t', '   ')  # doc for IVRSystem::GetTimeSinceLastVsync has a tab
+    docstring = inspect.cleandoc(docstring)
     if docstring.startswith('//'):
         docstring = docstring.replace('//', '  ')
     elif docstring.startswith('/**'):
@@ -23,6 +25,7 @@ def clean_comment(cursor):
         docstring = docstring.replace('**/', '   ')
         docstring.replace('\n  *', '\n   ')
         docstring = docstring.replace('*/', '  ')
+        # docstring = docstring.replace('\n*\t', '\n   ')
         docstring = docstring.replace('\n*', '\n ')
     elif docstring.startswith('/*'):
         docstring = docstring.replace('/*', '  ')
@@ -61,7 +64,7 @@ class Parser(object):
 
     def parse_enum(self, cursor):
         name = cursor.spelling
-        enum = model.Enum(name=name)
+        enum = model.EnumDecl(name=name)
         next_value = 0
         index = dict()
         for child in cursor.get_children():
@@ -130,12 +133,38 @@ class Parser(object):
     def parse_parameter(self, cursor):
         name = cursor.spelling
         type_ = cursor.type.spelling
-        parameter = model.Parameter(name=name, type_=type_, docstring=clean_comment(cursor))
+        in_out = model.Parameter.INOUT.INPUT  # Most parameters are not output parameters, unless...
+        default_value = None
+        if cursor.type.kind == TypeKind.POINTER:
+            pointee_type = cursor.type.get_pointee()
+            if pointee_type is None:
+                pass  # definitely not an output parameter
+            if pointee_type.is_const_qualified():
+                pass  # Not an output parameter because immutable
+            else:
+                in_out = model.Parameter.INOUT.OUTPUT
         for child in cursor.get_children():
             if child.kind == CursorKind.TYPE_REF:
                 pass  # OK, we expect one of these
+            elif child.kind == CursorKind.UNEXPOSED_EXPR:
+                for gc in child.get_children():
+                    if gc.kind == CursorKind.CXX_NULL_PTR_LITERAL_EXPR:
+                        default_value = 'nullptr'
+            elif child.kind == CursorKind.ANNOTATE_ATTR:
+                if child.spelling.startswith('array_count:'):
+                    in_out = model.Parameter.INOUT.ARRAY_COUNT
+                else:
+                    print(f'*** WARNING *** Unrecognized parameter annotation {child.spelling}')
             else:
+                print('!!! PARAMETER !!!')
                 self.report_unparsed(child)
+        parameter = model.Parameter(
+            name=name,
+            type_=type_,
+            docstring=clean_comment(cursor),
+            in_out=in_out,
+            default_value=default_value,
+        )
         return parameter
 
     def parse_namespace(self, cursor):
@@ -158,7 +187,10 @@ class Parser(object):
             elif child.kind == CursorKind.UNEXPOSED_DECL:
                 self.parse_unexposed_decl(child)
             elif child.kind == CursorKind.CLASS_DECL:
-                self.items.append(self.parse_class(child))
+                if child.spelling.startswith('IVR'):
+                    self.items.append(self.parse_class(child))
+                else:
+                    print(f'*** WARNING *** skipping class {child.spelling}(...)')
             elif child.kind == CursorKind.CXX_METHOD:
                 print(f'*** WARNING *** skipping class method implementation {child.spelling}(...)')
             else:

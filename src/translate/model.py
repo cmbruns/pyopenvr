@@ -1,3 +1,4 @@
+import enum
 import inspect
 import re
 import textwrap
@@ -24,11 +25,18 @@ class Class(Declaration):
             docstring = textwrap.indent(f'\n"""{self.docstring}"""\n', ' '*16)
         name = translate_type(self.name)
         methods = 'pass'
+        fn_table_methods = ''
         if len(self.methods) > 0:
             methods = '\n'
             for method in self.methods:
                 methods += textwrap.indent(str(method), 16*' ') + '\n'
+                fn_table_methods += '\n' + ' '*20 + f'{method.ctypes_fntable_string()}'
         return inspect.cleandoc(f'''
+            class {name}_FnTable(Structure):
+                _fields_ = [{fn_table_methods}
+                ]
+        
+
             class {name}({self.base}):{docstring}
                 def __init__(self):
                     version_key = {name}_Version
@@ -58,7 +66,7 @@ class ConstantDeclaration(Declaration):
         return f'{self.name} = {self.value}{docstring}'
 
 
-class Enum(Declaration):
+class EnumDecl(Declaration):
     def __init__(self, name, docstring=None):
         super().__init__(name=name, docstring=docstring)
         self.constants = []
@@ -90,6 +98,21 @@ class Method(Declaration):
         self.parameters = []
 
     def __str__(self):
+        return self.ctypes_string()
+
+    def add_parameter(self, parameter):
+        self.parameters.append(parameter)
+
+    def ctypes_fntable_string(self):
+        method_name = self.name[0].lower() + self.name[1:]
+        param_list = [translate_type(self.type), ]
+        for p in self.parameters:
+            param_list.append(translate_type(p.type))
+        params = ', '.join(param_list)
+        result = f'("{method_name}", OPENVR_FNTABLE_CALLTYPE({params})),'
+        return result
+
+    def ctypes_string(self):
         docstring = ''
         if self.docstring:
             docstring = f'\n"""{self.docstring}"""\n'
@@ -98,7 +121,7 @@ class Method(Declaration):
         out_params = []
         for p in self.parameters:
             # is this an output parameter?
-            if p.type.endswith('*'):
+            if p.in_out == Parameter.INOUT.OUTPUT:
                 out_params.append(p)
                 all_params.append(f'byref({p.name})')
             else:
@@ -142,14 +165,20 @@ class Method(Declaration):
             return {results}
         ''') + '\n'
 
-    def add_parameter(self, parameter):
-        self.parameters.append(parameter)
-
 
 class Parameter(Declaration):
-    def __init__(self, name, type_, docstring=None):
+    # @enum.Enum.unique
+    class INOUT(enum.Enum):
+        INPUT = enum.auto()
+        OUTPUT = enum.auto()
+        ARRAY_COUNT = enum.auto()
+        ARRAY_OUTPUT = enum.auto()
+
+    def __init__(self, name, type_, in_out=INOUT.INPUT, default_value=None, docstring=None):
         super().__init__(name=name, docstring=docstring)
         self.type = type_
+        self.in_out = in_out
+        self.default_value = default_value
 
 
 class Struct(Declaration):

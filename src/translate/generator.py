@@ -37,7 +37,7 @@ class CTypesGenerator(object):
         '''), file=file_out)
         print('', file=file_out)
         for declaration in declarations:
-            if isinstance(declaration, model.Enum):
+            if isinstance(declaration, model.EnumDecl):
                 print(declaration, file=file_out)
                 print('', file=file_out)
 
