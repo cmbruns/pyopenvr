@@ -6,6 +6,8 @@ import textwrap
 
 class Declaration(object):
     def __init__(self, name, docstring=None):
+        if name == 'type':
+            name = 'type_'
         self.name = name
         self.docstring = docstring
 
@@ -119,14 +121,42 @@ class Method(Declaration):
         result = f'("{method_name}", OPENVR_FNTABLE_CALLTYPE({params})),'
         return result
 
+    def has_return(self):
+        if self.type == 'void':
+            return False
+        for p in self.parameters:
+            if p.is_out_string():
+                return False
+        return True
+
     def ctypes_string(self):
         in_params = ['self']
         call_params = []
         out_params = []
-        if self.type != 'void':
+        if self.has_return():
             out_params.append('result')
         pre_call_statements = ''
         post_call_statements = ''
+        # Handle output strings
+        for pix, p in enumerate(self.parameters):
+            if p.is_out_string():
+                len_param = self.parameters[pix + 1]
+                len_param.is_count = True
+                call_params0 = []
+                for p2 in self.parameters:
+                    if p2 is p:
+                        call_params0.append('None')
+                    elif p2 is len_param:
+                        call_params0.append('0')
+                    elif p2.call_param_name():
+                        call_params0.append(p2.call_param_name())
+                param_list = ', '.join(call_params0)
+                pre_call_statements += textwrap.dedent(f'''\
+                    {len_param.name} = fn({param_list})
+                    if {len_param.name} == 0:
+                        return b''
+                    {p.name} = ctypes.create_string_buffer({len_param.name})
+                ''')
         for p in self.parameters:
             if p.input_param_name():
                 in_params.append(p.input_param_name())
@@ -146,10 +176,10 @@ class Method(Declaration):
         body_string += f'fn = self.function_table.{method_name}\n'
         body_string += pre_call_statements
         param_list2 = ', '.join(call_params)
-        if self.type == 'void':
-            body_string += f'fn({param_list2})\n'
-        else:
+        if self.has_return():
             body_string += f'result = fn({param_list2})\n'
+        else:
+            body_string += f'fn({param_list2})\n'
         body_string += post_call_statements
         if len(out_params) > 0:
             results = ', '.join(out_params)
@@ -167,10 +197,20 @@ class Parameter(Declaration):
         self.annotation = annotation
         self.is_count = False
 
+    def is_error(self):
+        if self.name != 'pError':
+            return False
+        return True
+
     def is_array(self):
         if not self.annotation:
             return False
         return re.match(r'array_count:(\S+);', self.annotation)
+
+    def is_out_string(self):
+        if not self.annotation:
+            return False
+        return str(self.annotation) == 'out_string: ;'
 
     def is_output(self):
         if self.is_count:
@@ -217,6 +257,8 @@ class Parameter(Declaration):
                     {self.name}Arg = byref({self.name}[0])
                 ''')
             return result
+        elif self.is_out_string():
+            return ''
         elif self.is_count:
             return ''
         elif not self.is_input():
@@ -226,6 +268,11 @@ class Parameter(Declaration):
             return ''
 
     def post_call_block(self):
+        if self.is_error():
+            return textwrap.dedent(f'''\
+                if pError.value != 0:
+                    raise OpenVRError(str(pError))
+            ''')
         return ''
 
     def input_param_name(self):
@@ -238,12 +285,18 @@ class Parameter(Declaration):
             return f'{self.name}Arg'
         elif self.is_count:
             return self.name
+        elif self.is_out_string():
+            return self.name
         elif self.is_output():
             return f'byref({self.name})'
         else:
             return self.name
 
     def return_param_name(self):
+        if self.is_error():
+            return None
+        if self.is_out_string():
+            return f'bytes({self.name}.value)'
         if not self.is_output():
             return None
         result = self.name
