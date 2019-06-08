@@ -1,4 +1,4 @@
-import enum
+from clang.cindex import TypeKind
 import inspect
 import re
 import textwrap
@@ -96,89 +96,161 @@ class Method(Declaration):
         self.name = name
         self.type = type_
         self.parameters = []
+        self._count_parameter_names = set()
 
     def __str__(self):
         return self.ctypes_string()
 
     def add_parameter(self, parameter):
+        # Tag count parameters
+        m = parameter.is_array()
+        if m:
+            self._count_parameter_names.add(m.group(1))
+        if parameter.name in self._count_parameter_names:
+            parameter.is_count = True
         self.parameters.append(parameter)
 
     def ctypes_fntable_string(self):
         method_name = self.name[0].lower() + self.name[1:]
         param_list = [translate_type(self.type), ]
         for p in self.parameters:
-            param_list.append(translate_type(p.type))
+            param_list.append(translate_type(p.type.spelling))
         params = ', '.join(param_list)
         result = f'("{method_name}", OPENVR_FNTABLE_CALLTYPE({params})),'
         return result
 
     def ctypes_string(self):
-        docstring = ''
-        if self.docstring:
-            docstring = f'\n"""{self.docstring}"""\n'
-        all_params = []
         in_params = ['self']
+        call_params = []
         out_params = []
+        if self.type != 'void':
+            out_params.append('result')
+        pre_call_statements = ''
+        post_call_statements = ''
         for p in self.parameters:
-            # is this an output parameter?
-            if p.in_out == Parameter.INOUT.OUTPUT:
-                out_params.append(p)
-                all_params.append(f'byref({p.name})')
-            else:
-                in_params.append(p.name)
-                all_params.append(p.name)
+            if p.input_param_name():
+                in_params.append(p.input_param_name())
+            if p.call_param_name():
+                call_params.append(p.call_param_name())
+            if p.return_param_name():
+                out_params.append(p.return_param_name())
+            pre_call_statements += p.pre_call_block()
+            post_call_statements += p.post_call_block()
         param_list1 = ', '.join(in_params)
-        param_list2 = ', '.join(all_params)
         # pythonically downcase first letter of method name
         method_name = self.name[0].lower() + self.name[1:]
-        if len(out_params) == 0:  # simple case: no output parameters
-            docstring = textwrap.indent(docstring, ' '*16)
-            return inspect.cleandoc(f'''
-            def {method_name}({param_list1}):{docstring}
-                fn = self.function_table.{method_name}
-                result = fn({param_list2})
-                return result
-            ''') + '\n'
-        result_list = []
-        fn_call = f'fn({param_list2})'
-        if not self.type == 'void':
-            result_list.append('result')
-            fn_call = f'result = fn({param_list2})'
-        out_decls = []
-        for op in out_params:
-            t = translate_type(op.type[:-1])
-            out_decls.append(f'{op.name} = {t}()')
-            # Pointers to primitive types return the .value member
-            s = op.name
-            t = translate_type(op.type)
-            if t.startswith('POINTER(c_'):
-                s += '.value'
-            result_list.append(s)
-        od = '\n' + '\n'.join(out_decls)
-        od = textwrap.indent(od, ' '*12)
-        docstring = textwrap.indent(docstring, ' '*12)
-        results = ', '.join(result_list)
-        return inspect.cleandoc(f'''
-        def {method_name}({param_list1}):{docstring}
-            fn = self.function_table.{method_name}{od}
-            {fn_call}
-            return {results}
-        ''') + '\n'
+        method_string = f'def {method_name}({param_list1}):\n'
+        body_string = ''
+        if self.docstring:
+            body_string += f'"""{self.docstring}"""\n\n'
+        body_string += f'fn = self.function_table.{method_name}\n'
+        body_string += pre_call_statements
+        param_list2 = ', '.join(call_params)
+        if self.type == 'void':
+            body_string += f'fn({param_list2})\n'
+        else:
+            body_string += f'result = fn({param_list2})\n'
+        body_string += post_call_statements
+        if len(out_params) > 0:
+            results = ', '.join(out_params)
+            body_string += f'return {results}\n'
+        body_string = textwrap.indent(body_string, ' '*4)
+        method_string += body_string
+        return method_string
 
 
 class Parameter(Declaration):
-    # @enum.Enum.unique
-    class INOUT(enum.Enum):
-        INPUT = enum.auto()
-        OUTPUT = enum.auto()
-        ARRAY_COUNT = enum.auto()
-        ARRAY_OUTPUT = enum.auto()
-
-    def __init__(self, name, type_, in_out=INOUT.INPUT, default_value=None, docstring=None):
+    def __init__(self, name, type_, default_value=None, docstring=None, annotation=None):
         super().__init__(name=name, docstring=docstring)
         self.type = type_
-        self.in_out = in_out
         self.default_value = default_value
+        self.annotation = annotation
+        self.is_count = False
+
+    def is_array(self):
+        if not self.annotation:
+            return False
+        return re.match(r'array_count:(\S+);', self.annotation)
+
+    def is_output(self):
+        if self.is_count:
+            return False
+        if not self.type.kind == TypeKind.POINTER:
+            return False
+        pt = self.type.get_pointee()
+        if pt.is_const_qualified():
+            return False
+        return True
+
+    def is_input(self):
+        if self.is_count:
+            return False
+        elif self.is_array():
+            return True
+        elif not self.is_output():
+            return True
+        else:
+            return False  # TODO:
+
+    def pre_call_block(self):
+        m = self.is_array()
+        if m:
+            result = ''
+            count_param = m.group(1)
+            element_t = translate_type(self.type.get_pointee().spelling)
+            if re.match(r'^unTrackedDevice.*Count$', count_param):
+                result += textwrap.dedent(f'''\
+                    if {self.name} is None:
+                        {count_param} = k_unMaxTrackedDeviceCount
+                        {self.name} = ({element_t} * {count_param})()
+                        {self.name}Arg = byref({self.name}[0])
+                    ''')
+            else:
+                result += textwrap.dedent(f'''\
+                if {self.name} is None:
+                    {count_param} = 0
+                    {self.name}Arg = None
+                ''')
+            result += textwrap.dedent(f'''\
+                else:
+                    {count_param} = len({self.name})
+                    {self.name}Arg = byref({self.name}[0])
+                ''')
+            return result
+        elif self.is_count:
+            return ''
+        elif not self.is_input():
+            t = translate_type(self.type.get_pointee().spelling)
+            return f'{self.name} = {t}()\n'
+        else:
+            return ''
+
+    def post_call_block(self):
+        return ''
+
+    def input_param_name(self):
+        if not self.is_input():
+            return None
+        return self.name
+
+    def call_param_name(self):
+        if self.is_array():
+            return f'{self.name}Arg'
+        elif self.is_count:
+            return self.name
+        elif self.is_output():
+            return f'byref({self.name})'
+        else:
+            return self.name
+
+    def return_param_name(self):
+        if not self.is_output():
+            return None
+        result = self.name
+        pt = translate_type(self.type.get_pointee().spelling)
+        if pt.startswith('c_'):
+            result += '.value'
+        return result
 
 
 class Struct(Declaration):

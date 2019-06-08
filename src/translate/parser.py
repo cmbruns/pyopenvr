@@ -2,9 +2,9 @@
 Parses translate header files to create a model of the code to be generated
 """
 
-from enum import Enum
 import inspect
 import pkg_resources
+import re
 
 from clang.cindex import CursorKind, Index, TypeKind
 
@@ -65,27 +65,11 @@ class Parser(object):
     def parse_enum(self, cursor):
         name = cursor.spelling
         enum = model.EnumDecl(name=name)
-        next_value = 0
-        index = dict()
         for child in cursor.get_children():
             if child.kind == CursorKind.ENUM_CONSTANT_DECL:
-                values = list(child.get_children())
-                if len(values) > 0:
-                    value = self.parse_literal(values[0])
-                else:
-                    value = str(next_value)
-                enum_const = model.EnumConstant(name=child.spelling, value=value)
+                value1 = child.enum_value
+                enum_const = model.EnumConstant(name=child.spelling, value=value1)
                 enum.add_constant(enum_const)
-                int_val = next_value
-                if str(value) in index:
-                    int_val = index[str(value)]  # reference to another enum value, e.g. 'k_EButton_Axis0'
-                else:
-                    try:
-                        int_val = int(eval(str(value)))
-                    except:
-                        pass  # I give up
-                index[str(child.spelling)] = int_val
-                next_value = int_val + 1
             else:
                 self.report_unparsed(child)
         self.items.append(enum)
@@ -132,17 +116,8 @@ class Parser(object):
 
     def parse_parameter(self, cursor):
         name = cursor.spelling
-        type_ = cursor.type.spelling
-        in_out = model.Parameter.INOUT.INPUT  # Most parameters are not output parameters, unless...
         default_value = None
-        if cursor.type.kind == TypeKind.POINTER:
-            pointee_type = cursor.type.get_pointee()
-            if pointee_type is None:
-                pass  # definitely not an output parameter
-            if pointee_type.is_const_qualified():
-                pass  # Not an output parameter because immutable
-            else:
-                in_out = model.Parameter.INOUT.OUTPUT
+        annotation = None
         for child in cursor.get_children():
             if child.kind == CursorKind.TYPE_REF:
                 pass  # OK, we expect one of these
@@ -151,19 +126,16 @@ class Parser(object):
                     if gc.kind == CursorKind.CXX_NULL_PTR_LITERAL_EXPR:
                         default_value = 'nullptr'
             elif child.kind == CursorKind.ANNOTATE_ATTR:
-                if child.spelling.startswith('array_count:'):
-                    in_out = model.Parameter.INOUT.ARRAY_COUNT
-                else:
-                    print(f'*** WARNING *** Unrecognized parameter annotation {child.spelling}')
+                annotation = child.spelling
             else:
                 print('!!! PARAMETER !!!')
                 self.report_unparsed(child)
         parameter = model.Parameter(
             name=name,
-            type_=type_,
+            type_=cursor.type,
             docstring=clean_comment(cursor),
-            in_out=in_out,
             default_value=default_value,
+            annotation=annotation,
         )
         return parameter
 
