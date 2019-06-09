@@ -27,8 +27,11 @@ class COpenVRContext(Declaration):
         class_string = textwrap.dedent(f'''\
             class {name}(object):{docstring}
                 def __init__(self):
-                    self.clear()
-                    
+        ''')
+        for m in self.vr_member_names:
+            class_string += ' '*8 + f'self.{m} = None\n'
+        class_string += textwrap.indent(textwrap.dedent(f'''\
+                
                 def checkClear(self):
                     global _vr_token
                     if _vr_token != getInitToken():
@@ -36,7 +39,7 @@ class COpenVRContext(Declaration):
                         _vr_token = getInitToken()
                         
                 def clear(self):  
-        ''')
+        '''), ' '*4)
         for m in self.vr_member_names:
             class_string += ' '*8 + f'self.{m} = None\n'
         class_string += '\n'
