@@ -94,6 +94,26 @@ class Parser(object):
         return self.items
 
     def parse_function(self, cursor):
+        name = cursor.spelling
+        is_c_function = False
+        if name.startswith('VR_'):
+            for child in cursor.get_children():
+                if child.kind == CursorKind.DLLIMPORT_ATTR:
+                    is_c_function = True
+        if is_c_function:
+            # Oh yes. This is the sort of function we were looking for.
+            restype = cursor.result_type
+            function = model.Function(name=name, type_=restype, docstring=clean_comment(cursor))
+            for child in cursor.get_children():
+                if child.kind == CursorKind.DLLIMPORT_ATTR:
+                    pass  # OK
+                elif child.kind == CursorKind.PARM_DECL:
+                    parameter = self.parse_parameter(child)
+                    if parameter is not None:
+                        function.add_parameter(parameter)
+                else:
+                    x = 3
+            self.items.append(function)
         print(f'*** WARNING *** skipping function declaration {cursor.spelling}(...)')
 
     def parse_literal(self, cursor):
@@ -124,9 +144,23 @@ class Parser(object):
             elif child.kind == CursorKind.UNEXPOSED_EXPR:
                 for gc in child.get_children():
                     if gc.kind == CursorKind.CXX_NULL_PTR_LITERAL_EXPR:
-                        default_value = 'nullptr'
+                        default_value = 'None'
+                    elif gc.kind == CursorKind.INTEGER_LITERAL:
+                        val = self.parse_literal(gc)
+                        if val.endswith('L'):
+                            val = val[:-1]
+                        if cursor.type.kind == TypeKind.POINTER and int(val) == 0:
+                            default_value = 'None'
+                        else:
+                            default_value = f'{int(val)}'
+                    elif len(gc.spelling) > 0:
+                        default_value = gc.spelling
+                    else:
+                        print('WARNING: unrecognized parameter thingy')
             elif child.kind == CursorKind.ANNOTATE_ATTR:
                 annotation = child.spelling
+            elif child.kind == CursorKind.DECL_REF_EXPR:
+                default_value = child.spelling
             else:
                 print('!!! PARAMETER !!!')
                 self.report_unparsed(child)
@@ -206,14 +240,12 @@ class Parser(object):
                 self.report_unparsed(child)
 
     def parse_typedef(self, cursor):
-        children = list(cursor.get_children())
         alias = cursor.spelling
-        if len(children) == 1:
-            original = children[0].spelling
-            if len(str(original)) < 1:
-                return
-            item = model.Typedef(alias=alias, original=original, docstring=cursor.brief_comment)
-            self.items.append(item)
+        original = cursor.underlying_typedef_type.spelling
+        if str(original).endswith('VRControllerState001_t'):
+            return
+        item = model.Typedef(alias=alias, original=original, docstring=cursor.brief_comment)
+        self.items.append(item)
 
     def parse_unexposed_decl(self, cursor):
         for child in cursor.get_children():

@@ -6,8 +6,6 @@ import textwrap
 
 class Declaration(object):
     def __init__(self, name, docstring=None):
-        if name == 'type':
-            name = 'type_'
         self.name = name
         self.docstring = docstring
 
@@ -92,10 +90,74 @@ class EnumConstant(Declaration):
         return f'{self.name} = ENUM_VALUE_TYPE({self.value})'
 
 
+class Function(Declaration):
+    def __init__(self, name, type_=None, docstring=None):
+        super().__init__(name=name, docstring=docstring)
+        self.type = type_
+        self.parameters = []
+
+    def __str__(self):
+        py_name = self.name
+        if py_name.startswith('VR_'):
+            py_name = py_name[3:]
+        py_name = py_name[0].lower() + py_name[1:]
+        docstring = ''
+        if self.docstring:
+            docstring = f'\n"""{self.docstring}"""'
+            docstring = textwrap.indent(docstring, ' '*20)
+        params = []
+        call_params = []
+        param_types = []
+        error_param = None
+        for p in self.parameters:
+            if p.is_error():
+                error_param = p
+            else:
+                n = p.name
+                if p.default_value:
+                    n += f'={p.default_value}'
+                params.append(n)
+            if p.type.kind == TypeKind.POINTER:
+                pt = p.type.get_pointee()
+                if pt.is_const_qualified():
+                    call_params.append(p.name)
+                else:
+                    call_params.append(f'byref({p.name})')
+            else:
+                call_params.append(p.name)
+            param_types.append(translate_type(p.type.spelling))
+        restype = translate_type(self.type.spelling)
+        args = ', '.join(params)
+        call_args = ', '.join(call_params)
+        arg_types = ', '.join(param_types)
+        if error_param is None:
+            method_string = f'''
+                _openvr.{self.name}.restype = {restype}
+                _openvr.{self.name}.argtypes = [{arg_types}]
+                def {py_name}({args}):{docstring}
+                    result =     _openvr.{self.name}({call_args})
+                    return result
+            '''
+        else:
+            etype = translate_type(error_param.type.get_pointee().spelling)
+            method_string = f'''
+                _openvr.{self.name}.restype = {restype}
+                _openvr.{self.name}.argtypes = [{arg_types}]
+                def {py_name}({args}):{docstring}
+                    {error_param.name} = {etype}()
+                    result =     _openvr.{self.name}({call_args})
+                    _checkInitError({error_param.name}.value)
+                    return result
+            '''
+        return inspect.cleandoc(method_string)
+
+    def add_parameter(self, parameter):
+        self.parameters.append(parameter)
+
+
 class Method(Declaration):
     def __init__(self, name, type_=None, docstring=None):
         super().__init__(name=name, docstring=docstring)
-        self.name = name
         self.type = type_
         self.parameters = []
         self._count_parameter_names = set()
@@ -191,6 +253,8 @@ class Method(Declaration):
 
 class Parameter(Declaration):
     def __init__(self, name, type_, default_value=None, docstring=None, annotation=None):
+        if name == 'type':
+            name = 'type_'
         super().__init__(name=name, docstring=docstring)
         self.type = type_
         self.default_value = default_value
@@ -198,9 +262,12 @@ class Parameter(Declaration):
         self.is_count = False
 
     def is_error(self):
-        if self.name != 'pError':
+        if self.type.kind != TypeKind.POINTER:
             return False
-        return True
+        t = translate_type(self.type.get_pointee().spelling)
+        if re.match(r'^(vr::)?E\S+Error$', t):
+            return True
+        return False
 
     def is_array(self):
         if not self.annotation:
@@ -220,6 +287,8 @@ class Parameter(Declaration):
         pt = self.type.get_pointee()
         if pt.is_const_qualified():
             return False
+        if pt.kind == TypeKind.VOID:
+            return False
         return True
 
     def is_input(self):
@@ -227,6 +296,12 @@ class Parameter(Declaration):
             return False
         elif self.is_array():
             return True
+        elif self.name == 'pEvent':
+            return True
+        elif self.name == 'uncbVREvent':
+            return False
+        elif self.name == 'unControllerStateSize':
+            return False
         elif not self.is_output():
             return True
         else:
@@ -261,6 +336,10 @@ class Parameter(Declaration):
             return ''
         elif self.is_count:
             return ''
+        elif self.name == 'uncbVREvent':
+            return f'uncbVREvent = sizeof(VREvent_t)\n'
+        elif self.name == 'unControllerStateSize':
+            return f'uncbVREvent = sizeof(VRControllerState_t)\n'
         elif not self.is_input():
             t = translate_type(self.type.get_pointee().spelling)
             return f'{self.name} = {t}()\n'
@@ -270,14 +349,16 @@ class Parameter(Declaration):
     def post_call_block(self):
         if self.is_error():
             return textwrap.dedent(f'''\
-                if pError.value != 0:
-                    raise OpenVRError(str(pError))
+                if {self.name}.value != 0:
+                    raise OpenVRError(str({self.name}))
             ''')
         return ''
 
     def input_param_name(self):
         if not self.is_input():
             return None
+        if self.default_value:
+            return f'{self.name}={self.default_value}'
         return self.name
 
     def call_param_name(self):
@@ -288,6 +369,8 @@ class Parameter(Declaration):
         elif self.is_out_string():
             return self.name
         elif self.is_output():
+            return f'byref({self.name})'
+        elif self.type.kind == TypeKind.POINTER:
             return f'byref({self.name})'
         else:
             return self.name
@@ -308,9 +391,15 @@ class Parameter(Declaration):
 
 class Struct(Declaration):
     def __init__(self, name, docstring=None):
+        if name == 'vr::VRControllerState001_t':
+            name = 'VRControllerState_t'
         super().__init__(name=name, docstring=docstring)
         self.fields = []
         self.base = None
+        if name == 'VRControllerState_t':
+            self.base = 'PackHackStructure'
+        if name == 'vr::VREvent_t':
+            self.base = 'PackHackStructure'
 
     def add_field(self, field):
         self.fields.append(field)
@@ -363,6 +452,8 @@ class Typedef(Declaration):
 
     def __str__(self):
         orig = translate_type(self.original)
+        if self.name == orig:
+            return ''
         return f'{self.name} = {orig}'
 
 
@@ -377,6 +468,7 @@ def translate_type(type_name, bracket=False):
     result = re.sub(r'\s+const\b', '', result)
     result = re.sub(r'\bstruct\s+', '', result)
     result = re.sub(r'\benum\s+', '', result)
+    result = re.sub(r'\bunion\s+', '', result)
     # no implicit int
     if result == 'unsigned':
         result = 'unsigned int'

@@ -53,7 +53,8 @@ class CTypesGenerator(object):
         print('', file=file_out)
         for declaration in declarations:
             if isinstance(declaration, model.Typedef):
-                print(declaration, file=file_out)
+                if len(str(declaration)) > 0:
+                    print(declaration, file=file_out)
 
         print('', file=file_out)
         print(inspect.cleandoc('''
@@ -109,6 +110,51 @@ class CTypesGenerator(object):
             if isinstance(declaration, model.Struct) or isinstance(declaration, model.Class):
                 print(declaration, file=file_out)
                 print('\n', file=file_out)
+
+        print('\n', file=file_out)
+        print(inspect.cleandoc('''
+            ########################
+            ### Expose functions ###
+            ########################
+            
+            def _checkInitError(error):
+                """
+                Replace openvr error return code with a python exception
+                """
+                if error != VRInitError_None:
+                    shutdown()
+                    raise OpenVRError("%s (error number %d)" %(getVRInitErrorAsSymbol(error), error))
+            
+            
+            # Copying VR_Init inline implementation from https://github.com/ValveSoftware/openvr/blob/master/headers/openvr.h
+            # and from https://github.com/phr00t/jMonkeyVR/blob/master/src/jmevr/input/OpenVR.java
+            def init(applicationType, pStartupInfo=None):
+                """
+                Finds the active installation of the VR API and initializes it. The provided path must be absolute
+                or relative to the current working directory. These are the local install versions of the equivalent
+                functions in steamvr.h and will work without a local Steam install.
+                
+                This path is to the "root" of the VR API install. That's the directory with
+                the "drivers" directory and a platform (i.e. "win32") directory in it, not the directory with the DLL itself.
+                """
+                initInternal2(applicationType, pStartupInfo)
+                # Retrieve "System" API
+                return VRSystem()
+            
+            
+            def shutdown():
+                """
+                unloads vrclient.dll. Any interface pointers from the interface are
+                invalid after this point
+                """
+                shutdownInternal() # OK, this is just like inline definition in openvr.h
+        '''), file=file_out)
+        print('\n', file=file_out)
+        for declaration in declarations:
+            if isinstance(declaration, model.Function):
+                print(declaration, file=file_out)
+                print('\n', file=file_out)
+
 
     @staticmethod
     def write_preamble(file_out):
