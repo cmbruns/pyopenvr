@@ -133,7 +133,7 @@ class CTypesGenerator(object):
                 """
                 if error != VRInitError_None:
                     shutdown()
-                    raise OpenVRError("%s (error number %d)" %(getVRInitErrorAsSymbol(error), error))
+                    raise OpenVRError("%s (error number %d)" % (getVRInitErrorAsSymbol(error), error))
             
             
             # Copying VR_Init inline implementation from https://github.com/ValveSoftware/openvr/blob/master/headers/openvr.h
@@ -164,6 +164,7 @@ class CTypesGenerator(object):
             if isinstance(declaration, model.Function):
                 print(declaration, file=file_out)
                 print('\n', file=file_out)
+        print('Generate complete')
 
 
     @staticmethod

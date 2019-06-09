@@ -126,7 +126,6 @@ class Parser(object):
                 if child.kind == CursorKind.DLLIMPORT_ATTR:
                     is_c_function = True
         if is_c_function:
-            # Oh yes. This is the sort of function we were looking for.
             restype = cursor.result_type
             function = model.Function(name=name, type_=restype, docstring=clean_comment(cursor))
             for child in cursor.get_children():
@@ -139,6 +138,24 @@ class Parser(object):
                 else:
                     x = 3
             self.items.append(function)
+            return
+        param_count = 0
+        for child in cursor.get_children():
+            if child.kind == CursorKind.PARM_DECL:
+                param_count += 1
+        is_ivr_instance_function = False
+        if name.startswith('VR') and param_count == 0:
+            rt = cursor.result_type
+            if rt.kind == TypeKind.POINTER:
+                pt = rt.get_pointee()
+                if pt.spelling.startswith('vr::IVR'):
+                    is_ivr_instance_function = True
+        if is_ivr_instance_function:
+            pass  # OK - we generate these from COpenVRConstext
+        elif cursor.spelling == 'VR_Init':
+            pass  # OK - we manually generate this one
+        elif cursor.spelling == 'VR_Shutdown':
+            pass  # OK - we manually generate this one
         else:
             print(f'*** WARNING *** skipping function declaration {cursor.spelling}(...)')
 
@@ -156,6 +173,10 @@ class Parser(object):
                 parameter = self.parse_parameter(child)
                 if parameter is not None:
                     method.add_parameter(parameter)
+            elif child.kind == CursorKind.TYPE_REF:
+                pass  # OK, probably the return type we already got
+            elif child.kind == CursorKind.NAMESPACE_REF:
+                pass  # OK, return type is probably namespace qualified
             else:
                 self.report_unparsed(child)
         return method
@@ -181,12 +202,23 @@ class Parser(object):
                             default_value = f'{int(val)}'
                     elif len(gc.spelling) > 0:
                         default_value = gc.spelling
+                    elif gc.kind == CursorKind.CXX_UNARY_EXPR:
+                        # default value is some expression
+                        # so jam the tokens together, and hope it's interpretable by python
+                        # unPrimitiveSize = sizeof( VROverlayIntersectionMaskPrimitive_t )
+                        tokens = ''.join([t.spelling for t in gc.get_tokens()])
+                        default_value = tokens
                     else:
                         self.report_unparsed(gc)
+            elif child.kind == CursorKind.CXX_BOOL_LITERAL_EXPR:
+                bool_val = str(next(child.get_tokens()).spelling)
+                default_value = str(bool_val == 'true')
             elif child.kind == CursorKind.ANNOTATE_ATTR:
                 annotation = child.spelling
             elif child.kind == CursorKind.DECL_REF_EXPR:
                 default_value = child.spelling
+            elif child.kind == CursorKind.NAMESPACE_REF:
+                pass  # probably on the parameter type
             else:
                 self.report_unparsed(child)
         parameter = model.Parameter(
@@ -225,7 +257,12 @@ class Parser(object):
                 else:
                     print(f'*** WARNING *** skipping class {child.spelling}(...)')
             elif child.kind == CursorKind.CXX_METHOD:
-                print(f'*** WARNING *** skipping class method implementation {child.spelling}(...)')
+                cn = child.semantic_parent.spelling
+                mn = child.spelling
+                if cn == 'COpenVRContext' and mn == 'Clear':
+                    pass  # OK - we manually wrap this one
+                else:
+                    print(f'*** WARNING *** skipping class method implementation {child.spelling}(...)')
             else:
                 self.report_unparsed(child)
 
