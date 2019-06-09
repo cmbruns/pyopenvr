@@ -171,7 +171,7 @@ class OpenVrGlRenderer(list):
     def render_scene(self):
         if self.compositor is None:
             return
-        self.compositor.waitGetPoses(self.poses, openvr.k_unMaxTrackedDeviceCount, None, 0)
+        self.compositor.waitGetPoses(self.poses, None)
         hmd_pose0 = self.poses[openvr.k_unTrackedDeviceIndex_Hmd]
         if not hmd_pose0.bPoseIsValid:
             return

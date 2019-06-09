@@ -13,7 +13,69 @@ class Declaration(object):
         return f'{self.name}'
 
 
-class Class(Declaration):
+class COpenVRContext(Declaration):
+    def __init__(self, name, docstring=None):
+        super().__init__(name=name, docstring=docstring)
+        self.vr_member_names = []
+        self.vr_method_names = []
+
+    def __str__(self):
+        docstring = ''
+        if self.docstring:
+            docstring = textwrap.indent(f'\n"""{self.docstring}"""\n', ' '*16)
+        name = translate_type(self.name)
+        class_string = textwrap.dedent(f'''\
+            class {name}(object):{docstring}
+                def __init__(self):
+                    self.clear()
+                    
+                def checkClear(self):
+                    global _vr_token
+                    if _vr_token != getInitToken():
+                        self.clear()
+                        _vr_token = getInitToken()
+                        
+                def clear(self):  
+        ''')
+        for m in self.vr_member_names:
+            class_string += ' '*8 + f'self.{m} = None\n'
+        class_string += '\n'
+        for m in self.vr_method_names:
+            method_string = textwrap.dedent(f'''\
+                def {m}(self):
+                    self.checkClear()
+                    if self.m_p{m} is None:
+                        self.m_p{m} = I{m}()
+                    return self.m_p{m}
+                              
+            ''')
+            class_string += textwrap.indent(method_string, ' '*4)
+        class_string += textwrap.dedent(f'''\
+            
+            # Globals for context management
+            _vr_token = None
+            _internal_module_context = COpenVRContext()
+            
+            
+        ''')
+        for m in self.vr_method_names:
+            method_string = textwrap.dedent(f'''\
+                def {m}():
+                    return _internal_module_context.{m}()
+                
+                
+            ''')
+            class_string += method_string
+        return class_string
+
+    def add_vr_member_name(self, name):
+        self.vr_member_names.append(name)
+
+    def add_vr_method_name(self, name):
+        self.vr_method_names.append(name)
+
+
+class IVRClass(Declaration):
     def __init__(self, name, docstring=None):
         super().__init__(name=name, docstring=docstring)
         self.base = 'object'
@@ -135,7 +197,7 @@ class Function(Declaration):
                 _openvr.{self.name}.restype = {restype}
                 _openvr.{self.name}.argtypes = [{arg_types}]
                 def {py_name}({args}):{docstring}
-                    result =     _openvr.{self.name}({call_args})
+                    result = _openvr.{self.name}({call_args})
                     return result
             '''
         else:
@@ -145,7 +207,7 @@ class Function(Declaration):
                 _openvr.{self.name}.argtypes = [{arg_types}]
                 def {py_name}({args}):{docstring}
                     {error_param.name} = {etype}()
-                    result =     _openvr.{self.name}({call_args})
+                    result = _openvr.{self.name}({call_args})
                     _checkInitError({error_param.name}.value)
                     return result
             '''
@@ -195,10 +257,24 @@ class Method(Declaration):
         in_params = ['self']
         call_params = []
         out_params = []
-        if self.has_return():
+        if self.has_return() and not self.catch_error_code():
             out_params.append('result')
         pre_call_statements = ''
         post_call_statements = ''
+        # Annotate count params just in time
+        for pix, p in enumerate(self.parameters):
+            if p.is_out_string():
+                len_param = self.parameters[pix + 1]
+                len_param.is_count = True
+        for p in self.parameters:
+            if p.input_param_name():
+                in_params.append(p.input_param_name())
+            if p.call_param_name():
+                call_params.append(p.call_param_name())
+            if p.return_param_name():
+                out_params.append(p.return_param_name())
+            pre_call_statements += p.pre_call_block()
+            post_call_statements += p.post_call_block()
         # Handle output strings
         for pix, p in enumerate(self.parameters):
             if p.is_out_string():
@@ -219,15 +295,6 @@ class Method(Declaration):
                         return b''
                     {p.name} = ctypes.create_string_buffer({len_param.name})
                 ''')
-        for p in self.parameters:
-            if p.input_param_name():
-                in_params.append(p.input_param_name())
-            if p.call_param_name():
-                call_params.append(p.call_param_name())
-            if p.return_param_name():
-                out_params.append(p.return_param_name())
-            pre_call_statements += p.pre_call_block()
-            post_call_statements += p.post_call_block()
         param_list1 = ', '.join(in_params)
         # pythonically downcase first letter of method name
         method_name = self.name[0].lower() + self.name[1:]
@@ -238,17 +305,32 @@ class Method(Declaration):
         body_string += f'fn = self.function_table.{method_name}\n'
         body_string += pre_call_statements
         param_list2 = ', '.join(call_params)
-        if self.has_return():
+        if self.catch_error_code():
+            body_string += f'error_code = fn({param_list2})\n'
+        elif self.has_return():
             body_string += f'result = fn({param_list2})\n'
         else:
             body_string += f'fn({param_list2})\n'
+        if self.catch_error_code():
+            message = f'{translate_type(self.type)}({{error_code}})'
+            post_call_statements += textwrap.dedent(f'''\
+                if error_code != 0:
+                    raise OpenVRError(f'{message}')
+            ''')
         body_string += post_call_statements
-        if len(out_params) > 0:
+        if method_name == 'pollNextEvent':
+            body_string += 'return result != 0\n'  # Custom return statement
+        elif len(out_params) > 0:
             results = ', '.join(out_params)
             body_string += f'return {results}\n'
         body_string = textwrap.indent(body_string, ' '*4)
         method_string += body_string
         return method_string
+
+    def catch_error_code(self):
+        if re.match(r'(?:vr\:\:)?EVRRenderModelError$', self.type):
+            return False  # Need the non-zero error code in this case
+        return re.match(r'(?:vr\:\:)?E\S+Error$', self.type)
 
 
 class Parameter(Declaration):
@@ -313,7 +395,12 @@ class Parameter(Declaration):
             result = ''
             count_param = m.group(1)
             element_t = translate_type(self.type.get_pointee().spelling)
+            is_pose_array = False
             if re.match(r'^unTrackedDevice.*Count$', count_param):
+                is_pose_array = True
+            if re.match(r'^un\S+PoseArrayCount$', count_param):
+                is_pose_array = True
+            if is_pose_array:
                 result += textwrap.dedent(f'''\
                     if {self.name} is None:
                         {count_param} = k_unMaxTrackedDeviceCount
@@ -337,9 +424,9 @@ class Parameter(Declaration):
         elif self.is_count:
             return ''
         elif self.name == 'uncbVREvent':
-            return f'uncbVREvent = sizeof(VREvent_t)\n'
+            return f'{self.name} = sizeof(VREvent_t)\n'
         elif self.name == 'unControllerStateSize':
-            return f'uncbVREvent = sizeof(VRControllerState_t)\n'
+            return f'{self.name} = sizeof(VRControllerState_t)\n'
         elif not self.is_input():
             t = translate_type(self.type.get_pointee().spelling)
             return f'{self.name} = {t}()\n'
@@ -347,12 +434,25 @@ class Parameter(Declaration):
             return ''
 
     def post_call_block(self):
+        result = ''
         if self.is_error():
-            return textwrap.dedent(f'''\
+            result += textwrap.dedent(f'''\
                 if {self.name}.value != 0:
                     raise OpenVRError(str({self.name}))
             ''')
-        return ''
+        if self.is_output() and self.type.kind == TypeKind.POINTER:
+            pt = self.type.get_pointee()
+            if pt.kind == TypeKind.POINTER:
+                pt2 = pt.get_pointee()
+                if pt2.spelling.endswith('_t'):
+                    n = self.name
+                    result += textwrap.dedent(f'''\
+                        if {n}:
+                            {n} = {n}.contents
+                        else:
+                            {n} = None
+                    ''')
+        return result
 
     def input_param_name(self):
         if not self.is_input():
@@ -371,7 +471,11 @@ class Parameter(Declaration):
         elif self.is_output():
             return f'byref({self.name})'
         elif self.type.kind == TypeKind.POINTER:
-            return f'byref({self.name})'
+            ptk = self.type.get_pointee().kind
+            if ptk == TypeKind.CHAR_S:
+                return self.name
+            else:
+                return f'byref({self.name})'
         else:
             return self.name
 

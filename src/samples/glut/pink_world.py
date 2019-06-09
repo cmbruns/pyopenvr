@@ -92,7 +92,7 @@ class PinkWorld(object):
     
     def display(self):
         "Renders the scene once every refresh"
-        self.compositor.waitGetPoses(self.poses, openvr.k_unMaxTrackedDeviceCount, None, 0)
+        self.compositor.waitGetPoses(self.poses, None)
         hmd_pose0 = self.poses[openvr.k_unTrackedDeviceIndex_Hmd]
         if not hmd_pose0.bPoseIsValid:
             return

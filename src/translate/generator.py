@@ -107,7 +107,17 @@ class CTypesGenerator(object):
         '''), file=file_out)
         print('\n', file=file_out)
         for declaration in declarations:
-            if isinstance(declaration, model.Struct) or isinstance(declaration, model.Class):
+            if isinstance(declaration, model.Struct):
+                print(declaration, file=file_out)
+                print('\n', file=file_out)
+
+        for declaration in declarations:
+            if isinstance(declaration, model.COpenVRContext):
+                print(declaration, file=file_out)
+                print('\n', file=file_out)
+
+        for declaration in declarations:
+            if isinstance(declaration, model.IVRClass):
                 print(declaration, file=file_out)
                 print('\n', file=file_out)
 
@@ -221,6 +231,12 @@ class CTypesGenerator(object):
                 OPENVR_FNTABLE_CALLTYPE = WINFUNCTYPE  # __stdcall in openvr_capi.h
             else:
                 OPENVR_FNTABLE_CALLTYPE = CFUNCTYPE  # __cdecl
+                
+            def byref(arg):
+                if arg is None:
+                    return None
+                else:
+                    return ctypes.byref(arg)
         ''')
         print(preamble, file=file_out)
 

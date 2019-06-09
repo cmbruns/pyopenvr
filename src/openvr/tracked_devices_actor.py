@@ -81,7 +81,7 @@ class TrackedDeviceMesh(object):
         error, texture_map = openvr.VRRenderModels().loadTexture_Async(self.model.diffuseTextureId)
         if error == openvr.VRRenderModelError_Loading:
             return
-        self.texture_map = texture_map.contents
+        self.texture_map = texture_map
         self.diffuse_texture = GL.glGenTextures(1)
         GL.glBindTexture(GL.GL_TEXTURE_2D, self.diffuse_texture)
         GL.glTexImage2D(GL.GL_TEXTURE_2D, 0, GL.GL_RGBA, self.texture_map.unWidth, self.texture_map.unHeight,

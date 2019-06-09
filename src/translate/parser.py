@@ -45,9 +45,35 @@ class Parser(object):
     def __init__(self):
         self.items = []
 
-    def parse_class(self, cursor):
+    def parse_copenvrcontext(self, cursor):
         name = cursor.type.spelling
-        class_ = model.Class(name=name, docstring=clean_comment(cursor))
+        class_ = model.COpenVRContext(name=name, docstring=clean_comment(cursor))
+        for child in cursor.get_children():
+            if child.kind == CursorKind.CXX_ACCESS_SPEC_DECL:
+                continue  # no such thing in python
+            elif child.kind == CursorKind.CONSTRUCTOR:
+                continue  # I will translate this manually
+            elif child.kind == CursorKind.CXX_METHOD:
+                if child.spelling == 'Clear':
+                    continue  # I will translate this manually
+                elif child.spelling == 'CheckClear':
+                    continue  # I will translate this manually
+                elif child.spelling.startswith('VR'):
+                    class_.add_vr_method_name(child.spelling)
+                else:
+                    self.report_unparsed(child)
+            elif child.kind == CursorKind.FIELD_DECL:
+                if child.spelling.startswith('m_pVR'):
+                    class_.add_vr_member_name(child.spelling)
+                else:
+                    self.report_unparsed(child)
+            else:
+                self.report_unparsed(child)
+        return class_
+
+    def parse_ivrclass(self, cursor):
+        name = cursor.type.spelling
+        class_ = model.IVRClass(name=name, docstring=clean_comment(cursor))
         for child in cursor.get_children():
             if child.kind == CursorKind.CXX_METHOD:
                 method = self.parse_method(child)
@@ -59,7 +85,6 @@ class Parser(object):
                 continue
             else:
                 self.report_unparsed(child)
-        # print(class_)
         return class_
 
     def parse_enum(self, cursor):
@@ -114,7 +139,8 @@ class Parser(object):
                 else:
                     x = 3
             self.items.append(function)
-        print(f'*** WARNING *** skipping function declaration {cursor.spelling}(...)')
+        else:
+            print(f'*** WARNING *** skipping function declaration {cursor.spelling}(...)')
 
     def parse_literal(self, cursor):
         value = ''.join([str(t.spelling) for t in cursor.get_tokens()])
@@ -156,13 +182,12 @@ class Parser(object):
                     elif len(gc.spelling) > 0:
                         default_value = gc.spelling
                     else:
-                        print('WARNING: unrecognized parameter thingy')
+                        self.report_unparsed(gc)
             elif child.kind == CursorKind.ANNOTATE_ATTR:
                 annotation = child.spelling
             elif child.kind == CursorKind.DECL_REF_EXPR:
                 default_value = child.spelling
             else:
-                print('!!! PARAMETER !!!')
                 self.report_unparsed(child)
         parameter = model.Parameter(
             name=name,
@@ -194,7 +219,9 @@ class Parser(object):
                 self.parse_unexposed_decl(child)
             elif child.kind == CursorKind.CLASS_DECL:
                 if child.spelling.startswith('IVR'):
-                    self.items.append(self.parse_class(child))
+                    self.items.append(self.parse_ivrclass(child))
+                elif child.spelling.startswith('COpenVRContext'):
+                    self.items.append(self.parse_copenvrcontext(child))
                 else:
                     print(f'*** WARNING *** skipping class {child.spelling}(...)')
             elif child.kind == CursorKind.CXX_METHOD:

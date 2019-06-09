@@ -77,7 +77,7 @@ class MainWindow(QWidget):
                     
     def update_page(self):
 
-        openvr.VRCompositor().waitGetPoses(self.poses, len(self.poses), None, 0)
+        openvr.VRCompositor().waitGetPoses(self.poses, None)
         vrsys = openvr.VRSystem()
         
         poses = {}

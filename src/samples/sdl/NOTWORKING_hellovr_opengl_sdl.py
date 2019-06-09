@@ -1250,7 +1250,7 @@ class CMainApplication(object):
                 openvr.VRRenderModels().FreeRenderModel( pModel )
                 return None # move on to the next tracked device
             pRenderModel = CGLRenderModel( pchRenderModelName )
-            if not pRenderModel.bInit( pModel.contents, pTexture.contents ):
+            if not pRenderModel.bInit( pModel, pTexture ):
                 dprintf( "Unable to create GL model from render model %s\n" % pchRenderModelName )
                 # delete pRenderModel
                 pRenderModel = None
