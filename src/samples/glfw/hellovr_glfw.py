@@ -5,6 +5,7 @@ import sys
 
 import glfw
 import numpy
+from numpy.linalg import inv
 from OpenGL import GL
 from OpenGL.GL import shaders
 from OpenGL.GL.EXT.texture_filter_anisotropic import GL_MAX_TEXTURE_MAX_ANISOTROPY_EXT, GL_TEXTURE_MAX_ANISOTROPY_EXT
@@ -54,16 +55,21 @@ class CMainApplication(object):
         self.action_trigger_haptic = None
         self.action_analog_input = None
         self.action_set_demo = None
+        self.render_models = list()
+        self.controller_vao = None
+        self.poses = []
+        self.show_cubes = True
+        self.hmd_pose = None
 
     def add_cube_to_scene(self, matrix):
-        A = matrix @ (0, 0, 0, 1)
-        B = matrix @ (1, 0, 0, 1)
-        C = matrix @ (1, 1, 0, 1)
-        D = matrix @ (0, 1, 0, 1)
-        E = matrix @ (0, 0, 1, 1)
-        F = matrix @ (1, 0, 1, 1)
-        G = matrix @ (1, 1, 1, 1)
-        H = matrix @ (0, 1, 1, 1)
+        A = (0, 0, 0, 1) @ matrix
+        B = (1, 0, 0, 1) @ matrix
+        C = (1, 1, 0, 1) @ matrix
+        D = (0, 1, 0, 1) @ matrix
+        E = (0, 0, 1, 1) @ matrix
+        F = (1, 0, 1, 1) @ matrix
+        G = (1, 1, 1, 1) @ matrix
+        H = (0, 1, 1, 1) @ matrix
         # triangles instead of quads
         self.add_cube_vertex(E[0], E[1], E[2], 0, 1)  # Front
         self.add_cube_vertex(F[0], F[1], F[2], 1, 1)
@@ -148,6 +154,14 @@ class CMainApplication(object):
         self.set_up_stereo_render_targets()
         self.set_up_companion_window()
         return True
+
+    def convert_steam_vr_matrix(self, pose):
+        return numpy.array((
+            (pose[0][0], pose[1][0], pose[2][0], 0.0),
+            (pose[0][1], pose[1][1], pose[2][1], 0.0),
+            (pose[0][2], pose[1][2], pose[2][2], 0.0),
+            (pose[0][3], pose[1][3], pose[2][3], 1.0),
+        ), dtype=numpy.float32)
 
     def create_all_shaders(self):
         self.scene_program = shaders.compileProgram(
@@ -253,26 +267,123 @@ class CMainApplication(object):
             '''), shaderType=GL.GL_FRAGMENT_SHADER),
         )
 
+    def get_current_view_projection_matrix(self, eye):
+        hmd_pose = numpy.identity(4, dtype=numpy.float32)
+        if self.hmd_pose is not None:
+            hmd_pose = self.hmd_pose
+        if eye == openvr.Eye_Left:
+            mvp = hmd_pose @ self.pos_left @ self.proj_left
+        else:
+            mvp = hmd_pose @ self.pos_right @ self.proj_right
+        return mvp
+
     def get_hmd_matrix_projection_eye(self, eye):
         if not self.hmd:
             return numpy.identity(4, dtype=numpy.float32)
         mat = self.hmd.getProjectionMatrix(eEye=eye, fNearZ=0.1, fFarZ=30.0)
-        return numpy.array(mat, dtype=numpy.float32).T
+        mat = numpy.array((
+            (mat[0][0], mat[1][0], mat[2][0], mat[3][0]),
+            (mat[0][1], mat[1][1], mat[2][1], mat[3][1]),
+            (mat[0][2], mat[1][2], mat[2][2], mat[3][2]),
+            (mat[0][3], mat[1][3], mat[2][3], mat[3][3]),
+        ), dtype=numpy.float32)
+        return mat
 
     def get_hmd_matrix_pose_eye(self, eye):
         if not self.hmd:
             return numpy.identity(4, dtype=numpy.float32)
         mat = self.hmd.getEyeToHeadTransform(eye)
-        return numpy.array((
+        mat = numpy.array((
             (mat[0][0], mat[1][0], mat[2][0], 0.0),
             (mat[0][1], mat[1][1], mat[2][1], 0.0),
             (mat[0][2], mat[1][2], mat[2][2], 0.0),
             (mat[0][3], mat[1][3], mat[2][3], 1.0),
         ), dtype=numpy.float32)
+        return inv(mat)
+
+    def handle_input(self):
+        bQuit = False
+        # TODO:
+        return bQuit
+
+    def render_frame(self):
+        if self.hmd:
+            self.render_stereo_targets()
+            left_eye_texture = openvr.Texture_t(
+                handle=self.left_eye_desc.resolve_texture_id,
+                eType=openvr.TextureType_OpenGL,
+                eColorSpace=openvr.ColorSpace_Gamma,
+            )
+            right_eye_texture = openvr.Texture_t(
+                handle=self.right_eye_desc.resolve_texture_id,
+                eType=openvr.TextureType_OpenGL,
+                eColorSpace=openvr.ColorSpace_Gamma,
+            )
+            try:
+                openvr.VRCompositor().submit(openvr.Eye_Left, left_eye_texture)
+                openvr.VRCompositor().submit(openvr.Eye_Right, right_eye_texture)
+            except:
+                pass
+        # TODO:
+        self.update_hmd_pose()
+
+    def render_stereo_targets(self):
+        GL.glClearColor(0, 0, 0.2, 1)
+        GL.glEnable(GL.GL_MULTISAMPLE)
+        # Left Eye
+        GL.glBindFramebuffer(GL.GL_FRAMEBUFFER, self.left_eye_desc.render_framebuffer_id)
+        GL.glViewport(0, 0, self.render_width, self.render_height)
+        self.render_scene(openvr.Eye_Left)
+        GL.glBindFramebuffer(GL.GL_FRAMEBUFFER, 0)
+        GL.glDisable(GL.GL_MULTISAMPLE)
+        GL.glBindFramebuffer(GL.GL_READ_FRAMEBUFFER, self.left_eye_desc.render_framebuffer_id)
+        GL.glBindFramebuffer(GL.GL_DRAW_FRAMEBUFFER, self.left_eye_desc.resolve_framebuffer_id)
+        GL.glBlitFramebuffer(
+            0, 0, self.render_width, self.render_height,
+            0, 0, self.render_width, self.render_height,
+            GL.GL_COLOR_BUFFER_BIT, GL.GL_LINEAR)
+        GL.glBindFramebuffer(GL.GL_READ_FRAMEBUFFER, 0)
+        GL.glBindFramebuffer(GL.GL_DRAW_FRAMEBUFFER, 0)
+        # Right Eye
+        GL.glEnable(GL.GL_MULTISAMPLE)
+        GL.glBindFramebuffer(GL.GL_FRAMEBUFFER, self.right_eye_desc.render_framebuffer_id)
+        GL.glViewport(0, 0, self.render_width, self.render_height)
+        self.render_scene(openvr.Eye_Right)
+        GL.glBindFramebuffer(GL.GL_FRAMEBUFFER, 0)
+        GL.glDisable(GL.GL_MULTISAMPLE)
+        GL.glBindFramebuffer(GL.GL_READ_FRAMEBUFFER, self.right_eye_desc.render_framebuffer_id)
+        GL.glBindFramebuffer(GL.GL_DRAW_FRAMEBUFFER, self.right_eye_desc.resolve_framebuffer_id)
+        GL.glBlitFramebuffer(
+            0, 0, self.render_width, self.render_height,
+            0, 0, self.render_width, self.render_height,
+            GL.GL_COLOR_BUFFER_BIT, GL.GL_LINEAR)
+        GL.glBindFramebuffer(GL.GL_READ_FRAMEBUFFER, 0)
+        GL.glBindFramebuffer(GL.GL_DRAW_FRAMEBUFFER, 0)
+
+    def render_scene(self, eye):
+        GL.glClear(GL.GL_COLOR_BUFFER_BIT | GL.GL_DEPTH_BUFFER_BIT)
+        GL.glEnable(GL.GL_DEPTH_TEST)
+        if self.show_cubes:
+            GL.glUseProgram(self.scene_program)
+            GL.glUniformMatrix4fv(
+                self.scene_matrix_location, 1, False,
+                self.get_current_view_projection_matrix(eye))
+            GL.glBindVertexArray(self.scene_vao)
+            GL.glBindTexture(GL.GL_TEXTURE_2D, self.i_texture)
+            GL.glDrawArrays(GL.GL_TRIANGLES, 0, int(self.vert_count))
+            GL.glBindVertexArray(0)
+        GL.glUseProgram(0)
+        # TODO:
 
     def run_main_loop(self):
         while not glfw.window_should_close(self.window):
+            bQuit = self.handle_input()
+            self.render_frame()
             glfw.swap_buffers(self.window)
+            GL.glClearColor(0, 0.2, 0, 1)
+            GL.glClear(GL.GL_COLOR_BUFFER_BIT | GL.GL_DEPTH_BUFFER_BIT)
+            if bQuit:
+                break
             glfw.poll_events()
 
     def set_up_cameras(self):
@@ -285,17 +396,19 @@ class CMainApplication(object):
         self.vertex_data = []
         v = self.scene_volume_init
         s = self.scale_spacing
-        mat_scale = numpy.diag(numpy.array([v, v, v, 1], dtype=numpy.float32))
+        scale = 0.3
+        mat_scale = numpy.diag(numpy.array([scale, scale, scale, 1], dtype=numpy.float32))
         t = -0.5 * v * s
-        mat = mat_scale @ translate(t, t, t)
+        mat_translate = translate(t, t, t)
+        mat = mat_translate @ mat_scale
         for z in range(v):
             for y in range(v):
                 for x in range(v):
                     self.add_cube_to_scene(mat)
-                    mat = mat @ translate(s, 0, 0)
-                mat = mat @ translate(-v * s, s, 0)
-            mat = mat @ translate(0, -v * s, s)
-        vertex_data = numpy.array(self.vertex_data, dtype=numpy.float32)
+                    mat = translate(s, 0, 0) @ mat
+                mat = translate(-v * s, s, 0) @ mat
+            mat = translate(0, -v * s, s) @ mat
+        vertex_data = numpy.array(self.vertex_data, dtype=numpy.float32).flatten()
         self.vert_count = len(vertex_data) / 5
         self.scene_vao = GL.glGenVertexArrays(1)
         GL.glBindVertexArray(self.scene_vao)
@@ -387,7 +500,35 @@ class CMainApplication(object):
         self.right_eye_desc = FramebufferDesc(self.render_width, self.render_height)
 
     def shut_down(self):
+        if self.hmd:
+            openvr.shutdown()
+            self.hmd = None
+        self.render_models = list()
+        if self.scene_vert_buffer:
+            GL.glDeleteBuffers(1, [self.scene_vert_buffer])
+            self.scene_vert_buffer = None
+            self.left_eye_desc.delete()
+            self.right_eye_desc.delete()
+            if self.companion_window_vao:
+                GL.glDeleteVertexArrays(1, [self.companion_window_vao])
+                self.companion_window_vao = None
+            if self.scene_vao:
+                GL.glDeleteVertexArrays(1, [self.scene_vao])
+                self.scene_vao = None
+            if self.controller_vao:
+                GL.glDeleteVertexArrays(1, [self.controller_vao])
+                self.controller_vao = None
         glfw.terminate()
+
+    def update_hmd_pose(self):
+        if not self.hmd:
+            return
+        self.poses = openvr.VRCompositor().waitGetPoses(self.poses, None)[0]
+        # TODO:
+        hp = self.poses[openvr.k_unTrackedDeviceIndex_Hmd]
+        if hp.bPoseIsValid:
+            p = self.convert_steam_vr_matrix(hp.mDeviceToAbsoluteTracking)
+            self.hmd_pose = inv(p)
 
 
 class ControllerInfo(object):
@@ -428,6 +569,18 @@ class FramebufferDesc(object):
         status = GL.glCheckFramebufferStatus(GL.GL_FRAMEBUFFER)
         assert status == GL.GL_FRAMEBUFFER_COMPLETE
 
+    def delete(self):
+        GL.glDeleteRenderbuffers(1, [self.depth_buffer_id])
+        self.depth_buffer_id = None
+        GL.glDeleteTextures(self.render_texture_id)
+        self.render_texture_id = None
+        GL.glDeleteFramebuffers(1, [self.render_framebuffer_id])
+        self.render_framebuffer_id = None
+        GL.glDeleteTextures(self.resolve_texture_id)
+        self.resolve_texture_id = None
+        GL.glDeleteFramebuffers(1, [self.resolve_framebuffer_id])
+        self.resolve_framebuffer_id = None
+
 
 def main(argv):
     print('Hello')
@@ -440,10 +593,10 @@ def main(argv):
 
 def translate(x, y, z):
     return numpy.array([
-        [1, 0, 0, x],
-        [0, 1, 0, y],
-        [0, 0, 1, z],
-        [0, 0, 0, 1],
+        [1, 0, 0, 0],
+        [0, 1, 0, 0],
+        [0, 0, 1, 0],
+        [x, y, z, 1],
     ], dtype=numpy.float32)
 
 

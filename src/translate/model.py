@@ -301,7 +301,10 @@ class Method(Declaration):
         param_list1 = ', '.join(in_params)
         # pythonically downcase first letter of method name
         method_name = self.name[0].lower() + self.name[1:]
-        method_string = f'def {method_name}({param_list1}):\n'
+        result_annotation = ''
+        if len(out_params) == 0:
+            result_annotation = ' -> None'
+        method_string = f'def {method_name}({param_list1}){result_annotation}:\n'
         body_string = ''
         if self.docstring:
             body_string += f'"""{self.docstring}"""\n\n'
@@ -345,6 +348,15 @@ class Parameter(Declaration):
         self.default_value = default_value
         self.annotation = annotation
         self.is_count = False
+        if self.is_in_string():
+            if self.name.startswith('pch'):
+                self.name = self.name[3:]
+                self.name = self.name[0].lower() + self.name[1:]
+
+    def is_array(self):
+        if not self.annotation:
+            return False
+        return re.match(r'array_count:(\S+);', self.annotation)
 
     def is_error(self):
         if self.type.kind != TypeKind.POINTER:
@@ -354,10 +366,35 @@ class Parameter(Declaration):
             return True
         return False
 
-    def is_array(self):
-        if not self.annotation:
+    def is_in_string(self):
+        if not self.type.kind == TypeKind.POINTER:
             return False
-        return re.match(r'array_count:(\S+);', self.annotation)
+        pt = self.type.get_pointee()
+        if not pt.is_const_qualified():
+            return False
+        return pt.kind == TypeKind.CHAR_S
+
+    def is_int(self):
+        return self.type.kind in (
+            TypeKind.USHORT,
+            TypeKind.UINT,
+            TypeKind.ULONG,
+            TypeKind.ULONGLONG,
+            TypeKind.UINT128,
+            TypeKind.SHORT,
+            TypeKind.INT,
+            TypeKind.LONG,
+            TypeKind.LONGLONG,
+            TypeKind.INT128,
+        )
+
+    def is_float(self):
+        return self.type.kind in (
+            TypeKind.FLOAT,
+            TypeKind.DOUBLE,
+            TypeKind.LONGDOUBLE,
+            TypeKind.FLOAT128,
+        )
 
     def is_out_string(self):
         if not self.annotation:
@@ -406,6 +443,12 @@ class Parameter(Declaration):
             if is_pose_array:
                 result += textwrap.dedent(f'''\
                     if {self.name} is None:
+                        {count_param} = 0
+                        {self.name}Arg = None
+                    elif isinstance({self.name}, ctypes.Array):
+                        {count_param} = len({self.name})
+                        {self.name}Arg = byref({self.name}[0])
+                    else:
                         {count_param} = k_unMaxTrackedDeviceCount
                         {self.name} = ({element_t} * {count_param})()
                         {self.name}Arg = byref({self.name}[0])
@@ -415,8 +458,6 @@ class Parameter(Declaration):
                 if {self.name} is None:
                     {count_param} = 0
                     {self.name}Arg = None
-                ''')
-            result += textwrap.dedent(f'''\
                 else:
                     {count_param} = len({self.name})
                     {self.name}Arg = byref({self.name}[0])
@@ -460,15 +501,24 @@ class Parameter(Declaration):
     def input_param_name(self):
         if not self.is_input():
             return None
+        n = self.name
+        if self.is_in_string():
+            n = f'{n}: str'
+        elif self.is_int():
+            n = f'{n}: int'
+        elif self.is_float():
+            n = f'{n}: float'
         if self.default_value:
-            return f'{self.name}={self.default_value}'
-        return self.name
+            n = f'{n}={self.default_value}'
+        return n
 
     def call_param_name(self):
         if self.is_array():
             return f'{self.name}Arg'
         elif self.is_count:
             return self.name
+        elif self.is_in_string():
+            return f"bytes({self.name}, encoding='utf-8')"
         elif self.is_out_string():
             return self.name
         elif self.is_output():
@@ -486,7 +536,7 @@ class Parameter(Declaration):
         if self.is_error():
             return None
         if self.is_out_string():
-            return f'bytes({self.name}.value)'
+            return f"bytes({self.name}.value).decode('utf-8')"
         if not self.is_output():
             return None
         result = self.name
