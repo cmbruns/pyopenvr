@@ -4695,7 +4695,7 @@ namespace vr
 	VR_INTERFACE bool VR_CALLTYPE VR_IsRuntimeInstalled();
 
 	/** Returns where the OpenVR runtime is installed. */
-	VR_INTERFACE bool VR_CALLTYPE VR_GetRuntimePath( VR_OUT_STRING() char *pchPathBuffer, uint32_t unBufferSize, uint32_t *punRequiredBufferSize );
+	VR_INTERFACE bool VR_GetRuntimePath( VR_OUT_STRING() char *pchPathBuffer, uint32_t unBufferSize, uint32_t *punRequiredBufferSize );
 	
 	/** Returns the name of the enum value for an EVRInitError. This function may be called outside of VR_Init()/VR_Shutdown(). */
 	VR_INTERFACE const char *VR_CALLTYPE VR_GetVRInitErrorAsSymbol( EVRInitError error );

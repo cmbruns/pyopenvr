@@ -14,7 +14,7 @@ if openvr.isRuntimeInstalled():
 
 vr_system = openvr.init(openvr.VRApplication_Scene)
 
-print(openvr.runtimePath())
+print(openvr.getRuntimePath())
 
 print(vr_system.getRecommendedRenderTargetSize())
 
