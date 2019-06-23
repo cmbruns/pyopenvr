@@ -1,8 +1,11 @@
+# Core python modules
 from ctypes import c_float, c_uint16, c_void_p, cast, sizeof
 import inspect
 import pkg_resources
 import sys
+import time
 
+# Third party modules
 import glfw
 import numpy
 from numpy.linalg import inv
@@ -11,11 +14,70 @@ from OpenGL.GL import shaders
 from OpenGL.GL.EXT.texture_filter_anisotropic import GL_MAX_TEXTURE_MAX_ANISOTROPY_EXT, GL_TEXTURE_MAX_ANISOTROPY_EXT
 from PIL import Image
 
+# Local modules
 import openvr
-
 
 Left = 0
 Right = 1
+
+
+class CGLRenderModel(object):
+    def __init__(self, name, vr_model, vr_diffuse_texture):
+        self.name = name
+        # create and bind a VAO to hold state for this model
+        self.vertex_array = GL.glGenVertexArrays(1)
+        GL.glBindVertexArray(self.vertex_array)
+        # Populate a vertex buffer
+        self.vertex_buffer = GL.glGenBuffers(1)
+        GL.glBindBuffer(GL.GL_ARRAY_BUFFER, self.vertex_buffer)
+        GL.glBufferData(GL.GL_ARRAY_BUFFER, vr_model.vertex_data, GL.GL_STATIC_DRAW)
+        # Identify the components in the vertex buffer
+        GL.glEnableVertexAttribArray(0)
+        hv3sz = sizeof(openvr.HmdVector3_t)
+        GL.glVertexAttribPointer(0, 3, GL.GL_FLOAT, False, sizeof(openvr.RenderModel_Vertex_t),
+                                 cast(0 * hv3sz, c_void_p))
+        GL.glEnableVertexAttribArray(1)
+        GL.glVertexAttribPointer(1, 3, GL.GL_FLOAT, False, sizeof(openvr.RenderModel_Vertex_t),
+                                 cast(1 * hv3sz, c_void_p))
+        GL.glEnableVertexAttribArray(2)
+        GL.glVertexAttribPointer(2, 2, GL.GL_FLOAT, False, sizeof(openvr.RenderModel_Vertex_t),
+                                 cast(2 & hv3sz, c_void_p))
+        # Create and populate the index buffer
+        self.index_buffer = GL.glGenBuffers(1)
+        GL.glBindBuffer(GL.GL_ELEMENT_ARRAY_BUFFER, self.index_buffer)
+        GL.glBufferData(GL.GL_ELEMENT_ARRAY_BUFFER, sizeof(c_uint16) * vr_model.unTriangleCount * 3,
+                        vr_model.rIndexData, GL.GL_STATIC_DRAW)
+        GL.glBindVertexArray(0)
+        # create and populate the texture
+        self.texture = GL.glGenTextures(1)
+        GL.glBindTexture(GL.GL_TEXTURE_2D, self.texture)
+        GL.glTexImage2D(GL.GL_TEXTURE_2D, 0, GL.GL_RGBA, vr_diffuse_texture.unWidth, vr_diffuse_texture.unHeight,
+                        0, GL.GL_RGBA, GL.GL_UNSIGNED_BYTE, vr_diffuse_texture.rubTextureMapData)
+        # If this renders black ask McJohn what's wrong.
+        GL.glGenerateMipmap(GL.GL_TEXTURE_2D)
+        GL.glTexParameteri(GL.GL_TEXTURE_2D, GL.GL_TEXTURE_WRAP_S, GL.GL_CLAMP_TO_EDGE)
+        GL.glTexParameteri(GL.GL_TEXTURE_2D, GL.GL_TEXTURE_WRAP_T, GL.GL_CLAMP_TO_EDGE)
+        GL.glTexParameteri(GL.GL_TEXTURE_2D, GL.GL_TEXTURE_MAG_FILTER, GL.GL_LINEAR)
+        GL.glTexParameteri(GL.GL_TEXTURE_2D, GL.GL_TEXTURE_MIN_FILTER, GL.GL_LINEAR_MIPMAP_LINEAR)
+        largest = GL.glGetFloatv(GL.GL_MAX_TEXTURE_MAX_ANISOTROPY_EXT)
+        GL.glTexParameterf(GL.GL_TEXTURE_2D, GL.GL_TEXTURE_MAX_ANISOTROPY_EXT, largest)
+        GL.glBindTexture(GL.GL_TEXTURE_2D, 0)
+        self.vertex_count = vr_model.unTriangleCount * 3
+
+    def cleanup(self):
+        GL.glDeleteBuffers(1, [self.index_buffer])
+        GL.glDeleteVertexArrays(1, [self.vertex_array])
+        GL.glDeleteBuffers(1, [self.vertex_buffer])
+        self.index_buffer = None
+        self.vertex_array = None
+        self.vertex_buffer = None
+
+    def draw(self):
+        GL.glBindVertexArray(self.vertex_array)
+        GL.glActiveTexture(GL.GL_TEXTURE0)
+        GL.glBindTexture(GL.GL_TEXTURE_2D, self.texture)
+        GL.glDrawElements(GL.GL_TRIANGLES, self.vertex_count, GL.GL_UNSIGNED_SHORT, 0)
+        GL.glBindVertexArray(0)
 
 
 class CMainApplication(object):
@@ -55,7 +117,7 @@ class CMainApplication(object):
         self.action_trigger_haptic = None
         self.action_analog_input = None
         self.action_set_demo = None
-        self.render_models = list()
+        self.render_models = dict()
         self.controller_vao = None
         self.poses = []
         self.show_cubes = True
@@ -276,6 +338,32 @@ class CMainApplication(object):
             '''), shaderType=GL.GL_FRAGMENT_SHADER),
         )
 
+    def find_or_load_render_model(self, render_model_name):
+        if render_model_name in self.render_models:
+            return self.render_models[render_model_name]
+        while True:
+            error, model = openvr.VRRenderModels().loadRenderModel_Async(render_model_name)
+            if error != openvr.VRRenderModelError_Loading:
+                break
+            time.sleep(1)
+        if error != openvr.VRRenderModelError_None:
+            print(f'Unable to load render model {render_model_name} - {openvr.VRRenderModels().getRenderModelErrorNameFromEnum(error)}')
+            return None
+        while True:
+            error, texture = openvr.VRRenderModels().loadTexture_Async(model.diffuseTextureId)
+            if error != openvr.VRRenderModelError_Loading:
+                break
+            time.sleep(1)
+        if error != openvr.VRRenderModelError_None:
+            print(f'Unable to load render texture id:{model.diffuseTextureId} for render model {renderm_model_name}')
+            openvr.VRRenderModels().freeRenderModel(model)
+            return None
+        render_model = CGLRenderModel(render_model_name, model, texture)
+        self.render_models[render_model_name] = render_model
+        openvr.VRRenderModels().freeRenderModel(model)
+        openvr.VRRenderModels().freeTexture(texture)
+        return render_model
+
     def get_current_view_projection_matrix(self, eye):
         hmd_pose = numpy.identity(4, dtype=numpy.float32)
         if self.hmd_pose is not None:
@@ -311,10 +399,35 @@ class CMainApplication(object):
         return inv(mat)
 
     def handle_input(self):
+        # Note: Key events are handled by glfw in key_callback
+        # Process SteamVR events
         event = openvr.VREvent_t()
         while self.hmd.pollNextEvent(event):
             self.process_vr_event(event)
-        # TODO:
+        # TODO: actions
+        for hand in self.hand:
+            try:
+                pose_data = openvr.VRInput().getPoseActionDataForNextFrame(
+                    hand.action_pose,
+                    openvr.TrackingUniverseStanding,
+                    sizeof(openvr.InputPoseActionData_t),  # TODO: compute argument
+                    openvr.k_ulInvalidInputValueHandle,
+                )
+                if not pose_data.bActive or not pose_data.pose.bPoseIsValid:
+                    hand.show_controller = False
+                else:
+                    hand.pose = self.convert_steam_vr_matrix(pose_data.pose.mDeviceToAbsoluteTracking)
+                    try:
+                        origin_info = openvr.VRInput().getOriginTrackedDeviceInfo(
+                            pose_data.activeOrigin,
+                            sizeof(openvr.InputOriginInfo_t()),  # TODO: compute argument
+                        )
+                        if origin_info.trackedDeviceIndex != openvr.k_unTrackedDeviceIndex_Invalid:
+                            pass # TODO:
+                    except:
+                        pass
+            except:
+                hand.show_controller = False
 
     def key_callback(self, window, key, scancode, action, mods):
         if action == glfw.PRESS:
@@ -336,7 +449,7 @@ class CMainApplication(object):
         GL.glUseProgram(self.companion_window_program)
         # render left eye (first half of index array)
         i_size = sizeof(c_uint16)
-        count = int(self.companion_window_index_size/2)
+        count = int(self.companion_window_index_size / 2)
         GL.glBindTexture(GL.GL_TEXTURE_2D, self.left_eye_desc.resolve_texture_id)
         GL.glTexParameteri(GL.GL_TEXTURE_2D, GL.GL_TEXTURE_WRAP_S, GL.GL_CLAMP_TO_EDGE)
         GL.glTexParameteri(GL.GL_TEXTURE_2D, GL.GL_TEXTURE_WRAP_T, GL.GL_CLAMP_TO_EDGE)
@@ -375,7 +488,7 @@ class CMainApplication(object):
                 pass  # First frame fails because waitGetPoses has not been called yet
 
         if (self.tracked_controller_count != self.tracked_controller_count_previous
-            or self.valid_pose_count != self.valid_pose_count_previous):
+                or self.valid_pose_count != self.valid_pose_count_previous):
             self.valid_pose_count_previous = self.valid_pose_count
             self.tracked_controller_count_previous = self.tracked_controller_count
             print(f' {self.valid_pose_count}({self.pose_classes}) Controllers:{self.tracked_controller_count}')
@@ -491,7 +604,7 @@ class CMainApplication(object):
         verts.append(((1, -1), (1, 1)))
         verts.append(((0, 1), (0, 0)))
         verts.append(((1, 1), (1, 0)))
-        vIndices = numpy.array([0, 1, 3,   0, 3, 2,   4, 5, 7,   4, 7, 6], dtype=numpy.uint16)
+        vIndices = numpy.array([0, 1, 3, 0, 3, 2, 4, 5, 7, 4, 7, 6], dtype=numpy.uint16)
         self.companion_window_index_size = len(vIndices)
         self.companion_window_vao = GL.glGenVertexArrays(1)
         GL.glBindVertexArray(self.companion_window_vao)
@@ -507,10 +620,10 @@ class CMainApplication(object):
         #
         f_size = sizeof(c_float)
         GL.glEnableVertexAttribArray(0)
-        GL.glVertexAttribPointer(0, 2, GL.GL_FLOAT, False, 4*f_size, cast(0 * f_size, c_void_p))
+        GL.glVertexAttribPointer(0, 2, GL.GL_FLOAT, False, 4 * f_size, cast(0 * f_size, c_void_p))
         #
         GL.glEnableVertexAttribArray(1)
-        GL.glVertexAttribPointer(1, 2, GL.GL_FLOAT, False, 4*f_size, cast(2 * f_size, c_void_p))
+        GL.glVertexAttribPointer(1, 2, GL.GL_FLOAT, False, 4 * f_size, cast(2 * f_size, c_void_p))
         #
         GL.glBindVertexArray(0)
         GL.glDisableVertexAttribArray(0)
@@ -555,7 +668,7 @@ class CMainApplication(object):
         if self.hmd:
             openvr.shutdown()
             self.hmd = None
-        self.render_models = list()
+        self.render_models = dict()
         if self.scene_vert_buffer:
             GL.glDeleteBuffers(1, [self.scene_vert_buffer])
             self.scene_vert_buffer = None
@@ -621,12 +734,14 @@ class FramebufferDesc(object):
         self.depth_buffer_id = GL.glGenRenderbuffers(1)
         GL.glBindRenderbuffer(GL.GL_RENDERBUFFER, self.depth_buffer_id)
         GL.glRenderbufferStorageMultisample(GL.GL_RENDERBUFFER, 4, GL.GL_DEPTH_COMPONENT, width, height)
-        GL.glFramebufferRenderbuffer(GL.GL_FRAMEBUFFER, GL.GL_DEPTH_ATTACHMENT, GL.GL_RENDERBUFFER, self.depth_buffer_id)
+        GL.glFramebufferRenderbuffer(GL.GL_FRAMEBUFFER, GL.GL_DEPTH_ATTACHMENT, GL.GL_RENDERBUFFER,
+                                     self.depth_buffer_id)
         #
         self.render_texture_id = GL.glGenTextures(1)
         GL.glBindTexture(GL.GL_TEXTURE_2D_MULTISAMPLE, self.render_texture_id)
         GL.glTexImage2DMultisample(GL.GL_TEXTURE_2D_MULTISAMPLE, 4, GL.GL_RGBA8, width, height, True)
-        GL.glFramebufferTexture2D(GL.GL_FRAMEBUFFER, GL.GL_COLOR_ATTACHMENT0, GL.GL_TEXTURE_2D_MULTISAMPLE, self.render_texture_id, 0)
+        GL.glFramebufferTexture2D(GL.GL_FRAMEBUFFER, GL.GL_COLOR_ATTACHMENT0, GL.GL_TEXTURE_2D_MULTISAMPLE,
+                                  self.render_texture_id, 0)
         #
         self.resolve_framebuffer_id = GL.glGenFramebuffers(1)
         GL.glBindFramebuffer(GL.GL_FRAMEBUFFER, self.resolve_framebuffer_id)
@@ -636,7 +751,8 @@ class FramebufferDesc(object):
         GL.glTexParameteri(GL.GL_TEXTURE_2D, GL.GL_TEXTURE_MIN_FILTER, GL.GL_LINEAR)
         GL.glTexParameteri(GL.GL_TEXTURE_2D, GL.GL_TEXTURE_MAX_LEVEL, 0)
         GL.glTexImage2D(GL.GL_TEXTURE_2D, 0, GL.GL_RGBA8, width, height, 0, GL.GL_RGBA, GL.GL_UNSIGNED_BYTE, None)
-        GL.glFramebufferTexture2D(GL.GL_FRAMEBUFFER, GL.GL_COLOR_ATTACHMENT0, GL.GL_TEXTURE_2D, self.resolve_texture_id, 0)
+        GL.glFramebufferTexture2D(GL.GL_FRAMEBUFFER, GL.GL_COLOR_ATTACHMENT0, GL.GL_TEXTURE_2D, self.resolve_texture_id,
+                                  0)
         status = GL.glCheckFramebufferStatus(GL.GL_FRAMEBUFFER)
         assert status == GL.GL_FRAMEBUFFER_COMPLETE
 
