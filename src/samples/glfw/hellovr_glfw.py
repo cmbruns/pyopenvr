@@ -1,4 +1,4 @@
-from ctypes import c_float, c_void_p, cast, sizeof
+from ctypes import c_float, c_uint16, c_void_p, cast, sizeof
 import inspect
 import pkg_resources
 import sys
@@ -60,6 +60,14 @@ class CMainApplication(object):
         self.poses = []
         self.show_cubes = True
         self.hmd_pose = None
+        self.tracked_controller_count_previous = -1
+        self.tracked_controller_count = 0
+        self.valid_pose_count = 0
+        self.valid_pose_count_previous = -1
+        self.pose_classes = ''
+        self.dev_class_char = dict()
+        self.companion_width = 640
+        self.companion_height = 320
 
     def add_cube_to_scene(self, matrix):
         A = (0, 0, 0, 1) @ matrix
@@ -114,7 +122,8 @@ class CMainApplication(object):
     def b_init(self):
         glfw.init()
         glfw.window_hint(glfw.SAMPLES, 4)
-        self.window = glfw.create_window(500, 200, 'hello_vr', None, None)
+        self.window = glfw.create_window(self.companion_width, self.companion_height, 'hello_vr', None, None)
+        glfw.set_key_callback(self.window, self.key_callback)
         glfw.make_context_current(self.window)
         #
         self.hmd = openvr.init(openvr.VRApplication_Scene)
@@ -262,7 +271,7 @@ class CMainApplication(object):
                 out vec4 outputColor;
                 void main()
                 {
-                        outputColor = texture(mytexture, v2UV);
+                    outputColor = texture(mytexture, v2UV);
                 }
             '''), shaderType=GL.GL_FRAGMENT_SHADER),
         )
@@ -302,13 +311,53 @@ class CMainApplication(object):
         return inv(mat)
 
     def handle_input(self):
-        bQuit = False
+        event = openvr.VREvent_t()
+        while self.hmd.pollNextEvent(event):
+            self.process_vr_event(event)
         # TODO:
-        return bQuit
+
+    def key_callback(self, window, key, scancode, action, mods):
+        if action == glfw.PRESS:
+            if key == glfw.KEY_ESCAPE:
+                glfw.set_window_should_close(window, True)
+            if key == glfw.KEY_C:
+                self.show_cubes = not self.show_cubes
+
+    def process_vr_event(self, event):
+        if event.eventType == openvr.VREvent_TrackedDeviceDeactivated:
+            print(f'Device {event.trackedDeviceIndex} detached')
+        elif event.eventType == openvr.VREvent_TrackedDeviceUpdated:
+            print(f'Device {event.trackedDeviceIndex} updated')
+
+    def render_companion_window(self):
+        GL.glDisable(GL.GL_DEPTH_TEST)
+        GL.glViewport(0, 0, self.companion_width, self.companion_height)
+        GL.glBindVertexArray(self.companion_window_vao)
+        GL.glUseProgram(self.companion_window_program)
+        # render left eye (first half of index array)
+        i_size = sizeof(c_uint16)
+        count = int(self.companion_window_index_size/2)
+        GL.glBindTexture(GL.GL_TEXTURE_2D, self.left_eye_desc.resolve_texture_id)
+        GL.glTexParameteri(GL.GL_TEXTURE_2D, GL.GL_TEXTURE_WRAP_S, GL.GL_CLAMP_TO_EDGE)
+        GL.glTexParameteri(GL.GL_TEXTURE_2D, GL.GL_TEXTURE_WRAP_T, GL.GL_CLAMP_TO_EDGE)
+        GL.glTexParameteri(GL.GL_TEXTURE_2D, GL.GL_TEXTURE_MAG_FILTER, GL.GL_LINEAR)
+        GL.glTexParameteri(GL.GL_TEXTURE_2D, GL.GL_TEXTURE_MIN_FILTER, GL.GL_LINEAR)
+        GL.glDrawElements(GL.GL_TRIANGLES, count, GL.GL_UNSIGNED_SHORT, cast(0 * i_size, c_void_p))
+        # render right eye (second half of index array)
+        GL.glBindTexture(GL.GL_TEXTURE_2D, self.right_eye_desc.resolve_texture_id)
+        GL.glTexParameteri(GL.GL_TEXTURE_2D, GL.GL_TEXTURE_WRAP_S, GL.GL_CLAMP_TO_EDGE)
+        GL.glTexParameteri(GL.GL_TEXTURE_2D, GL.GL_TEXTURE_WRAP_T, GL.GL_CLAMP_TO_EDGE)
+        GL.glTexParameteri(GL.GL_TEXTURE_2D, GL.GL_TEXTURE_MAG_FILTER, GL.GL_LINEAR)
+        GL.glTexParameteri(GL.GL_TEXTURE_2D, GL.GL_TEXTURE_MIN_FILTER, GL.GL_LINEAR)
+        GL.glDrawElements(GL.GL_TRIANGLES, count, GL.GL_UNSIGNED_SHORT, cast(count * i_size, c_void_p))
+        GL.glBindVertexArray(0)
+        GL.glUseProgram(0)
 
     def render_frame(self):
         if self.hmd:
+            # TODO: controller axes
             self.render_stereo_targets()
+            self.render_companion_window()
             left_eye_texture = openvr.Texture_t(
                 handle=self.left_eye_desc.resolve_texture_id,
                 eType=openvr.TextureType_OpenGL,
@@ -322,9 +371,14 @@ class CMainApplication(object):
             try:
                 openvr.VRCompositor().submit(openvr.Eye_Left, left_eye_texture)
                 openvr.VRCompositor().submit(openvr.Eye_Right, right_eye_texture)
-            except:
-                pass
-        # TODO:
+            except openvr.OpenVRError:
+                pass  # First frame fails because waitGetPoses has not been called yet
+
+        if (self.tracked_controller_count != self.tracked_controller_count_previous
+            or self.valid_pose_count != self.valid_pose_count_previous):
+            self.valid_pose_count_previous = self.valid_pose_count
+            self.tracked_controller_count_previous = self.tracked_controller_count
+            print(f' {self.valid_pose_count}({self.pose_classes}) Controllers:{self.tracked_controller_count}')
         self.update_hmd_pose()
 
     def render_stereo_targets(self):
@@ -377,13 +431,11 @@ class CMainApplication(object):
 
     def run_main_loop(self):
         while not glfw.window_should_close(self.window):
-            bQuit = self.handle_input()
+            self.handle_input()
             self.render_frame()
             glfw.swap_buffers(self.window)
             GL.glClearColor(0, 0.2, 0, 1)
             GL.glClear(GL.GL_COLOR_BUFFER_BIT | GL.GL_DEPTH_BUFFER_BIT)
-            if bQuit:
-                break
             glfw.poll_events()
 
     def set_up_cameras(self):
@@ -430,23 +482,23 @@ class CMainApplication(object):
             return
         verts = list()
         # left eye verts
-        verts.append( ( (-1, -1), (0, 1)) )
-        verts.append( ( (0, -1), (1, 1)) )
-        verts.append( ( (-1, 1), (0, 0)) )
-        verts.append( ( (0, 1), (1, 0)) )
+        verts.append(((-1, -1), (0, 1)))
+        verts.append(((0, -1), (1, 1)))
+        verts.append(((-1, 1), (0, 0)))
+        verts.append(((0, 1), (1, 0)))
         # right eye verts
-        verts.append( ( (0, -1), (0, 1)) )
-        verts.append( ( (1, -1), (1, 1)) )
-        verts.append( ( (0, 1), (0, 0)) )
-        verts.append( ( (1, 1), (1, 0)) )
-        vIndices = numpy.array([0, 1, 3,   0, 3, 2,   4, 5, 7,   4, 7, 6], dtype=numpy.uint8)
+        verts.append(((0, -1), (0, 1)))
+        verts.append(((1, -1), (1, 1)))
+        verts.append(((0, 1), (0, 0)))
+        verts.append(((1, 1), (1, 0)))
+        vIndices = numpy.array([0, 1, 3,   0, 3, 2,   4, 5, 7,   4, 7, 6], dtype=numpy.uint16)
         self.companion_window_index_size = len(vIndices)
         self.companion_window_vao = GL.glGenVertexArrays(1)
         GL.glBindVertexArray(self.companion_window_vao)
         #
         self.companion_window_id_vert_buffer = GL.glGenBuffers(1)
         GL.glBindBuffer(GL.GL_ARRAY_BUFFER, self.companion_window_id_vert_buffer)
-        vVerts = numpy.array(verts, dtype=numpy.float32)
+        vVerts = numpy.array(verts, dtype=numpy.float32).flatten()
         GL.glBufferData(GL.GL_ARRAY_BUFFER, vVerts, GL.GL_STATIC_DRAW)
         #
         self.companion_window_id_index_buffer = GL.glGenBuffers(1)
@@ -458,7 +510,7 @@ class CMainApplication(object):
         GL.glVertexAttribPointer(0, 2, GL.GL_FLOAT, False, 4*f_size, cast(0 * f_size, c_void_p))
         #
         GL.glEnableVertexAttribArray(1)
-        GL.glVertexAttribPointer(1, 2, GL.GL_FLOAT, False, 4**f_size, cast(2 * f_size, c_void_p))
+        GL.glVertexAttribPointer(1, 2, GL.GL_FLOAT, False, 4*f_size, cast(2 * f_size, c_void_p))
         #
         GL.glBindVertexArray(0)
         GL.glDisableVertexAttribArray(0)
@@ -523,8 +575,27 @@ class CMainApplication(object):
     def update_hmd_pose(self):
         if not self.hmd:
             return
-        self.poses = openvr.VRCompositor().waitGetPoses(self.poses, None)[0]
-        # TODO:
+        self.poses, _ = openvr.VRCompositor().waitGetPoses(self.poses, None)
+        self.valid_pose_count = 0
+        self.pose_classes = ''
+        for nDevice, pose in enumerate(self.poses):
+            if pose.bPoseIsValid:
+                self.valid_pose_count += 1
+                if nDevice not in self.dev_class_char:
+                    c = self.hmd.getTrackedDeviceClass(nDevice)
+                    if c == openvr.TrackedDeviceClass_Controller:
+                        self.dev_class_char[nDevice] = 'C'
+                    elif c == openvr.TrackedDeviceClass_HMD:
+                        self.dev_class_char[nDevice] = 'H'
+                    elif c == openvr.TrackedDeviceClass_Invalid:
+                        self.dev_class_char[nDevice] = 'I'
+                    elif c == openvr.TrackedDeviceClass_GenericTracker:
+                        self.dev_class_char[nDevice] = 'G'
+                    elif c == openvr.TrackedDeviceClass_TrackingReference:
+                        self.dev_class_char[nDevice] = 'T'
+                    else:
+                        self.dev_class_char[nDevice] = '?'
+                self.pose_classes += self.dev_class_char[nDevice]
         hp = self.poses[openvr.k_unTrackedDeviceIndex_Hmd]
         if hp.bPoseIsValid:
             p = self.convert_steam_vr_matrix(hp.mDeviceToAbsoluteTracking)
@@ -583,7 +654,6 @@ class FramebufferDesc(object):
 
 
 def main(argv):
-    print('Hello')
     main_application = CMainApplication(argv)
     if main_application.b_init():
         main_application.run_main_loop()
