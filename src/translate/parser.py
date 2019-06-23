@@ -319,19 +319,40 @@ class Parser(object):
                 self.report_unparsed(child)
 
     def parse_var_decl(self, cursor):
+        comment = cursor.brief_comment
+        if comment is not None and comment.startswith('---'):
+            comment = None
         for child in cursor.get_children():
             if child.kind == CursorKind.UNEXPOSED_EXPR:
                 value_cursor = list(child.get_children())[0]
                 value = self.parse_literal(value_cursor)
-                comment = cursor.brief_comment
-                if comment is not None and comment.startswith('---'):
-                    comment = None
                 item = model.ConstantDeclaration(
                     name=cursor.spelling,
                     value=value,
                     docstring=comment,
                 )
                 self.items.append(item)
+            elif child.kind == CursorKind.TYPE_REF:
+                pass  # OK
+            elif child.kind == CursorKind.INTEGER_LITERAL:
+                value = self.parse_literal(child)
+                item = model.ConstantDeclaration(
+                    name=cursor.spelling,
+                    value=value,
+                    docstring=comment,
+                )
+                self.items.append(item)
+            elif child.kind == CursorKind.UNARY_OPERATOR:
+                # Presumable a minus sign
+                value = self.parse_literal(child)
+                item = model.ConstantDeclaration(
+                    name=cursor.spelling,
+                    value=value,
+                    docstring=comment,
+                )
+                self.items.append(item)
+            else:
+                self.report_unparsed(child)
 
     def report_unparsed(self, cursor, indent=0):
         print(' '*indent, 'UNPARSED: ', cursor.kind, cursor.spelling, cursor.location)

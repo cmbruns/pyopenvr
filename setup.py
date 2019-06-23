@@ -3,6 +3,7 @@
 from setuptools import setup
 
 # Load module version from ovr/version.py
+__version__ = '0.0.0'  # value will be replaced on the next line
 exec(open('src/openvr/version.py').read())
 
 setup(
@@ -38,7 +39,7 @@ Development Status :: 4 - Beta
 """.splitlines(),
     install_requires=[],
     extras_require={
-        'all': ['numpy', 'PyOpenGL', 'glfw', 'PyQt5', 'jinja2', 'wxPython', 'clang', ],
+        'all': ['numpy', 'PyOpenGL', 'glfw', 'PyQt5', 'jinja2', 'wxPython', 'clang', 'PIL'],
         'glfw': ['numpy', 'PyOpenGL', 'glfw'],
         'opengl': ['numpy', 'PyOpenGL'],
         'PyQt5': ['numpy', 'PyOpenGL', 'PyQt5', 'jinja2'],

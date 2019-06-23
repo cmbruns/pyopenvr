@@ -252,7 +252,7 @@ class Method(Declaration):
         if self.type == 'void':
             return False
         for p in self.parameters:
-            if p.is_out_string():
+            if p.is_output_string():
                 return False
         return True
 
@@ -266,9 +266,15 @@ class Method(Declaration):
         post_call_statements = ''
         # Annotate count params just in time
         for pix, p in enumerate(self.parameters):
-            if p.is_out_string():
+            if p.is_output_string():
                 len_param = self.parameters[pix + 1]
                 len_param.is_count = True
+            if p.is_struct_size():
+                if pix > 0:
+                    sized_param = self.parameters[pix - 1]
+                    t = sized_param.type.get_pointee().spelling
+                    t = translate_type(t)
+                    p.always_value = f'sizeof({t})'
         for p in self.parameters:
             if p.input_param_name():
                 in_params.append(p.input_param_name())
@@ -280,7 +286,7 @@ class Method(Declaration):
             post_call_statements += p.post_call_block()
         # Handle output strings
         for pix, p in enumerate(self.parameters):
-            if p.is_out_string():
+            if p.is_output_string():
                 len_param = self.parameters[pix + 1]
                 len_param.is_count = True
                 call_params0 = []
@@ -334,9 +340,9 @@ class Method(Declaration):
         return method_string
 
     def catch_error_code(self):
-        if re.match(r'(?:vr\:\:)?EVRRenderModelError$', self.type):
+        if re.match(r'(?:vr::)?EVRRenderModelError$', self.type):
             return False  # Need the non-zero error code in this case
-        return re.match(r'(?:vr\:\:)?E\S+Error$', self.type)
+        return re.match(r'(?:vr::)?E\S+Error$', self.type)
 
 
 class Parameter(Declaration):
@@ -345,10 +351,11 @@ class Parameter(Declaration):
             name = 'type_'
         super().__init__(name=name, docstring=docstring)
         self.type = type_
+        self.always_value = None
         self.default_value = default_value
         self.annotation = annotation
         self.is_count = False
-        if self.is_in_string():
+        if self.is_input_string():
             if self.name.startswith('pch'):
                 self.name = self.name[3:]
                 self.name = self.name[0].lower() + self.name[1:]
@@ -366,13 +373,21 @@ class Parameter(Declaration):
             return True
         return False
 
-    def is_in_string(self):
+    def is_input_string(self):
         if not self.type.kind == TypeKind.POINTER:
             return False
         pt = self.type.get_pointee()
         if not pt.is_const_qualified():
             return False
         return pt.kind == TypeKind.CHAR_S
+
+    def is_float(self):
+        return self.type.kind in (
+            TypeKind.FLOAT,
+            TypeKind.DOUBLE,
+            TypeKind.LONGDOUBLE,
+            TypeKind.FLOAT128,
+        )
 
     def is_int(self):
         return self.type.kind in (
@@ -388,15 +403,7 @@ class Parameter(Declaration):
             TypeKind.INT128,
         )
 
-    def is_float(self):
-        return self.type.kind in (
-            TypeKind.FLOAT,
-            TypeKind.DOUBLE,
-            TypeKind.LONGDOUBLE,
-            TypeKind.FLOAT128,
-        )
-
-    def is_out_string(self):
+    def is_output_string(self):
         if not self.annotation:
             return False
         return str(self.annotation) == 'out_string: ;'
@@ -420,14 +427,31 @@ class Parameter(Declaration):
             return True
         elif self.name == 'pEvent':
             return True
-        elif self.name == 'uncbVREvent':
-            return False
-        elif self.name == 'unControllerStateSize':
+        elif self.always_value is not None:
             return False
         elif not self.is_output():
             return True
         else:
             return False  # TODO:
+
+    def is_struct_size(self):
+        if self.is_count:
+            return False
+        if not self.type.kind in (TypeKind.TYPEDEF, ):
+            return False
+        if self.name in ('uncbVREvent', ):
+            return True
+        if not self.name.endswith('Size'):
+            return False
+        if self.default_value is not None:
+            return False
+        if self.name.endswith('BufferSize'):
+            return False
+        if self.name.endswith('CompressedSize'):
+            return False
+        if self.name.endswith('ElementSize'):
+            return False
+        return True
 
     def pre_call_block(self):
         m = self.is_array()
@@ -463,14 +487,12 @@ class Parameter(Declaration):
                     {self.name}Arg = byref({self.name}[0])
                 ''')
             return result
-        elif self.is_out_string():
+        elif self.is_output_string():
             return ''
         elif self.is_count:
             return ''
-        elif self.name == 'uncbVREvent':
-            return f'{self.name} = sizeof(VREvent_t)\n'
-        elif self.name == 'unControllerStateSize':
-            return f'{self.name} = sizeof(VRControllerState_t)\n'
+        elif self.always_value is not None:
+            return f'{self.name} = {self.always_value}\n'
         elif not self.is_input():
             t = translate_type(self.type.get_pointee().spelling)
             return f'{self.name} = {t}()\n'
@@ -502,7 +524,7 @@ class Parameter(Declaration):
         if not self.is_input():
             return None
         n = self.name
-        if self.is_in_string():
+        if self.is_input_string():
             n = f'{n}: str'
         elif self.is_int():
             n = f'{n}: int'
@@ -517,9 +539,9 @@ class Parameter(Declaration):
             return f'{self.name}Arg'
         elif self.is_count:
             return self.name
-        elif self.is_in_string():
+        elif self.is_input_string():
             return f"bytes({self.name}, encoding='utf-8')"
-        elif self.is_out_string():
+        elif self.is_output_string():
             return self.name
         elif self.is_output():
             return f'byref({self.name})'
@@ -535,7 +557,7 @@ class Parameter(Declaration):
     def return_param_name(self):
         if self.is_error():
             return None
-        if self.is_out_string():
+        if self.is_output_string():
             return f"bytes({self.name}.value).decode('utf-8')"
         if not self.is_output():
             return None
@@ -644,18 +666,18 @@ def translate_type(type_name, bracket=False):
     # remove leading "VR_"
     result = re.sub(r'\bVR_', '', result)
 
-    m = re.match(r'^([^\*]+\S)\s*[\*&](.*)$', result)
+    m = re.match(r'^([^*]+\S)\s*[*&](.*)$', result)
     while m:  # # HmdStruct* -> POINTER(HmdStruct)
         pointee_type = translate_type(m.group(1))
         result = f'POINTER({pointee_type}){m.group(2)}'
-        m = re.match(r'^([^\*]+\S)\s*[\*&](.*)$', result)
+        m = re.match(r'^([^*]+\S)\s*[*&](.*)$', result)
 
     # translate pointer type "ptr"
-    m = re.match(r'^([^\*]+)ptr(?:_t)?(.*)$', result)
+    m = re.match(r'^([^*]+)ptr(?:_t)?(.*)$', result)
     while m:  # uintptr_t -> POINTER(c_uint)
         pointee_type = translate_type(m.group(1))
         result = f'POINTER({pointee_type}){m.group(2)}'
-        m = re.match(r'^([^\*]+)ptr(?:_t)?(.*)$', result)
+        m = re.match(r'^([^*]+)ptr(?:_t)?(.*)$', result)
 
     if result == 'void':
         result = 'None'

@@ -1,3 +1,5 @@
+#!/usr/bin/env python
+
 # Core python modules
 from ctypes import c_float, c_uint16, c_void_p, cast, sizeof
 import inspect
@@ -226,14 +228,6 @@ class CMainApplication(object):
         self.set_up_companion_window()
         return True
 
-    def convert_steam_vr_matrix(self, pose):
-        return numpy.array((
-            (pose[0][0], pose[1][0], pose[2][0], 0.0),
-            (pose[0][1], pose[1][1], pose[2][1], 0.0),
-            (pose[0][2], pose[1][2], pose[2][2], 0.0),
-            (pose[0][3], pose[1][3], pose[2][3], 1.0),
-        ), dtype=numpy.float32)
-
     def create_all_shaders(self):
         self.scene_program = shaders.compileProgram(
             shaders.compileShader(source=inspect.cleandoc('''
@@ -355,7 +349,7 @@ class CMainApplication(object):
                 break
             time.sleep(1)
         if error != openvr.VRRenderModelError_None:
-            print(f'Unable to load render texture id:{model.diffuseTextureId} for render model {renderm_model_name}')
+            print(f'Unable to load render texture id:{model.diffuseTextureId} for render model {render_model_name}')
             openvr.VRRenderModels().freeRenderModel(model)
             return None
         render_model = CGLRenderModel(render_model_name, model, texture)
@@ -416,13 +410,13 @@ class CMainApplication(object):
                 if not pose_data.bActive or not pose_data.pose.bPoseIsValid:
                     hand.show_controller = False
                 else:
-                    hand.pose = self.convert_steam_vr_matrix(pose_data.pose.mDeviceToAbsoluteTracking)
+                    hand.pose = convert_steam_vr_matrix(pose_data.pose.mDeviceToAbsoluteTracking)
                     try:
                         origin_info = openvr.VRInput().getOriginTrackedDeviceInfo(
                             pose_data.activeOrigin,
                             sizeof(openvr.InputOriginInfo_t()),  # TODO: compute argument
                         )
-                        if origin_info.trackedDeviceIndex != openvr.k_unTrackedDeviceIndex_Invalid:
+                        if origin_info.trackedDeviceIndex != openvr.k_unTrackedDeviceIndexInvalid:
                             pass # TODO:
                     except:
                         pass
@@ -711,7 +705,7 @@ class CMainApplication(object):
                 self.pose_classes += self.dev_class_char[nDevice]
         hp = self.poses[openvr.k_unTrackedDeviceIndex_Hmd]
         if hp.bPoseIsValid:
-            p = self.convert_steam_vr_matrix(hp.mDeviceToAbsoluteTracking)
+            p = convert_steam_vr_matrix(hp.mDeviceToAbsoluteTracking)
             self.hmd_pose = inv(p)
 
 
@@ -767,6 +761,15 @@ class FramebufferDesc(object):
         self.resolve_texture_id = None
         GL.glDeleteFramebuffers(1, [self.resolve_framebuffer_id])
         self.resolve_framebuffer_id = None
+
+
+def convert_steam_vr_matrix(pose):
+    return numpy.array((
+        (pose[0][0], pose[1][0], pose[2][0], 0.0),
+        (pose[0][1], pose[1][1], pose[2][1], 0.0),
+        (pose[0][2], pose[1][2], pose[2][2], 0.0),
+        (pose[0][3], pose[1][3], pose[2][3], 1.0),
+    ), dtype=numpy.float32)
 
 
 def main(argv):

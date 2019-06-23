@@ -102,9 +102,12 @@ class ID3D12CommandQueue(Structure):
 k_nSteamVRVersionMajor = 1
 k_nSteamVRVersionMinor = 4
 k_nSteamVRVersionBuild = 18
+k_nDriverNone = 0xFFFFFFFF
 k_unMaxDriverDebugResponseSize = 32768
 k_unTrackedDeviceIndex_Hmd = 0
 k_unMaxTrackedDeviceCount = 64
+k_unTrackedDeviceIndexOther = 0xFFFFFFFE
+k_unTrackedDeviceIndexInvalid = 0xFFFFFFFF
 k_ulInvalidPropertyContainer = 0
 k_unInvalidPropertyTag = 0
 k_ulInvalidDriverHandle = 0
@@ -137,6 +140,7 @@ k_ulInvalidActionSetHandle = 0
 k_ulInvalidInputValueHandle = 0
 k_unControllerStateAxisCount = 5  # the number of axes in the controller state
 k_ulOverlayHandleInvalid = 0
+k_unInvalidBoneIndex = -1
 k_unMaxDistortionFunctionParameters = 8
 k_unScreenshotHandleInvalid = 0
 IVRSystem_Version = b"IVRSystem_019"
@@ -334,6 +338,7 @@ k_pch_Controller_Component_Base = b"base"  # For controllers with an unambiguous
 k_pch_Controller_Component_Tip = b"tip"  # For controllers with an unambiguous 'tip' (used for 'laser-pointing')
 k_pch_Controller_Component_HandGrip = b"handgrip"  # Neutral, ambidextrous hand-pose when holding controller. On plane between neutrally posed index finger and thumb
 k_pch_Controller_Component_Status = b"status"  # 1:1 aspect ratio status area, with canonical [0,1] uv mapping
+INVALID_TEXTURE_ID = -1
 IVRRenderModels_Version = b"IVRRenderModels_006"
 IVRExtendedDisplay_Version = b"IVRExtendedDisplay_001"
 IVRTrackedCamera_Version = b"IVRTrackedCamera_005"
@@ -6004,7 +6009,7 @@ class IVRTrackedCamera(object):
         if error_code != 0:
             raise OpenVRError(f'EVRTrackedCameraError({error_code})')
 
-    def getVideoStreamFrameBuffer(self, hTrackedCamera, eFrameType, pFrameBuffer, nFrameBufferSize, nFrameHeaderSize):
+    def getVideoStreamFrameBuffer(self, hTrackedCamera, eFrameType, pFrameBuffer, nFrameBufferSize):
         """
         Copies the image frame into a caller's provided buffer. The image data is currently provided as RGBA data, 4 bytes per pixel.
         A caller can provide null for the framebuffer or frameheader if not desired. Requesting the frame header first, followed by the frame buffer allows
@@ -6015,6 +6020,7 @@ class IVRTrackedCamera(object):
 
         fn = self.function_table.getVideoStreamFrameBuffer
         pFrameHeader = CameraVideoStreamFrameHeader_t()
+        nFrameHeaderSize = sizeof(CameraVideoStreamFrameHeader_t)
         error_code = fn(hTrackedCamera, eFrameType, byref(pFrameBuffer), nFrameBufferSize, byref(pFrameHeader), nFrameHeaderSize)
         if error_code != 0:
             raise OpenVRError(f'EVRTrackedCameraError({error_code})')
@@ -6032,7 +6038,7 @@ class IVRTrackedCamera(object):
             raise OpenVRError(f'EVRTrackedCameraError({error_code})')
         return pTextureBounds, pnWidth.value, pnHeight.value
 
-    def getVideoStreamTextureD3D11(self, hTrackedCamera, eFrameType, pD3D11DeviceOrResource, nFrameHeaderSize):
+    def getVideoStreamTextureD3D11(self, hTrackedCamera, eFrameType, pD3D11DeviceOrResource):
         """
         Access a shared D3D11 texture for the specified tracked camera stream.
         The camera frame type VRTrackedCameraFrameType_Undistorted is not supported directly as a shared texture. It is an interior subregion of the shared texture VRTrackedCameraFrameType_MaximumUndistorted.
@@ -6045,17 +6051,19 @@ class IVRTrackedCamera(object):
         fn = self.function_table.getVideoStreamTextureD3D11
         ppD3D11ShaderResourceView = c_void_p()
         pFrameHeader = CameraVideoStreamFrameHeader_t()
+        nFrameHeaderSize = sizeof(CameraVideoStreamFrameHeader_t)
         error_code = fn(hTrackedCamera, eFrameType, byref(pD3D11DeviceOrResource), byref(ppD3D11ShaderResourceView), byref(pFrameHeader), nFrameHeaderSize)
         if error_code != 0:
             raise OpenVRError(f'EVRTrackedCameraError({error_code})')
         return ppD3D11ShaderResourceView.value, pFrameHeader
 
-    def getVideoStreamTextureGL(self, hTrackedCamera, eFrameType, nFrameHeaderSize):
+    def getVideoStreamTextureGL(self, hTrackedCamera, eFrameType):
         """Access a shared GL texture for the specified tracked camera stream"""
 
         fn = self.function_table.getVideoStreamTextureGL
         pglTextureId = glUInt_t()
         pFrameHeader = CameraVideoStreamFrameHeader_t()
+        nFrameHeaderSize = sizeof(CameraVideoStreamFrameHeader_t)
         error_code = fn(hTrackedCamera, eFrameType, byref(pglTextureId), byref(pFrameHeader), nFrameHeaderSize)
         if error_code != 0:
             raise OpenVRError(f'EVRTrackedCameraError({error_code})')
@@ -6435,7 +6443,7 @@ class IVRInput(object):
             raise OpenVRError(f'EVRInputError({error_code})')
         return pSets
 
-    def getDigitalActionData(self, action, unActionDataSize, ulRestrictToDevice):
+    def getDigitalActionData(self, action, ulRestrictToDevice):
         """
         Reads the state of a digital action given its handle. This will return VRInputError_WrongType if the type of
         action is something other than digital
@@ -6443,12 +6451,13 @@ class IVRInput(object):
 
         fn = self.function_table.getDigitalActionData
         pActionData = InputDigitalActionData_t()
+        unActionDataSize = sizeof(InputDigitalActionData_t)
         error_code = fn(action, byref(pActionData), unActionDataSize, ulRestrictToDevice)
         if error_code != 0:
             raise OpenVRError(f'EVRInputError({error_code})')
         return pActionData
 
-    def getAnalogActionData(self, action, unActionDataSize, ulRestrictToDevice):
+    def getAnalogActionData(self, action, ulRestrictToDevice):
         """
         Reads the state of an analog action given its handle. This will return VRInputError_WrongType if the type of
         action is something other than analog
@@ -6456,12 +6465,13 @@ class IVRInput(object):
 
         fn = self.function_table.getAnalogActionData
         pActionData = InputAnalogActionData_t()
+        unActionDataSize = sizeof(InputAnalogActionData_t)
         error_code = fn(action, byref(pActionData), unActionDataSize, ulRestrictToDevice)
         if error_code != 0:
             raise OpenVRError(f'EVRInputError({error_code})')
         return pActionData
 
-    def getPoseActionDataRelativeToNow(self, action, eOrigin, fPredictedSecondsFromNow: float, unActionDataSize, ulRestrictToDevice):
+    def getPoseActionDataRelativeToNow(self, action, eOrigin, fPredictedSecondsFromNow: float, ulRestrictToDevice):
         """
         Reads the state of a pose action given its handle for the number of seconds relative to now. This
         will generally be called with negative times from the fUpdateTime fields in other actions.
@@ -6469,12 +6479,13 @@ class IVRInput(object):
 
         fn = self.function_table.getPoseActionDataRelativeToNow
         pActionData = InputPoseActionData_t()
+        unActionDataSize = sizeof(InputPoseActionData_t)
         error_code = fn(action, eOrigin, fPredictedSecondsFromNow, byref(pActionData), unActionDataSize, ulRestrictToDevice)
         if error_code != 0:
             raise OpenVRError(f'EVRInputError({error_code})')
         return pActionData
 
-    def getPoseActionDataForNextFrame(self, action, eOrigin, unActionDataSize, ulRestrictToDevice):
+    def getPoseActionDataForNextFrame(self, action, eOrigin, ulRestrictToDevice):
         """
         Reads the state of a pose action given its handle. The returned values will match the values returned
         by the last call to IVRCompositor::WaitGetPoses().
@@ -6482,16 +6493,18 @@ class IVRInput(object):
 
         fn = self.function_table.getPoseActionDataForNextFrame
         pActionData = InputPoseActionData_t()
+        unActionDataSize = sizeof(InputPoseActionData_t)
         error_code = fn(action, eOrigin, byref(pActionData), unActionDataSize, ulRestrictToDevice)
         if error_code != 0:
             raise OpenVRError(f'EVRInputError({error_code})')
         return pActionData
 
-    def getSkeletalActionData(self, action, unActionDataSize):
+    def getSkeletalActionData(self, action):
         """Reads the state of a skeletal action given its handle."""
 
         fn = self.function_table.getSkeletalActionData
         pActionData = InputSkeletalActionData_t()
+        unActionDataSize = sizeof(InputSkeletalActionData_t)
         error_code = fn(action, byref(pActionData), unActionDataSize)
         if error_code != 0:
             raise OpenVRError(f'EVRInputError({error_code})')
@@ -6653,11 +6666,12 @@ class IVRInput(object):
             raise OpenVRError(f'EVRInputError({error_code})')
         return bytes(pchNameArray.value).decode('utf-8')
 
-    def getOriginTrackedDeviceInfo(self, origin, unOriginInfoSize):
+    def getOriginTrackedDeviceInfo(self, origin):
         """Retrieves useful information for the origin of this action"""
 
         fn = self.function_table.getOriginTrackedDeviceInfo
         pOriginInfo = InputOriginInfo_t()
+        unOriginInfoSize = sizeof(InputOriginInfo_t)
         error_code = fn(origin, byref(pOriginInfo), unOriginInfoSize)
         if error_code != 0:
             raise OpenVRError(f'EVRInputError({error_code})')
