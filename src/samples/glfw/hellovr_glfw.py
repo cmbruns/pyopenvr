@@ -32,7 +32,9 @@ class CGLRenderModel(object):
         # Populate a vertex buffer
         self.vertex_buffer = GL.glGenBuffers(1)
         GL.glBindBuffer(GL.GL_ARRAY_BUFFER, self.vertex_buffer)
-        GL.glBufferData(GL.GL_ARRAY_BUFFER, vr_model.vertex_data, GL.GL_STATIC_DRAW)
+        GL.glBufferData(GL.GL_ARRAY_BUFFER,
+                        sizeof(openvr.RenderModel_Vertex_t) * vr_model.unVertexCount,
+                        vr_model.rVertexData, GL.GL_STATIC_DRAW)
         # Identify the components in the vertex buffer
         GL.glEnableVertexAttribArray(0)
         hv3sz = sizeof(openvr.HmdVector3_t)
@@ -47,7 +49,8 @@ class CGLRenderModel(object):
         # Create and populate the index buffer
         self.index_buffer = GL.glGenBuffers(1)
         GL.glBindBuffer(GL.GL_ELEMENT_ARRAY_BUFFER, self.index_buffer)
-        GL.glBufferData(GL.GL_ELEMENT_ARRAY_BUFFER, sizeof(c_uint16) * vr_model.unTriangleCount * 3,
+        GL.glBufferData(GL.GL_ELEMENT_ARRAY_BUFFER,
+                        sizeof(c_uint16) * vr_model.unTriangleCount * 3,
                         vr_model.rIndexData, GL.GL_STATIC_DRAW)
         GL.glBindVertexArray(0)
         # create and populate the texture
@@ -61,8 +64,8 @@ class CGLRenderModel(object):
         GL.glTexParameteri(GL.GL_TEXTURE_2D, GL.GL_TEXTURE_WRAP_T, GL.GL_CLAMP_TO_EDGE)
         GL.glTexParameteri(GL.GL_TEXTURE_2D, GL.GL_TEXTURE_MAG_FILTER, GL.GL_LINEAR)
         GL.glTexParameteri(GL.GL_TEXTURE_2D, GL.GL_TEXTURE_MIN_FILTER, GL.GL_LINEAR_MIPMAP_LINEAR)
-        largest = GL.glGetFloatv(GL.GL_MAX_TEXTURE_MAX_ANISOTROPY_EXT)
-        GL.glTexParameterf(GL.GL_TEXTURE_2D, GL.GL_TEXTURE_MAX_ANISOTROPY_EXT, largest)
+        f_largest = GL.glGetFloatv(GL_MAX_TEXTURE_MAX_ANISOTROPY_EXT)
+        GL.glTexParameterf(GL.GL_TEXTURE_2D, GL_TEXTURE_MAX_ANISOTROPY_EXT, f_largest)
         GL.glBindTexture(GL.GL_TEXTURE_2D, 0)
         self.vertex_count = vr_model.unTriangleCount * 3
 
@@ -122,16 +125,19 @@ class CMainApplication(object):
         self.render_models = dict()
         self.controller_vao = None
         self.poses = []
-        self.show_cubes = True
         self.hmd_pose = None
         self.tracked_controller_count_previous = -1
         self.tracked_controller_count = 0
         self.valid_pose_count = 0
         self.valid_pose_count_previous = -1
+        self.show_cubes = True
+        self.analog_value = [0, 0]
         self.pose_classes = ''
         self.dev_class_char = dict()
         self.companion_width = 640
         self.companion_height = 320
+        self.controller_vertex_count = 0
+        self.controller_vertex_buffer = None
 
     def add_cube_to_scene(self, matrix):
         A = (0, 0, 0, 1) @ matrix
@@ -212,10 +218,10 @@ class CMainApplication(object):
         self.action_analog_input = openvr.VRInput().getActionHandle('/actions/demo/in/AnalogInput')
         self.action_set_demo = openvr.VRInput().getActionSetHandle('/actions/demo')
         self.hand[Left].action_haptic = openvr.VRInput().getActionHandle('/actions/demo/out/Haptic_Left')
-        self.hand[Left].source = openvr.VRInput().getInputSourceHandle('/user/hand/left')
+        self.hand[Left].source = openvr.VRInput().getInputSourceHandle('/user/hand/left').value
         self.hand[Left].action_pose = openvr.VRInput().getActionHandle('/actions/demo/in/Hand_Left')
         self.hand[Right].action_haptic = openvr.VRInput().getActionHandle('/actions/demo/out/Haptic_Right')
-        self.hand[Right].source = openvr.VRInput().getInputSourceHandle('/user/hand/right')
+        self.hand[Right].source = openvr.VRInput().getInputSourceHandle('/user/hand/right').value
         self.hand[Right].action_pose = openvr.VRInput().getActionHandle('/actions/demo/in/Hand_Right')
         return True
 
@@ -396,32 +402,66 @@ class CMainApplication(object):
         # Note: Key events are handled by glfw in key_callback
         # Process SteamVR events
         event = openvr.VREvent_t()
-        while self.hmd.pollNextEvent(event):
+        has_events = True
+        while has_events:
+            has_events = self.hmd.pollNextEvent(event)
             self.process_vr_event(event)
-        # TODO: actions
+        # Process SteamVR action state
+        # UpdateActionState is called each frame to update the state of the actions themselves. The application
+        # controls which action sets are active with the provided array of VRActiveActionSet_t structs.
+        action_sets = (openvr.VRActiveActionSet_t * 1)()
+        action_set = action_sets[0]
+        action_set.ulActionSet = self.action_set_demo
+        openvr.VRInput().updateActionState(action_sets)
+        #
+        self.show_cubes = not get_digital_action_state(self.action_hide_cubes)[0]
+        #
+        bH, haptic_device = get_digital_action_rising_edge(self.action_trigger_haptic, True)
+        if bH:
+            print('haptic')
+            for hand in self.hand:
+                if haptic_device == hand.source:
+                    openvr.VRInput().triggerHapticVibrationAction(hand.action_haptic, 0, 1, 4, 1, openvr.k_ulInvalidInputValueHandle)
+        try:
+            analog_data = openvr.VRInput().getAnalogActionData(self.action_analog_input, openvr.k_ulInvalidInputValueHandle)
+            self.analog_value[0] = analog_data.x
+            self.analog_value[1] = analog_data.y  # TODO: these seem to be unused...
+        except:
+            pass
+        self.hand[Left].show_controller = True
+        self.hand[Right].show_controller = True
+        do_hide, hide_device = get_digital_action_state(self.action_hide_this_controller, True)
+        if do_hide:
+            for hand in self.hands:
+                if hide_device == hand.source:
+                    hand.show_controller = False
         for hand in self.hand:
             try:
                 pose_data = openvr.VRInput().getPoseActionDataForNextFrame(
                     hand.action_pose,
                     openvr.TrackingUniverseStanding,
-                    sizeof(openvr.InputPoseActionData_t),  # TODO: compute argument
                     openvr.k_ulInvalidInputValueHandle,
                 )
-                if not pose_data.bActive or not pose_data.pose.bPoseIsValid:
+                if not pose_data.bActive:
                     hand.show_controller = False
-                else:
-                    hand.pose = convert_steam_vr_matrix(pose_data.pose.mDeviceToAbsoluteTracking)
-                    try:
-                        origin_info = openvr.VRInput().getOriginTrackedDeviceInfo(
-                            pose_data.activeOrigin,
-                            sizeof(openvr.InputOriginInfo_t()),  # TODO: compute argument
-                        )
-                        if origin_info.trackedDeviceIndex != openvr.k_unTrackedDeviceIndexInvalid:
-                            pass # TODO:
-                    except:
-                        pass
-            except:
+                    continue
+                if not pose_data.pose.bPoseIsValid:
+                    hand.show_controller = False
+                    continue
+                hand.pose = convert_steam_vr_matrix(pose_data.pose.mDeviceToAbsoluteTracking)
+                origin_info = openvr.VRInput().getOriginTrackedDeviceInfo(
+                    pose_data.activeOrigin,
+                )
+                if origin_info.trackedDeviceIndex != openvr.k_unTrackedDeviceIndexInvalid:
+                    render_model_name = openvr.VRSystem().getStringTrackedDeviceProperty(
+                        origin_info.trackedDeviceIndex,
+                        openvr.Prop_RenderModelName_String
+                    )
+                    hand.render_model = self.find_or_load_render_model(render_model_name)
+                    hand.render_model_name = render_model_name
+            except Exception as exc:
                 hand.show_controller = False
+                continue
 
     def key_callback(self, window, key, scancode, action, mods):
         if action == glfw.PRESS:
@@ -460,9 +500,79 @@ class CMainApplication(object):
         GL.glBindVertexArray(0)
         GL.glUseProgram(0)
 
+    def render_controller_axes(self):
+        """
+        Purpose: Draw all of the controllers as X/Y/Z lines
+        """
+        # Don't attempt to update controllers if input is not available
+        if not self.hmd.isInputAvailable():
+            return
+        vertex_data_array = list()
+        self.controller_vertex_count = 0
+        self.tracked_controller_count = 0
+        for hand in self.hand:
+            if not hand.show_controller:
+                continue
+            mat = hand.pose
+            center = (0, 0, 0, 1) @ mat
+            for i in range(3):
+                color = [0, 0, 0]
+                point = [0, 0, 0, 1]
+                point[i] += 0.05
+                color[i] = 1.0
+                point = point @ mat
+                vertex_data_array.append(center[0])
+                vertex_data_array.append(center[1])
+                vertex_data_array.append(center[2])
+                vertex_data_array.append(color[0])
+                vertex_data_array.append(color[1])
+                vertex_data_array.append(color[2])
+                vertex_data_array.append(point[0])
+                vertex_data_array.append(point[1])
+                vertex_data_array.append(point[2])
+                vertex_data_array.append(color[0])
+                vertex_data_array.append(color[1])
+                vertex_data_array.append(color[2])
+                self.controller_vertex_count += 2
+            start = (0, 0, -0.02, 1) @ mat
+            end = (0, 0, -39, 1) @ mat
+            color = (.92, .92, .71)
+            vertex_data_array.append(start[0])
+            vertex_data_array.append(start[1])
+            vertex_data_array.append(start[2])
+            vertex_data_array.append(color[0])
+            vertex_data_array.append(color[1])
+            vertex_data_array.append(color[2])
+            vertex_data_array.append(end[0])
+            vertex_data_array.append(end[1])
+            vertex_data_array.append(end[2])
+            vertex_data_array.append(color[0])
+            vertex_data_array.append(color[1])
+            vertex_data_array.append(color[2])
+            self.controller_vertex_count += 2
+        vertex_data_array = numpy.array(vertex_data_array, dtype=numpy.float32)
+        # Setup the VAO the first time through.
+        if self.controller_vao is None:
+            self.controller_vao = GL.glGenVertexArrays(1)
+            GL.glBindVertexArray(self.controller_vao)
+            self.controller_vertex_buffer = GL.glGenBuffers(1)
+            GL.glBindBuffer(GL.GL_ARRAY_BUFFER, self.controller_vertex_buffer)
+            stride = 2 * 3 * sizeof(c_float)
+            offset = 0
+            GL.glEnableVertexAttribArray(0)
+            GL.glVertexAttribPointer(0, 3, GL.GL_FLOAT, False, stride, cast(offset, c_void_p))
+            offset += 3 * sizeof(c_float)
+            GL.glEnableVertexAttribArray(1)
+            GL.glVertexAttribPointer(1, 3, GL.GL_FLOAT, False, stride, cast(offset, c_void_p))
+            GL.glBindVertexArray(0)
+        GL.glBindBuffer(GL.GL_ARRAY_BUFFER, self.controller_vertex_buffer)
+        # set vertex data if we have some
+        if len(vertex_data_array) > 0:
+            GL.glBufferData(GL.GL_ARRAY_BUFFER, vertex_data_array, GL.GL_STREAM_DRAW)
+
     def render_frame(self):
         if self.hmd:
-            # TODO: controller axes
+            self.render_controller_axes()
             self.render_stereo_targets()
             self.render_companion_window()
             left_eye_texture = openvr.Texture_t(
@@ -532,6 +642,14 @@ class CMainApplication(object):
             GL.glBindVertexArray(self.scene_vao)
             GL.glBindTexture(GL.GL_TEXTURE_2D, self.i_texture)
             GL.glDrawArrays(GL.GL_TRIANGLES, 0, int(self.vert_count))
+            GL.glBindVertexArray(0)
+        b_is_input_available = self.hmd.isInputAvailable()
+        if b_is_input_available:
+            # draw the controller axis lines
+            GL.glUseProgram(self.controller_transform_program)
+            GL.glUniformMatrix4fv(self.controller_matrix_location, 1, False, self.get_current_view_projection_matrix(eye))
+            GL.glBindVertexArray(self.controller_vao)
+            GL.glDrawArrays( GL.GL_LINES, 0, self.controller_vertex_count)
             GL.glBindVertexArray(0)
         GL.glUseProgram(0)
         # TODO:
@@ -770,6 +888,51 @@ def convert_steam_vr_matrix(pose):
         (pose[0][2], pose[1][2], pose[2][2], 0.0),
         (pose[0][3], pose[1][3], pose[2][3], 1.0),
     ), dtype=numpy.float32)
+
+
+def get_digital_action_rising_edge(action, device_path=None):
+    """
+    Purpose: Returns true if the action is active and had a rising edge
+    """
+    action_data = openvr.VRInput().getDigitalActionData(action, openvr.k_ulInvalidInputValueHandle)
+    if device_path is not None:
+        if action_data.bActive:
+            try:
+                origin_info = openvr.VRInput().getOriginTrackedDeviceInfo(action_data.activeOrigin)
+                device_path = origin_info.devicePath
+            except:
+                pass
+    return action_data.bActive and action_data.bChanged and action_data.bState, device_path
+
+
+def get_digital_action_falling_edge(action, device_path=None):
+    """
+    Purpose: Returns true if the action is active and had a falling edge
+    """
+    action_data = openvr.VRInput().getDigitalActionData(action, openvr.k_ulInvalidInputValueHandle)
+    if device_path is not None:
+        if action_data.bActive:
+            try:
+                origin_info = openvr.VRInput().getOriginTrackedDeviceInfo(action_data.activeOrigin)
+                device_path = origin_info.devicePath
+            except:
+                pass
+    return action_data.bActive and action_data.bChanged and not action_data.bState, device_path
+
+
+def get_digital_action_state(action, device_path=None):
+    """
+    Purpose: Returns true if the action is active and its state is true
+    """
+    action_data = openvr.VRInput().getDigitalActionData(action, openvr.k_ulInvalidInputValueHandle)
+    if device_path is not None:
+        if action_data.bActive:
+            try:
+                origin_info = openvr.VRInput().getOriginTrackedDeviceInfo(action_data.activeOrigin)
+                device_path = origin_info.devicePath
+            except:
+                pass
+    return action_data.bActive and action_data.bState, device_path
 
 
 def main(argv):

@@ -260,7 +260,7 @@ class Method(Declaration):
         in_params = ['self']
         call_params = []
         out_params = []
-        if self.has_return() and not self.catch_error_code():
+        if self.has_return() and not self.raise_error_code():
             out_params.append('result')
         pre_call_statements = ''
         post_call_statements = ''
@@ -288,6 +288,8 @@ class Method(Declaration):
         for pix, p in enumerate(self.parameters):
             if p.is_output_string():
                 len_param = self.parameters[pix + 1]
+                if len_param.is_struct_size():
+                    len_param = self.parameters[pix + 2]
                 len_param.is_count = True
                 call_params0 = []
                 for p2 in self.parameters:
@@ -317,13 +319,13 @@ class Method(Declaration):
         body_string += f'fn = self.function_table.{method_name}\n'
         body_string += pre_call_statements
         param_list2 = ', '.join(call_params)
-        if self.catch_error_code():
+        if self.raise_error_code():
             body_string += f'error_code = fn({param_list2})\n'
         elif self.has_return():
             body_string += f'result = fn({param_list2})\n'
         else:
             body_string += f'fn({param_list2})\n'
-        if self.catch_error_code():
+        if self.raise_error_code():
             message = f'{translate_type(self.type)}({{error_code}})'
             post_call_statements += textwrap.dedent(f'''\
                 if error_code != 0:
@@ -339,7 +341,7 @@ class Method(Declaration):
         method_string += body_string
         return method_string
 
-    def catch_error_code(self):
+    def raise_error_code(self):
         if re.match(r'(?:vr::)?EVRRenderModelError$', self.type):
             return False  # Need the non-zero error code in this case
         return re.match(r'(?:vr::)?E\S+Error$', self.type)
@@ -439,6 +441,8 @@ class Parameter(Declaration):
             return False
         if not self.type.kind in (TypeKind.TYPEDEF, ):
             return False
+        if self.name.startswith('unSizeOf'):
+            return True
         if self.name in ('uncbVREvent', ):
             return True
         if not self.name.endswith('Size'):

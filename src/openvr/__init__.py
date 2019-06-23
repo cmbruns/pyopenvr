@@ -6425,7 +6425,7 @@ class IVRInput(object):
             raise OpenVRError(f'EVRInputError({error_code})')
         return pHandle
 
-    def updateActionState(self, pSets, unSizeOfVRSelectedActionSet_t):
+    def updateActionState(self, pSets):
         """
         Reads the current state into all actions. After this call, the results of Get*Action calls 
         will be the same until the next call to UpdateActionState.
@@ -6438,6 +6438,7 @@ class IVRInput(object):
         else:
             unSetCount = len(pSets)
             pSetsArg = byref(pSets[0])
+        unSizeOfVRSelectedActionSet_t = sizeof(VRActiveActionSet_t)
         error_code = fn(pSetsArg, unSizeOfVRSelectedActionSet_t, unSetCount)
         if error_code != 0:
             raise OpenVRError(f'EVRInputError({error_code})')
@@ -6685,7 +6686,7 @@ class IVRInput(object):
         if error_code != 0:
             raise OpenVRError(f'EVRInputError({error_code})')
 
-    def showBindingsForActionSet(self, pSets, unSizeOfVRSelectedActionSet_t, originToHighlight):
+    def showBindingsForActionSet(self, pSets, originToHighlight):
         """Shows the current binding all the actions in the specified action sets"""
 
         fn = self.function_table.showBindingsForActionSet
@@ -6695,6 +6696,7 @@ class IVRInput(object):
         else:
             unSetCount = len(pSets)
             pSetsArg = byref(pSets[0])
+        unSizeOfVRSelectedActionSet_t = sizeof(VRActiveActionSet_t)
         error_code = fn(pSetsArg, unSizeOfVRSelectedActionSet_t, unSetCount, originToHighlight)
         if error_code != 0:
             raise OpenVRError(f'EVRInputError({error_code})')
