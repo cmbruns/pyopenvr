@@ -81,7 +81,7 @@ class CGLRenderModel(object):
         GL.glBindVertexArray(self.vertex_array)
         GL.glActiveTexture(GL.GL_TEXTURE0)
         GL.glBindTexture(GL.GL_TEXTURE_2D, self.texture)
-        GL.glDrawElements(GL.GL_TRIANGLES, self.vertex_count, GL.GL_UNSIGNED_SHORT, 0)
+        GL.glDrawElements(GL.GL_TRIANGLES, self.vertex_count, GL.GL_UNSIGNED_SHORT, None)
         GL.glBindVertexArray(0)
 
 
@@ -308,7 +308,7 @@ class CMainApplication(object):
                 out vec4 outputColor;
                 void main()
                 {
-                   outputColor = texture( diffuse, v2TexCoord);
+                    outputColor = texture( diffuse, v2TexCoord);
                 }
             '''), shaderType=GL.GL_FRAGMENT_SHADER),
         )
@@ -649,10 +649,19 @@ class CMainApplication(object):
             GL.glUseProgram(self.controller_transform_program)
             GL.glUniformMatrix4fv(self.controller_matrix_location, 1, False, self.get_current_view_projection_matrix(eye))
             GL.glBindVertexArray(self.controller_vao)
-            GL.glDrawArrays( GL.GL_LINES, 0, self.controller_vertex_count)
+            GL.glDrawArrays(GL.GL_LINES, 0, self.controller_vertex_count)
             GL.glBindVertexArray(0)
+        # ----- Render Model rendering -----
+        GL.glUseProgram(self.render_model_program)
+        for hand in self.hand:
+            if not hand.show_controller:
+                continue
+            if hand.render_model is None:
+                continue
+            mvp = hand.pose @ self.get_current_view_projection_matrix(eye)
+            GL.glUniformMatrix4fv(self.render_model_matrix_location, 1, False, mvp)
+            hand.render_model.draw()
         GL.glUseProgram(0)
-        # TODO:
 
     def run_main_loop(self):
         while not glfw.window_should_close(self.window):
