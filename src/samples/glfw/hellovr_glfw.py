@@ -595,7 +595,7 @@ class CMainApplication(object):
                 or self.valid_pose_count != self.valid_pose_count_previous):
             self.valid_pose_count_previous = self.valid_pose_count
             self.tracked_controller_count_previous = self.tracked_controller_count
-            print(f' {self.valid_pose_count}({self.pose_classes}) Controllers:{self.tracked_controller_count}')
+            print(f'PoseCount:{self.valid_pose_count}({self.pose_classes}) Controllers:{self.tracked_controller_count}')
         self.update_hmd_pose()
 
     def render_stereo_targets(self):
@@ -716,15 +716,15 @@ class CMainApplication(object):
             return
         verts = list()
         # left eye verts
-        verts.append(((-1, -1), (0, 1)))
-        verts.append(((0, -1), (1, 1)))
-        verts.append(((-1, 1), (0, 0)))
-        verts.append(((0, 1), (1, 0)))
+        verts.append(((-1, -1), (0, 0)))
+        verts.append(((0, -1), (1, 0)))
+        verts.append(((-1, 1), (0, 1)))
+        verts.append(((0, 1), (1, 1)))
         # right eye verts
-        verts.append(((0, -1), (0, 1)))
-        verts.append(((1, -1), (1, 1)))
-        verts.append(((0, 1), (0, 0)))
-        verts.append(((1, 1), (1, 0)))
+        verts.append(((0, -1), (0, 0)))
+        verts.append(((1, -1), (1, 0)))
+        verts.append(((0, 1), (0, 1)))
+        verts.append(((1, 1), (1, 1)))
         vIndices = numpy.array([0, 1, 3, 0, 3, 2, 4, 5, 7, 4, 7, 6], dtype=numpy.uint16)
         self.companion_window_index_size = len(vIndices)
         self.companion_window_vao = GL.glGenVertexArrays(1)
