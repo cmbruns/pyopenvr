@@ -45,7 +45,7 @@ class CGLRenderModel(object):
                                  cast(1 * hv3sz, c_void_p))
         GL.glEnableVertexAttribArray(2)
         GL.glVertexAttribPointer(2, 2, GL.GL_FLOAT, False, sizeof(openvr.RenderModel_Vertex_t),
-                                 cast(2 & hv3sz, c_void_p))
+                                 cast(2 * hv3sz, c_void_p))
         # Create and populate the index buffer
         self.index_buffer = GL.glGenBuffers(1)
         GL.glBindBuffer(GL.GL_ELEMENT_ARRAY_BUFFER, self.index_buffer)
