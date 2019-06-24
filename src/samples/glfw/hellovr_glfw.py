@@ -432,7 +432,7 @@ class CMainApplication(object):
         self.hand[Right].show_controller = True
         do_hide, hide_device = get_digital_action_state(self.action_hide_this_controller, True)
         if do_hide:
-            for hand in self.hands:
+            for hand in self.hand:
                 if hide_device == hand.source:
                     hand.show_controller = False
         for hand in self.hand:
