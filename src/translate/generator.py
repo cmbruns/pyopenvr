@@ -7,13 +7,13 @@ import translate.model as model
 
 class CTypesGenerator(object):
     @staticmethod
-    def write_preamble(file_out):
-        preamble = inspect.cleandoc('''
+    def write_preamble(file_out, version):
+        preamble = inspect.cleandoc(f'''
             #!/bin/env python
             
-            # Python bindings for OpenVR API version 1.0.11
-            # from https://github.com/ValveSoftware/openvr
-            # Created Jan 1, 2018 Christopher Bruns
+            # Unofficial python bindings for OpenVR API version {".".join(str(v) for v in version)}
+            # from https://github.com/cmbruns/pyopenvr
+            # based on OpenVR C++ API at https://github.com/ValveSoftware/openvr
             
             import os
             import platform
@@ -82,8 +82,8 @@ class CTypesGenerator(object):
         print(preamble, file=file_out)
 
     @staticmethod
-    def generate(declarations, file_out):
-        CTypesGenerator.write_preamble(file_out=file_out)
+    def generate(declarations, file_out, version):
+        CTypesGenerator.write_preamble(file_out=file_out, version=version)
         for declaration in declarations:
             if isinstance(declaration, model.StructureForwardDeclaration):
                 print('\n', file=file_out)
@@ -196,11 +196,10 @@ class CTypesGenerator(object):
                 print(declaration, file=file_out)
                 print('\n', file=file_out)
 
-        print('\n', file=file_out)
         print(inspect.cleandoc('''
-            ########################
-            ### Expose functions ###
-            ########################
+            ####################
+            # Expose functions #
+            ####################
             
             def _checkInitError(error):
                 """
@@ -232,7 +231,7 @@ class CTypesGenerator(object):
                 unloads vrclient.dll. Any interface pointers from the interface are
                 invalid after this point
                 """
-                shutdownInternal() # OK, this is just like inline definition in openvr.h
+                shutdownInternal()  # OK, this is just like inline definition in openvr.h
         '''), file=file_out)
         print('\n', file=file_out)
         for declaration in declarations:
@@ -242,16 +241,55 @@ class CTypesGenerator(object):
         print('Generate complete')
 
 
-def main():
+def get_version(declarations):
+    version = [0, 0, 0]
+    for declaration in declarations:
+        if isinstance(declaration, model.ConstantDeclaration):
+            n = declaration.name
+            if not n.startswith('k_nSteamVRVersion'):
+                continue
+            if n.endswith('Major'):
+                version[0] = int(declaration.value)
+            elif n.endswith('Minor'):
+                version[1] = int(declaration.value)
+            elif n.endswith('Build'):
+                version[2] = int(declaration.value)
+            else:
+                assert False
+    return tuple(version)
+
+
+def main(sub_version=1):
     file_name1 = 'openvr.h'
     file_string1 = pkg_resources.resource_string(__name__, file_name1)
     declarations = Parser().parse_file(file_name=file_name1, file_string=file_string1)
+    version = get_version(declarations)
+    patch_version = str(version[2]).zfill(2) + str(sub_version).zfill(2)
+    py_version = (version[0], version[1], patch_version)
+    write_version(
+        file_out=open('../openvr/version.py', 'w'),
+        version=py_version,
+    )
     generator = CTypesGenerator()
     generator.generate(
         declarations=declarations,
         file_out=open('../openvr/__init__.py', 'w', newline=None),
+        version=version,
     )
 
 
+def write_version(version, file_out):
+    print(inspect.cleandoc(f"""
+    # Store the version here so:
+    # 1) we don't load dependencies by storing it in __init__.py
+    # 2) we can import it in setup.py for the same reason
+    # 3) we can import it into your module module
+    # http://stackoverflow.com/questions/458550/standard-way-to-embed-version-into-python-package
+
+    __version__ = '{".".join([str(v) for v in version])}'
+    """), file=file_out)
+
+
 if __name__ == '__main__':
-    main()
+    # Increase sub_version for additional python-only releases within a single openvr version
+    main(sub_version=1)

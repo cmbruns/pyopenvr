@@ -58,15 +58,13 @@ class COpenVRContext(Declaration):
             # Globals for context management
             _vr_token = None
             _internal_module_context = COpenVRContext()
-            
-            
         ''')
         for m in self.vr_method_names:
             method_string = textwrap.dedent(f'''\
+                
+                
                 def {m}():
                     return _internal_module_context.{m}()
-                
-                
             ''')
             class_string += method_string
         return class_string
@@ -199,6 +197,8 @@ class Function(Declaration):
             method_string = f'''
                 _openvr.{self.name}.restype = {restype}
                 _openvr.{self.name}.argtypes = [{arg_types}]
+                
+                
                 def {py_name}({args}):{docstring}
                     result = _openvr.{self.name}({call_args})
                     return result
@@ -208,6 +208,8 @@ class Function(Declaration):
             method_string = f'''
                 _openvr.{self.name}.restype = {restype}
                 _openvr.{self.name}.argtypes = [{arg_types}]
+                
+                
                 def {py_name}({args}):{docstring}
                     {error_param.name} = {etype}()
                     result = _openvr.{self.name}({call_args})
