@@ -251,12 +251,12 @@ class CMainApplication(object):
             '''), shaderType=GL.GL_VERTEX_SHADER),
             shaders.compileShader(source=inspect.cleandoc('''
                 #version 410 core
-                uniform sampler2D mytexture;
+                uniform sampler2D myTexture;
                 in vec2 v2UVcoords;
                 out vec4 outputColor;
                 void main()
                 {
-                    outputColor = texture(mytexture, v2UVcoords);
+                    outputColor = texture(myTexture, v2UVcoords);
                 }
             '''), shaderType=GL.GL_FRAGMENT_SHADER),
         )
@@ -328,12 +328,12 @@ class CMainApplication(object):
             '''), shaderType=GL.GL_VERTEX_SHADER),
             shaders.compileShader(source=inspect.cleandoc('''
                 #version 410 core
-                uniform sampler2D mytexture;
+                uniform sampler2D myTexture;
                 noperspective in vec2 v2UV;
                 out vec4 outputColor;
                 void main()
                 {
-                    outputColor = texture(mytexture, v2UV);
+                    outputColor = texture(myTexture, v2UV);
                 }
             '''), shaderType=GL.GL_FRAGMENT_SHADER),
         )
@@ -342,22 +342,17 @@ class CMainApplication(object):
         if render_model_name in self.render_models:
             return self.render_models[render_model_name]
         while True:
-            error, model = openvr.VRRenderModels().loadRenderModel_Async(render_model_name)
-            if error != openvr.VRRenderModelError_Loading:
+            try:
+                model = openvr.VRRenderModels().loadRenderModel_Async(render_model_name)
                 break
-            time.sleep(1)
-        if error != openvr.VRRenderModelError_None:
-            print(f'Unable to load render model {render_model_name} - {openvr.VRRenderModels().getRenderModelErrorNameFromEnum(error)}')
-            return None
+            except openvr.RenderModelError_Loading:
+                time.sleep(1)
         while True:
-            error, texture = openvr.VRRenderModels().loadTexture_Async(model.diffuseTextureId)
-            if error != openvr.VRRenderModelError_Loading:
+            try:
+                texture = openvr.VRRenderModels().loadTexture_Async(model.diffuseTextureId)
                 break
-            time.sleep(1)
-        if error != openvr.VRRenderModelError_None:
-            print(f'Unable to load render texture id:{model.diffuseTextureId} for render model {render_model_name}')
-            openvr.VRRenderModels().freeRenderModel(model)
-            return None
+            except openvr.RenderModelError_Loading:
+                time.sleep(1)
         render_model = CGLRenderModel(render_model_name, model, texture)
         self.render_models[render_model_name] = render_model
         openvr.VRRenderModels().freeRenderModel(model)
@@ -418,16 +413,12 @@ class CMainApplication(object):
         #
         bH, haptic_device = get_digital_action_rising_edge(self.action_trigger_haptic, True)
         if bH:
-            print('haptic')
             for hand in self.hand:
                 if haptic_device == hand.source:
                     openvr.VRInput().triggerHapticVibrationAction(hand.action_haptic, 0, 1, 4, 1, openvr.k_ulInvalidInputValueHandle)
-        try:
-            analog_data = openvr.VRInput().getAnalogActionData(self.action_analog_input, openvr.k_ulInvalidInputValueHandle)
-            self.analog_value[0] = analog_data.x
-            self.analog_value[1] = analog_data.y  # TODO: these seem to be unused...
-        except:
-            pass
+        analog_data = openvr.VRInput().getAnalogActionData(self.action_analog_input, openvr.k_ulInvalidInputValueHandle)
+        self.analog_value[0] = analog_data.x
+        self.analog_value[1] = analog_data.y  # TODO: these seem to be unused...
         self.hand[Left].show_controller = True
         self.hand[Right].show_controller = True
         do_hide, hide_device = get_digital_action_state(self.action_hide_this_controller, True)
@@ -436,34 +427,30 @@ class CMainApplication(object):
                 if hide_device == hand.source:
                     hand.show_controller = False
         for hand in self.hand:
-            try:
-                pose_data = openvr.VRInput().getPoseActionDataForNextFrame(
-                    hand.action_pose,
-                    openvr.TrackingUniverseStanding,
-                    openvr.k_ulInvalidInputValueHandle,
-                )
-                if not pose_data.bActive:
-                    hand.show_controller = False
-                    continue
-                if not pose_data.pose.bPoseIsValid:
-                    hand.show_controller = False
-                    continue
-                hand.pose = convert_steam_vr_matrix(pose_data.pose.mDeviceToAbsoluteTracking)
-                origin_info = openvr.VRInput().getOriginTrackedDeviceInfo(
-                    pose_data.activeOrigin,
-                )
-                if origin_info.trackedDeviceIndex != openvr.k_unTrackedDeviceIndexInvalid:
-                    render_model_name = openvr.VRSystem().getStringTrackedDeviceProperty(
-                        origin_info.trackedDeviceIndex,
-                        openvr.Prop_RenderModelName_String
-                    )
-                    hand.render_model = self.find_or_load_render_model(render_model_name)
-                    hand.render_model_name = render_model_name
-            except Exception as exc:
+            pose_data = openvr.VRInput().getPoseActionDataForNextFrame(
+                hand.action_pose,
+                openvr.TrackingUniverseStanding,
+                openvr.k_ulInvalidInputValueHandle,
+            )
+            if not pose_data.bActive:
                 hand.show_controller = False
                 continue
+            if not pose_data.pose.bPoseIsValid:
+                hand.show_controller = False
+                continue
+            hand.pose = convert_steam_vr_matrix(pose_data.pose.mDeviceToAbsoluteTracking)
+            origin_info = openvr.VRInput().getOriginTrackedDeviceInfo(
+                pose_data.activeOrigin,
+            )
+            if origin_info.trackedDeviceIndex != openvr.k_unTrackedDeviceIndexInvalid:
+                render_model_name = openvr.VRSystem().getStringTrackedDeviceProperty(
+                    origin_info.trackedDeviceIndex,
+                    openvr.Prop_RenderModelName_String
+                )
+                hand.render_model = self.find_or_load_render_model(render_model_name)
+                hand.render_model_name = render_model_name
 
-    def key_callback(self, window, key, scancode, action, mods):
+    def key_callback(self, window, key, _scan_code, action, _mods):
         if action == glfw.PRESS:
             if key == glfw.KEY_ESCAPE:
                 glfw.set_window_should_close(window, True)
@@ -588,7 +575,7 @@ class CMainApplication(object):
             try:
                 openvr.VRCompositor().submit(openvr.Eye_Left, left_eye_texture)
                 openvr.VRCompositor().submit(openvr.Eye_Right, right_eye_texture)
-            except openvr.OpenVRError:
+            except openvr.CompositorError_DoNotHaveFocus:
                 pass  # First frame fails because waitGetPoses has not been called yet
 
         if (self.tracked_controller_count != self.tracked_controller_count_previous
@@ -599,7 +586,7 @@ class CMainApplication(object):
         self.update_hmd_pose()
 
     def render_stereo_targets(self):
-        GL.glClearColor(0, 0, 0.2, 1)
+        GL.glClearColor(0, 0, 0, 1)
         GL.glEnable(GL.GL_MULTISAMPLE)
         # Left Eye
         GL.glBindFramebuffer(GL.GL_FRAMEBUFFER, self.left_eye_desc.render_framebuffer_id)
@@ -668,7 +655,7 @@ class CMainApplication(object):
             self.handle_input()
             self.render_frame()
             glfw.swap_buffers(self.window)
-            GL.glClearColor(0, 0.2, 0, 1)
+            GL.glClearColor(0, 0, 0, 1)
             GL.glClear(GL.GL_COLOR_BUFFER_BIT | GL.GL_DEPTH_BUFFER_BIT)
             glfw.poll_events()
 
@@ -906,11 +893,8 @@ def get_digital_action_rising_edge(action, device_path=None):
     action_data = openvr.VRInput().getDigitalActionData(action, openvr.k_ulInvalidInputValueHandle)
     if device_path is not None:
         if action_data.bActive:
-            try:
-                origin_info = openvr.VRInput().getOriginTrackedDeviceInfo(action_data.activeOrigin)
-                device_path = origin_info.devicePath
-            except:
-                pass
+            origin_info = openvr.VRInput().getOriginTrackedDeviceInfo(action_data.activeOrigin)
+            device_path = origin_info.devicePath
     return action_data.bActive and action_data.bChanged and action_data.bState, device_path
 
 
@@ -921,11 +905,8 @@ def get_digital_action_falling_edge(action, device_path=None):
     action_data = openvr.VRInput().getDigitalActionData(action, openvr.k_ulInvalidInputValueHandle)
     if device_path is not None:
         if action_data.bActive:
-            try:
-                origin_info = openvr.VRInput().getOriginTrackedDeviceInfo(action_data.activeOrigin)
-                device_path = origin_info.devicePath
-            except:
-                pass
+            origin_info = openvr.VRInput().getOriginTrackedDeviceInfo(action_data.activeOrigin)
+            device_path = origin_info.devicePath
     return action_data.bActive and action_data.bChanged and not action_data.bState, device_path
 
 
@@ -936,11 +917,8 @@ def get_digital_action_state(action, device_path=None):
     action_data = openvr.VRInput().getDigitalActionData(action, openvr.k_ulInvalidInputValueHandle)
     if device_path is not None:
         if action_data.bActive:
-            try:
-                origin_info = openvr.VRInput().getOriginTrackedDeviceInfo(action_data.activeOrigin)
-                device_path = origin_info.devicePath
-            except:
-                pass
+            origin_info = openvr.VRInput().getOriginTrackedDeviceInfo(action_data.activeOrigin)
+            device_path = origin_info.devicePath
     return action_data.bActive and action_data.bState, device_path
 
 

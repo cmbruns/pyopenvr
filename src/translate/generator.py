@@ -1,5 +1,6 @@
 import inspect
 import pkg_resources
+import textwrap
 
 from translate.parser import Parser
 import translate.model as model
@@ -116,6 +117,83 @@ class CTypesGenerator(object):
                 print(declaration, file=file_out)
                 print('', file=file_out)
 
+        # Python exceptions for error codes
+        print('', file=file_out)
+        print(inspect.cleandoc('''
+            ############################################
+            # Python exceptions for openvr error codes #
+            ############################################
+
+
+            class OpenVRError(Exception):
+                """
+                OpenVRError is a custom exception type for when OpenVR functions return a failure code.
+                Such a specific exception type allows more precise exception handling that does just raising Exception().
+                """
+                pass
+            
+            
+            class ErrorCode(OpenVRError):
+                _error_index = dict()
+                is_error = True  # FooError_None classes should override this
+            
+                @classmethod
+                def check_error_value(cls, error_value, message=''):
+                    error_class = cls._error_index[int(error_value)]
+                    if not error_class.is_error:
+                        return
+                    raise error_class(message)
+        '''), file=file_out)
+        print('', file=file_out)
+        for declaration in declarations:
+            if not isinstance(declaration, model.EnumDecl):
+                continue
+            nm = declaration.name
+            if nm.startswith('EVR'):
+                nm = nm[3:]  # Strip 'EVR'
+            elif nm.startswith('EIO'):
+                nm = nm[1:]
+            else:
+                continue
+            if not nm.endswith('Error'):
+                continue
+            error_category = nm
+            # General error type category class
+            print(textwrap.dedent(f'''\
+                
+                class {error_category}(ErrorCode):
+                    _error_index = dict()
+            '''), file=file_out)
+            index = ''
+            for c in declaration.constants:
+                # particular error type class
+                error_name = c.name
+                if error_name.startswith('VR'):
+                    error_name = error_name[2:]
+                if error_name.startswith('IOBuffer_'):
+                    # Avoid conflict with enum name
+                    error_name = 'IOBufferError_' + error_name[9:]
+                index += f'{error_category}._error_index[{c.value}] = {error_name}\n'
+                is_error = True
+                if error_name.endswith('_None'):
+                    is_error = False
+                if error_name.endswith('_Success'):
+                    is_error = False
+                if is_error:
+                    print(textwrap.dedent(f'''\
+                        
+                        class {error_name}({error_category}):
+                            pass
+                    '''), file=file_out)
+                else:
+                    print(textwrap.dedent(f'''\
+                        
+                        class {error_name}({error_category}):
+                            is_error = False
+                    '''), file=file_out)
+            print('', file=file_out)
+            print(index, file=file_out)
+
         print('', file=file_out)
         print(inspect.cleandoc('''
             ###################
@@ -136,14 +214,6 @@ class CTypesGenerator(object):
             ##################
             # Expose classes #
             ##################
-            
-            
-            class OpenVRError(RuntimeError):
-                """
-                OpenVRError is a custom exception type for when OpenVR functions return a failure code.
-                Such a specific exception type allows more precise exception handling that does just raising Exception().
-                """
-                pass
             
             
             # Methods to include in all openvr vector classes

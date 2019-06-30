@@ -328,11 +328,16 @@ class Method(Declaration):
         else:
             body_string += f'fn({param_list2})\n'
         if self.raise_error_code():
+            error_category = self.type
+            assert error_category.endswith('Error')
+            if error_category.startswith('vr::EVR'):
+                error_category = error_category[7:]
+            elif error_category.startswith('vr::EIO'):
+                error_category = error_category[5:]
+            else:
+                assert False
+            post_call_statements += f'{error_category}.check_error_value(error_code)\n'
             message = f'{translate_type(self.type)}({{error_code}})'
-            post_call_statements += textwrap.dedent(f'''\
-                if error_code != 0:
-                    raise OpenVRError(f'{message}')
-            ''')
         body_string += post_call_statements
         if method_name == 'pollNextEvent':
             body_string += 'return result != 0\n'  # Custom return statement
@@ -344,8 +349,6 @@ class Method(Declaration):
         return method_string
 
     def raise_error_code(self):
-        if re.match(r'(?:vr::)?EVRRenderModelError$', self.type):
-            return False  # Need the non-zero error code in this case
         return re.match(r'(?:vr::)?E\S+Error$', self.type)
 
 
@@ -421,6 +424,12 @@ class Parameter(Declaration):
         if pt.is_const_qualified():
             return False
         if pt.kind == TypeKind.VOID:
+            return False
+        if pt.kind == TypeKind.POINTER:
+            return True  # pointer to pointer
+        if pt.spelling == 'vr::RenderModel_t':  # IVRRenderModels.freeRenderModel()
+            return False
+        if pt.spelling == 'vr::RenderModel_TextureMap_t':  # IVRRenderModels.freeTexture()
             return False
         return True
 
