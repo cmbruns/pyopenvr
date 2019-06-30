@@ -372,7 +372,7 @@ class CMainApplication(object):
     def get_hmd_matrix_projection_eye(self, eye):
         if not self.hmd:
             return numpy.identity(4, dtype=numpy.float32)
-        mat = self.hmd.getProjectionMatrix(eEye=eye, fNearZ=0.1, fFarZ=30.0)
+        mat = self.hmd.getProjectionMatrix(eye=eye, nearZ=0.1, farZ=30.0)
         mat = numpy.array((
             (mat[0][0], mat[1][0], mat[2][0], mat[3][0]),
             (mat[0][1], mat[1][1], mat[2][1], mat[3][1]),

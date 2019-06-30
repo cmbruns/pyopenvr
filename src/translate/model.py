@@ -204,14 +204,14 @@ class Function(Declaration):
                     return result
             '''
         else:
-            etype = translate_type(error_param.type.get_pointee().spelling)
+            e_type = translate_type(error_param.type.get_pointee().spelling)
             method_string = f'''
                 _openvr.{self.name}.restype = {restype}
                 _openvr.{self.name}.argtypes = [{arg_types}]
                 
                 
                 def {py_name}({args}):{docstring}
-                    {error_param.name} = {etype}()
+                    {error_param.name} = {e_type}()
                     result = _openvr.{self.name}({call_args})
                     _checkInitError({error_param.name}.value)
                     return result
@@ -303,10 +303,10 @@ class Method(Declaration):
                         call_params0.append(p2.call_param_name())
                 param_list = ', '.join(call_params0)
                 pre_call_statements += textwrap.dedent(f'''\
-                    {len_param.name} = fn({param_list})
-                    if {len_param.name} == 0:
+                    {len_param.py_name} = fn({param_list})
+                    if {len_param.py_name} == 0:
                         return b''
-                    {p.name} = ctypes.create_string_buffer({len_param.name})
+                    {p.py_name} = ctypes.create_string_buffer({len_param.py_name})
                 ''')
         param_list1 = ', '.join(in_params)
         # pythonically downcase first letter of method name
@@ -332,12 +332,11 @@ class Method(Declaration):
             assert error_category.endswith('Error')
             if error_category.startswith('vr::EVR'):
                 error_category = error_category[7:]
-            elif error_category.startswith('vr::EIO'):
+            elif error_category.startswith('vr::E'):
                 error_category = error_category[5:]
             else:
                 assert False
             post_call_statements += f'{error_category}.check_error_value(error_code)\n'
-            message = f'{translate_type(self.type)}({{error_code}})'
         body_string += post_call_statements
         if method_name == 'pollNextEvent':
             body_string += 'return result != 0\n'  # Custom return statement
@@ -354,18 +353,24 @@ class Method(Declaration):
 
 class Parameter(Declaration):
     def __init__(self, name, type_, default_value=None, docstring=None, annotation=None):
-        if name == 'type':
-            name = 'type_'
         super().__init__(name=name, docstring=docstring)
         self.type = type_
         self.always_value = None
         self.default_value = default_value
         self.annotation = annotation
         self.is_count = False
-        if self.is_input_string():
-            if self.name.startswith('pch'):
-                self.name = self.name[3:]
-                self.name = self.name[0].lower() + self.name[1:]
+        self.py_name = self.get_py_name(self.name)
+
+    @staticmethod
+    def get_py_name(c_name):
+        result = c_name
+        match = re.match(r'^[a-z]{1,5}([A-Z].*)$', result)
+        if match:  # strip initial hungarian prefix
+            n = match.group(1)
+            result = n[0].lower() + n[1:]  # convert first character to lower case
+        if result in ('bytes', 'from', 'property', 'type'):  # avoid python keywords
+            result += '_'
+        return result
 
     def is_array(self):
         if not self.annotation:
@@ -450,7 +455,7 @@ class Parameter(Declaration):
     def is_struct_size(self):
         if self.is_count:
             return False
-        if not self.type.kind in (TypeKind.TYPEDEF, ):
+        if self.type.kind not in (TypeKind.TYPEDEF, ):
             return False
         if self.name.startswith('unSizeOf'):
             return True
@@ -473,33 +478,27 @@ class Parameter(Declaration):
         if m:
             result = ''
             count_param = m.group(1)
+            count_param = self.get_py_name(count_param)
             element_t = translate_type(self.type.get_pointee().spelling)
             is_pose_array = False
-            if re.match(r'^unTrackedDevice.*Count$', count_param):
+            if re.match(r'^trackedDevice.*Count$', count_param):
                 is_pose_array = True
-            if re.match(r'^un\S+PoseArrayCount$', count_param):
+            if re.match(r'^\S+PoseArrayCount$', count_param):
                 is_pose_array = True
+            default_length = 1
             if is_pose_array:
-                result += textwrap.dedent(f'''\
-                    if {self.name} is None:
-                        {count_param} = 0
-                        {self.name}Arg = None
-                    elif isinstance({self.name}, ctypes.Array):
-                        {count_param} = len({self.name})
-                        {self.name}Arg = byref({self.name}[0])
-                    else:
-                        {count_param} = k_unMaxTrackedDeviceCount
-                        {self.name} = ({element_t} * {count_param})()
-                        {self.name}Arg = byref({self.name}[0])
-                    ''')
-            else:
-                result += textwrap.dedent(f'''\
-                if {self.name} is None:
+                default_length = 'k_unMaxTrackedDeviceCount'
+            result += textwrap.dedent(f'''\
+                if {self.py_name} is None:
                     {count_param} = 0
-                    {self.name}Arg = None
+                    {self.py_name}Arg = None
+                elif isinstance({self.py_name}, ctypes.Array):
+                    {count_param} = len({self.py_name})
+                    {self.py_name}Arg = byref({self.py_name}[0])
                 else:
-                    {count_param} = len({self.name})
-                    {self.name}Arg = byref({self.name}[0])
+                    {count_param} = {default_length}
+                    {self.py_name} = ({element_t} * {count_param})()
+                    {self.py_name}Arg = byref({self.py_name}[0])
                 ''')
             return result
         elif self.is_output_string():
@@ -507,26 +506,35 @@ class Parameter(Declaration):
         elif self.is_count:
             return ''
         elif self.always_value is not None:
-            return f'{self.name} = {self.always_value}\n'
+            return f'{self.py_name} = {self.always_value}\n'
         elif not self.is_input():
             t = translate_type(self.type.get_pointee().spelling)
-            return f'{self.name} = {t}()\n'
+            return f'{self.py_name} = {t}()\n'
         else:
             return ''
 
     def post_call_block(self):
         result = ''
         if self.is_error():
-            result += textwrap.dedent(f'''\
-                if {self.name}.value != 0:
-                    raise OpenVRError(str({self.name}))
-            ''')
+            assert self.type.kind == TypeKind.POINTER
+            pt = self.type.get_pointee()
+            error_category = pt.spelling
+            assert error_category.endswith('Error')
+            if error_category.startswith('vr::EVR'):
+                error_category = error_category[7:]
+            elif error_category.startswith('vr::E'):
+                error_category = error_category[5:]
+            else:
+                assert False
+            if error_category == 'TrackedPropertyError':  # avoid symbol conflict
+                error_category = 'TrackedProperty_Error'
+            result += f'{error_category}.check_error_value({self.py_name}.value)\n'
         if self.is_output() and self.type.kind == TypeKind.POINTER:
             pt = self.type.get_pointee()
             if pt.kind == TypeKind.POINTER:
                 pt2 = pt.get_pointee()
                 if pt2.spelling.endswith('_t'):
-                    n = self.name
+                    n = self.py_name
                     result += textwrap.dedent(f'''\
                         if {n}:
                             {n} = {n}.contents
@@ -538,7 +546,7 @@ class Parameter(Declaration):
     def input_param_name(self):
         if not self.is_input():
             return None
-        n = self.name
+        n = self.py_name
         if self.is_input_string():
             n = f'{n}: str'
         elif self.is_int():
@@ -551,32 +559,32 @@ class Parameter(Declaration):
 
     def call_param_name(self):
         if self.is_array():
-            return f'{self.name}Arg'
+            return f'{self.py_name}Arg'
         elif self.is_count:
-            return self.name
+            return self.py_name
         elif self.is_input_string():
-            return f"bytes({self.name}, encoding='utf-8')"
+            return f"bytes({self.py_name}, encoding='utf-8')"
         elif self.is_output_string():
-            return self.name
+            return self.py_name
         elif self.is_output():
-            return f'byref({self.name})'
+            return f'byref({self.py_name})'
         elif self.type.kind == TypeKind.POINTER:
             ptk = self.type.get_pointee().kind
             if ptk == TypeKind.CHAR_S:
-                return self.name
+                return self.py_name
             else:
-                return f'byref({self.name})'
+                return f'byref({self.py_name})'
         else:
-            return self.name
+            return self.py_name
 
     def return_param_name(self):
         if self.is_error():
             return None
         if self.is_output_string():
-            return f"bytes({self.name}.value).decode('utf-8')"
+            return f"bytes({self.py_name}.value).decode('utf-8')"
         if not self.is_output():
             return None
-        result = self.name
+        result = self.py_name
         pt0 = self.type.get_pointee()
         extract_value = False
         if pt0.kind == TypeKind.TYPEDEF and pt0.spelling.endswith('Handle_t'):

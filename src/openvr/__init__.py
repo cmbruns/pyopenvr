@@ -1484,6 +1484,113 @@ class ErrorCode(OpenVRError):
         raise error_class(message)
 
 
+class TrackedProperty_Error(ErrorCode):
+    _error_index = dict()
+
+
+class TrackedProperty_Success(TrackedProperty_Error):
+    is_error = False
+
+
+class TrackedProperty_WrongDataType(TrackedProperty_Error):
+    pass
+
+
+class TrackedProperty_WrongDeviceClass(TrackedProperty_Error):
+    pass
+
+
+class TrackedProperty_BufferTooSmall(TrackedProperty_Error):
+    pass
+
+
+class TrackedProperty_UnknownProperty(TrackedProperty_Error):
+    pass
+
+
+class TrackedProperty_InvalidDevice(TrackedProperty_Error):
+    pass
+
+
+class TrackedProperty_CouldNotContactServer(TrackedProperty_Error):
+    pass
+
+
+class TrackedProperty_ValueNotProvidedByDevice(TrackedProperty_Error):
+    pass
+
+
+class TrackedProperty_StringExceedsMaximumLength(TrackedProperty_Error):
+    pass
+
+
+class TrackedProperty_NotYetAvailable(TrackedProperty_Error):
+    pass
+
+
+class TrackedProperty_PermissionDenied(TrackedProperty_Error):
+    pass
+
+
+class TrackedProperty_InvalidOperation(TrackedProperty_Error):
+    pass
+
+
+class TrackedProperty_CannotWriteToWildcards(TrackedProperty_Error):
+    pass
+
+
+class TrackedProperty_IPCReadFailure(TrackedProperty_Error):
+    pass
+
+
+TrackedProperty_Error._error_index[0] = TrackedProperty_Success
+TrackedProperty_Error._error_index[1] = TrackedProperty_WrongDataType
+TrackedProperty_Error._error_index[2] = TrackedProperty_WrongDeviceClass
+TrackedProperty_Error._error_index[3] = TrackedProperty_BufferTooSmall
+TrackedProperty_Error._error_index[4] = TrackedProperty_UnknownProperty
+TrackedProperty_Error._error_index[5] = TrackedProperty_InvalidDevice
+TrackedProperty_Error._error_index[6] = TrackedProperty_CouldNotContactServer
+TrackedProperty_Error._error_index[7] = TrackedProperty_ValueNotProvidedByDevice
+TrackedProperty_Error._error_index[8] = TrackedProperty_StringExceedsMaximumLength
+TrackedProperty_Error._error_index[9] = TrackedProperty_NotYetAvailable
+TrackedProperty_Error._error_index[10] = TrackedProperty_PermissionDenied
+TrackedProperty_Error._error_index[11] = TrackedProperty_InvalidOperation
+TrackedProperty_Error._error_index[12] = TrackedProperty_CannotWriteToWildcards
+TrackedProperty_Error._error_index[13] = TrackedProperty_IPCReadFailure
+
+
+class HDCPError(ErrorCode):
+    _error_index = dict()
+
+
+class HDCP_Error_None(HDCPError):
+    is_error = False
+
+
+class HDCP_Error_LinkLost(HDCPError):
+    pass
+
+
+class HDCP_Error_Tampered(HDCPError):
+    pass
+
+
+class HDCP_Error_DeviceRevoked(HDCPError):
+    pass
+
+
+class HDCP_Error_Unknown(HDCPError):
+    pass
+
+
+HDCPError._error_index[0] = HDCP_Error_None
+HDCPError._error_index[1] = HDCP_Error_LinkLost
+HDCPError._error_index[2] = HDCP_Error_Tampered
+HDCPError._error_index[3] = HDCP_Error_DeviceRevoked
+HDCPError._error_index[4] = HDCP_Error_Unknown
+
+
 class InputError(ErrorCode):
     _error_index = dict()
 
@@ -4290,7 +4397,6 @@ def VRNotifications():
     return _internal_module_context.VRNotifications()
 
 
-
 class IVRSystem_FnTable(Structure):
     _fields_ = [
         ("getRecommendedRenderTargetSize", OPENVR_FNTABLE_CALLTYPE(None, POINTER(c_uint32), POINTER(c_uint32))),
@@ -4359,33 +4465,33 @@ class IVRSystem(object):
         """Suggested size for the intermediate render target that the distortion pulls from."""
 
         fn = self.function_table.getRecommendedRenderTargetSize
-        pnWidth = c_uint32()
-        pnHeight = c_uint32()
-        fn(byref(pnWidth), byref(pnHeight))
-        return pnWidth.value, pnHeight.value
+        width = c_uint32()
+        height = c_uint32()
+        fn(byref(width), byref(height))
+        return width.value, height.value
 
-    def getProjectionMatrix(self, eEye, fNearZ: float, fFarZ: float):
+    def getProjectionMatrix(self, eye, nearZ: float, farZ: float):
         """The projection matrix for the specified eye"""
 
         fn = self.function_table.getProjectionMatrix
-        result = fn(eEye, fNearZ, fFarZ)
+        result = fn(eye, nearZ, farZ)
         return result
 
-    def getProjectionRaw(self, eEye):
+    def getProjectionRaw(self, eye):
         """
         The components necessary to build your own projection matrix in case your
         application is doing something fancy like infinite Z
         """
 
         fn = self.function_table.getProjectionRaw
-        pfLeft = c_float()
-        pfRight = c_float()
-        pfTop = c_float()
-        pfBottom = c_float()
-        fn(eEye, byref(pfLeft), byref(pfRight), byref(pfTop), byref(pfBottom))
-        return pfLeft.value, pfRight.value, pfTop.value, pfBottom.value
+        left = c_float()
+        right = c_float()
+        top = c_float()
+        bottom = c_float()
+        fn(eye, byref(left), byref(right), byref(top), byref(bottom))
+        return left.value, right.value, top.value, bottom.value
 
-    def computeDistortion(self, eEye, fU: float, fV: float):
+    def computeDistortion(self, eye, u: float, v: float):
         """
         Gets the result of the distortion function for the specified eye and input UVs. UVs go from 0,0 in 
         the upper left of that eye's viewport and 1,1 in the lower right of that eye's viewport.
@@ -4393,11 +4499,11 @@ class IVRSystem(object):
         """
 
         fn = self.function_table.computeDistortion
-        pDistortionCoordinates = DistortionCoordinates_t()
-        result = fn(eEye, fU, fV, byref(pDistortionCoordinates))
-        return result, pDistortionCoordinates
+        distortionCoordinates = DistortionCoordinates_t()
+        result = fn(eye, u, v, byref(distortionCoordinates))
+        return result, distortionCoordinates
 
-    def getEyeToHeadTransform(self, eEye):
+    def getEyeToHeadTransform(self, eye):
         """
         Returns the transform from eye space to the head space. Eye space is the per-eye flavor of head
         space that provides stereo disparity. Instead of Model * View * Projection the sequence is Model * View * Eye^-1 * Projection. 
@@ -4405,7 +4511,7 @@ class IVRSystem(object):
         """
 
         fn = self.function_table.getEyeToHeadTransform
-        result = fn(eEye)
+        result = fn(eye)
         return result
 
     def getTimeSinceLastVsync(self):
@@ -4417,10 +4523,10 @@ class IVRSystem(object):
         """
 
         fn = self.function_table.getTimeSinceLastVsync
-        pfSecondsSinceLastVsync = c_float()
-        pulFrameCounter = c_uint64()
-        result = fn(byref(pfSecondsSinceLastVsync), byref(pulFrameCounter))
-        return result, pfSecondsSinceLastVsync.value, pulFrameCounter.value
+        secondsSinceLastVsync = c_float()
+        frameCounter = c_uint64()
+        result = fn(byref(secondsSinceLastVsync), byref(frameCounter))
+        return result, secondsSinceLastVsync.value, frameCounter.value
 
     def getD3D9AdapterIndex(self):
         """
@@ -4441,9 +4547,9 @@ class IVRSystem(object):
         """
 
         fn = self.function_table.getDXGIOutputInfo
-        pnAdapterIndex = c_int32()
-        fn(byref(pnAdapterIndex))
-        return pnAdapterIndex.value
+        adapterIndex = c_int32()
+        fn(byref(adapterIndex))
+        return adapterIndex.value
 
     def getOutputDevice(self, textureType):
         """
@@ -4470,10 +4576,10 @@ class IVRSystem(object):
         """
 
         fn = self.function_table.getOutputDevice
-        pnDevice = c_uint64()
-        pInstance = VkInstance_T()
-        fn(byref(pnDevice), textureType, byref(pInstance))
-        return pnDevice.value, pInstance
+        device = c_uint64()
+        instance = VkInstance_T()
+        fn(byref(device), textureType, byref(instance))
+        return device.value, instance
 
     def isDisplayOnDesktop(self):
         """Use to determine if the headset display is part of the desktop (i.e. extended) or hidden (i.e. direct mode)."""
@@ -4482,14 +4588,14 @@ class IVRSystem(object):
         result = fn()
         return result
 
-    def setDisplayVisibility(self, bIsVisibleOnDesktop):
+    def setDisplayVisibility(self, isVisibleOnDesktop):
         """Set the display visibility (true = extended, false = direct mode).  Return value of true indicates that the change was successful."""
 
         fn = self.function_table.setDisplayVisibility
-        result = fn(bIsVisibleOnDesktop)
+        result = fn(isVisibleOnDesktop)
         return result
 
-    def getDeviceToAbsoluteTrackingPose(self, eOrigin, fPredictedSecondsToPhotonsFromNow: float, pTrackedDevicePoseArray):
+    def getDeviceToAbsoluteTrackingPose(self, origin, predictedSecondsToPhotonsFromNow: float, trackedDevicePoseArray):
         """
         The pose that the tracker thinks that the HMD will be in at the specified number of seconds into the 
         future. Pass 0 to get the state at the instant the method is called. Most of the time the application should
@@ -4510,18 +4616,18 @@ class IVRSystem(object):
         """
 
         fn = self.function_table.getDeviceToAbsoluteTrackingPose
-        if pTrackedDevicePoseArray is None:
-            unTrackedDevicePoseArrayCount = 0
-            pTrackedDevicePoseArrayArg = None
-        elif isinstance(pTrackedDevicePoseArray, ctypes.Array):
-            unTrackedDevicePoseArrayCount = len(pTrackedDevicePoseArray)
-            pTrackedDevicePoseArrayArg = byref(pTrackedDevicePoseArray[0])
+        if trackedDevicePoseArray is None:
+            trackedDevicePoseArrayCount = 0
+            trackedDevicePoseArrayArg = None
+        elif isinstance(trackedDevicePoseArray, ctypes.Array):
+            trackedDevicePoseArrayCount = len(trackedDevicePoseArray)
+            trackedDevicePoseArrayArg = byref(trackedDevicePoseArray[0])
         else:
-            unTrackedDevicePoseArrayCount = k_unMaxTrackedDeviceCount
-            pTrackedDevicePoseArray = (TrackedDevicePose_t * unTrackedDevicePoseArrayCount)()
-            pTrackedDevicePoseArrayArg = byref(pTrackedDevicePoseArray[0])
-        fn(eOrigin, fPredictedSecondsToPhotonsFromNow, pTrackedDevicePoseArrayArg, unTrackedDevicePoseArrayCount)
-        return pTrackedDevicePoseArray
+            trackedDevicePoseArrayCount = k_unMaxTrackedDeviceCount
+            trackedDevicePoseArray = (TrackedDevicePose_t * trackedDevicePoseArrayCount)()
+            trackedDevicePoseArrayArg = byref(trackedDevicePoseArray[0])
+        fn(origin, predictedSecondsToPhotonsFromNow, trackedDevicePoseArrayArg, trackedDevicePoseArrayCount)
+        return trackedDevicePoseArray
 
     def resetSeatedZeroPose(self) -> None:
         """
@@ -4562,7 +4668,7 @@ class IVRSystem(object):
         result = fn()
         return result
 
-    def getSortedTrackedDeviceIndicesOfClass(self, eTrackedDeviceClass, punTrackedDeviceIndexArray, unRelativeToTrackedDeviceIndex=k_unTrackedDeviceIndex_Hmd):
+    def getSortedTrackedDeviceIndicesOfClass(self, trackedDeviceClass, trackedDeviceIndexArray, relativeToTrackedDeviceIndex=k_unTrackedDeviceIndex_Hmd):
         """
         Get a sorted array of device indices of a given class of tracked devices (e.g. controllers).  Devices are sorted right to left
         relative to the specified tracked device (default: hmd -- pass in -1 for absolute tracking space).  Returns the number of devices
@@ -4570,52 +4676,52 @@ class IVRSystem(object):
         """
 
         fn = self.function_table.getSortedTrackedDeviceIndicesOfClass
-        if punTrackedDeviceIndexArray is None:
-            unTrackedDeviceIndexArrayCount = 0
-            punTrackedDeviceIndexArrayArg = None
-        elif isinstance(punTrackedDeviceIndexArray, ctypes.Array):
-            unTrackedDeviceIndexArrayCount = len(punTrackedDeviceIndexArray)
-            punTrackedDeviceIndexArrayArg = byref(punTrackedDeviceIndexArray[0])
+        if trackedDeviceIndexArray is None:
+            trackedDeviceIndexArrayCount = 0
+            trackedDeviceIndexArrayArg = None
+        elif isinstance(trackedDeviceIndexArray, ctypes.Array):
+            trackedDeviceIndexArrayCount = len(trackedDeviceIndexArray)
+            trackedDeviceIndexArrayArg = byref(trackedDeviceIndexArray[0])
         else:
-            unTrackedDeviceIndexArrayCount = k_unMaxTrackedDeviceCount
-            punTrackedDeviceIndexArray = (TrackedDeviceIndex_t * unTrackedDeviceIndexArrayCount)()
-            punTrackedDeviceIndexArrayArg = byref(punTrackedDeviceIndexArray[0])
-        result = fn(eTrackedDeviceClass, punTrackedDeviceIndexArrayArg, unTrackedDeviceIndexArrayCount, unRelativeToTrackedDeviceIndex)
-        return result, punTrackedDeviceIndexArray
+            trackedDeviceIndexArrayCount = k_unMaxTrackedDeviceCount
+            trackedDeviceIndexArray = (TrackedDeviceIndex_t * trackedDeviceIndexArrayCount)()
+            trackedDeviceIndexArrayArg = byref(trackedDeviceIndexArray[0])
+        result = fn(trackedDeviceClass, trackedDeviceIndexArrayArg, trackedDeviceIndexArrayCount, relativeToTrackedDeviceIndex)
+        return result, trackedDeviceIndexArray
 
-    def getTrackedDeviceActivityLevel(self, unDeviceId):
+    def getTrackedDeviceActivityLevel(self, deviceId):
         """Returns the level of activity on the device."""
 
         fn = self.function_table.getTrackedDeviceActivityLevel
-        result = fn(unDeviceId)
+        result = fn(deviceId)
         return result
 
-    def applyTransform(self, pTrackedDevicePose, pTransform):
+    def applyTransform(self, trackedDevicePose, transform):
         """
         Convenience utility to apply the specified transform to the specified pose.
         This properly transforms all pose components, including velocity and angular velocity
         """
 
         fn = self.function_table.applyTransform
-        pOutputPose = TrackedDevicePose_t()
-        fn(byref(pOutputPose), byref(pTrackedDevicePose), byref(pTransform))
-        return pOutputPose
+        outputPose = TrackedDevicePose_t()
+        fn(byref(outputPose), byref(trackedDevicePose), byref(transform))
+        return outputPose
 
-    def getTrackedDeviceIndexForControllerRole(self, unDeviceType):
+    def getTrackedDeviceIndexForControllerRole(self, deviceType):
         """Returns the device index associated with a specific role, for example the left hand or the right hand. This function is deprecated in favor of the new IVRInput system."""
 
         fn = self.function_table.getTrackedDeviceIndexForControllerRole
-        result = fn(unDeviceType)
+        result = fn(deviceType)
         return result
 
-    def getControllerRoleForTrackedDeviceIndex(self, unDeviceIndex):
+    def getControllerRoleForTrackedDeviceIndex(self, deviceIndex):
         """Returns the controller type associated with a device index. This function is deprecated in favor of the new IVRInput system."""
 
         fn = self.function_table.getControllerRoleForTrackedDeviceIndex
-        result = fn(unDeviceIndex)
+        result = fn(deviceIndex)
         return result
 
-    def getTrackedDeviceClass(self, unDeviceIndex):
+    def getTrackedDeviceClass(self, deviceIndex):
         """
         Returns the device class of a tracked device. If there has not been a device connected in this slot
         since the application started this function will return TrackedDevice_Invalid. For previous detected
@@ -4627,67 +4733,62 @@ class IVRSystem(object):
         """
 
         fn = self.function_table.getTrackedDeviceClass
-        result = fn(unDeviceIndex)
+        result = fn(deviceIndex)
         return result
 
-    def isTrackedDeviceConnected(self, unDeviceIndex):
+    def isTrackedDeviceConnected(self, deviceIndex):
         """Returns true if there is a device connected in this slot."""
 
         fn = self.function_table.isTrackedDeviceConnected
-        result = fn(unDeviceIndex)
+        result = fn(deviceIndex)
         return result
 
-    def getBoolTrackedDeviceProperty(self, unDeviceIndex, prop):
+    def getBoolTrackedDeviceProperty(self, deviceIndex, prop):
         """Returns a bool property. If the device index is not valid or the property is not a bool type this function will return false."""
 
         fn = self.function_table.getBoolTrackedDeviceProperty
-        pError = ETrackedPropertyError()
-        result = fn(unDeviceIndex, prop, byref(pError))
-        if pError.value != 0:
-            raise OpenVRError(str(pError))
+        error = ETrackedPropertyError()
+        result = fn(deviceIndex, prop, byref(error))
+        TrackedProperty_Error.check_error_value(error.value)
         return result
 
-    def getFloatTrackedDeviceProperty(self, unDeviceIndex, prop):
+    def getFloatTrackedDeviceProperty(self, deviceIndex, prop):
         """Returns a float property. If the device index is not valid or the property is not a float type this function will return 0."""
 
         fn = self.function_table.getFloatTrackedDeviceProperty
-        pError = ETrackedPropertyError()
-        result = fn(unDeviceIndex, prop, byref(pError))
-        if pError.value != 0:
-            raise OpenVRError(str(pError))
+        error = ETrackedPropertyError()
+        result = fn(deviceIndex, prop, byref(error))
+        TrackedProperty_Error.check_error_value(error.value)
         return result
 
-    def getInt32TrackedDeviceProperty(self, unDeviceIndex, prop):
+    def getInt32TrackedDeviceProperty(self, deviceIndex, prop):
         """Returns an int property. If the device index is not valid or the property is not a int type this function will return 0."""
 
         fn = self.function_table.getInt32TrackedDeviceProperty
-        pError = ETrackedPropertyError()
-        result = fn(unDeviceIndex, prop, byref(pError))
-        if pError.value != 0:
-            raise OpenVRError(str(pError))
+        error = ETrackedPropertyError()
+        result = fn(deviceIndex, prop, byref(error))
+        TrackedProperty_Error.check_error_value(error.value)
         return result
 
-    def getUint64TrackedDeviceProperty(self, unDeviceIndex, prop):
+    def getUint64TrackedDeviceProperty(self, deviceIndex, prop):
         """Returns a uint64 property. If the device index is not valid or the property is not a uint64 type this function will return 0."""
 
         fn = self.function_table.getUint64TrackedDeviceProperty
-        pError = ETrackedPropertyError()
-        result = fn(unDeviceIndex, prop, byref(pError))
-        if pError.value != 0:
-            raise OpenVRError(str(pError))
+        error = ETrackedPropertyError()
+        result = fn(deviceIndex, prop, byref(error))
+        TrackedProperty_Error.check_error_value(error.value)
         return result
 
-    def getMatrix34TrackedDeviceProperty(self, unDeviceIndex, prop):
+    def getMatrix34TrackedDeviceProperty(self, deviceIndex, prop):
         """Returns a matrix property. If the device index is not valid or the property is not a matrix type, this function will return identity."""
 
         fn = self.function_table.getMatrix34TrackedDeviceProperty
-        pError = ETrackedPropertyError()
-        result = fn(unDeviceIndex, prop, byref(pError))
-        if pError.value != 0:
-            raise OpenVRError(str(pError))
+        error = ETrackedPropertyError()
+        result = fn(deviceIndex, prop, byref(error))
+        TrackedProperty_Error.check_error_value(error.value)
         return result
 
-    def getArrayTrackedDeviceProperty(self, unDeviceIndex, prop, propType, pBuffer, unBufferSize):
+    def getArrayTrackedDeviceProperty(self, deviceIndex, prop, type_, buffer, bufferSize):
         """
         Returns an array of one type of property. If the device index is not valid or the property is not a single value or an array of the specified type,
         this function will return 0. Otherwise it returns the number of bytes necessary to hold the array of properties. If unBufferSize is
@@ -4695,13 +4796,12 @@ class IVRSystem(object):
         """
 
         fn = self.function_table.getArrayTrackedDeviceProperty
-        pError = ETrackedPropertyError()
-        result = fn(unDeviceIndex, prop, propType, byref(pBuffer), unBufferSize, byref(pError))
-        if pError.value != 0:
-            raise OpenVRError(str(pError))
+        error = ETrackedPropertyError()
+        result = fn(deviceIndex, prop, type_, byref(buffer), bufferSize, byref(error))
+        TrackedProperty_Error.check_error_value(error.value)
         return result
 
-    def getStringTrackedDeviceProperty(self, unDeviceIndex, prop):
+    def getStringTrackedDeviceProperty(self, deviceIndex, prop):
         """
         Returns a string property. If the device index is not valid or the property is not a string type this function will 
         return 0. Otherwise it returns the length of the number of bytes necessary to hold this string including the trailing
@@ -4709,15 +4809,14 @@ class IVRSystem(object):
         """
 
         fn = self.function_table.getStringTrackedDeviceProperty
-        pError = ETrackedPropertyError()
-        unBufferSize = fn(unDeviceIndex, prop, None, 0, byref(pError))
-        if unBufferSize == 0:
+        error = ETrackedPropertyError()
+        bufferSize = fn(deviceIndex, prop, None, 0, byref(error))
+        if bufferSize == 0:
             return b''
-        pchValue = ctypes.create_string_buffer(unBufferSize)
-        fn(unDeviceIndex, prop, pchValue, unBufferSize, byref(pError))
-        if pError.value != 0:
-            raise OpenVRError(str(pError))
-        return bytes(pchValue.value).decode('utf-8')
+        value = ctypes.create_string_buffer(bufferSize)
+        fn(deviceIndex, prop, value, bufferSize, byref(error))
+        TrackedProperty_Error.check_error_value(error.value)
+        return bytes(value.value).decode('utf-8')
 
     def getPropErrorNameFromEnum(self, error):
         """
@@ -4729,18 +4828,18 @@ class IVRSystem(object):
         result = fn(error)
         return result
 
-    def pollNextEvent(self, pEvent):
+    def pollNextEvent(self, event):
         """
         Returns true and fills the event with the next event on the queue if there is one. If there are no events
         this method returns false. uncbVREvent should be the size in bytes of the VREvent_t struct
         """
 
         fn = self.function_table.pollNextEvent
-        uncbVREvent = sizeof(VREvent_t)
-        result = fn(byref(pEvent), uncbVREvent)
+        vREvent = sizeof(VREvent_t)
+        result = fn(byref(event), vREvent)
         return result != 0
 
-    def pollNextEventWithPose(self, eOrigin, pEvent):
+    def pollNextEventWithPose(self, origin, event):
         """
         Returns true and fills the event with the next event on the queue if there is one. If there are no events
           this method returns false. Fills in the pose of the associated tracked device in the provided pose struct. 
@@ -4749,19 +4848,19 @@ class IVRSystem(object):
         """
 
         fn = self.function_table.pollNextEventWithPose
-        uncbVREvent = sizeof(VREvent_t)
-        pTrackedDevicePose = TrackedDevicePose_t()
-        result = fn(eOrigin, byref(pEvent), uncbVREvent, byref(pTrackedDevicePose))
-        return result, pEvent, pTrackedDevicePose
+        vREvent = sizeof(VREvent_t)
+        trackedDevicePose = TrackedDevicePose_t()
+        result = fn(origin, byref(event), vREvent, byref(trackedDevicePose))
+        return result, event, trackedDevicePose
 
-    def getEventTypeNameFromEnum(self, eType):
+    def getEventTypeNameFromEnum(self, type_):
         """returns the name of an EVREvent enum value"""
 
         fn = self.function_table.getEventTypeNameFromEnum
-        result = fn(eType)
+        result = fn(type_)
         return result
 
-    def getHiddenAreaMesh(self, eEye, type_=k_eHiddenAreaMesh_Standard):
+    def getHiddenAreaMesh(self, eye, type_=k_eHiddenAreaMesh_Standard):
         """
         Returns the hidden area mesh for the current HMD. The pixels covered by this mesh will never be seen by the user after the lens distortion is
         applied based on visibility to the panels. If this HMD does not have a hidden area mesh, the vertex data and count will be NULL and 0 respectively.
@@ -4773,22 +4872,22 @@ class IVRSystem(object):
         """
 
         fn = self.function_table.getHiddenAreaMesh
-        result = fn(eEye, type_)
+        result = fn(eye, type_)
         return result
 
-    def getControllerState(self, unControllerDeviceIndex):
+    def getControllerState(self, controllerDeviceIndex):
         """
         Fills the supplied struct with the current state of the controller. Returns false if the controller index
         is invalid. This function is deprecated in favor of the new IVRInput system.
         """
 
         fn = self.function_table.getControllerState
-        pControllerState = VRControllerState_t()
-        unControllerStateSize = sizeof(VRControllerState_t)
-        result = fn(unControllerDeviceIndex, byref(pControllerState), unControllerStateSize)
-        return result, pControllerState
+        controllerState = VRControllerState_t()
+        controllerStateSize = sizeof(VRControllerState_t)
+        result = fn(controllerDeviceIndex, byref(controllerState), controllerStateSize)
+        return result, controllerState
 
-    def getControllerStateWithPose(self, eOrigin, unControllerDeviceIndex):
+    def getControllerStateWithPose(self, origin, controllerDeviceIndex):
         """
         fills the supplied struct with the current state of the controller and the provided pose with the pose of 
         the controller when the controller state was updated most recently. Use this form if you need a precise controller
@@ -4796,33 +4895,33 @@ class IVRSystem(object):
         """
 
         fn = self.function_table.getControllerStateWithPose
-        pControllerState = VRControllerState_t()
-        unControllerStateSize = sizeof(VRControllerState_t)
-        pTrackedDevicePose = TrackedDevicePose_t()
-        result = fn(eOrigin, unControllerDeviceIndex, byref(pControllerState), unControllerStateSize, byref(pTrackedDevicePose))
-        return result, pControllerState, pTrackedDevicePose
+        controllerState = VRControllerState_t()
+        controllerStateSize = sizeof(VRControllerState_t)
+        trackedDevicePose = TrackedDevicePose_t()
+        result = fn(origin, controllerDeviceIndex, byref(controllerState), controllerStateSize, byref(trackedDevicePose))
+        return result, controllerState, trackedDevicePose
 
-    def triggerHapticPulse(self, unControllerDeviceIndex, unAxisId, usDurationMicroSec: int) -> None:
+    def triggerHapticPulse(self, controllerDeviceIndex, axisId, durationMicroSec: int) -> None:
         """
         Trigger a single haptic pulse on a controller. After this call the application may not trigger another haptic pulse on this controller
         and axis combination for 5ms. This function is deprecated in favor of the new IVRInput system.
         """
 
         fn = self.function_table.triggerHapticPulse
-        fn(unControllerDeviceIndex, unAxisId, usDurationMicroSec)
+        fn(controllerDeviceIndex, axisId, durationMicroSec)
 
-    def getButtonIdNameFromEnum(self, eButtonId):
+    def getButtonIdNameFromEnum(self, buttonId):
         """returns the name of an EVRButtonId enum value. This function is deprecated in favor of the new IVRInput system."""
 
         fn = self.function_table.getButtonIdNameFromEnum
-        result = fn(eButtonId)
+        result = fn(buttonId)
         return result
 
-    def getControllerAxisTypeNameFromEnum(self, eAxisType):
+    def getControllerAxisTypeNameFromEnum(self, axisType):
         """returns the name of an EVRControllerAxisType enum value. This function is deprecated in favor of the new IVRInput system."""
 
         fn = self.function_table.getControllerAxisTypeNameFromEnum
-        result = fn(eAxisType)
+        result = fn(axisType)
         return result
 
     def isInputAvailable(self):
@@ -4865,7 +4964,7 @@ class IVRSystem(object):
         result = fn()
         return result
 
-    def driverDebugRequest(self, unDeviceIndex, request: str):
+    def driverDebugRequest(self, deviceIndex, request: str):
         """
         Sends a request to the driver for the specified device and returns the response. The maximum response size is 32k,
         but this method can be called with a smaller buffer. If the response exceeds the size of the buffer, it is truncated. 
@@ -4873,14 +4972,14 @@ class IVRSystem(object):
         """
 
         fn = self.function_table.driverDebugRequest
-        unResponseBufferSize = fn(unDeviceIndex, bytes(request, encoding='utf-8'), None, 0)
-        if unResponseBufferSize == 0:
+        responseBufferSize = fn(deviceIndex, bytes(request, encoding='utf-8'), None, 0)
+        if responseBufferSize == 0:
             return b''
-        pchResponseBuffer = ctypes.create_string_buffer(unResponseBufferSize)
-        fn(unDeviceIndex, bytes(request, encoding='utf-8'), pchResponseBuffer, unResponseBufferSize)
-        return bytes(pchResponseBuffer.value).decode('utf-8')
+        responseBuffer = ctypes.create_string_buffer(responseBufferSize)
+        fn(deviceIndex, bytes(request, encoding='utf-8'), responseBuffer, responseBufferSize)
+        return bytes(responseBuffer.value).decode('utf-8')
 
-    def performFirmwareUpdate(self, unDeviceIndex) -> None:
+    def performFirmwareUpdate(self, deviceIndex) -> None:
         """
         Performs the actual firmware update if applicable. 
         The following events will be sent, if VRFirmwareError_None was returned: VREvent_FirmwareUpdateStarted, VREvent_FirmwareUpdateFinished 
@@ -4890,7 +4989,7 @@ class IVRSystem(object):
         """
 
         fn = self.function_table.performFirmwareUpdate
-        error_code = fn(unDeviceIndex)
+        error_code = fn(deviceIndex)
         FirmwareError.check_error_value(error_code)
 
     def acknowledgeQuit_Exiting(self) -> None:
@@ -4961,14 +5060,14 @@ class IVRApplications(object):
             raise OpenVRError("Error retrieving VR API for IVRApplications")
         self.function_table = fn_table_ptr.contents
 
-    def addApplicationManifest(self, applicationManifestFullPath: str, bTemporary=False) -> None:
+    def addApplicationManifest(self, applicationManifestFullPath: str, temporary=False) -> None:
         """
         Adds an application manifest to the list to load when building the list of installed applications. 
         Temporary manifests are not automatically loaded
         """
 
         fn = self.function_table.addApplicationManifest
-        error_code = fn(bytes(applicationManifestFullPath, encoding='utf-8'), bTemporary)
+        error_code = fn(bytes(applicationManifestFullPath, encoding='utf-8'), temporary)
         ApplicationError.check_error_value(error_code)
 
     def removeApplicationManifest(self, applicationManifestFullPath: str) -> None:
@@ -4992,7 +5091,7 @@ class IVRApplications(object):
         result = fn()
         return result
 
-    def getApplicationKeyByIndex(self, unApplicationIndex):
+    def getApplicationKeyByIndex(self, applicationIndex):
         """
         Returns the key of the specified application. The index is at least 0 and is less than the return 
         value of GetApplicationCount(). The buffer should be at least k_unMaxApplicationKeyLength in order to 
@@ -5000,28 +5099,28 @@ class IVRApplications(object):
         """
 
         fn = self.function_table.getApplicationKeyByIndex
-        unAppKeyBufferLen = fn(unApplicationIndex, None, 0)
-        if unAppKeyBufferLen == 0:
+        appKeyBufferLen = fn(applicationIndex, None, 0)
+        if appKeyBufferLen == 0:
             return b''
-        pchAppKeyBuffer = ctypes.create_string_buffer(unAppKeyBufferLen)
-        error_code = fn(unApplicationIndex, pchAppKeyBuffer, unAppKeyBufferLen)
+        appKeyBuffer = ctypes.create_string_buffer(appKeyBufferLen)
+        error_code = fn(applicationIndex, appKeyBuffer, appKeyBufferLen)
         ApplicationError.check_error_value(error_code)
-        return bytes(pchAppKeyBuffer.value).decode('utf-8')
+        return bytes(appKeyBuffer.value).decode('utf-8')
 
-    def getApplicationKeyByProcessId(self, unProcessId):
+    def getApplicationKeyByProcessId(self, processId):
         """
         Returns the key of the application for the specified Process Id. The buffer should be at least 
         k_unMaxApplicationKeyLength in order to fit the key.
         """
 
         fn = self.function_table.getApplicationKeyByProcessId
-        unAppKeyBufferLen = fn(unProcessId, None, 0)
-        if unAppKeyBufferLen == 0:
+        appKeyBufferLen = fn(processId, None, 0)
+        if appKeyBufferLen == 0:
             return b''
-        pchAppKeyBuffer = ctypes.create_string_buffer(unAppKeyBufferLen)
-        error_code = fn(unProcessId, pchAppKeyBuffer, unAppKeyBufferLen)
+        appKeyBuffer = ctypes.create_string_buffer(appKeyBufferLen)
+        error_code = fn(processId, appKeyBuffer, appKeyBufferLen)
         ApplicationError.check_error_value(error_code)
-        return bytes(pchAppKeyBuffer.value).decode('utf-8')
+        return bytes(appKeyBuffer.value).decode('utf-8')
 
     def launchApplication(self, appKey: str) -> None:
         """
@@ -5033,20 +5132,24 @@ class IVRApplications(object):
         error_code = fn(bytes(appKey, encoding='utf-8'))
         ApplicationError.check_error_value(error_code)
 
-    def launchTemplateApplication(self, templateAppKey: str, newAppKey: str, pKeys) -> None:
+    def launchTemplateApplication(self, templateAppKey: str, newAppKey: str, keys) -> None:
         """
         Launches an instance of an application of type template, with its app key being pchNewAppKey (which must be unique) and optionally override sections
         from the manifest file via AppOverrideKeys_t
         """
 
         fn = self.function_table.launchTemplateApplication
-        if pKeys is None:
-            unKeys = 0
-            pKeysArg = None
+        if keys is None:
+            keys = 0
+            keysArg = None
+        elif isinstance(keys, ctypes.Array):
+            keys = len(keys)
+            keysArg = byref(keys[0])
         else:
-            unKeys = len(pKeys)
-            pKeysArg = byref(pKeys[0])
-        error_code = fn(bytes(templateAppKey, encoding='utf-8'), bytes(newAppKey, encoding='utf-8'), pKeysArg, unKeys)
+            keys = 1
+            keys = (AppOverrideKeys_t * keys)()
+            keysArg = byref(keys[0])
+        error_code = fn(bytes(templateAppKey, encoding='utf-8'), bytes(newAppKey, encoding='utf-8'), keysArg, keys)
         ApplicationError.check_error_value(error_code)
 
     def launchApplicationFromMimeType(self, mimeType: str, args: str) -> None:
@@ -5073,7 +5176,7 @@ class IVRApplications(object):
         result = fn(bytes(appKey, encoding='utf-8'))
         return result
 
-    def identifyApplication(self, unProcessId, appKey: str) -> None:
+    def identifyApplication(self, processId, appKey: str) -> None:
         """
         Identifies a running application. OpenVR can't always tell which process started in response
         to a URL. This function allows a URL handler (or the process itself) to identify the app key 
@@ -5082,7 +5185,7 @@ class IVRApplications(object):
         """
 
         fn = self.function_table.identifyApplication
-        error_code = fn(unProcessId, bytes(appKey, encoding='utf-8'))
+        error_code = fn(processId, bytes(appKey, encoding='utf-8'))
         ApplicationError.check_error_value(error_code)
 
     def getApplicationProcessId(self, appKey: str):
@@ -5099,45 +5202,42 @@ class IVRApplications(object):
         result = fn(error)
         return result
 
-    def getApplicationPropertyString(self, appKey: str, eProperty):
+    def getApplicationPropertyString(self, appKey: str, property_):
         """Returns a value for an application property. The required buffer size to fit this value will be returned."""
 
         fn = self.function_table.getApplicationPropertyString
-        peError = EVRApplicationError()
-        unPropertyValueBufferLen = fn(bytes(appKey, encoding='utf-8'), eProperty, None, 0, byref(peError))
-        if unPropertyValueBufferLen == 0:
+        error = EVRApplicationError()
+        propertyValueBufferLen = fn(bytes(appKey, encoding='utf-8'), property_, None, 0, byref(error))
+        if propertyValueBufferLen == 0:
             return b''
-        pchPropertyValueBuffer = ctypes.create_string_buffer(unPropertyValueBufferLen)
-        fn(bytes(appKey, encoding='utf-8'), eProperty, pchPropertyValueBuffer, unPropertyValueBufferLen, byref(peError))
-        if peError.value != 0:
-            raise OpenVRError(str(peError))
-        return bytes(pchPropertyValueBuffer.value).decode('utf-8')
+        propertyValueBuffer = ctypes.create_string_buffer(propertyValueBufferLen)
+        fn(bytes(appKey, encoding='utf-8'), property_, propertyValueBuffer, propertyValueBufferLen, byref(error))
+        ApplicationError.check_error_value(error.value)
+        return bytes(propertyValueBuffer.value).decode('utf-8')
 
-    def getApplicationPropertyBool(self, appKey: str, eProperty):
+    def getApplicationPropertyBool(self, appKey: str, property_):
         """Returns a bool value for an application property. Returns false in all error cases."""
 
         fn = self.function_table.getApplicationPropertyBool
-        peError = EVRApplicationError()
-        result = fn(bytes(appKey, encoding='utf-8'), eProperty, byref(peError))
-        if peError.value != 0:
-            raise OpenVRError(str(peError))
+        error = EVRApplicationError()
+        result = fn(bytes(appKey, encoding='utf-8'), property_, byref(error))
+        ApplicationError.check_error_value(error.value)
         return result
 
-    def getApplicationPropertyUint64(self, appKey: str, eProperty):
+    def getApplicationPropertyUint64(self, appKey: str, property_):
         """Returns a uint64 value for an application property. Returns 0 in all error cases."""
 
         fn = self.function_table.getApplicationPropertyUint64
-        peError = EVRApplicationError()
-        result = fn(bytes(appKey, encoding='utf-8'), eProperty, byref(peError))
-        if peError.value != 0:
-            raise OpenVRError(str(peError))
+        error = EVRApplicationError()
+        result = fn(bytes(appKey, encoding='utf-8'), property_, byref(error))
+        ApplicationError.check_error_value(error.value)
         return result
 
-    def setApplicationAutoLaunch(self, appKey: str, bAutoLaunch) -> None:
+    def setApplicationAutoLaunch(self, appKey: str, autoLaunch) -> None:
         """Sets the application auto-launch flag. This is only valid for applications which return true for VRApplicationProperty_IsDashboardOverlay_Bool."""
 
         fn = self.function_table.setApplicationAutoLaunch
-        error_code = fn(bytes(appKey, encoding='utf-8'), bAutoLaunch)
+        error_code = fn(bytes(appKey, encoding='utf-8'), autoLaunch)
         ApplicationError.check_error_value(error_code)
 
     def getApplicationAutoLaunch(self, appKey: str):
@@ -5158,57 +5258,57 @@ class IVRApplications(object):
         """return the app key that will open this mime type"""
 
         fn = self.function_table.getDefaultApplicationForMimeType
-        unAppKeyBufferLen = fn(bytes(mimeType, encoding='utf-8'), None, 0)
-        if unAppKeyBufferLen == 0:
+        appKeyBufferLen = fn(bytes(mimeType, encoding='utf-8'), None, 0)
+        if appKeyBufferLen == 0:
             return b''
-        pchAppKeyBuffer = ctypes.create_string_buffer(unAppKeyBufferLen)
-        fn(bytes(mimeType, encoding='utf-8'), pchAppKeyBuffer, unAppKeyBufferLen)
-        return bytes(pchAppKeyBuffer.value).decode('utf-8')
+        appKeyBuffer = ctypes.create_string_buffer(appKeyBufferLen)
+        fn(bytes(mimeType, encoding='utf-8'), appKeyBuffer, appKeyBufferLen)
+        return bytes(appKeyBuffer.value).decode('utf-8')
 
     def getApplicationSupportedMimeTypes(self, appKey: str):
         """Get the list of supported mime types for this application, comma-delimited"""
 
         fn = self.function_table.getApplicationSupportedMimeTypes
-        unMimeTypesBuffer = fn(bytes(appKey, encoding='utf-8'), None, 0)
-        if unMimeTypesBuffer == 0:
+        mimeTypesBuffer = fn(bytes(appKey, encoding='utf-8'), None, 0)
+        if mimeTypesBuffer == 0:
             return b''
-        pchMimeTypesBuffer = ctypes.create_string_buffer(unMimeTypesBuffer)
-        fn(bytes(appKey, encoding='utf-8'), pchMimeTypesBuffer, unMimeTypesBuffer)
-        return bytes(pchMimeTypesBuffer.value).decode('utf-8')
+        mimeTypesBuffer = ctypes.create_string_buffer(mimeTypesBuffer)
+        fn(bytes(appKey, encoding='utf-8'), mimeTypesBuffer, mimeTypesBuffer)
+        return bytes(mimeTypesBuffer.value).decode('utf-8')
 
     def getApplicationsThatSupportMimeType(self, mimeType: str):
         """Get the list of app-keys that support this mime type, comma-delimited, the return value is number of bytes you need to return the full string"""
 
         fn = self.function_table.getApplicationsThatSupportMimeType
-        unAppKeysThatSupportBuffer = fn(bytes(mimeType, encoding='utf-8'), None, 0)
-        if unAppKeysThatSupportBuffer == 0:
+        appKeysThatSupportBuffer = fn(bytes(mimeType, encoding='utf-8'), None, 0)
+        if appKeysThatSupportBuffer == 0:
             return b''
-        pchAppKeysThatSupportBuffer = ctypes.create_string_buffer(unAppKeysThatSupportBuffer)
-        fn(bytes(mimeType, encoding='utf-8'), pchAppKeysThatSupportBuffer, unAppKeysThatSupportBuffer)
-        return bytes(pchAppKeysThatSupportBuffer.value).decode('utf-8')
+        appKeysThatSupportBuffer = ctypes.create_string_buffer(appKeysThatSupportBuffer)
+        fn(bytes(mimeType, encoding='utf-8'), appKeysThatSupportBuffer, appKeysThatSupportBuffer)
+        return bytes(appKeysThatSupportBuffer.value).decode('utf-8')
 
-    def getApplicationLaunchArguments(self, unHandle):
+    def getApplicationLaunchArguments(self, handle):
         """Get the args list from an app launch that had the process already running, you call this when you get a VREvent_ApplicationMimeTypeLoad"""
 
         fn = self.function_table.getApplicationLaunchArguments
-        unArgs = fn(unHandle, None, 0)
-        if unArgs == 0:
+        args = fn(handle, None, 0)
+        if args == 0:
             return b''
-        pchArgs = ctypes.create_string_buffer(unArgs)
-        fn(unHandle, pchArgs, unArgs)
-        return bytes(pchArgs.value).decode('utf-8')
+        args = ctypes.create_string_buffer(args)
+        fn(handle, args, args)
+        return bytes(args.value).decode('utf-8')
 
     def getStartingApplication(self):
         """Returns the app key for the application that is starting up"""
 
         fn = self.function_table.getStartingApplication
-        unAppKeyBufferLen = fn(None, 0)
-        if unAppKeyBufferLen == 0:
+        appKeyBufferLen = fn(None, 0)
+        if appKeyBufferLen == 0:
             return b''
-        pchAppKeyBuffer = ctypes.create_string_buffer(unAppKeyBufferLen)
-        error_code = fn(pchAppKeyBuffer, unAppKeyBufferLen)
+        appKeyBuffer = ctypes.create_string_buffer(appKeyBufferLen)
+        error_code = fn(appKeyBuffer, appKeyBufferLen)
         ApplicationError.check_error_value(error_code)
-        return bytes(pchAppKeyBuffer.value).decode('utf-8')
+        return bytes(appKeyBuffer.value).decode('utf-8')
 
     def getTransitionState(self):
         """Returns the application transition state"""
@@ -5301,48 +5401,43 @@ class IVRSettings(object):
             raise OpenVRError("Error retrieving VR API for IVRSettings")
         self.function_table = fn_table_ptr.contents
 
-    def getSettingsErrorNameFromEnum(self, eError):
+    def getSettingsErrorNameFromEnum(self, error):
         fn = self.function_table.getSettingsErrorNameFromEnum
-        result = fn(eError)
+        result = fn(error)
         return result
 
-    def sync(self, bForce=False):
+    def sync(self, force=False):
         """Returns true if file sync occurred (force or settings dirty)"""
 
         fn = self.function_table.sync
-        peError = EVRSettingsError()
-        result = fn(bForce, byref(peError))
-        if peError.value != 0:
-            raise OpenVRError(str(peError))
+        error = EVRSettingsError()
+        result = fn(force, byref(error))
+        SettingsError.check_error_value(error.value)
         return result
 
-    def setBool(self, section: str, settingsKey: str, bValue) -> None:
+    def setBool(self, section: str, settingsKey: str, value) -> None:
         fn = self.function_table.setBool
-        peError = EVRSettingsError()
-        fn(bytes(section, encoding='utf-8'), bytes(settingsKey, encoding='utf-8'), bValue, byref(peError))
-        if peError.value != 0:
-            raise OpenVRError(str(peError))
+        error = EVRSettingsError()
+        fn(bytes(section, encoding='utf-8'), bytes(settingsKey, encoding='utf-8'), value, byref(error))
+        SettingsError.check_error_value(error.value)
 
-    def setInt32(self, section: str, settingsKey: str, nValue) -> None:
+    def setInt32(self, section: str, settingsKey: str, value) -> None:
         fn = self.function_table.setInt32
-        peError = EVRSettingsError()
-        fn(bytes(section, encoding='utf-8'), bytes(settingsKey, encoding='utf-8'), nValue, byref(peError))
-        if peError.value != 0:
-            raise OpenVRError(str(peError))
+        error = EVRSettingsError()
+        fn(bytes(section, encoding='utf-8'), bytes(settingsKey, encoding='utf-8'), value, byref(error))
+        SettingsError.check_error_value(error.value)
 
-    def setFloat(self, section: str, settingsKey: str, flValue: float) -> None:
+    def setFloat(self, section: str, settingsKey: str, value: float) -> None:
         fn = self.function_table.setFloat
-        peError = EVRSettingsError()
-        fn(bytes(section, encoding='utf-8'), bytes(settingsKey, encoding='utf-8'), flValue, byref(peError))
-        if peError.value != 0:
-            raise OpenVRError(str(peError))
+        error = EVRSettingsError()
+        fn(bytes(section, encoding='utf-8'), bytes(settingsKey, encoding='utf-8'), value, byref(error))
+        SettingsError.check_error_value(error.value)
 
     def setString(self, section: str, settingsKey: str, value: str) -> None:
         fn = self.function_table.setString
-        peError = EVRSettingsError()
-        fn(bytes(section, encoding='utf-8'), bytes(settingsKey, encoding='utf-8'), bytes(value, encoding='utf-8'), byref(peError))
-        if peError.value != 0:
-            raise OpenVRError(str(peError))
+        error = EVRSettingsError()
+        fn(bytes(section, encoding='utf-8'), bytes(settingsKey, encoding='utf-8'), bytes(value, encoding='utf-8'), byref(error))
+        SettingsError.check_error_value(error.value)
 
     def getBool(self, section: str, settingsKey: str):
         """
@@ -5351,53 +5446,47 @@ class IVRSettings(object):
         """
 
         fn = self.function_table.getBool
-        peError = EVRSettingsError()
-        result = fn(bytes(section, encoding='utf-8'), bytes(settingsKey, encoding='utf-8'), byref(peError))
-        if peError.value != 0:
-            raise OpenVRError(str(peError))
+        error = EVRSettingsError()
+        result = fn(bytes(section, encoding='utf-8'), bytes(settingsKey, encoding='utf-8'), byref(error))
+        SettingsError.check_error_value(error.value)
         return result
 
     def getInt32(self, section: str, settingsKey: str):
         fn = self.function_table.getInt32
-        peError = EVRSettingsError()
-        result = fn(bytes(section, encoding='utf-8'), bytes(settingsKey, encoding='utf-8'), byref(peError))
-        if peError.value != 0:
-            raise OpenVRError(str(peError))
+        error = EVRSettingsError()
+        result = fn(bytes(section, encoding='utf-8'), bytes(settingsKey, encoding='utf-8'), byref(error))
+        SettingsError.check_error_value(error.value)
         return result
 
     def getFloat(self, section: str, settingsKey: str):
         fn = self.function_table.getFloat
-        peError = EVRSettingsError()
-        result = fn(bytes(section, encoding='utf-8'), bytes(settingsKey, encoding='utf-8'), byref(peError))
-        if peError.value != 0:
-            raise OpenVRError(str(peError))
+        error = EVRSettingsError()
+        result = fn(bytes(section, encoding='utf-8'), bytes(settingsKey, encoding='utf-8'), byref(error))
+        SettingsError.check_error_value(error.value)
         return result
 
     def getString(self, section: str, settingsKey: str):
         fn = self.function_table.getString
-        peError = EVRSettingsError()
-        unValueLen = fn(bytes(section, encoding='utf-8'), bytes(settingsKey, encoding='utf-8'), None, 0, byref(peError))
-        if unValueLen == 0:
+        error = EVRSettingsError()
+        valueLen = fn(bytes(section, encoding='utf-8'), bytes(settingsKey, encoding='utf-8'), None, 0, byref(error))
+        if valueLen == 0:
             return b''
-        pchValue = ctypes.create_string_buffer(unValueLen)
-        fn(bytes(section, encoding='utf-8'), bytes(settingsKey, encoding='utf-8'), pchValue, unValueLen, byref(peError))
-        if peError.value != 0:
-            raise OpenVRError(str(peError))
-        return bytes(pchValue.value).decode('utf-8')
+        value = ctypes.create_string_buffer(valueLen)
+        fn(bytes(section, encoding='utf-8'), bytes(settingsKey, encoding='utf-8'), value, valueLen, byref(error))
+        SettingsError.check_error_value(error.value)
+        return bytes(value.value).decode('utf-8')
 
     def removeSection(self, section: str) -> None:
         fn = self.function_table.removeSection
-        peError = EVRSettingsError()
-        fn(bytes(section, encoding='utf-8'), byref(peError))
-        if peError.value != 0:
-            raise OpenVRError(str(peError))
+        error = EVRSettingsError()
+        fn(bytes(section, encoding='utf-8'), byref(error))
+        SettingsError.check_error_value(error.value)
 
     def removeKeyInSection(self, section: str, settingsKey: str) -> None:
         fn = self.function_table.removeKeyInSection
-        peError = EVRSettingsError()
-        fn(bytes(section, encoding='utf-8'), bytes(settingsKey, encoding='utf-8'), byref(peError))
-        if peError.value != 0:
-            raise OpenVRError(str(peError))
+        error = EVRSettingsError()
+        fn(bytes(section, encoding='utf-8'), bytes(settingsKey, encoding='utf-8'), byref(error))
+        SettingsError.check_error_value(error.value)
 
 
 class IVRChaperone_FnTable(Structure):
@@ -5446,10 +5535,10 @@ class IVRChaperone(object):
         """
 
         fn = self.function_table.getPlayAreaSize
-        pSizeX = c_float()
-        pSizeZ = c_float()
-        result = fn(byref(pSizeX), byref(pSizeZ))
-        return result, pSizeX.value, pSizeZ.value
+        sizeX = c_float()
+        sizeZ = c_float()
+        result = fn(byref(sizeX), byref(sizeZ))
+        return result, sizeX.value, sizeZ.value
 
     def getPlayAreaRect(self):
         """
@@ -5478,14 +5567,14 @@ class IVRChaperone(object):
         fn = self.function_table.setSceneColor
         fn(color)
 
-    def getBoundsColor(self, nNumOutputColors: int, flCollisionBoundsFadeDistance: float):
+    def getBoundsColor(self, numOutputColors: int, collisionBoundsFadeDistance: float):
         """Get the current chaperone bounds draw color and brightness"""
 
         fn = self.function_table.getBoundsColor
-        pOutputColorArray = HmdColor_t()
-        pOutputCameraColor = HmdColor_t()
-        fn(byref(pOutputColorArray), nNumOutputColors, flCollisionBoundsFadeDistance, byref(pOutputCameraColor))
-        return pOutputColorArray, pOutputCameraColor
+        outputColorArray = HmdColor_t()
+        outputCameraColor = HmdColor_t()
+        fn(byref(outputColorArray), numOutputColors, collisionBoundsFadeDistance, byref(outputCameraColor))
+        return outputColorArray, outputCameraColor
 
     def areBoundsVisible(self):
         """Determine whether the bounds are showing right now"""
@@ -5494,11 +5583,11 @@ class IVRChaperone(object):
         result = fn()
         return result
 
-    def forceBoundsVisible(self, bForce) -> None:
+    def forceBoundsVisible(self, force) -> None:
         """Force the bounds to show, mostly for utilities"""
 
         fn = self.function_table.forceBoundsVisible
-        fn(bForce)
+        fn(force)
 
 
 class IVRChaperoneSetup_FnTable(Structure):
@@ -5569,10 +5658,10 @@ class IVRChaperoneSetup(object):
         """
 
         fn = self.function_table.getWorkingPlayAreaSize
-        pSizeX = c_float()
-        pSizeZ = c_float()
-        result = fn(byref(pSizeX), byref(pSizeZ))
-        return result, pSizeX.value, pSizeZ.value
+        sizeX = c_float()
+        sizeZ = c_float()
+        result = fn(byref(sizeX), byref(sizeZ))
+        return result, sizeX.value, sizeZ.value
 
     def getWorkingPlayAreaRect(self):
         """
@@ -5596,10 +5685,10 @@ class IVRChaperoneSetup(object):
         """
 
         fn = self.function_table.getWorkingCollisionBoundsInfo
-        pQuadsBuffer = HmdQuad_t()
-        punQuadsCount = c_uint32()
-        result = fn(byref(pQuadsBuffer), byref(punQuadsCount))
-        return result, pQuadsBuffer, punQuadsCount.value
+        quadsBuffer = HmdQuad_t()
+        quadsCount = c_uint32()
+        result = fn(byref(quadsBuffer), byref(quadsCount))
+        return result, quadsBuffer, quadsCount.value
 
     def getLiveCollisionBoundsInfo(self):
         """
@@ -5608,70 +5697,78 @@ class IVRChaperoneSetup(object):
         """
 
         fn = self.function_table.getLiveCollisionBoundsInfo
-        pQuadsBuffer = HmdQuad_t()
-        punQuadsCount = c_uint32()
-        result = fn(byref(pQuadsBuffer), byref(punQuadsCount))
-        return result, pQuadsBuffer, punQuadsCount.value
+        quadsBuffer = HmdQuad_t()
+        quadsCount = c_uint32()
+        result = fn(byref(quadsBuffer), byref(quadsCount))
+        return result, quadsBuffer, quadsCount.value
 
     def getWorkingSeatedZeroPoseToRawTrackingPose(self):
         """Returns the preferred seated position from the working copy."""
 
         fn = self.function_table.getWorkingSeatedZeroPoseToRawTrackingPose
-        pmatSeatedZeroPoseToRawTrackingPose = HmdMatrix34_t()
-        result = fn(byref(pmatSeatedZeroPoseToRawTrackingPose))
-        return result, pmatSeatedZeroPoseToRawTrackingPose
+        seatedZeroPoseToRawTrackingPose = HmdMatrix34_t()
+        result = fn(byref(seatedZeroPoseToRawTrackingPose))
+        return result, seatedZeroPoseToRawTrackingPose
 
     def getWorkingStandingZeroPoseToRawTrackingPose(self):
         """Returns the standing origin from the working copy."""
 
         fn = self.function_table.getWorkingStandingZeroPoseToRawTrackingPose
-        pmatStandingZeroPoseToRawTrackingPose = HmdMatrix34_t()
-        result = fn(byref(pmatStandingZeroPoseToRawTrackingPose))
-        return result, pmatStandingZeroPoseToRawTrackingPose
+        standingZeroPoseToRawTrackingPose = HmdMatrix34_t()
+        result = fn(byref(standingZeroPoseToRawTrackingPose))
+        return result, standingZeroPoseToRawTrackingPose
 
-    def setWorkingPlayAreaSize(self, sizeX: float, sizeZ: float) -> None:
+    def setWorkingPlayAreaSize(self, x: float, z: float) -> None:
         """Sets the Play Area in the working copy."""
 
         fn = self.function_table.setWorkingPlayAreaSize
-        fn(sizeX, sizeZ)
+        fn(x, z)
 
-    def setWorkingCollisionBoundsInfo(self, pQuadsBuffer):
+    def setWorkingCollisionBoundsInfo(self, quadsBuffer):
         """Sets the Collision Bounds in the working copy."""
 
         fn = self.function_table.setWorkingCollisionBoundsInfo
-        if pQuadsBuffer is None:
-            unQuadsCount = 0
-            pQuadsBufferArg = None
+        if quadsBuffer is None:
+            quadsCount = 0
+            quadsBufferArg = None
+        elif isinstance(quadsBuffer, ctypes.Array):
+            quadsCount = len(quadsBuffer)
+            quadsBufferArg = byref(quadsBuffer[0])
         else:
-            unQuadsCount = len(pQuadsBuffer)
-            pQuadsBufferArg = byref(pQuadsBuffer[0])
-        fn(pQuadsBufferArg, unQuadsCount)
-        return pQuadsBuffer
+            quadsCount = 1
+            quadsBuffer = (HmdQuad_t * quadsCount)()
+            quadsBufferArg = byref(quadsBuffer[0])
+        fn(quadsBufferArg, quadsCount)
+        return quadsBuffer
 
-    def setWorkingPerimeter(self, pPointBuffer):
+    def setWorkingPerimeter(self, pointBuffer):
         """Sets the Collision Bounds in the working copy."""
 
         fn = self.function_table.setWorkingPerimeter
-        if pPointBuffer is None:
-            unPointCount = 0
-            pPointBufferArg = None
+        if pointBuffer is None:
+            pointCount = 0
+            pointBufferArg = None
+        elif isinstance(pointBuffer, ctypes.Array):
+            pointCount = len(pointBuffer)
+            pointBufferArg = byref(pointBuffer[0])
         else:
-            unPointCount = len(pPointBuffer)
-            pPointBufferArg = byref(pPointBuffer[0])
-        fn(pPointBufferArg, unPointCount)
-        return pPointBuffer
+            pointCount = 1
+            pointBuffer = (HmdVector2_t * pointCount)()
+            pointBufferArg = byref(pointBuffer[0])
+        fn(pointBufferArg, pointCount)
+        return pointBuffer
 
-    def setWorkingSeatedZeroPoseToRawTrackingPose(self, pMatSeatedZeroPoseToRawTrackingPose) -> None:
+    def setWorkingSeatedZeroPoseToRawTrackingPose(self, matSeatedZeroPoseToRawTrackingPose) -> None:
         """Sets the preferred seated position in the working copy."""
 
         fn = self.function_table.setWorkingSeatedZeroPoseToRawTrackingPose
-        fn(byref(pMatSeatedZeroPoseToRawTrackingPose))
+        fn(byref(matSeatedZeroPoseToRawTrackingPose))
 
-    def setWorkingStandingZeroPoseToRawTrackingPose(self, pMatStandingZeroPoseToRawTrackingPose) -> None:
+    def setWorkingStandingZeroPoseToRawTrackingPose(self, matStandingZeroPoseToRawTrackingPose) -> None:
         """Sets the preferred standing position in the working copy."""
 
         fn = self.function_table.setWorkingStandingZeroPoseToRawTrackingPose
-        fn(byref(pMatStandingZeroPoseToRawTrackingPose))
+        fn(byref(matStandingZeroPoseToRawTrackingPose))
 
     def reloadFromDisk(self, configFile) -> None:
         """Tear everything down and reload it from the file on disk"""
@@ -5683,22 +5780,22 @@ class IVRChaperoneSetup(object):
         """Returns the preferred seated position."""
 
         fn = self.function_table.getLiveSeatedZeroPoseToRawTrackingPose
-        pmatSeatedZeroPoseToRawTrackingPose = HmdMatrix34_t()
-        result = fn(byref(pmatSeatedZeroPoseToRawTrackingPose))
-        return result, pmatSeatedZeroPoseToRawTrackingPose
+        seatedZeroPoseToRawTrackingPose = HmdMatrix34_t()
+        result = fn(byref(seatedZeroPoseToRawTrackingPose))
+        return result, seatedZeroPoseToRawTrackingPose
 
     def exportLiveToBuffer(self):
         fn = self.function_table.exportLiveToBuffer
-        pnBufferLength = fn(None, 0)
-        if pnBufferLength == 0:
+        bufferLength = fn(None, 0)
+        if bufferLength == 0:
             return b''
-        pBuffer = ctypes.create_string_buffer(pnBufferLength)
-        fn(pBuffer, pnBufferLength)
-        return bytes(pBuffer.value).decode('utf-8')
+        buffer = ctypes.create_string_buffer(bufferLength)
+        fn(buffer, bufferLength)
+        return bytes(buffer.value).decode('utf-8')
 
-    def importFromBufferToWorking(self, pBuffer: str, nImportFlags):
+    def importFromBufferToWorking(self, buffer: str, importFlags):
         fn = self.function_table.importFromBufferToWorking
-        result = fn(bytes(pBuffer, encoding='utf-8'), nImportFlags)
+        result = fn(bytes(buffer, encoding='utf-8'), importFlags)
         return result
 
     def showWorkingSetPreview(self) -> None:
@@ -5789,11 +5886,11 @@ class IVRCompositor(object):
             raise OpenVRError("Error retrieving VR API for IVRCompositor")
         self.function_table = fn_table_ptr.contents
 
-    def setTrackingSpace(self, eOrigin) -> None:
+    def setTrackingSpace(self, origin) -> None:
         """Sets tracking space returned by WaitGetPoses"""
 
         fn = self.function_table.setTrackingSpace
-        fn(eOrigin)
+        fn(origin)
 
     def getTrackingSpace(self):
         """Gets current tracking space returned by WaitGetPoses"""
@@ -5802,7 +5899,7 @@ class IVRCompositor(object):
         result = fn()
         return result
 
-    def waitGetPoses(self, pRenderPoseArray, pGamePoseArray):
+    def waitGetPoses(self, renderPoseArray, gamePoseArray):
         """
         Scene applications should call this function to get poses to render with (and optionally poses predicted an additional frame out to use for gameplay).
         This function will block until "running start" milliseconds before the start of the frame, and should be called at the last moment before needing to
@@ -5814,59 +5911,59 @@ class IVRCompositor(object):
         """
 
         fn = self.function_table.waitGetPoses
-        if pRenderPoseArray is None:
-            unRenderPoseArrayCount = 0
-            pRenderPoseArrayArg = None
-        elif isinstance(pRenderPoseArray, ctypes.Array):
-            unRenderPoseArrayCount = len(pRenderPoseArray)
-            pRenderPoseArrayArg = byref(pRenderPoseArray[0])
+        if renderPoseArray is None:
+            renderPoseArrayCount = 0
+            renderPoseArrayArg = None
+        elif isinstance(renderPoseArray, ctypes.Array):
+            renderPoseArrayCount = len(renderPoseArray)
+            renderPoseArrayArg = byref(renderPoseArray[0])
         else:
-            unRenderPoseArrayCount = k_unMaxTrackedDeviceCount
-            pRenderPoseArray = (TrackedDevicePose_t * unRenderPoseArrayCount)()
-            pRenderPoseArrayArg = byref(pRenderPoseArray[0])
-        if pGamePoseArray is None:
-            unGamePoseArrayCount = 0
-            pGamePoseArrayArg = None
-        elif isinstance(pGamePoseArray, ctypes.Array):
-            unGamePoseArrayCount = len(pGamePoseArray)
-            pGamePoseArrayArg = byref(pGamePoseArray[0])
+            renderPoseArrayCount = k_unMaxTrackedDeviceCount
+            renderPoseArray = (TrackedDevicePose_t * renderPoseArrayCount)()
+            renderPoseArrayArg = byref(renderPoseArray[0])
+        if gamePoseArray is None:
+            gamePoseArrayCount = 0
+            gamePoseArrayArg = None
+        elif isinstance(gamePoseArray, ctypes.Array):
+            gamePoseArrayCount = len(gamePoseArray)
+            gamePoseArrayArg = byref(gamePoseArray[0])
         else:
-            unGamePoseArrayCount = k_unMaxTrackedDeviceCount
-            pGamePoseArray = (TrackedDevicePose_t * unGamePoseArrayCount)()
-            pGamePoseArrayArg = byref(pGamePoseArray[0])
-        error_code = fn(pRenderPoseArrayArg, unRenderPoseArrayCount, pGamePoseArrayArg, unGamePoseArrayCount)
+            gamePoseArrayCount = k_unMaxTrackedDeviceCount
+            gamePoseArray = (TrackedDevicePose_t * gamePoseArrayCount)()
+            gamePoseArrayArg = byref(gamePoseArray[0])
+        error_code = fn(renderPoseArrayArg, renderPoseArrayCount, gamePoseArrayArg, gamePoseArrayCount)
         CompositorError.check_error_value(error_code)
-        return pRenderPoseArray, pGamePoseArray
+        return renderPoseArray, gamePoseArray
 
-    def getLastPoses(self, pRenderPoseArray, pGamePoseArray):
+    def getLastPoses(self, renderPoseArray, gamePoseArray):
         """Get the last set of poses returned by WaitGetPoses."""
 
         fn = self.function_table.getLastPoses
-        if pRenderPoseArray is None:
-            unRenderPoseArrayCount = 0
-            pRenderPoseArrayArg = None
-        elif isinstance(pRenderPoseArray, ctypes.Array):
-            unRenderPoseArrayCount = len(pRenderPoseArray)
-            pRenderPoseArrayArg = byref(pRenderPoseArray[0])
+        if renderPoseArray is None:
+            renderPoseArrayCount = 0
+            renderPoseArrayArg = None
+        elif isinstance(renderPoseArray, ctypes.Array):
+            renderPoseArrayCount = len(renderPoseArray)
+            renderPoseArrayArg = byref(renderPoseArray[0])
         else:
-            unRenderPoseArrayCount = k_unMaxTrackedDeviceCount
-            pRenderPoseArray = (TrackedDevicePose_t * unRenderPoseArrayCount)()
-            pRenderPoseArrayArg = byref(pRenderPoseArray[0])
-        if pGamePoseArray is None:
-            unGamePoseArrayCount = 0
-            pGamePoseArrayArg = None
-        elif isinstance(pGamePoseArray, ctypes.Array):
-            unGamePoseArrayCount = len(pGamePoseArray)
-            pGamePoseArrayArg = byref(pGamePoseArray[0])
+            renderPoseArrayCount = k_unMaxTrackedDeviceCount
+            renderPoseArray = (TrackedDevicePose_t * renderPoseArrayCount)()
+            renderPoseArrayArg = byref(renderPoseArray[0])
+        if gamePoseArray is None:
+            gamePoseArrayCount = 0
+            gamePoseArrayArg = None
+        elif isinstance(gamePoseArray, ctypes.Array):
+            gamePoseArrayCount = len(gamePoseArray)
+            gamePoseArrayArg = byref(gamePoseArray[0])
         else:
-            unGamePoseArrayCount = k_unMaxTrackedDeviceCount
-            pGamePoseArray = (TrackedDevicePose_t * unGamePoseArrayCount)()
-            pGamePoseArrayArg = byref(pGamePoseArray[0])
-        error_code = fn(pRenderPoseArrayArg, unRenderPoseArrayCount, pGamePoseArrayArg, unGamePoseArrayCount)
+            gamePoseArrayCount = k_unMaxTrackedDeviceCount
+            gamePoseArray = (TrackedDevicePose_t * gamePoseArrayCount)()
+            gamePoseArrayArg = byref(gamePoseArray[0])
+        error_code = fn(renderPoseArrayArg, renderPoseArrayCount, gamePoseArrayArg, gamePoseArrayCount)
         CompositorError.check_error_value(error_code)
-        return pRenderPoseArray, pGamePoseArray
+        return renderPoseArray, gamePoseArray
 
-    def getLastPoseForTrackedDeviceIndex(self, unDeviceIndex):
+    def getLastPoseForTrackedDeviceIndex(self, deviceIndex):
         """
         Interface for accessing last set of poses returned by WaitGetPoses one at a time.
         Returns VRCompositorError_IndexOutOfRange if unDeviceIndex not less than k_unMaxTrackedDeviceCount otherwise VRCompositorError_None.
@@ -5874,13 +5971,13 @@ class IVRCompositor(object):
         """
 
         fn = self.function_table.getLastPoseForTrackedDeviceIndex
-        pOutputPose = TrackedDevicePose_t()
-        pOutputGamePose = TrackedDevicePose_t()
-        error_code = fn(unDeviceIndex, byref(pOutputPose), byref(pOutputGamePose))
+        outputPose = TrackedDevicePose_t()
+        outputGamePose = TrackedDevicePose_t()
+        error_code = fn(deviceIndex, byref(outputPose), byref(outputGamePose))
         CompositorError.check_error_value(error_code)
-        return pOutputPose, pOutputGamePose
+        return outputPose, outputGamePose
 
-    def submit(self, eEye, pTexture, pBounds=None, nSubmitFlags=Submit_Default) -> None:
+    def submit(self, eye, texture, bounds=None, submitFlags=Submit_Default) -> None:
         """
         Updated scene texture to display. If pBounds is NULL the entire texture will be used.  If called from an OpenGL app, consider adding a glFlush after
         Submitting both frames to signal the driver to start processing, otherwise it may wait until the command buffer fills up, causing the app to miss frames.
@@ -5899,7 +5996,7 @@ class IVRCompositor(object):
         """
 
         fn = self.function_table.submit
-        error_code = fn(eEye, byref(pTexture), byref(pBounds), nSubmitFlags)
+        error_code = fn(eye, byref(texture), byref(bounds), submitFlags)
         CompositorError.check_error_value(error_code)
 
     def clearLastSubmittedFrame(self) -> None:
@@ -5923,32 +6020,36 @@ class IVRCompositor(object):
         fn = self.function_table.postPresentHandoff
         fn()
 
-    def getFrameTiming(self, unFramesAgo=0):
+    def getFrameTiming(self, framesAgo=0):
         """
         Returns true if timing data is filled it.  Sets oldest timing info if nFramesAgo is larger than the stored history.
         Be sure to set timing.size = sizeof(Compositor_FrameTiming) on struct passed in before calling this function.
         """
 
         fn = self.function_table.getFrameTiming
-        pTiming = Compositor_FrameTiming()
-        result = fn(byref(pTiming), unFramesAgo)
-        return result, pTiming
+        timing = Compositor_FrameTiming()
+        result = fn(byref(timing), framesAgo)
+        return result, timing
 
-    def getFrameTimings(self, pTiming):
+    def getFrameTimings(self, timing):
         """
         Interface for copying a range of timing data.  Frames are returned in ascending order (oldest to newest) with the last being the most recent frame.
         Only the first entry's m_nSize needs to be set, as the rest will be inferred from that.  Returns total number of entries filled out.
         """
 
         fn = self.function_table.getFrameTimings
-        if pTiming is None:
-            nFrames = 0
-            pTimingArg = None
+        if timing is None:
+            frames = 0
+            timingArg = None
+        elif isinstance(timing, ctypes.Array):
+            frames = len(timing)
+            timingArg = byref(timing[0])
         else:
-            nFrames = len(pTiming)
-            pTimingArg = byref(pTiming[0])
-        result = fn(pTimingArg, nFrames)
-        return result, pTiming
+            frames = 1
+            timing = (Compositor_FrameTiming * frames)()
+            timingArg = byref(timing[0])
+        result = fn(timingArg, frames)
+        return result, timing
 
     def getFrameTimeRemaining(self):
         """
@@ -5960,15 +6061,15 @@ class IVRCompositor(object):
         result = fn()
         return result
 
-    def getCumulativeStats(self, nStatsSizeInBytes):
+    def getCumulativeStats(self, statsSizeInBytes):
         """Fills out stats accumulated for the last connected application.  Pass in sizeof( Compositor_CumulativeStats ) as second parameter."""
 
         fn = self.function_table.getCumulativeStats
-        pStats = Compositor_CumulativeStats()
-        fn(byref(pStats), nStatsSizeInBytes)
-        return pStats
+        stats = Compositor_CumulativeStats()
+        fn(byref(stats), statsSizeInBytes)
+        return stats
 
-    def fadeToColor(self, fSeconds: float, fRed: float, fGreen: float, fBlue: float, fAlpha: float, bBackground=False) -> None:
+    def fadeToColor(self, seconds: float, red: float, green: float, blue: float, alpha: float, background=False) -> None:
         """
         Fades the view on the HMD to the specified color. The fade will take fSeconds, and the color values are between
         0.0 and 1.0. This color is faded on top of the scene based on the alpha parameter. Removing the fade color instantly 
@@ -5976,20 +6077,20 @@ class IVRCompositor(object):
         """
 
         fn = self.function_table.fadeToColor
-        fn(fSeconds, fRed, fGreen, fBlue, fAlpha, bBackground)
+        fn(seconds, red, green, blue, alpha, background)
 
-    def getCurrentFadeColor(self, bBackground=False):
+    def getCurrentFadeColor(self, background=False):
         """Get current fade color value."""
 
         fn = self.function_table.getCurrentFadeColor
-        result = fn(bBackground)
+        result = fn(background)
         return result
 
-    def fadeGrid(self, fSeconds: float, bFadeIn) -> None:
+    def fadeGrid(self, seconds: float, fadeIn) -> None:
         """Fading the Grid in or out in fSeconds"""
 
         fn = self.function_table.fadeGrid
-        fn(fSeconds, bFadeIn)
+        fn(seconds, fadeIn)
 
     def getCurrentGridAlpha(self):
         """Get current alpha value of grid."""
@@ -5998,7 +6099,7 @@ class IVRCompositor(object):
         result = fn()
         return result
 
-    def setSkyboxOverride(self, pTextures) -> None:
+    def setSkyboxOverride(self, textures) -> None:
         """
         Override the skybox used in the compositor (e.g. for during level loads when the app can't feed scene images fast enough)
         Order is Front, Back, Left, Right, Top, Bottom.  If only a single texture is passed, it is assumed in lat-long format.
@@ -6006,13 +6107,17 @@ class IVRCompositor(object):
         """
 
         fn = self.function_table.setSkyboxOverride
-        if pTextures is None:
-            unTextureCount = 0
-            pTexturesArg = None
+        if textures is None:
+            textureCount = 0
+            texturesArg = None
+        elif isinstance(textures, ctypes.Array):
+            textureCount = len(textures)
+            texturesArg = byref(textures[0])
         else:
-            unTextureCount = len(pTextures)
-            pTexturesArg = byref(pTextures[0])
-        error_code = fn(pTexturesArg, unTextureCount)
+            textureCount = 1
+            textures = (Texture_t * textureCount)()
+            texturesArg = byref(textures[0])
+        error_code = fn(texturesArg, textureCount)
         CompositorError.check_error_value(error_code)
 
     def clearSkyboxOverride(self) -> None:
@@ -6108,11 +6213,11 @@ class IVRCompositor(object):
         result = fn()
         return result
 
-    def forceInterleavedReprojectionOn(self, bOverride) -> None:
+    def forceInterleavedReprojectionOn(self, override) -> None:
         """Override interleaved reprojection logic to force on."""
 
         fn = self.function_table.forceInterleavedReprojectionOn
-        fn(bOverride)
+        fn(override)
 
     def forceReconnectProcess(self) -> None:
         """Force reconnecting to the compositor process."""
@@ -6120,50 +6225,50 @@ class IVRCompositor(object):
         fn = self.function_table.forceReconnectProcess
         fn()
 
-    def suspendRendering(self, bSuspend) -> None:
+    def suspendRendering(self, suspend) -> None:
         """Temporarily suspends rendering (useful for finer control over scene transitions)."""
 
         fn = self.function_table.suspendRendering
-        fn(bSuspend)
+        fn(suspend)
 
-    def getMirrorTextureD3D11(self, eEye, pD3D11DeviceOrResource):
+    def getMirrorTextureD3D11(self, eye, d3D11DeviceOrResource):
         """
         Opens a shared D3D11 texture with the undistorted composited image for each eye.  Use ReleaseMirrorTextureD3D11 when finished
         instead of calling Release on the resource itself.
         """
 
         fn = self.function_table.getMirrorTextureD3D11
-        ppD3D11ShaderResourceView = c_void_p()
-        error_code = fn(eEye, byref(pD3D11DeviceOrResource), byref(ppD3D11ShaderResourceView))
+        d3D11ShaderResourceView = c_void_p()
+        error_code = fn(eye, byref(d3D11DeviceOrResource), byref(d3D11ShaderResourceView))
         CompositorError.check_error_value(error_code)
-        return ppD3D11ShaderResourceView.value
+        return d3D11ShaderResourceView.value
 
-    def releaseMirrorTextureD3D11(self, pD3D11ShaderResourceView) -> None:
+    def releaseMirrorTextureD3D11(self, d3D11ShaderResourceView) -> None:
         fn = self.function_table.releaseMirrorTextureD3D11
-        fn(byref(pD3D11ShaderResourceView))
+        fn(byref(d3D11ShaderResourceView))
 
-    def getMirrorTextureGL(self, eEye):
+    def getMirrorTextureGL(self, eye):
         """Access to mirror textures from OpenGL."""
 
         fn = self.function_table.getMirrorTextureGL
-        pglTextureId = glUInt_t()
-        pglSharedTextureHandle = glSharedTextureHandle_t()
-        error_code = fn(eEye, byref(pglTextureId), byref(pglSharedTextureHandle))
+        textureId = glUInt_t()
+        sharedTextureHandle = glSharedTextureHandle_t()
+        error_code = fn(eye, byref(textureId), byref(sharedTextureHandle))
         CompositorError.check_error_value(error_code)
-        return pglTextureId, pglSharedTextureHandle
+        return textureId, sharedTextureHandle
 
-    def releaseSharedGLTexture(self, glTextureId, glSharedTextureHandle):
+    def releaseSharedGLTexture(self, textureId, sharedTextureHandle):
         fn = self.function_table.releaseSharedGLTexture
-        result = fn(glTextureId, glSharedTextureHandle)
+        result = fn(textureId, sharedTextureHandle)
         return result
 
-    def lockGLSharedTextureForAccess(self, glSharedTextureHandle) -> None:
+    def lockGLSharedTextureForAccess(self, sharedTextureHandle) -> None:
         fn = self.function_table.lockGLSharedTextureForAccess
-        fn(glSharedTextureHandle)
+        fn(sharedTextureHandle)
 
-    def unlockGLSharedTextureForAccess(self, glSharedTextureHandle) -> None:
+    def unlockGLSharedTextureForAccess(self, sharedTextureHandle) -> None:
         fn = self.function_table.unlockGLSharedTextureForAccess
-        fn(glSharedTextureHandle)
+        fn(sharedTextureHandle)
 
     def getVulkanInstanceExtensionsRequired(self):
         """
@@ -6173,12 +6278,12 @@ class IVRCompositor(object):
         """
 
         fn = self.function_table.getVulkanInstanceExtensionsRequired
-        unBufferSize = fn(None, 0)
-        if unBufferSize == 0:
+        bufferSize = fn(None, 0)
+        if bufferSize == 0:
             return b''
-        pchValue = ctypes.create_string_buffer(unBufferSize)
-        fn(pchValue, unBufferSize)
-        return bytes(pchValue.value).decode('utf-8')
+        value = ctypes.create_string_buffer(bufferSize)
+        fn(value, bufferSize)
+        return bytes(value.value).decode('utf-8')
 
     def getVulkanDeviceExtensionsRequired(self):
         """
@@ -6188,15 +6293,15 @@ class IVRCompositor(object):
         """
 
         fn = self.function_table.getVulkanDeviceExtensionsRequired
-        pPhysicalDevice = VkPhysicalDevice_T()
-        unBufferSize = fn(byref(pPhysicalDevice), None, 0)
-        if unBufferSize == 0:
+        physicalDevice = VkPhysicalDevice_T()
+        bufferSize = fn(byref(physicalDevice), None, 0)
+        if bufferSize == 0:
             return b''
-        pchValue = ctypes.create_string_buffer(unBufferSize)
-        fn(byref(pPhysicalDevice), pchValue, unBufferSize)
-        return pPhysicalDevice, bytes(pchValue.value).decode('utf-8')
+        value = ctypes.create_string_buffer(bufferSize)
+        fn(byref(physicalDevice), value, bufferSize)
+        return physicalDevice, bytes(value.value).decode('utf-8')
 
-    def setExplicitTimingMode(self, eTimingMode) -> None:
+    def setExplicitTimingMode(self, timingMode) -> None:
         """
         [ Vulkan/D3D12 Only ]
         There are two purposes for SetExplicitTimingMode:
@@ -6219,7 +6324,7 @@ class IVRCompositor(object):
         """
 
         fn = self.function_table.setExplicitTimingMode
-        fn(eTimingMode)
+        fn(timingMode)
 
     def submitExplicitTimingData(self) -> None:
         """
@@ -6288,7 +6393,7 @@ class IVRNotifications(object):
             raise OpenVRError("Error retrieving VR API for IVRNotifications")
         self.function_table = fn_table_ptr.contents
 
-    def createNotification(self, ulOverlayHandle, ulUserValue, type_, text: str, style, pImage):
+    def createNotification(self, overlayHandle, userValue, type_, text: str, style, image):
         """
         Create a notification and enqueue it to be shown to the user.
         An overlay handle is required to create a notification, as otherwise it would be impossible for a user to act on it.
@@ -6297,10 +6402,10 @@ class IVRNotifications(object):
         """
 
         fn = self.function_table.createNotification
-        pNotificationId = VRNotificationId()
-        error_code = fn(ulOverlayHandle, ulUserValue, type_, bytes(text, encoding='utf-8'), style, byref(pImage), byref(pNotificationId))
+        notificationId = VRNotificationId()
+        error_code = fn(overlayHandle, userValue, type_, bytes(text, encoding='utf-8'), style, byref(image), byref(notificationId))
         NotificationError.check_error_value(error_code)
-        return pNotificationId
+        return notificationId
 
     def removeNotification(self, notificationId) -> None:
         """Destroy a notification, hiding it first if it currently shown to the user."""
@@ -6413,31 +6518,31 @@ class IVROverlay(object):
         """Finds an existing overlay with the specified key."""
 
         fn = self.function_table.findOverlay
-        pOverlayHandle = VROverlayHandle_t()
-        error_code = fn(bytes(overlayKey, encoding='utf-8'), byref(pOverlayHandle))
+        overlayHandle = VROverlayHandle_t()
+        error_code = fn(bytes(overlayKey, encoding='utf-8'), byref(overlayHandle))
         OverlayError.check_error_value(error_code)
-        return pOverlayHandle.value
+        return overlayHandle.value
 
     def createOverlay(self, overlayKey: str, overlayName: str):
         """Creates a new named overlay. All overlays start hidden and with default settings."""
 
         fn = self.function_table.createOverlay
-        pOverlayHandle = VROverlayHandle_t()
-        error_code = fn(bytes(overlayKey, encoding='utf-8'), bytes(overlayName, encoding='utf-8'), byref(pOverlayHandle))
+        overlayHandle = VROverlayHandle_t()
+        error_code = fn(bytes(overlayKey, encoding='utf-8'), bytes(overlayName, encoding='utf-8'), byref(overlayHandle))
         OverlayError.check_error_value(error_code)
-        return pOverlayHandle.value
+        return overlayHandle.value
 
-    def destroyOverlay(self, ulOverlayHandle) -> None:
+    def destroyOverlay(self, overlayHandle) -> None:
         """
         Destroys the specified overlay. When an application calls VR_Shutdown all overlays created by that app are
         automatically destroyed.
         """
 
         fn = self.function_table.destroyOverlay
-        error_code = fn(ulOverlayHandle)
+        error_code = fn(overlayHandle)
         OverlayError.check_error_value(error_code)
 
-    def setHighQualityOverlay(self, ulOverlayHandle) -> None:
+    def setHighQualityOverlay(self, overlayHandle) -> None:
         """
         Specify which overlay to use the high quality render path.  This overlay will be composited in during the distortion pass which
         results in it drawing on top of everything else, but also at a higher quality as it samples the source texture directly rather than
@@ -6447,7 +6552,7 @@ class IVROverlay(object):
         """
 
         fn = self.function_table.setHighQualityOverlay
-        error_code = fn(ulOverlayHandle)
+        error_code = fn(overlayHandle)
         OverlayError.check_error_value(error_code)
 
     def getHighQualityOverlay(self):
@@ -6460,59 +6565,57 @@ class IVROverlay(object):
         result = fn()
         return result
 
-    def getOverlayKey(self, ulOverlayHandle):
+    def getOverlayKey(self, overlayHandle):
         """
         Fills the provided buffer with the string key of the overlay. Returns the size of buffer required to store the key, including
         the terminating null character. k_unVROverlayMaxKeyLength will be enough bytes to fit the string.
         """
 
         fn = self.function_table.getOverlayKey
-        pError = EVROverlayError()
-        unBufferSize = fn(ulOverlayHandle, None, 0, byref(pError))
-        if unBufferSize == 0:
+        error = EVROverlayError()
+        bufferSize = fn(overlayHandle, None, 0, byref(error))
+        if bufferSize == 0:
             return b''
-        pchValue = ctypes.create_string_buffer(unBufferSize)
-        fn(ulOverlayHandle, pchValue, unBufferSize, byref(pError))
-        if pError.value != 0:
-            raise OpenVRError(str(pError))
-        return bytes(pchValue.value).decode('utf-8')
+        value = ctypes.create_string_buffer(bufferSize)
+        fn(overlayHandle, value, bufferSize, byref(error))
+        OverlayError.check_error_value(error.value)
+        return bytes(value.value).decode('utf-8')
 
-    def getOverlayName(self, ulOverlayHandle):
+    def getOverlayName(self, overlayHandle):
         """
         Fills the provided buffer with the friendly name of the overlay. Returns the size of buffer required to store the key, including
         the terminating null character. k_unVROverlayMaxNameLength will be enough bytes to fit the string.
         """
 
         fn = self.function_table.getOverlayName
-        pError = EVROverlayError()
-        unBufferSize = fn(ulOverlayHandle, None, 0, byref(pError))
-        if unBufferSize == 0:
+        error = EVROverlayError()
+        bufferSize = fn(overlayHandle, None, 0, byref(error))
+        if bufferSize == 0:
             return b''
-        pchValue = ctypes.create_string_buffer(unBufferSize)
-        fn(ulOverlayHandle, pchValue, unBufferSize, byref(pError))
-        if pError.value != 0:
-            raise OpenVRError(str(pError))
-        return bytes(pchValue.value).decode('utf-8')
+        value = ctypes.create_string_buffer(bufferSize)
+        fn(overlayHandle, value, bufferSize, byref(error))
+        OverlayError.check_error_value(error.value)
+        return bytes(value.value).decode('utf-8')
 
-    def setOverlayName(self, ulOverlayHandle, name: str) -> None:
+    def setOverlayName(self, overlayHandle, name: str) -> None:
         """set the name to use for this overlay"""
 
         fn = self.function_table.setOverlayName
-        error_code = fn(ulOverlayHandle, bytes(name, encoding='utf-8'))
+        error_code = fn(overlayHandle, bytes(name, encoding='utf-8'))
         OverlayError.check_error_value(error_code)
 
-    def getOverlayImageData(self, ulOverlayHandle, pvBuffer, unBufferSize):
+    def getOverlayImageData(self, overlayHandle, buffer, bufferSize):
         """
         Gets the raw image data from an overlay. Overlay image data is always returned as RGBA data, 4 bytes per pixel. If the buffer is not large enough, width and height 
         will be set and VROverlayError_ArrayTooSmall is returned.
         """
 
         fn = self.function_table.getOverlayImageData
-        punWidth = c_uint32()
-        punHeight = c_uint32()
-        error_code = fn(ulOverlayHandle, byref(pvBuffer), unBufferSize, byref(punWidth), byref(punHeight))
+        width = c_uint32()
+        height = c_uint32()
+        error_code = fn(overlayHandle, byref(buffer), bufferSize, byref(width), byref(height))
         OverlayError.check_error_value(error_code)
-        return punWidth.value, punHeight.value
+        return width.value, height.value
 
     def getOverlayErrorNameFromEnum(self, error):
         """
@@ -6524,93 +6627,93 @@ class IVROverlay(object):
         result = fn(error)
         return result
 
-    def setOverlayRenderingPid(self, ulOverlayHandle, unPID) -> None:
+    def setOverlayRenderingPid(self, overlayHandle, pID) -> None:
         """
         Sets the pid that is allowed to render to this overlay (the creator pid is always allow to render),
         by default this is the pid of the process that made the overlay
         """
 
         fn = self.function_table.setOverlayRenderingPid
-        error_code = fn(ulOverlayHandle, unPID)
+        error_code = fn(overlayHandle, pID)
         OverlayError.check_error_value(error_code)
 
-    def getOverlayRenderingPid(self, ulOverlayHandle):
+    def getOverlayRenderingPid(self, overlayHandle):
         """Gets the pid that is allowed to render to this overlay"""
 
         fn = self.function_table.getOverlayRenderingPid
-        result = fn(ulOverlayHandle)
+        result = fn(overlayHandle)
         return result
 
-    def setOverlayFlag(self, ulOverlayHandle, eOverlayFlag, bEnabled) -> None:
+    def setOverlayFlag(self, overlayHandle, overlayFlag, enabled) -> None:
         """Specify flag setting for a given overlay"""
 
         fn = self.function_table.setOverlayFlag
-        error_code = fn(ulOverlayHandle, eOverlayFlag, bEnabled)
+        error_code = fn(overlayHandle, overlayFlag, enabled)
         OverlayError.check_error_value(error_code)
 
-    def getOverlayFlag(self, ulOverlayHandle, eOverlayFlag):
+    def getOverlayFlag(self, overlayHandle, overlayFlag):
         """Sets flag setting for a given overlay"""
 
         fn = self.function_table.getOverlayFlag
-        pbEnabled = openvr_bool()
-        error_code = fn(ulOverlayHandle, eOverlayFlag, byref(pbEnabled))
+        enabled = openvr_bool()
+        error_code = fn(overlayHandle, overlayFlag, byref(enabled))
         OverlayError.check_error_value(error_code)
-        return pbEnabled
+        return enabled
 
-    def setOverlayColor(self, ulOverlayHandle, fRed: float, fGreen: float, fBlue: float) -> None:
+    def setOverlayColor(self, overlayHandle, red: float, green: float, blue: float) -> None:
         """Sets the color tint of the overlay quad. Use 0.0 to 1.0 per channel."""
 
         fn = self.function_table.setOverlayColor
-        error_code = fn(ulOverlayHandle, fRed, fGreen, fBlue)
+        error_code = fn(overlayHandle, red, green, blue)
         OverlayError.check_error_value(error_code)
 
-    def getOverlayColor(self, ulOverlayHandle):
+    def getOverlayColor(self, overlayHandle):
         """Gets the color tint of the overlay quad."""
 
         fn = self.function_table.getOverlayColor
-        pfRed = c_float()
-        pfGreen = c_float()
-        pfBlue = c_float()
-        error_code = fn(ulOverlayHandle, byref(pfRed), byref(pfGreen), byref(pfBlue))
+        red = c_float()
+        green = c_float()
+        blue = c_float()
+        error_code = fn(overlayHandle, byref(red), byref(green), byref(blue))
         OverlayError.check_error_value(error_code)
-        return pfRed.value, pfGreen.value, pfBlue.value
+        return red.value, green.value, blue.value
 
-    def setOverlayAlpha(self, ulOverlayHandle, fAlpha: float) -> None:
+    def setOverlayAlpha(self, overlayHandle, alpha: float) -> None:
         """Sets the alpha of the overlay quad. Use 1.0 for 100 percent opacity to 0.0 for 0 percent opacity."""
 
         fn = self.function_table.setOverlayAlpha
-        error_code = fn(ulOverlayHandle, fAlpha)
+        error_code = fn(overlayHandle, alpha)
         OverlayError.check_error_value(error_code)
 
-    def getOverlayAlpha(self, ulOverlayHandle):
+    def getOverlayAlpha(self, overlayHandle):
         """Gets the alpha of the overlay quad. By default overlays are rendering at 100 percent alpha (1.0)."""
 
         fn = self.function_table.getOverlayAlpha
-        pfAlpha = c_float()
-        error_code = fn(ulOverlayHandle, byref(pfAlpha))
+        alpha = c_float()
+        error_code = fn(overlayHandle, byref(alpha))
         OverlayError.check_error_value(error_code)
-        return pfAlpha.value
+        return alpha.value
 
-    def setOverlayTexelAspect(self, ulOverlayHandle, fTexelAspect: float) -> None:
+    def setOverlayTexelAspect(self, overlayHandle, texelAspect: float) -> None:
         """
         Sets the aspect ratio of the texels in the overlay. 1.0 means the texels are square. 2.0 means the texels
         are twice as wide as they are tall. Defaults to 1.0.
         """
 
         fn = self.function_table.setOverlayTexelAspect
-        error_code = fn(ulOverlayHandle, fTexelAspect)
+        error_code = fn(overlayHandle, texelAspect)
         OverlayError.check_error_value(error_code)
 
-    def getOverlayTexelAspect(self, ulOverlayHandle):
+    def getOverlayTexelAspect(self, overlayHandle):
         """Gets the aspect ratio of the texels in the overlay. Defaults to 1.0"""
 
         fn = self.function_table.getOverlayTexelAspect
-        pfTexelAspect = c_float()
-        error_code = fn(ulOverlayHandle, byref(pfTexelAspect))
+        texelAspect = c_float()
+        error_code = fn(overlayHandle, byref(texelAspect))
         OverlayError.check_error_value(error_code)
-        return pfTexelAspect.value
+        return texelAspect.value
 
-    def setOverlaySortOrder(self, ulOverlayHandle, unSortOrder) -> None:
+    def setOverlaySortOrder(self, overlayHandle, sortOrder) -> None:
         """
         Sets the rendering sort order for the overlay. Overlays are rendered this order:
            Overlays owned by the scene application
@@ -6623,298 +6726,297 @@ class IVROverlay(object):
         """
 
         fn = self.function_table.setOverlaySortOrder
-        error_code = fn(ulOverlayHandle, unSortOrder)
+        error_code = fn(overlayHandle, sortOrder)
         OverlayError.check_error_value(error_code)
 
-    def getOverlaySortOrder(self, ulOverlayHandle):
+    def getOverlaySortOrder(self, overlayHandle):
         """Gets the sort order of the overlay. See SetOverlaySortOrder for how this works."""
 
         fn = self.function_table.getOverlaySortOrder
-        punSortOrder = c_uint32()
-        error_code = fn(ulOverlayHandle, byref(punSortOrder))
+        sortOrder = c_uint32()
+        error_code = fn(overlayHandle, byref(sortOrder))
         OverlayError.check_error_value(error_code)
-        return punSortOrder.value
+        return sortOrder.value
 
-    def setOverlayWidthInMeters(self, ulOverlayHandle, fWidthInMeters: float) -> None:
+    def setOverlayWidthInMeters(self, overlayHandle, widthInMeters: float) -> None:
         """Sets the width of the overlay quad in meters. By default overlays are rendered on a quad that is 1 meter across"""
 
         fn = self.function_table.setOverlayWidthInMeters
-        error_code = fn(ulOverlayHandle, fWidthInMeters)
+        error_code = fn(overlayHandle, widthInMeters)
         OverlayError.check_error_value(error_code)
 
-    def getOverlayWidthInMeters(self, ulOverlayHandle):
+    def getOverlayWidthInMeters(self, overlayHandle):
         """Returns the width of the overlay quad in meters. By default overlays are rendered on a quad that is 1 meter across"""
 
         fn = self.function_table.getOverlayWidthInMeters
-        pfWidthInMeters = c_float()
-        error_code = fn(ulOverlayHandle, byref(pfWidthInMeters))
+        widthInMeters = c_float()
+        error_code = fn(overlayHandle, byref(widthInMeters))
         OverlayError.check_error_value(error_code)
-        return pfWidthInMeters.value
+        return widthInMeters.value
 
-    def setOverlayAutoCurveDistanceRangeInMeters(self, ulOverlayHandle, fMinDistanceInMeters: float, fMaxDistanceInMeters: float) -> None:
+    def setOverlayAutoCurveDistanceRangeInMeters(self, overlayHandle, minDistanceInMeters: float, maxDistanceInMeters: float) -> None:
         """
         For high-quality curved overlays only, sets the distance range in meters from the overlay used to automatically curve
         the surface around the viewer.  Min is distance is when the surface will be most curved.  Max is when least curved.
         """
 
         fn = self.function_table.setOverlayAutoCurveDistanceRangeInMeters
-        error_code = fn(ulOverlayHandle, fMinDistanceInMeters, fMaxDistanceInMeters)
+        error_code = fn(overlayHandle, minDistanceInMeters, maxDistanceInMeters)
         OverlayError.check_error_value(error_code)
 
-    def getOverlayAutoCurveDistanceRangeInMeters(self, ulOverlayHandle):
+    def getOverlayAutoCurveDistanceRangeInMeters(self, overlayHandle):
         """
         For high-quality curved overlays only, gets the distance range in meters from the overlay used to automatically curve
         the surface around the viewer.  Min is distance is when the surface will be most curved.  Max is when least curved.
         """
 
         fn = self.function_table.getOverlayAutoCurveDistanceRangeInMeters
-        pfMinDistanceInMeters = c_float()
-        pfMaxDistanceInMeters = c_float()
-        error_code = fn(ulOverlayHandle, byref(pfMinDistanceInMeters), byref(pfMaxDistanceInMeters))
+        minDistanceInMeters = c_float()
+        maxDistanceInMeters = c_float()
+        error_code = fn(overlayHandle, byref(minDistanceInMeters), byref(maxDistanceInMeters))
         OverlayError.check_error_value(error_code)
-        return pfMinDistanceInMeters.value, pfMaxDistanceInMeters.value
+        return minDistanceInMeters.value, maxDistanceInMeters.value
 
-    def setOverlayTextureColorSpace(self, ulOverlayHandle, eTextureColorSpace) -> None:
+    def setOverlayTextureColorSpace(self, overlayHandle, textureColorSpace) -> None:
         """
         Sets the colorspace the overlay texture's data is in.  Defaults to 'auto'.
         If the texture needs to be resolved, you should call SetOverlayTexture with the appropriate colorspace instead.
         """
 
         fn = self.function_table.setOverlayTextureColorSpace
-        error_code = fn(ulOverlayHandle, eTextureColorSpace)
+        error_code = fn(overlayHandle, textureColorSpace)
         OverlayError.check_error_value(error_code)
 
-    def getOverlayTextureColorSpace(self, ulOverlayHandle):
+    def getOverlayTextureColorSpace(self, overlayHandle):
         """Gets the overlay's current colorspace setting."""
 
         fn = self.function_table.getOverlayTextureColorSpace
-        peTextureColorSpace = EColorSpace()
-        error_code = fn(ulOverlayHandle, byref(peTextureColorSpace))
+        textureColorSpace = EColorSpace()
+        error_code = fn(overlayHandle, byref(textureColorSpace))
         OverlayError.check_error_value(error_code)
-        return peTextureColorSpace
+        return textureColorSpace
 
-    def setOverlayTextureBounds(self, ulOverlayHandle, pOverlayTextureBounds) -> None:
+    def setOverlayTextureBounds(self, overlayHandle, overlayTextureBounds) -> None:
         """Sets the part of the texture to use for the overlay. UV Min is the upper left corner and UV Max is the lower right corner."""
 
         fn = self.function_table.setOverlayTextureBounds
-        error_code = fn(ulOverlayHandle, byref(pOverlayTextureBounds))
+        error_code = fn(overlayHandle, byref(overlayTextureBounds))
         OverlayError.check_error_value(error_code)
 
-    def getOverlayTextureBounds(self, ulOverlayHandle):
+    def getOverlayTextureBounds(self, overlayHandle):
         """Gets the part of the texture to use for the overlay. UV Min is the upper left corner and UV Max is the lower right corner."""
 
         fn = self.function_table.getOverlayTextureBounds
-        pOverlayTextureBounds = VRTextureBounds_t()
-        error_code = fn(ulOverlayHandle, byref(pOverlayTextureBounds))
+        overlayTextureBounds = VRTextureBounds_t()
+        error_code = fn(overlayHandle, byref(overlayTextureBounds))
         OverlayError.check_error_value(error_code)
-        return pOverlayTextureBounds
+        return overlayTextureBounds
 
-    def getOverlayRenderModel(self, ulOverlayHandle):
+    def getOverlayRenderModel(self, overlayHandle):
         """Gets render model to draw behind this overlay"""
 
         fn = self.function_table.getOverlayRenderModel
-        pColor = HmdColor_t()
-        pError = EVROverlayError()
-        unBufferSize = fn(ulOverlayHandle, None, 0, byref(pColor), byref(pError))
-        if unBufferSize == 0:
+        color = HmdColor_t()
+        error = EVROverlayError()
+        bufferSize = fn(overlayHandle, None, 0, byref(color), byref(error))
+        if bufferSize == 0:
             return b''
-        pchValue = ctypes.create_string_buffer(unBufferSize)
-        fn(ulOverlayHandle, pchValue, unBufferSize, byref(pColor), byref(pError))
-        if pError.value != 0:
-            raise OpenVRError(str(pError))
-        return bytes(pchValue.value).decode('utf-8'), pColor
+        value = ctypes.create_string_buffer(bufferSize)
+        fn(overlayHandle, value, bufferSize, byref(color), byref(error))
+        OverlayError.check_error_value(error.value)
+        return bytes(value.value).decode('utf-8'), color
 
-    def setOverlayRenderModel(self, ulOverlayHandle, renderModel: str, pColor) -> None:
+    def setOverlayRenderModel(self, overlayHandle, renderModel: str, color) -> None:
         """
         Sets render model to draw behind this overlay and the vertex color to use, pass null for pColor to match the overlays vertex color. 
         The model is scaled by the same amount as the overlay, with a default of 1m.
         """
 
         fn = self.function_table.setOverlayRenderModel
-        error_code = fn(ulOverlayHandle, bytes(renderModel, encoding='utf-8'), byref(pColor))
+        error_code = fn(overlayHandle, bytes(renderModel, encoding='utf-8'), byref(color))
         OverlayError.check_error_value(error_code)
 
-    def getOverlayTransformType(self, ulOverlayHandle):
+    def getOverlayTransformType(self, overlayHandle):
         """Returns the transform type of this overlay."""
 
         fn = self.function_table.getOverlayTransformType
-        peTransformType = VROverlayTransformType()
-        error_code = fn(ulOverlayHandle, byref(peTransformType))
+        transformType = VROverlayTransformType()
+        error_code = fn(overlayHandle, byref(transformType))
         OverlayError.check_error_value(error_code)
-        return peTransformType
+        return transformType
 
-    def setOverlayTransformAbsolute(self, ulOverlayHandle, eTrackingOrigin, pmatTrackingOriginToOverlayTransform) -> None:
+    def setOverlayTransformAbsolute(self, overlayHandle, trackingOrigin, trackingOriginToOverlayTransform) -> None:
         """Sets the transform to absolute tracking origin."""
 
         fn = self.function_table.setOverlayTransformAbsolute
-        error_code = fn(ulOverlayHandle, eTrackingOrigin, byref(pmatTrackingOriginToOverlayTransform))
+        error_code = fn(overlayHandle, trackingOrigin, byref(trackingOriginToOverlayTransform))
         OverlayError.check_error_value(error_code)
 
-    def getOverlayTransformAbsolute(self, ulOverlayHandle):
+    def getOverlayTransformAbsolute(self, overlayHandle):
         """Gets the transform if it is absolute. Returns an error if the transform is some other type."""
 
         fn = self.function_table.getOverlayTransformAbsolute
-        peTrackingOrigin = ETrackingUniverseOrigin()
-        pmatTrackingOriginToOverlayTransform = HmdMatrix34_t()
-        error_code = fn(ulOverlayHandle, byref(peTrackingOrigin), byref(pmatTrackingOriginToOverlayTransform))
+        trackingOrigin = ETrackingUniverseOrigin()
+        trackingOriginToOverlayTransform = HmdMatrix34_t()
+        error_code = fn(overlayHandle, byref(trackingOrigin), byref(trackingOriginToOverlayTransform))
         OverlayError.check_error_value(error_code)
-        return peTrackingOrigin, pmatTrackingOriginToOverlayTransform
+        return trackingOrigin, trackingOriginToOverlayTransform
 
-    def setOverlayTransformTrackedDeviceRelative(self, ulOverlayHandle, unTrackedDevice, pmatTrackedDeviceToOverlayTransform) -> None:
+    def setOverlayTransformTrackedDeviceRelative(self, overlayHandle, trackedDevice, trackedDeviceToOverlayTransform) -> None:
         """Sets the transform to relative to the transform of the specified tracked device."""
 
         fn = self.function_table.setOverlayTransformTrackedDeviceRelative
-        error_code = fn(ulOverlayHandle, unTrackedDevice, byref(pmatTrackedDeviceToOverlayTransform))
+        error_code = fn(overlayHandle, trackedDevice, byref(trackedDeviceToOverlayTransform))
         OverlayError.check_error_value(error_code)
 
-    def getOverlayTransformTrackedDeviceRelative(self, ulOverlayHandle):
+    def getOverlayTransformTrackedDeviceRelative(self, overlayHandle):
         """Gets the transform if it is relative to a tracked device. Returns an error if the transform is some other type."""
 
         fn = self.function_table.getOverlayTransformTrackedDeviceRelative
-        punTrackedDevice = TrackedDeviceIndex_t()
-        pmatTrackedDeviceToOverlayTransform = HmdMatrix34_t()
-        error_code = fn(ulOverlayHandle, byref(punTrackedDevice), byref(pmatTrackedDeviceToOverlayTransform))
+        trackedDevice = TrackedDeviceIndex_t()
+        trackedDeviceToOverlayTransform = HmdMatrix34_t()
+        error_code = fn(overlayHandle, byref(trackedDevice), byref(trackedDeviceToOverlayTransform))
         OverlayError.check_error_value(error_code)
-        return punTrackedDevice, pmatTrackedDeviceToOverlayTransform
+        return trackedDevice, trackedDeviceToOverlayTransform
 
-    def setOverlayTransformTrackedDeviceComponent(self, ulOverlayHandle, unDeviceIndex, componentName: str) -> None:
+    def setOverlayTransformTrackedDeviceComponent(self, overlayHandle, deviceIndex, componentName: str) -> None:
         """
         Sets the transform to draw the overlay on a rendermodel component mesh instead of a quad. This will only draw when the system is
         drawing the device. Overlays with this transform type cannot receive mouse events.
         """
 
         fn = self.function_table.setOverlayTransformTrackedDeviceComponent
-        error_code = fn(ulOverlayHandle, unDeviceIndex, bytes(componentName, encoding='utf-8'))
+        error_code = fn(overlayHandle, deviceIndex, bytes(componentName, encoding='utf-8'))
         OverlayError.check_error_value(error_code)
 
-    def getOverlayTransformTrackedDeviceComponent(self, ulOverlayHandle):
+    def getOverlayTransformTrackedDeviceComponent(self, overlayHandle):
         """Gets the transform information when the overlay is rendering on a component."""
 
         fn = self.function_table.getOverlayTransformTrackedDeviceComponent
-        punDeviceIndex = TrackedDeviceIndex_t()
-        unComponentNameSize = fn(ulOverlayHandle, byref(punDeviceIndex), None, 0)
-        if unComponentNameSize == 0:
+        deviceIndex = TrackedDeviceIndex_t()
+        componentNameSize = fn(overlayHandle, byref(deviceIndex), None, 0)
+        if componentNameSize == 0:
             return b''
-        pchComponentName = ctypes.create_string_buffer(unComponentNameSize)
-        error_code = fn(ulOverlayHandle, byref(punDeviceIndex), pchComponentName, unComponentNameSize)
+        componentName = ctypes.create_string_buffer(componentNameSize)
+        error_code = fn(overlayHandle, byref(deviceIndex), componentName, componentNameSize)
         OverlayError.check_error_value(error_code)
-        return punDeviceIndex, bytes(pchComponentName.value).decode('utf-8')
+        return deviceIndex, bytes(componentName.value).decode('utf-8')
 
-    def getOverlayTransformOverlayRelative(self, ulOverlayHandle):
+    def getOverlayTransformOverlayRelative(self, overlayHandle):
         """Gets the transform if it is relative to another overlay. Returns an error if the transform is some other type."""
 
         fn = self.function_table.getOverlayTransformOverlayRelative
-        ulOverlayHandleParent = VROverlayHandle_t()
-        pmatParentOverlayToOverlayTransform = HmdMatrix34_t()
-        error_code = fn(ulOverlayHandle, byref(ulOverlayHandleParent), byref(pmatParentOverlayToOverlayTransform))
+        overlayHandleParent = VROverlayHandle_t()
+        parentOverlayToOverlayTransform = HmdMatrix34_t()
+        error_code = fn(overlayHandle, byref(overlayHandleParent), byref(parentOverlayToOverlayTransform))
         OverlayError.check_error_value(error_code)
-        return ulOverlayHandleParent.value, pmatParentOverlayToOverlayTransform
+        return overlayHandleParent.value, parentOverlayToOverlayTransform
 
-    def setOverlayTransformOverlayRelative(self, ulOverlayHandle, ulOverlayHandleParent, pmatParentOverlayToOverlayTransform) -> None:
+    def setOverlayTransformOverlayRelative(self, overlayHandle, overlayHandleParent, parentOverlayToOverlayTransform) -> None:
         """Sets the transform to relative to the transform of the specified overlay. This overlays visibility will also track the parents visibility"""
 
         fn = self.function_table.setOverlayTransformOverlayRelative
-        error_code = fn(ulOverlayHandle, ulOverlayHandleParent, byref(pmatParentOverlayToOverlayTransform))
+        error_code = fn(overlayHandle, overlayHandleParent, byref(parentOverlayToOverlayTransform))
         OverlayError.check_error_value(error_code)
 
-    def showOverlay(self, ulOverlayHandle) -> None:
+    def showOverlay(self, overlayHandle) -> None:
         """Shows the VR overlay.  For dashboard overlays, only the Dashboard Manager is allowed to call this."""
 
         fn = self.function_table.showOverlay
-        error_code = fn(ulOverlayHandle)
+        error_code = fn(overlayHandle)
         OverlayError.check_error_value(error_code)
 
-    def hideOverlay(self, ulOverlayHandle) -> None:
+    def hideOverlay(self, overlayHandle) -> None:
         """Hides the VR overlay.  For dashboard overlays, only the Dashboard Manager is allowed to call this."""
 
         fn = self.function_table.hideOverlay
-        error_code = fn(ulOverlayHandle)
+        error_code = fn(overlayHandle)
         OverlayError.check_error_value(error_code)
 
-    def isOverlayVisible(self, ulOverlayHandle):
+    def isOverlayVisible(self, overlayHandle):
         """Returns true if the overlay is visible."""
 
         fn = self.function_table.isOverlayVisible
-        result = fn(ulOverlayHandle)
+        result = fn(overlayHandle)
         return result
 
-    def getTransformForOverlayCoordinates(self, ulOverlayHandle, eTrackingOrigin, coordinatesInOverlay):
+    def getTransformForOverlayCoordinates(self, overlayHandle, trackingOrigin, coordinatesInOverlay):
         """Get the transform in 3d space associated with a specific 2d point in the overlay's coordinate space (where 0,0 is the lower left). -Z points out of the overlay"""
 
         fn = self.function_table.getTransformForOverlayCoordinates
-        pmatTransform = HmdMatrix34_t()
-        error_code = fn(ulOverlayHandle, eTrackingOrigin, coordinatesInOverlay, byref(pmatTransform))
+        transform = HmdMatrix34_t()
+        error_code = fn(overlayHandle, trackingOrigin, coordinatesInOverlay, byref(transform))
         OverlayError.check_error_value(error_code)
-        return pmatTransform
+        return transform
 
-    def pollNextOverlayEvent(self, ulOverlayHandle, pEvent):
+    def pollNextOverlayEvent(self, overlayHandle, event):
         """
         Returns true and fills the event with the next event on the overlay's event queue, if there is one. 
         If there are no events this method returns false. uncbVREvent should be the size in bytes of the VREvent_t struct
         """
 
         fn = self.function_table.pollNextOverlayEvent
-        uncbVREvent = sizeof(VREvent_t)
-        result = fn(ulOverlayHandle, byref(pEvent), uncbVREvent)
-        return result, pEvent
+        vREvent = sizeof(VREvent_t)
+        result = fn(overlayHandle, byref(event), vREvent)
+        return result, event
 
-    def getOverlayInputMethod(self, ulOverlayHandle):
+    def getOverlayInputMethod(self, overlayHandle):
         """Returns the current input settings for the specified overlay."""
 
         fn = self.function_table.getOverlayInputMethod
-        peInputMethod = VROverlayInputMethod()
-        error_code = fn(ulOverlayHandle, byref(peInputMethod))
+        inputMethod = VROverlayInputMethod()
+        error_code = fn(overlayHandle, byref(inputMethod))
         OverlayError.check_error_value(error_code)
-        return peInputMethod
+        return inputMethod
 
-    def setOverlayInputMethod(self, ulOverlayHandle, eInputMethod) -> None:
+    def setOverlayInputMethod(self, overlayHandle, inputMethod) -> None:
         """Sets the input settings for the specified overlay."""
 
         fn = self.function_table.setOverlayInputMethod
-        error_code = fn(ulOverlayHandle, eInputMethod)
+        error_code = fn(overlayHandle, inputMethod)
         OverlayError.check_error_value(error_code)
 
-    def getOverlayMouseScale(self, ulOverlayHandle):
+    def getOverlayMouseScale(self, overlayHandle):
         """
         Gets the mouse scaling factor that is used for mouse events. The actual texture may be a different size, but this is
         typically the size of the underlying UI in pixels.
         """
 
         fn = self.function_table.getOverlayMouseScale
-        pvecMouseScale = HmdVector2_t()
-        error_code = fn(ulOverlayHandle, byref(pvecMouseScale))
+        mouseScale = HmdVector2_t()
+        error_code = fn(overlayHandle, byref(mouseScale))
         OverlayError.check_error_value(error_code)
-        return pvecMouseScale
+        return mouseScale
 
-    def setOverlayMouseScale(self, ulOverlayHandle, pvecMouseScale) -> None:
+    def setOverlayMouseScale(self, overlayHandle, mouseScale) -> None:
         """
         Sets the mouse scaling factor that is used for mouse events. The actual texture may be a different size, but this is
         typically the size of the underlying UI in pixels (not in world space).
         """
 
         fn = self.function_table.setOverlayMouseScale
-        error_code = fn(ulOverlayHandle, byref(pvecMouseScale))
+        error_code = fn(overlayHandle, byref(mouseScale))
         OverlayError.check_error_value(error_code)
 
-    def computeOverlayIntersection(self, ulOverlayHandle, pParams):
+    def computeOverlayIntersection(self, overlayHandle, params):
         """
         Computes the overlay-space pixel coordinates of where the ray intersects the overlay with the
         specified settings. Returns false if there is no intersection.
         """
 
         fn = self.function_table.computeOverlayIntersection
-        pResults = VROverlayIntersectionResults_t()
-        result = fn(ulOverlayHandle, byref(pParams), byref(pResults))
-        return result, pResults
+        results = VROverlayIntersectionResults_t()
+        result = fn(overlayHandle, byref(params), byref(results))
+        return result, results
 
-    def isHoverTargetOverlay(self, ulOverlayHandle):
+    def isHoverTargetOverlay(self, overlayHandle):
         """
         Returns true if the specified overlay is the hover target. An overlay is the hover target when it is the last overlay "moused over" 
         by the virtual mouse pointer
         """
 
         fn = self.function_table.isHoverTargetOverlay
-        result = fn(ulOverlayHandle)
+        result = fn(overlayHandle)
         return result
 
     def getGamepadFocusOverlay(self):
@@ -6924,14 +7026,14 @@ class IVROverlay(object):
         result = fn()
         return result
 
-    def setGamepadFocusOverlay(self, ulNewFocusOverlay) -> None:
+    def setGamepadFocusOverlay(self, newFocusOverlay) -> None:
         """Sets the current Gamepad focus overlay"""
 
         fn = self.function_table.setGamepadFocusOverlay
-        error_code = fn(ulNewFocusOverlay)
+        error_code = fn(newFocusOverlay)
         OverlayError.check_error_value(error_code)
 
-    def setOverlayNeighbor(self, eDirection, ulFrom, ulTo) -> None:
+    def setOverlayNeighbor(self, direction, from_, to) -> None:
         """
         Sets an overlay's neighbor. This will also set the neighbor of the "to" overlay
         to point back to the "from" overlay. If an overlay's neighbor is set to invalid both
@@ -6939,37 +7041,37 @@ class IVROverlay(object):
         """
 
         fn = self.function_table.setOverlayNeighbor
-        error_code = fn(eDirection, ulFrom, ulTo)
+        error_code = fn(direction, from_, to)
         OverlayError.check_error_value(error_code)
 
-    def moveGamepadFocusToNeighbor(self, eDirection, ulFrom) -> None:
+    def moveGamepadFocusToNeighbor(self, direction, from_) -> None:
         """
         Changes the Gamepad focus from one overlay to one of its neighbors. Returns VROverlayError_NoNeighbor if there is no
         neighbor in that direction
         """
 
         fn = self.function_table.moveGamepadFocusToNeighbor
-        error_code = fn(eDirection, ulFrom)
+        error_code = fn(direction, from_)
         OverlayError.check_error_value(error_code)
 
-    def setOverlayDualAnalogTransform(self, ulOverlay, eWhich, pvCenter, fRadius: float) -> None:
+    def setOverlayDualAnalogTransform(self, overlay, which, center, radius: float) -> None:
         """Sets the analog input to Dual Analog coordinate scale for the specified overlay."""
 
         fn = self.function_table.setOverlayDualAnalogTransform
-        error_code = fn(ulOverlay, eWhich, byref(pvCenter), fRadius)
+        error_code = fn(overlay, which, byref(center), radius)
         OverlayError.check_error_value(error_code)
 
-    def getOverlayDualAnalogTransform(self, ulOverlay, eWhich):
+    def getOverlayDualAnalogTransform(self, overlay, which):
         """Gets the analog input to Dual Analog coordinate scale for the specified overlay."""
 
         fn = self.function_table.getOverlayDualAnalogTransform
-        pvCenter = HmdVector2_t()
-        pfRadius = c_float()
-        error_code = fn(ulOverlay, eWhich, byref(pvCenter), byref(pfRadius))
+        center = HmdVector2_t()
+        radius = c_float()
+        error_code = fn(overlay, which, byref(center), byref(radius))
         OverlayError.check_error_value(error_code)
-        return pvCenter, pfRadius.value
+        return center, radius.value
 
-    def setOverlayTexture(self, ulOverlayHandle, pTexture) -> None:
+    def setOverlayTexture(self, overlayHandle, texture) -> None:
         """
         Texture to draw for the overlay. This function can only be called by the overlay's creator or renderer process (see SetOverlayRenderingPid) .
 
@@ -6978,37 +7080,37 @@ class IVROverlay(object):
         """
 
         fn = self.function_table.setOverlayTexture
-        error_code = fn(ulOverlayHandle, byref(pTexture))
+        error_code = fn(overlayHandle, byref(texture))
         OverlayError.check_error_value(error_code)
 
-    def clearOverlayTexture(self, ulOverlayHandle) -> None:
+    def clearOverlayTexture(self, overlayHandle) -> None:
         """Use this to tell the overlay system to release the texture set for this overlay."""
 
         fn = self.function_table.clearOverlayTexture
-        error_code = fn(ulOverlayHandle)
+        error_code = fn(overlayHandle)
         OverlayError.check_error_value(error_code)
 
-    def setOverlayRaw(self, ulOverlayHandle, pvBuffer, unWidth, unHeight, unDepth) -> None:
+    def setOverlayRaw(self, overlayHandle, buffer, width, height, depth) -> None:
         """
         Separate interface for providing the data as a stream of bytes, but there is an upper bound on data 
         that can be sent. This function can only be called by the overlay's renderer process.
         """
 
         fn = self.function_table.setOverlayRaw
-        error_code = fn(ulOverlayHandle, byref(pvBuffer), unWidth, unHeight, unDepth)
+        error_code = fn(overlayHandle, byref(buffer), width, height, depth)
         OverlayError.check_error_value(error_code)
 
-    def setOverlayFromFile(self, ulOverlayHandle, filePath: str) -> None:
+    def setOverlayFromFile(self, overlayHandle, filePath: str) -> None:
         """
         Separate interface for providing the image through a filename: can be png or jpg, and should not be bigger than 1920x1080.
         This function can only be called by the overlay's renderer process
         """
 
         fn = self.function_table.setOverlayFromFile
-        error_code = fn(ulOverlayHandle, bytes(filePath, encoding='utf-8'))
+        error_code = fn(overlayHandle, bytes(filePath, encoding='utf-8'))
         OverlayError.check_error_value(error_code)
 
-    def getOverlayTexture(self, ulOverlayHandle, pNativeTextureRef):
+    def getOverlayTexture(self, overlayHandle, nativeTextureRef):
         """
         Get the native texture handle/device for an overlay you have created.
         On windows this handle will be a ID3D11ShaderResourceView with a ID3D11Texture2D bound.
@@ -7022,46 +7124,46 @@ class IVROverlay(object):
         """
 
         fn = self.function_table.getOverlayTexture
-        pNativeTextureHandle = c_void_p()
-        pWidth = c_uint32()
-        pHeight = c_uint32()
-        pNativeFormat = c_uint32()
-        pAPIType = ETextureType()
-        pColorSpace = EColorSpace()
-        pTextureBounds = VRTextureBounds_t()
-        error_code = fn(ulOverlayHandle, byref(pNativeTextureHandle), byref(pNativeTextureRef), byref(pWidth), byref(pHeight), byref(pNativeFormat), byref(pAPIType), byref(pColorSpace), byref(pTextureBounds))
+        nativeTextureHandle = c_void_p()
+        width = c_uint32()
+        height = c_uint32()
+        nativeFormat = c_uint32()
+        aPIType = ETextureType()
+        colorSpace = EColorSpace()
+        textureBounds = VRTextureBounds_t()
+        error_code = fn(overlayHandle, byref(nativeTextureHandle), byref(nativeTextureRef), byref(width), byref(height), byref(nativeFormat), byref(aPIType), byref(colorSpace), byref(textureBounds))
         OverlayError.check_error_value(error_code)
-        return pNativeTextureHandle.value, pWidth.value, pHeight.value, pNativeFormat.value, pAPIType, pColorSpace, pTextureBounds
+        return nativeTextureHandle.value, width.value, height.value, nativeFormat.value, aPIType, colorSpace, textureBounds
 
-    def releaseNativeOverlayHandle(self, ulOverlayHandle, pNativeTextureHandle) -> None:
+    def releaseNativeOverlayHandle(self, overlayHandle, nativeTextureHandle) -> None:
         """
         Release the pNativeTextureHandle provided from the GetOverlayTexture call, this allows the system to free the underlying GPU resources for this object,
         so only do it once you stop rendering this texture.
         """
 
         fn = self.function_table.releaseNativeOverlayHandle
-        error_code = fn(ulOverlayHandle, byref(pNativeTextureHandle))
+        error_code = fn(overlayHandle, byref(nativeTextureHandle))
         OverlayError.check_error_value(error_code)
 
-    def getOverlayTextureSize(self, ulOverlayHandle):
+    def getOverlayTextureSize(self, overlayHandle):
         """Get the size of the overlay texture"""
 
         fn = self.function_table.getOverlayTextureSize
-        pWidth = c_uint32()
-        pHeight = c_uint32()
-        error_code = fn(ulOverlayHandle, byref(pWidth), byref(pHeight))
+        width = c_uint32()
+        height = c_uint32()
+        error_code = fn(overlayHandle, byref(width), byref(height))
         OverlayError.check_error_value(error_code)
-        return pWidth.value, pHeight.value
+        return width.value, height.value
 
     def createDashboardOverlay(self, overlayKey: str, overlayFriendlyName: str):
         """Creates a dashboard overlay and returns its handle"""
 
         fn = self.function_table.createDashboardOverlay
-        pMainHandle = VROverlayHandle_t()
-        pThumbnailHandle = VROverlayHandle_t()
-        error_code = fn(bytes(overlayKey, encoding='utf-8'), bytes(overlayFriendlyName, encoding='utf-8'), byref(pMainHandle), byref(pThumbnailHandle))
+        mainHandle = VROverlayHandle_t()
+        thumbnailHandle = VROverlayHandle_t()
+        error_code = fn(bytes(overlayKey, encoding='utf-8'), bytes(overlayFriendlyName, encoding='utf-8'), byref(mainHandle), byref(thumbnailHandle))
         OverlayError.check_error_value(error_code)
-        return pMainHandle.value, pThumbnailHandle.value
+        return mainHandle.value, thumbnailHandle.value
 
     def isDashboardVisible(self):
         """Returns true if the dashboard is visible"""
@@ -7070,28 +7172,28 @@ class IVROverlay(object):
         result = fn()
         return result
 
-    def isActiveDashboardOverlay(self, ulOverlayHandle):
+    def isActiveDashboardOverlay(self, overlayHandle):
         """returns true if the dashboard is visible and the specified overlay is the active system Overlay"""
 
         fn = self.function_table.isActiveDashboardOverlay
-        result = fn(ulOverlayHandle)
+        result = fn(overlayHandle)
         return result
 
-    def setDashboardOverlaySceneProcess(self, ulOverlayHandle, unProcessId) -> None:
+    def setDashboardOverlaySceneProcess(self, overlayHandle, processId) -> None:
         """Sets the dashboard overlay to only appear when the specified process ID has scene focus"""
 
         fn = self.function_table.setDashboardOverlaySceneProcess
-        error_code = fn(ulOverlayHandle, unProcessId)
+        error_code = fn(overlayHandle, processId)
         OverlayError.check_error_value(error_code)
 
-    def getDashboardOverlaySceneProcess(self, ulOverlayHandle):
+    def getDashboardOverlaySceneProcess(self, overlayHandle):
         """Gets the process ID that this dashboard overlay requires to have scene focus"""
 
         fn = self.function_table.getDashboardOverlaySceneProcess
-        punProcessId = c_uint32()
-        error_code = fn(ulOverlayHandle, byref(punProcessId))
+        processId = c_uint32()
+        error_code = fn(overlayHandle, byref(processId))
         OverlayError.check_error_value(error_code)
-        return punProcessId.value
+        return processId.value
 
     def showDashboard(self, overlayToShow: str) -> None:
         """Shows the dashboard."""
@@ -7106,28 +7208,28 @@ class IVROverlay(object):
         result = fn()
         return result
 
-    def showKeyboard(self, eInputMode, eLineInputMode, description: str, unCharMax, existingText: str, bUseMinimalMode, uUserValue) -> None:
+    def showKeyboard(self, inputMode, lineInputMode, description: str, charMax, existingText: str, useMinimalMode, userValue) -> None:
         """Show the virtual keyboard to accept input"""
 
         fn = self.function_table.showKeyboard
-        error_code = fn(eInputMode, eLineInputMode, bytes(description, encoding='utf-8'), unCharMax, bytes(existingText, encoding='utf-8'), bUseMinimalMode, uUserValue)
+        error_code = fn(inputMode, lineInputMode, bytes(description, encoding='utf-8'), charMax, bytes(existingText, encoding='utf-8'), useMinimalMode, userValue)
         OverlayError.check_error_value(error_code)
 
-    def showKeyboardForOverlay(self, ulOverlayHandle, eInputMode, eLineInputMode, description: str, unCharMax, existingText: str, bUseMinimalMode, uUserValue) -> None:
+    def showKeyboardForOverlay(self, overlayHandle, inputMode, lineInputMode, description: str, charMax, existingText: str, useMinimalMode, userValue) -> None:
         fn = self.function_table.showKeyboardForOverlay
-        error_code = fn(ulOverlayHandle, eInputMode, eLineInputMode, bytes(description, encoding='utf-8'), unCharMax, bytes(existingText, encoding='utf-8'), bUseMinimalMode, uUserValue)
+        error_code = fn(overlayHandle, inputMode, lineInputMode, bytes(description, encoding='utf-8'), charMax, bytes(existingText, encoding='utf-8'), useMinimalMode, userValue)
         OverlayError.check_error_value(error_code)
 
     def getKeyboardText(self):
         """Get the text that was entered into the text input"""
 
         fn = self.function_table.getKeyboardText
-        cchText = fn(None, 0)
-        if cchText == 0:
+        text = fn(None, 0)
+        if text == 0:
             return b''
-        pchText = ctypes.create_string_buffer(cchText)
-        fn(pchText, cchText)
-        return bytes(pchText.value).decode('utf-8')
+        text = ctypes.create_string_buffer(text)
+        fn(text, text)
+        return bytes(text.value).decode('utf-8')
 
     def hideKeyboard(self) -> None:
         """Hide the virtual keyboard"""
@@ -7135,36 +7237,36 @@ class IVROverlay(object):
         fn = self.function_table.hideKeyboard
         fn()
 
-    def setKeyboardTransformAbsolute(self, eTrackingOrigin, pmatTrackingOriginToKeyboardTransform) -> None:
+    def setKeyboardTransformAbsolute(self, trackingOrigin, trackingOriginToKeyboardTransform) -> None:
         """Set the position of the keyboard in world space"""
 
         fn = self.function_table.setKeyboardTransformAbsolute
-        fn(eTrackingOrigin, byref(pmatTrackingOriginToKeyboardTransform))
+        fn(trackingOrigin, byref(trackingOriginToKeyboardTransform))
 
-    def setKeyboardPositionForOverlay(self, ulOverlayHandle, avoidRect) -> None:
+    def setKeyboardPositionForOverlay(self, overlayHandle, rect) -> None:
         """Set the position of the keyboard in overlay space by telling it to avoid a rectangle in the overlay. Rectangle coords have (0,0) in the bottom left"""
 
         fn = self.function_table.setKeyboardPositionForOverlay
-        fn(ulOverlayHandle, avoidRect)
+        fn(overlayHandle, rect)
 
-    def setOverlayIntersectionMask(self, ulOverlayHandle, unNumMaskPrimitives, unPrimitiveSize=sizeof(VROverlayIntersectionMaskPrimitive_t)):
+    def setOverlayIntersectionMask(self, overlayHandle, numMaskPrimitives, primitiveSize=sizeof(VROverlayIntersectionMaskPrimitive_t)):
         """
         Sets a list of primitives to be used for controller ray intersection
         typically the size of the underlying UI in pixels (not in world space).
         """
 
         fn = self.function_table.setOverlayIntersectionMask
-        pMaskPrimitives = VROverlayIntersectionMaskPrimitive_t()
-        error_code = fn(ulOverlayHandle, byref(pMaskPrimitives), unNumMaskPrimitives, unPrimitiveSize)
+        maskPrimitives = VROverlayIntersectionMaskPrimitive_t()
+        error_code = fn(overlayHandle, byref(maskPrimitives), numMaskPrimitives, primitiveSize)
         OverlayError.check_error_value(error_code)
-        return pMaskPrimitives
+        return maskPrimitives
 
-    def getOverlayFlags(self, ulOverlayHandle):
+    def getOverlayFlags(self, overlayHandle):
         fn = self.function_table.getOverlayFlags
-        pFlags = c_uint32()
-        error_code = fn(ulOverlayHandle, byref(pFlags))
+        flags = c_uint32()
+        error_code = fn(overlayHandle, byref(flags))
         OverlayError.check_error_value(error_code)
-        return pFlags.value
+        return flags.value
 
     def showMessageOverlay(self, text: str, caption: str, button0Text: str, button1Text: str=None, button2Text: str=None, button3Text: str=None):
         """Show the message overlay. This will block and return you a result."""
@@ -7230,69 +7332,69 @@ class IVRRenderModels(object):
         """
 
         fn = self.function_table.loadRenderModel_Async
-        ppRenderModel = POINTER(RenderModel_t)()
-        error_code = fn(bytes(renderModelName, encoding='utf-8'), byref(ppRenderModel))
-        if ppRenderModel:
-            ppRenderModel = ppRenderModel.contents
+        renderModel = POINTER(RenderModel_t)()
+        error_code = fn(bytes(renderModelName, encoding='utf-8'), byref(renderModel))
+        if renderModel:
+            renderModel = renderModel.contents
         else:
-            ppRenderModel = None
+            renderModel = None
         RenderModelError.check_error_value(error_code)
-        return ppRenderModel
+        return renderModel
 
-    def freeRenderModel(self, pRenderModel) -> None:
+    def freeRenderModel(self, renderModel) -> None:
         """
         Frees a previously returned render model
         It is safe to call this on a null ptr.
         """
 
         fn = self.function_table.freeRenderModel
-        fn(byref(pRenderModel))
+        fn(byref(renderModel))
 
     def loadTexture_Async(self, textureId):
         """Loads and returns a texture for use in the application."""
 
         fn = self.function_table.loadTexture_Async
-        ppTexture = POINTER(RenderModel_TextureMap_t)()
-        error_code = fn(textureId, byref(ppTexture))
-        if ppTexture:
-            ppTexture = ppTexture.contents
+        texture = POINTER(RenderModel_TextureMap_t)()
+        error_code = fn(textureId, byref(texture))
+        if texture:
+            texture = texture.contents
         else:
-            ppTexture = None
+            texture = None
         RenderModelError.check_error_value(error_code)
-        return ppTexture
+        return texture
 
-    def freeTexture(self, pTexture) -> None:
+    def freeTexture(self, texture) -> None:
         """
         Frees a previously returned texture
         It is safe to call this on a null ptr.
         """
 
         fn = self.function_table.freeTexture
-        fn(byref(pTexture))
+        fn(byref(texture))
 
-    def loadTextureD3D11_Async(self, textureId, pD3D11Device):
+    def loadTextureD3D11_Async(self, textureId, d3D11Device):
         """Creates a D3D11 texture and loads data into it."""
 
         fn = self.function_table.loadTextureD3D11_Async
-        ppD3D11Texture2D = c_void_p()
-        error_code = fn(textureId, byref(pD3D11Device), byref(ppD3D11Texture2D))
+        d3D11Texture2D = c_void_p()
+        error_code = fn(textureId, byref(d3D11Device), byref(d3D11Texture2D))
         RenderModelError.check_error_value(error_code)
-        return ppD3D11Texture2D.value
+        return d3D11Texture2D.value
 
-    def loadIntoTextureD3D11_Async(self, textureId, pDstTexture) -> None:
+    def loadIntoTextureD3D11_Async(self, textureId, dstTexture) -> None:
         """Helper function to copy the bits into an existing texture."""
 
         fn = self.function_table.loadIntoTextureD3D11_Async
-        error_code = fn(textureId, byref(pDstTexture))
+        error_code = fn(textureId, byref(dstTexture))
         RenderModelError.check_error_value(error_code)
 
-    def freeTextureD3D11(self, pD3D11Texture2D) -> None:
+    def freeTextureD3D11(self, d3D11Texture2D) -> None:
         """Use this to free textures created with LoadTextureD3D11_Async instead of calling Release on them."""
 
         fn = self.function_table.freeTextureD3D11
-        fn(byref(pD3D11Texture2D))
+        fn(byref(d3D11Texture2D))
 
-    def getRenderModelName(self, unRenderModelIndex):
+    def getRenderModelName(self, renderModelIndex):
         """
         Use this to get the names of available render models.  Index does not correlate to a tracked device index, but
         is only used for iterating over all available render models.  If the index is out of range, this function will return 0.
@@ -7300,12 +7402,12 @@ class IVRRenderModels(object):
         """
 
         fn = self.function_table.getRenderModelName
-        unRenderModelNameLen = fn(unRenderModelIndex, None, 0)
-        if unRenderModelNameLen == 0:
+        renderModelNameLen = fn(renderModelIndex, None, 0)
+        if renderModelNameLen == 0:
             return b''
-        pchRenderModelName = ctypes.create_string_buffer(unRenderModelNameLen)
-        fn(unRenderModelIndex, pchRenderModelName, unRenderModelNameLen)
-        return bytes(pchRenderModelName.value).decode('utf-8')
+        renderModelName = ctypes.create_string_buffer(renderModelNameLen)
+        fn(renderModelIndex, renderModelName, renderModelNameLen)
+        return bytes(renderModelName.value).decode('utf-8')
 
     def getRenderModelCount(self):
         """Returns the number of available render models."""
@@ -7329,7 +7431,7 @@ class IVRRenderModels(object):
         result = fn(bytes(renderModelName, encoding='utf-8'))
         return result
 
-    def getComponentName(self, renderModelName: str, unComponentIndex):
+    def getComponentName(self, renderModelName: str, componentIndex):
         """
         Use this to get the names of available components.  Index does not correlate to a tracked device index, but
         is only used for iterating over all available components.  If the index is out of range, this function will return 0.
@@ -7337,12 +7439,12 @@ class IVRRenderModels(object):
         """
 
         fn = self.function_table.getComponentName
-        unComponentNameLen = fn(bytes(renderModelName, encoding='utf-8'), unComponentIndex, None, 0)
-        if unComponentNameLen == 0:
+        componentNameLen = fn(bytes(renderModelName, encoding='utf-8'), componentIndex, None, 0)
+        if componentNameLen == 0:
             return b''
-        pchComponentName = ctypes.create_string_buffer(unComponentNameLen)
-        fn(bytes(renderModelName, encoding='utf-8'), unComponentIndex, pchComponentName, unComponentNameLen)
-        return bytes(pchComponentName.value).decode('utf-8')
+        componentName = ctypes.create_string_buffer(componentNameLen)
+        fn(bytes(renderModelName, encoding='utf-8'), componentIndex, componentName, componentNameLen)
+        return bytes(componentName.value).decode('utf-8')
 
     def getComponentButtonMask(self, renderModelName: str, componentName: str):
         """
@@ -7364,14 +7466,14 @@ class IVRRenderModels(object):
         """
 
         fn = self.function_table.getComponentRenderModelName
-        unComponentRenderModelNameLen = fn(bytes(renderModelName, encoding='utf-8'), bytes(componentName, encoding='utf-8'), None, 0)
-        if unComponentRenderModelNameLen == 0:
+        componentRenderModelNameLen = fn(bytes(renderModelName, encoding='utf-8'), bytes(componentName, encoding='utf-8'), None, 0)
+        if componentRenderModelNameLen == 0:
             return b''
-        pchComponentRenderModelName = ctypes.create_string_buffer(unComponentRenderModelNameLen)
-        fn(bytes(renderModelName, encoding='utf-8'), bytes(componentName, encoding='utf-8'), pchComponentRenderModelName, unComponentRenderModelNameLen)
-        return bytes(pchComponentRenderModelName.value).decode('utf-8')
+        componentRenderModelName = ctypes.create_string_buffer(componentRenderModelNameLen)
+        fn(bytes(renderModelName, encoding='utf-8'), bytes(componentName, encoding='utf-8'), componentRenderModelName, componentRenderModelNameLen)
+        return bytes(componentRenderModelName.value).decode('utf-8')
 
-    def getComponentStateForDevicePath(self, renderModelName: str, componentName: str, devicePath, pState):
+    def getComponentStateForDevicePath(self, renderModelName: str, componentName: str, devicePath, state):
         """
         Use this to query information about the component, as a function of the controller state.
 
@@ -7384,17 +7486,17 @@ class IVRRenderModels(object):
         """
 
         fn = self.function_table.getComponentStateForDevicePath
-        pComponentState = RenderModel_ComponentState_t()
-        result = fn(bytes(renderModelName, encoding='utf-8'), bytes(componentName, encoding='utf-8'), devicePath, byref(pState), byref(pComponentState))
-        return result, pComponentState
+        componentState = RenderModel_ComponentState_t()
+        result = fn(bytes(renderModelName, encoding='utf-8'), bytes(componentName, encoding='utf-8'), devicePath, byref(state), byref(componentState))
+        return result, componentState
 
-    def getComponentState(self, renderModelName: str, componentName: str, pControllerState, pState):
+    def getComponentState(self, renderModelName: str, componentName: str, controllerState, state):
         """This version of GetComponentState takes a controller state block instead of an action origin. This function is deprecated. You should use the new input system and GetComponentStateForDevicePath instead."""
 
         fn = self.function_table.getComponentState
-        pComponentState = RenderModel_ComponentState_t()
-        result = fn(bytes(renderModelName, encoding='utf-8'), bytes(componentName, encoding='utf-8'), byref(pControllerState), byref(pState), byref(pComponentState))
-        return result, pComponentState
+        componentState = RenderModel_ComponentState_t()
+        result = fn(bytes(renderModelName, encoding='utf-8'), bytes(componentName, encoding='utf-8'), byref(controllerState), byref(state), byref(componentState))
+        return result, componentState
 
     def renderModelHasComponent(self, renderModelName: str, componentName: str):
         """Returns true if the render model has a component with the specified name"""
@@ -7407,15 +7509,14 @@ class IVRRenderModels(object):
         """Returns the URL of the thumbnail image for this rendermodel"""
 
         fn = self.function_table.getRenderModelThumbnailURL
-        peError = EVRRenderModelError()
-        unThumbnailURLLen = fn(bytes(renderModelName, encoding='utf-8'), None, 0, byref(peError))
-        if unThumbnailURLLen == 0:
+        error = EVRRenderModelError()
+        thumbnailURLLen = fn(bytes(renderModelName, encoding='utf-8'), None, 0, byref(error))
+        if thumbnailURLLen == 0:
             return b''
-        pchThumbnailURL = ctypes.create_string_buffer(unThumbnailURLLen)
-        fn(bytes(renderModelName, encoding='utf-8'), pchThumbnailURL, unThumbnailURLLen, byref(peError))
-        if peError.value != 0:
-            raise OpenVRError(str(peError))
-        return bytes(pchThumbnailURL.value).decode('utf-8')
+        thumbnailURL = ctypes.create_string_buffer(thumbnailURLLen)
+        fn(bytes(renderModelName, encoding='utf-8'), thumbnailURL, thumbnailURLLen, byref(error))
+        RenderModelError.check_error_value(error.value)
+        return bytes(thumbnailURL.value).decode('utf-8')
 
     def getRenderModelOriginalPath(self, renderModelName: str):
         """
@@ -7425,15 +7526,14 @@ class IVRRenderModels(object):
         """
 
         fn = self.function_table.getRenderModelOriginalPath
-        peError = EVRRenderModelError()
-        unOriginalPathLen = fn(bytes(renderModelName, encoding='utf-8'), None, 0, byref(peError))
-        if unOriginalPathLen == 0:
+        error = EVRRenderModelError()
+        originalPathLen = fn(bytes(renderModelName, encoding='utf-8'), None, 0, byref(error))
+        if originalPathLen == 0:
             return b''
-        pchOriginalPath = ctypes.create_string_buffer(unOriginalPathLen)
-        fn(bytes(renderModelName, encoding='utf-8'), pchOriginalPath, unOriginalPathLen, byref(peError))
-        if peError.value != 0:
-            raise OpenVRError(str(peError))
-        return bytes(pchOriginalPath.value).decode('utf-8')
+        originalPath = ctypes.create_string_buffer(originalPathLen)
+        fn(bytes(renderModelName, encoding='utf-8'), originalPath, originalPathLen, byref(error))
+        RenderModelError.check_error_value(error.value)
+        return bytes(originalPath.value).decode('utf-8')
 
     def getRenderModelErrorNameFromEnum(self, error):
         """Returns a string for a render model error"""
@@ -7472,23 +7572,23 @@ class IVRExtendedDisplay(object):
         """Size and position that the window needs to be on the VR display."""
 
         fn = self.function_table.getWindowBounds
-        pnX = c_int32()
-        pnY = c_int32()
-        pnWidth = c_uint32()
-        pnHeight = c_uint32()
-        fn(byref(pnX), byref(pnY), byref(pnWidth), byref(pnHeight))
-        return pnX.value, pnY.value, pnWidth.value, pnHeight.value
+        x = c_int32()
+        y = c_int32()
+        width = c_uint32()
+        height = c_uint32()
+        fn(byref(x), byref(y), byref(width), byref(height))
+        return x.value, y.value, width.value, height.value
 
-    def getEyeOutputViewport(self, eEye):
+    def getEyeOutputViewport(self, eye):
         """Gets the viewport in the frame buffer to draw the output of the distortion into"""
 
         fn = self.function_table.getEyeOutputViewport
-        pnX = c_uint32()
-        pnY = c_uint32()
-        pnWidth = c_uint32()
-        pnHeight = c_uint32()
-        fn(eEye, byref(pnX), byref(pnY), byref(pnWidth), byref(pnHeight))
-        return pnX.value, pnY.value, pnWidth.value, pnHeight.value
+        x = c_uint32()
+        y = c_uint32()
+        width = c_uint32()
+        height = c_uint32()
+        fn(eye, byref(x), byref(y), byref(width), byref(height))
+        return x.value, y.value, width.value, height.value
 
     def getDXGIOutputInfo(self):
         """
@@ -7498,10 +7598,10 @@ class IVRExtendedDisplay(object):
         """
 
         fn = self.function_table.getDXGIOutputInfo
-        pnAdapterIndex = c_int32()
-        pnAdapterOutputIndex = c_int32()
-        fn(byref(pnAdapterIndex), byref(pnAdapterOutputIndex))
-        return pnAdapterIndex.value, pnAdapterOutputIndex.value
+        adapterIndex = c_int32()
+        adapterOutputIndex = c_int32()
+        fn(byref(adapterIndex), byref(adapterOutputIndex))
+        return adapterIndex.value, adapterOutputIndex.value
 
 
 class IVRTrackedCamera_FnTable(Structure):
@@ -7533,49 +7633,49 @@ class IVRTrackedCamera(object):
             raise OpenVRError("Error retrieving VR API for IVRTrackedCamera")
         self.function_table = fn_table_ptr.contents
 
-    def getCameraErrorNameFromEnum(self, eCameraError):
+    def getCameraErrorNameFromEnum(self, cameraError):
         """Returns a string for an error"""
 
         fn = self.function_table.getCameraErrorNameFromEnum
-        result = fn(eCameraError)
+        result = fn(cameraError)
         return result
 
-    def hasCamera(self, nDeviceIndex):
+    def hasCamera(self, deviceIndex):
         """For convenience, same as tracked property request Prop_HasCamera_Bool"""
 
         fn = self.function_table.hasCamera
-        pHasCamera = openvr_bool()
-        error_code = fn(nDeviceIndex, byref(pHasCamera))
+        hasCamera = openvr_bool()
+        error_code = fn(deviceIndex, byref(hasCamera))
         TrackedCameraError.check_error_value(error_code)
-        return pHasCamera
+        return hasCamera
 
-    def getCameraFrameSize(self, nDeviceIndex, eFrameType):
+    def getCameraFrameSize(self, deviceIndex, frameType):
         """Gets size of the image frame."""
 
         fn = self.function_table.getCameraFrameSize
-        pnWidth = c_uint32()
-        pnHeight = c_uint32()
-        pnFrameBufferSize = c_uint32()
-        error_code = fn(nDeviceIndex, eFrameType, byref(pnWidth), byref(pnHeight), byref(pnFrameBufferSize))
+        width = c_uint32()
+        height = c_uint32()
+        frameBufferSize = c_uint32()
+        error_code = fn(deviceIndex, frameType, byref(width), byref(height), byref(frameBufferSize))
         TrackedCameraError.check_error_value(error_code)
-        return pnWidth.value, pnHeight.value, pnFrameBufferSize.value
+        return width.value, height.value, frameBufferSize.value
 
-    def getCameraIntrinsics(self, nDeviceIndex, nCameraIndex, eFrameType):
+    def getCameraIntrinsics(self, deviceIndex, cameraIndex, frameType):
         fn = self.function_table.getCameraIntrinsics
-        pFocalLength = HmdVector2_t()
-        pCenter = HmdVector2_t()
-        error_code = fn(nDeviceIndex, nCameraIndex, eFrameType, byref(pFocalLength), byref(pCenter))
+        focalLength = HmdVector2_t()
+        center = HmdVector2_t()
+        error_code = fn(deviceIndex, cameraIndex, frameType, byref(focalLength), byref(center))
         TrackedCameraError.check_error_value(error_code)
-        return pFocalLength, pCenter
+        return focalLength, center
 
-    def getCameraProjection(self, nDeviceIndex, nCameraIndex, eFrameType, flZNear: float, flZFar: float):
+    def getCameraProjection(self, deviceIndex, cameraIndex, frameType, zNear: float, zFar: float):
         fn = self.function_table.getCameraProjection
-        pProjection = HmdMatrix44_t()
-        error_code = fn(nDeviceIndex, nCameraIndex, eFrameType, flZNear, flZFar, byref(pProjection))
+        projection = HmdMatrix44_t()
+        error_code = fn(deviceIndex, cameraIndex, frameType, zNear, zFar, byref(projection))
         TrackedCameraError.check_error_value(error_code)
-        return pProjection
+        return projection
 
-    def acquireVideoStreamingService(self, nDeviceIndex):
+    def acquireVideoStreamingService(self, deviceIndex):
         """
         Acquiring streaming service permits video streaming for the caller. Releasing hints the system that video services do not need to be maintained for this client.
         If the camera has not already been activated, a one time spin up may incur some auto exposure as well as initial streaming frame delays.
@@ -7584,17 +7684,17 @@ class IVRTrackedCamera(object):
         """
 
         fn = self.function_table.acquireVideoStreamingService
-        pHandle = TrackedCameraHandle_t()
-        error_code = fn(nDeviceIndex, byref(pHandle))
+        handle = TrackedCameraHandle_t()
+        error_code = fn(deviceIndex, byref(handle))
         TrackedCameraError.check_error_value(error_code)
-        return pHandle
+        return handle
 
-    def releaseVideoStreamingService(self, hTrackedCamera) -> None:
+    def releaseVideoStreamingService(self, trackedCamera) -> None:
         fn = self.function_table.releaseVideoStreamingService
-        error_code = fn(hTrackedCamera)
+        error_code = fn(trackedCamera)
         TrackedCameraError.check_error_value(error_code)
 
-    def getVideoStreamFrameBuffer(self, hTrackedCamera, eFrameType, pFrameBuffer, nFrameBufferSize):
+    def getVideoStreamFrameBuffer(self, trackedCamera, frameType, frameBuffer, frameBufferSize):
         """
         Copies the image frame into a caller's provided buffer. The image data is currently provided as RGBA data, 4 bytes per pixel.
         A caller can provide null for the framebuffer or frameheader if not desired. Requesting the frame header first, followed by the frame buffer allows
@@ -7604,24 +7704,24 @@ class IVRTrackedCamera(object):
         """
 
         fn = self.function_table.getVideoStreamFrameBuffer
-        pFrameHeader = CameraVideoStreamFrameHeader_t()
-        nFrameHeaderSize = sizeof(CameraVideoStreamFrameHeader_t)
-        error_code = fn(hTrackedCamera, eFrameType, byref(pFrameBuffer), nFrameBufferSize, byref(pFrameHeader), nFrameHeaderSize)
+        frameHeader = CameraVideoStreamFrameHeader_t()
+        frameHeaderSize = sizeof(CameraVideoStreamFrameHeader_t)
+        error_code = fn(trackedCamera, frameType, byref(frameBuffer), frameBufferSize, byref(frameHeader), frameHeaderSize)
         TrackedCameraError.check_error_value(error_code)
-        return pFrameHeader
+        return frameHeader
 
-    def getVideoStreamTextureSize(self, nDeviceIndex, eFrameType):
+    def getVideoStreamTextureSize(self, deviceIndex, frameType):
         """Gets size of the image frame."""
 
         fn = self.function_table.getVideoStreamTextureSize
-        pTextureBounds = VRTextureBounds_t()
-        pnWidth = c_uint32()
-        pnHeight = c_uint32()
-        error_code = fn(nDeviceIndex, eFrameType, byref(pTextureBounds), byref(pnWidth), byref(pnHeight))
+        textureBounds = VRTextureBounds_t()
+        width = c_uint32()
+        height = c_uint32()
+        error_code = fn(deviceIndex, frameType, byref(textureBounds), byref(width), byref(height))
         TrackedCameraError.check_error_value(error_code)
-        return pTextureBounds, pnWidth.value, pnHeight.value
+        return textureBounds, width.value, height.value
 
-    def getVideoStreamTextureD3D11(self, hTrackedCamera, eFrameType, pD3D11DeviceOrResource):
+    def getVideoStreamTextureD3D11(self, trackedCamera, frameType, d3D11DeviceOrResource):
         """
         Access a shared D3D11 texture for the specified tracked camera stream.
         The camera frame type VRTrackedCameraFrameType_Undistorted is not supported directly as a shared texture. It is an interior subregion of the shared texture VRTrackedCameraFrameType_MaximumUndistorted.
@@ -7632,27 +7732,27 @@ class IVRTrackedCamera(object):
         """
 
         fn = self.function_table.getVideoStreamTextureD3D11
-        ppD3D11ShaderResourceView = c_void_p()
-        pFrameHeader = CameraVideoStreamFrameHeader_t()
-        nFrameHeaderSize = sizeof(CameraVideoStreamFrameHeader_t)
-        error_code = fn(hTrackedCamera, eFrameType, byref(pD3D11DeviceOrResource), byref(ppD3D11ShaderResourceView), byref(pFrameHeader), nFrameHeaderSize)
+        d3D11ShaderResourceView = c_void_p()
+        frameHeader = CameraVideoStreamFrameHeader_t()
+        frameHeaderSize = sizeof(CameraVideoStreamFrameHeader_t)
+        error_code = fn(trackedCamera, frameType, byref(d3D11DeviceOrResource), byref(d3D11ShaderResourceView), byref(frameHeader), frameHeaderSize)
         TrackedCameraError.check_error_value(error_code)
-        return ppD3D11ShaderResourceView.value, pFrameHeader
+        return d3D11ShaderResourceView.value, frameHeader
 
-    def getVideoStreamTextureGL(self, hTrackedCamera, eFrameType):
+    def getVideoStreamTextureGL(self, trackedCamera, frameType):
         """Access a shared GL texture for the specified tracked camera stream"""
 
         fn = self.function_table.getVideoStreamTextureGL
-        pglTextureId = glUInt_t()
-        pFrameHeader = CameraVideoStreamFrameHeader_t()
-        nFrameHeaderSize = sizeof(CameraVideoStreamFrameHeader_t)
-        error_code = fn(hTrackedCamera, eFrameType, byref(pglTextureId), byref(pFrameHeader), nFrameHeaderSize)
+        textureId = glUInt_t()
+        frameHeader = CameraVideoStreamFrameHeader_t()
+        frameHeaderSize = sizeof(CameraVideoStreamFrameHeader_t)
+        error_code = fn(trackedCamera, frameType, byref(textureId), byref(frameHeader), frameHeaderSize)
         TrackedCameraError.check_error_value(error_code)
-        return pglTextureId, pFrameHeader
+        return textureId, frameHeader
 
-    def releaseVideoStreamTextureGL(self, hTrackedCamera, glTextureId) -> None:
+    def releaseVideoStreamTextureGL(self, trackedCamera, textureId) -> None:
         fn = self.function_table.releaseVideoStreamTextureGL
-        error_code = fn(hTrackedCamera, glTextureId)
+        error_code = fn(trackedCamera, textureId)
         TrackedCameraError.check_error_value(error_code)
 
 
@@ -7718,12 +7818,12 @@ class IVRScreenshots(object):
         """
 
         fn = self.function_table.requestScreenshot
-        pOutScreenshotHandle = ScreenshotHandle_t()
-        error_code = fn(byref(pOutScreenshotHandle), type_, bytes(previewFilename, encoding='utf-8'), bytes(vRFilename, encoding='utf-8'))
+        outScreenshotHandle = ScreenshotHandle_t()
+        error_code = fn(byref(outScreenshotHandle), type_, bytes(previewFilename, encoding='utf-8'), bytes(vRFilename, encoding='utf-8'))
         ScreenshotError.check_error_value(error_code)
-        return pOutScreenshotHandle
+        return outScreenshotHandle
 
-    def hookScreenshot(self, pSupportedTypes) -> None:
+    def hookScreenshot(self, supportedTypes) -> None:
         """
         Called by the running VR application to indicate that it
         wishes to be in charge of screenshots.  If the
@@ -7736,13 +7836,17 @@ class IVRScreenshots(object):
         """
 
         fn = self.function_table.hookScreenshot
-        if pSupportedTypes is None:
-            numTypes = 0
-            pSupportedTypesArg = None
+        if supportedTypes is None:
+            types = 0
+            supportedTypesArg = None
+        elif isinstance(supportedTypes, ctypes.Array):
+            types = len(supportedTypes)
+            supportedTypesArg = byref(supportedTypes[0])
         else:
-            numTypes = len(pSupportedTypes)
-            pSupportedTypesArg = byref(pSupportedTypes[0])
-        error_code = fn(pSupportedTypesArg, numTypes)
+            types = 1
+            supportedTypes = (EVRScreenshotType * types)()
+            supportedTypesArg = byref(supportedTypes[0])
+        error_code = fn(supportedTypesArg, types)
         ScreenshotError.check_error_value(error_code)
 
     def getScreenshotPropertyType(self, screenshotHandle):
@@ -7753,10 +7857,9 @@ class IVRScreenshots(object):
         """
 
         fn = self.function_table.getScreenshotPropertyType
-        pError = EVRScreenshotError()
-        result = fn(screenshotHandle, byref(pError))
-        if pError.value != 0:
-            raise OpenVRError(str(pError))
+        error = EVRScreenshotError()
+        result = fn(screenshotHandle, byref(error))
+        ScreenshotError.check_error_value(error.value)
         return result
 
     def getScreenshotPropertyFilename(self, screenshotHandle, filenameType):
@@ -7767,17 +7870,16 @@ class IVRScreenshots(object):
         """
 
         fn = self.function_table.getScreenshotPropertyFilename
-        pError = EVRScreenshotError()
-        cchFilename = fn(screenshotHandle, filenameType, None, 0, byref(pError))
-        if cchFilename == 0:
+        error = EVRScreenshotError()
+        filename = fn(screenshotHandle, filenameType, None, 0, byref(error))
+        if filename == 0:
             return b''
-        pchFilename = ctypes.create_string_buffer(cchFilename)
-        fn(screenshotHandle, filenameType, pchFilename, cchFilename, byref(pError))
-        if pError.value != 0:
-            raise OpenVRError(str(pError))
-        return bytes(pchFilename.value).decode('utf-8')
+        filename = ctypes.create_string_buffer(filename)
+        fn(screenshotHandle, filenameType, filename, filename, byref(error))
+        ScreenshotError.check_error_value(error.value)
+        return bytes(filename.value).decode('utf-8')
 
-    def updateScreenshotProgress(self, screenshotHandle, flProgress: float) -> None:
+    def updateScreenshotProgress(self, screenshotHandle, progress: float) -> None:
         """
         Call this if the application is taking the screen shot
         will take more than a few ms processing. This will result
@@ -7786,7 +7888,7 @@ class IVRScreenshots(object):
         """
 
         fn = self.function_table.updateScreenshotProgress
-        error_code = fn(screenshotHandle, flProgress)
+        error_code = fn(screenshotHandle, progress)
         ScreenshotError.check_error_value(error_code)
 
     def takeStereoScreenshot(self, previewFilename: str, vRFilename: str):
@@ -7801,10 +7903,10 @@ class IVRScreenshots(object):
         """
 
         fn = self.function_table.takeStereoScreenshot
-        pOutScreenshotHandle = ScreenshotHandle_t()
-        error_code = fn(byref(pOutScreenshotHandle), bytes(previewFilename, encoding='utf-8'), bytes(vRFilename, encoding='utf-8'))
+        outScreenshotHandle = ScreenshotHandle_t()
+        error_code = fn(byref(outScreenshotHandle), bytes(previewFilename, encoding='utf-8'), bytes(vRFilename, encoding='utf-8'))
         ScreenshotError.check_error_value(error_code)
-        return pOutScreenshotHandle
+        return outScreenshotHandle
 
     def submitScreenshot(self, screenshotHandle, type_, sourcePreviewFilename: str, sourceVRFilename: str) -> None:
         """
@@ -7845,16 +7947,16 @@ class IVRResources(object):
             raise OpenVRError("Error retrieving VR API for IVRResources")
         self.function_table = fn_table_ptr.contents
 
-    def loadSharedResource(self, resourceName: str, unBufferLen):
+    def loadSharedResource(self, resourceName: str, bufferLen):
         """
         Loads the specified resource into the provided buffer if large enough.
         Returns the size in bytes of the buffer required to hold the specified resource.
         """
 
         fn = self.function_table.loadSharedResource
-        pchBuffer = c_char()
-        result = fn(bytes(resourceName, encoding='utf-8'), byref(pchBuffer), unBufferLen)
-        return result, pchBuffer.value
+        buffer = c_char()
+        result = fn(bytes(resourceName, encoding='utf-8'), byref(buffer), bufferLen)
+        return result, buffer.value
 
     def getResourceFullPath(self, resourceName: str, resourceTypeDirectory: str):
         """
@@ -7864,12 +7966,12 @@ class IVRResources(object):
         """
 
         fn = self.function_table.getResourceFullPath
-        unBufferLen = fn(bytes(resourceName, encoding='utf-8'), bytes(resourceTypeDirectory, encoding='utf-8'), None, 0)
-        if unBufferLen == 0:
+        bufferLen = fn(bytes(resourceName, encoding='utf-8'), bytes(resourceTypeDirectory, encoding='utf-8'), None, 0)
+        if bufferLen == 0:
             return b''
-        pchPathBuffer = ctypes.create_string_buffer(unBufferLen)
-        fn(bytes(resourceName, encoding='utf-8'), bytes(resourceTypeDirectory, encoding='utf-8'), pchPathBuffer, unBufferLen)
-        return bytes(pchPathBuffer.value).decode('utf-8')
+        pathBuffer = ctypes.create_string_buffer(bufferLen)
+        fn(bytes(resourceName, encoding='utf-8'), bytes(resourceTypeDirectory, encoding='utf-8'), pathBuffer, bufferLen)
+        return bytes(pathBuffer.value).decode('utf-8')
 
 
 class IVRDriverManager_FnTable(Structure):
@@ -7897,16 +7999,16 @@ class IVRDriverManager(object):
         result = fn()
         return result
 
-    def getDriverName(self, nDriver):
+    def getDriverName(self, driver):
         """Returns the length of the number of bytes necessary to hold this string including the trailing null."""
 
         fn = self.function_table.getDriverName
-        unBufferSize = fn(nDriver, None, 0)
-        if unBufferSize == 0:
+        bufferSize = fn(driver, None, 0)
+        if bufferSize == 0:
             return b''
-        pchValue = ctypes.create_string_buffer(unBufferSize)
-        fn(nDriver, pchValue, unBufferSize)
-        return bytes(pchValue.value).decode('utf-8')
+        value = ctypes.create_string_buffer(bufferSize)
+        fn(driver, value, bufferSize)
+        return bytes(value.value).decode('utf-8')
 
     def getDriverHandle(self, driverName: str):
         fn = self.function_table.getDriverHandle
@@ -7973,191 +8075,207 @@ class IVRInput(object):
         """Returns a handle for an action set. This handle is used for all performance-sensitive calls."""
 
         fn = self.function_table.getActionSetHandle
-        pHandle = VRActionSetHandle_t()
-        error_code = fn(bytes(actionSetName, encoding='utf-8'), byref(pHandle))
+        handle = VRActionSetHandle_t()
+        error_code = fn(bytes(actionSetName, encoding='utf-8'), byref(handle))
         InputError.check_error_value(error_code)
-        return pHandle.value
+        return handle.value
 
     def getActionHandle(self, actionName: str):
         """Returns a handle for an action. This handle is used for all performance-sensitive calls."""
 
         fn = self.function_table.getActionHandle
-        pHandle = VRActionHandle_t()
-        error_code = fn(bytes(actionName, encoding='utf-8'), byref(pHandle))
+        handle = VRActionHandle_t()
+        error_code = fn(bytes(actionName, encoding='utf-8'), byref(handle))
         InputError.check_error_value(error_code)
-        return pHandle.value
+        return handle.value
 
     def getInputSourceHandle(self, inputSourcePath: str):
         """Returns a handle for any path in the input system. E.g. /user/hand/right"""
 
         fn = self.function_table.getInputSourceHandle
-        pHandle = VRInputValueHandle_t()
-        error_code = fn(bytes(inputSourcePath, encoding='utf-8'), byref(pHandle))
+        handle = VRInputValueHandle_t()
+        error_code = fn(bytes(inputSourcePath, encoding='utf-8'), byref(handle))
         InputError.check_error_value(error_code)
-        return pHandle.value
+        return handle.value
 
-    def updateActionState(self, pSets):
+    def updateActionState(self, sets):
         """
         Reads the current state into all actions. After this call, the results of Get*Action calls 
         will be the same until the next call to UpdateActionState.
         """
 
         fn = self.function_table.updateActionState
-        if pSets is None:
-            unSetCount = 0
-            pSetsArg = None
+        if sets is None:
+            setCount = 0
+            setsArg = None
+        elif isinstance(sets, ctypes.Array):
+            setCount = len(sets)
+            setsArg = byref(sets[0])
         else:
-            unSetCount = len(pSets)
-            pSetsArg = byref(pSets[0])
-        unSizeOfVRSelectedActionSet_t = sizeof(VRActiveActionSet_t)
-        error_code = fn(pSetsArg, unSizeOfVRSelectedActionSet_t, unSetCount)
+            setCount = 1
+            sets = (VRActiveActionSet_t * setCount)()
+            setsArg = byref(sets[0])
+        sizeOfVRSelectedActionSet_t = sizeof(VRActiveActionSet_t)
+        error_code = fn(setsArg, sizeOfVRSelectedActionSet_t, setCount)
         InputError.check_error_value(error_code)
-        return pSets
+        return sets
 
-    def getDigitalActionData(self, action, ulRestrictToDevice):
+    def getDigitalActionData(self, action, restrictToDevice):
         """
         Reads the state of a digital action given its handle. This will return VRInputError_WrongType if the type of
         action is something other than digital
         """
 
         fn = self.function_table.getDigitalActionData
-        pActionData = InputDigitalActionData_t()
-        unActionDataSize = sizeof(InputDigitalActionData_t)
-        error_code = fn(action, byref(pActionData), unActionDataSize, ulRestrictToDevice)
+        actionData = InputDigitalActionData_t()
+        actionDataSize = sizeof(InputDigitalActionData_t)
+        error_code = fn(action, byref(actionData), actionDataSize, restrictToDevice)
         InputError.check_error_value(error_code)
-        return pActionData
+        return actionData
 
-    def getAnalogActionData(self, action, ulRestrictToDevice):
+    def getAnalogActionData(self, action, restrictToDevice):
         """
         Reads the state of an analog action given its handle. This will return VRInputError_WrongType if the type of
         action is something other than analog
         """
 
         fn = self.function_table.getAnalogActionData
-        pActionData = InputAnalogActionData_t()
-        unActionDataSize = sizeof(InputAnalogActionData_t)
-        error_code = fn(action, byref(pActionData), unActionDataSize, ulRestrictToDevice)
+        actionData = InputAnalogActionData_t()
+        actionDataSize = sizeof(InputAnalogActionData_t)
+        error_code = fn(action, byref(actionData), actionDataSize, restrictToDevice)
         InputError.check_error_value(error_code)
-        return pActionData
+        return actionData
 
-    def getPoseActionDataRelativeToNow(self, action, eOrigin, fPredictedSecondsFromNow: float, ulRestrictToDevice):
+    def getPoseActionDataRelativeToNow(self, action, origin, predictedSecondsFromNow: float, restrictToDevice):
         """
         Reads the state of a pose action given its handle for the number of seconds relative to now. This
         will generally be called with negative times from the fUpdateTime fields in other actions.
         """
 
         fn = self.function_table.getPoseActionDataRelativeToNow
-        pActionData = InputPoseActionData_t()
-        unActionDataSize = sizeof(InputPoseActionData_t)
-        error_code = fn(action, eOrigin, fPredictedSecondsFromNow, byref(pActionData), unActionDataSize, ulRestrictToDevice)
+        actionData = InputPoseActionData_t()
+        actionDataSize = sizeof(InputPoseActionData_t)
+        error_code = fn(action, origin, predictedSecondsFromNow, byref(actionData), actionDataSize, restrictToDevice)
         InputError.check_error_value(error_code)
-        return pActionData
+        return actionData
 
-    def getPoseActionDataForNextFrame(self, action, eOrigin, ulRestrictToDevice):
+    def getPoseActionDataForNextFrame(self, action, origin, restrictToDevice):
         """
         Reads the state of a pose action given its handle. The returned values will match the values returned
         by the last call to IVRCompositor::WaitGetPoses().
         """
 
         fn = self.function_table.getPoseActionDataForNextFrame
-        pActionData = InputPoseActionData_t()
-        unActionDataSize = sizeof(InputPoseActionData_t)
-        error_code = fn(action, eOrigin, byref(pActionData), unActionDataSize, ulRestrictToDevice)
+        actionData = InputPoseActionData_t()
+        actionDataSize = sizeof(InputPoseActionData_t)
+        error_code = fn(action, origin, byref(actionData), actionDataSize, restrictToDevice)
         InputError.check_error_value(error_code)
-        return pActionData
+        return actionData
 
     def getSkeletalActionData(self, action):
         """Reads the state of a skeletal action given its handle."""
 
         fn = self.function_table.getSkeletalActionData
-        pActionData = InputSkeletalActionData_t()
-        unActionDataSize = sizeof(InputSkeletalActionData_t)
-        error_code = fn(action, byref(pActionData), unActionDataSize)
+        actionData = InputSkeletalActionData_t()
+        actionDataSize = sizeof(InputSkeletalActionData_t)
+        error_code = fn(action, byref(actionData), actionDataSize)
         InputError.check_error_value(error_code)
-        return pActionData
+        return actionData
 
     def getBoneCount(self, action):
         """Reads the number of bones in skeleton associated with the given action"""
 
         fn = self.function_table.getBoneCount
-        pBoneCount = c_uint32()
-        error_code = fn(action, byref(pBoneCount))
+        boneCount = c_uint32()
+        error_code = fn(action, byref(boneCount))
         InputError.check_error_value(error_code)
-        return pBoneCount.value
+        return boneCount.value
 
-    def getBoneHierarchy(self, action, pParentIndices):
+    def getBoneHierarchy(self, action, parentIndices):
         """Fills the given array with the index of each bone's parent in the skeleton associated with the given action"""
 
         fn = self.function_table.getBoneHierarchy
-        if pParentIndices is None:
-            unIndexArayCount = 0
-            pParentIndicesArg = None
+        if parentIndices is None:
+            indexArayCount = 0
+            parentIndicesArg = None
+        elif isinstance(parentIndices, ctypes.Array):
+            indexArayCount = len(parentIndices)
+            parentIndicesArg = byref(parentIndices[0])
         else:
-            unIndexArayCount = len(pParentIndices)
-            pParentIndicesArg = byref(pParentIndices[0])
-        error_code = fn(action, pParentIndicesArg, unIndexArayCount)
+            indexArayCount = 1
+            parentIndices = (BoneIndex_t * indexArayCount)()
+            parentIndicesArg = byref(parentIndices[0])
+        error_code = fn(action, parentIndicesArg, indexArayCount)
         InputError.check_error_value(error_code)
-        return pParentIndices
+        return parentIndices
 
-    def getBoneName(self, action, nBoneIndex):
+    def getBoneName(self, action, boneIndex):
         """Fills the given buffer with the name of the bone at the given index in the skeleton associated with the given action"""
 
         fn = self.function_table.getBoneName
-        unNameBufferSize = fn(action, nBoneIndex, None, 0)
-        if unNameBufferSize == 0:
+        nameBufferSize = fn(action, boneIndex, None, 0)
+        if nameBufferSize == 0:
             return b''
-        pchBoneName = ctypes.create_string_buffer(unNameBufferSize)
-        error_code = fn(action, nBoneIndex, pchBoneName, unNameBufferSize)
+        boneName = ctypes.create_string_buffer(nameBufferSize)
+        error_code = fn(action, boneIndex, boneName, nameBufferSize)
         InputError.check_error_value(error_code)
-        return bytes(pchBoneName.value).decode('utf-8')
+        return bytes(boneName.value).decode('utf-8')
 
-    def getSkeletalReferenceTransforms(self, action, eTransformSpace, eReferencePose, pTransformArray):
+    def getSkeletalReferenceTransforms(self, action, transformSpace, referencePose, transformArray):
         """Fills the given buffer with the transforms for a specific static skeletal reference pose"""
 
         fn = self.function_table.getSkeletalReferenceTransforms
-        if pTransformArray is None:
-            unTransformArrayCount = 0
-            pTransformArrayArg = None
+        if transformArray is None:
+            transformArrayCount = 0
+            transformArrayArg = None
+        elif isinstance(transformArray, ctypes.Array):
+            transformArrayCount = len(transformArray)
+            transformArrayArg = byref(transformArray[0])
         else:
-            unTransformArrayCount = len(pTransformArray)
-            pTransformArrayArg = byref(pTransformArray[0])
-        error_code = fn(action, eTransformSpace, eReferencePose, pTransformArrayArg, unTransformArrayCount)
+            transformArrayCount = 1
+            transformArray = (VRBoneTransform_t * transformArrayCount)()
+            transformArrayArg = byref(transformArray[0])
+        error_code = fn(action, transformSpace, referencePose, transformArrayArg, transformArrayCount)
         InputError.check_error_value(error_code)
-        return pTransformArray
+        return transformArray
 
     def getSkeletalTrackingLevel(self, action):
         """Reads the level of accuracy to which the controller is able to track the user to recreate a skeletal pose"""
 
         fn = self.function_table.getSkeletalTrackingLevel
-        pSkeletalTrackingLevel = EVRSkeletalTrackingLevel()
-        error_code = fn(action, byref(pSkeletalTrackingLevel))
+        skeletalTrackingLevel = EVRSkeletalTrackingLevel()
+        error_code = fn(action, byref(skeletalTrackingLevel))
         InputError.check_error_value(error_code)
-        return pSkeletalTrackingLevel
+        return skeletalTrackingLevel
 
-    def getSkeletalBoneData(self, action, eTransformSpace, eMotionRange, pTransformArray):
+    def getSkeletalBoneData(self, action, transformSpace, motionRange, transformArray):
         """Reads the state of the skeletal bone data associated with this action and copies it into the given buffer."""
 
         fn = self.function_table.getSkeletalBoneData
-        if pTransformArray is None:
-            unTransformArrayCount = 0
-            pTransformArrayArg = None
+        if transformArray is None:
+            transformArrayCount = 0
+            transformArrayArg = None
+        elif isinstance(transformArray, ctypes.Array):
+            transformArrayCount = len(transformArray)
+            transformArrayArg = byref(transformArray[0])
         else:
-            unTransformArrayCount = len(pTransformArray)
-            pTransformArrayArg = byref(pTransformArray[0])
-        error_code = fn(action, eTransformSpace, eMotionRange, pTransformArrayArg, unTransformArrayCount)
+            transformArrayCount = 1
+            transformArray = (VRBoneTransform_t * transformArrayCount)()
+            transformArrayArg = byref(transformArray[0])
+        error_code = fn(action, transformSpace, motionRange, transformArrayArg, transformArrayCount)
         InputError.check_error_value(error_code)
-        return pTransformArray
+        return transformArray
 
-    def getSkeletalSummaryData(self, action, eSummaryType):
+    def getSkeletalSummaryData(self, action, summaryType):
         """Reads summary information about the current pose of the skeleton associated with the given action."""
 
         fn = self.function_table.getSkeletalSummaryData
-        pSkeletalSummaryData = VRSkeletalSummaryData_t()
-        error_code = fn(action, eSummaryType, byref(pSkeletalSummaryData))
+        skeletalSummaryData = VRSkeletalSummaryData_t()
+        error_code = fn(action, summaryType, byref(skeletalSummaryData))
         InputError.check_error_value(error_code)
-        return pSkeletalSummaryData
+        return skeletalSummaryData
 
-    def getSkeletalBoneDataCompressed(self, action, eMotionRange, pvCompressedData, unCompressedSize):
+    def getSkeletalBoneDataCompressed(self, action, motionRange, compressedData, compressedSize):
         """
         Reads the state of the skeletal bone data in a compressed form that is suitable for
         sending over the network. The required buffer size will never exceed ( sizeof(VR_BoneTransform_t)*boneCount + 2).
@@ -8165,30 +8283,34 @@ class IVRInput(object):
         """
 
         fn = self.function_table.getSkeletalBoneDataCompressed
-        punRequiredCompressedSize = c_uint32()
-        error_code = fn(action, eMotionRange, byref(pvCompressedData), unCompressedSize, byref(punRequiredCompressedSize))
+        requiredCompressedSize = c_uint32()
+        error_code = fn(action, motionRange, byref(compressedData), compressedSize, byref(requiredCompressedSize))
         InputError.check_error_value(error_code)
-        return punRequiredCompressedSize.value
+        return requiredCompressedSize.value
 
-    def decompressSkeletalBoneData(self, pvCompressedBuffer, unCompressedBufferSize, eTransformSpace, pTransformArray):
+    def decompressSkeletalBoneData(self, compressedBuffer, compressedBufferSize, transformSpace, transformArray):
         """Turns a compressed buffer from GetSkeletalBoneDataCompressed and turns it back into a bone transform array."""
 
         fn = self.function_table.decompressSkeletalBoneData
-        if pTransformArray is None:
-            unTransformArrayCount = 0
-            pTransformArrayArg = None
+        if transformArray is None:
+            transformArrayCount = 0
+            transformArrayArg = None
+        elif isinstance(transformArray, ctypes.Array):
+            transformArrayCount = len(transformArray)
+            transformArrayArg = byref(transformArray[0])
         else:
-            unTransformArrayCount = len(pTransformArray)
-            pTransformArrayArg = byref(pTransformArray[0])
-        error_code = fn(byref(pvCompressedBuffer), unCompressedBufferSize, eTransformSpace, pTransformArrayArg, unTransformArrayCount)
+            transformArrayCount = 1
+            transformArray = (VRBoneTransform_t * transformArrayCount)()
+            transformArrayArg = byref(transformArray[0])
+        error_code = fn(byref(compressedBuffer), compressedBufferSize, transformSpace, transformArrayArg, transformArrayCount)
         InputError.check_error_value(error_code)
-        return pTransformArray
+        return transformArray
 
-    def triggerHapticVibrationAction(self, action, fStartSecondsFromNow: float, fDurationSeconds: float, fFrequency: float, fAmplitude: float, ulRestrictToDevice) -> None:
+    def triggerHapticVibrationAction(self, action, startSecondsFromNow: float, durationSeconds: float, frequency: float, amplitude: float, restrictToDevice) -> None:
         """Triggers a haptic event as described by the specified action"""
 
         fn = self.function_table.triggerHapticVibrationAction
-        error_code = fn(action, fStartSecondsFromNow, fDurationSeconds, fFrequency, fAmplitude, ulRestrictToDevice)
+        error_code = fn(action, startSecondsFromNow, durationSeconds, frequency, amplitude, restrictToDevice)
         InputError.check_error_value(error_code)
 
     def getActionOrigins(self, actionSetHandle, digitalActionHandle, originsOut):
@@ -8198,59 +8320,67 @@ class IVRInput(object):
         if originsOut is None:
             originOutCount = 0
             originsOutArg = None
-        else:
+        elif isinstance(originsOut, ctypes.Array):
             originOutCount = len(originsOut)
+            originsOutArg = byref(originsOut[0])
+        else:
+            originOutCount = 1
+            originsOut = (VRInputValueHandle_t * originOutCount)()
             originsOutArg = byref(originsOut[0])
         error_code = fn(actionSetHandle, digitalActionHandle, originsOutArg, originOutCount)
         InputError.check_error_value(error_code)
         return originsOut.value
 
-    def getOriginLocalizedName(self, origin, unStringSectionsToInclude):
+    def getOriginLocalizedName(self, origin, stringSectionsToInclude):
         """
         Retrieves the name of the origin in the current language. unStringSectionsToInclude is a bitfield of values in EVRInputStringBits that allows the 
         application to specify which parts of the origin's information it wants a string for.
         """
 
         fn = self.function_table.getOriginLocalizedName
-        unNameArraySize = fn(origin, None, 0, unStringSectionsToInclude)
-        if unNameArraySize == 0:
+        nameArraySize = fn(origin, None, 0, stringSectionsToInclude)
+        if nameArraySize == 0:
             return b''
-        pchNameArray = ctypes.create_string_buffer(unNameArraySize)
-        error_code = fn(origin, pchNameArray, unNameArraySize, unStringSectionsToInclude)
+        nameArray = ctypes.create_string_buffer(nameArraySize)
+        error_code = fn(origin, nameArray, nameArraySize, stringSectionsToInclude)
         InputError.check_error_value(error_code)
-        return bytes(pchNameArray.value).decode('utf-8')
+        return bytes(nameArray.value).decode('utf-8')
 
     def getOriginTrackedDeviceInfo(self, origin):
         """Retrieves useful information for the origin of this action"""
 
         fn = self.function_table.getOriginTrackedDeviceInfo
-        pOriginInfo = InputOriginInfo_t()
-        unOriginInfoSize = sizeof(InputOriginInfo_t)
-        error_code = fn(origin, byref(pOriginInfo), unOriginInfoSize)
+        originInfo = InputOriginInfo_t()
+        originInfoSize = sizeof(InputOriginInfo_t)
+        error_code = fn(origin, byref(originInfo), originInfoSize)
         InputError.check_error_value(error_code)
-        return pOriginInfo
+        return originInfo
 
-    def showActionOrigins(self, actionSetHandle, ulActionHandle) -> None:
+    def showActionOrigins(self, actionSetHandle, actionHandle) -> None:
         """Shows the current binding for the action in-headset"""
 
         fn = self.function_table.showActionOrigins
-        error_code = fn(actionSetHandle, ulActionHandle)
+        error_code = fn(actionSetHandle, actionHandle)
         InputError.check_error_value(error_code)
 
-    def showBindingsForActionSet(self, pSets, originToHighlight):
+    def showBindingsForActionSet(self, sets, originToHighlight):
         """Shows the current binding all the actions in the specified action sets"""
 
         fn = self.function_table.showBindingsForActionSet
-        if pSets is None:
-            unSetCount = 0
-            pSetsArg = None
+        if sets is None:
+            setCount = 0
+            setsArg = None
+        elif isinstance(sets, ctypes.Array):
+            setCount = len(sets)
+            setsArg = byref(sets[0])
         else:
-            unSetCount = len(pSets)
-            pSetsArg = byref(pSets[0])
-        unSizeOfVRSelectedActionSet_t = sizeof(VRActiveActionSet_t)
-        error_code = fn(pSetsArg, unSizeOfVRSelectedActionSet_t, unSetCount, originToHighlight)
+            setCount = 1
+            sets = (VRActiveActionSet_t * setCount)()
+            setsArg = byref(sets[0])
+        sizeOfVRSelectedActionSet_t = sizeof(VRActiveActionSet_t)
+        error_code = fn(setsArg, sizeOfVRSelectedActionSet_t, setCount, originToHighlight)
         InputError.check_error_value(error_code)
-        return pSets
+        return sets
 
     def isUsingLegacyInput(self):
         """--------------- Legacy Input -------------------"""
@@ -8289,50 +8419,50 @@ class IVRIOBuffer(object):
             raise OpenVRError("Error retrieving VR API for IVRIOBuffer")
         self.function_table = fn_table_ptr.contents
 
-    def open(self, path: str, mode, unElementSize, unElements):
+    def open(self, path: str, mode, elementSize, elements):
         """opens an existing or creates a new IOBuffer of unSize bytes"""
 
         fn = self.function_table.open
-        pulBuffer = IOBufferHandle_t()
-        error_code = fn(bytes(path, encoding='utf-8'), mode, unElementSize, unElements, byref(pulBuffer))
+        buffer = IOBufferHandle_t()
+        error_code = fn(bytes(path, encoding='utf-8'), mode, elementSize, elements, byref(buffer))
         IOBufferError.check_error_value(error_code)
-        return pulBuffer
+        return buffer
 
-    def close(self, ulBuffer) -> None:
+    def close(self, buffer) -> None:
         """closes a previously opened or created buffer"""
 
         fn = self.function_table.close
-        error_code = fn(ulBuffer)
+        error_code = fn(buffer)
         IOBufferError.check_error_value(error_code)
 
-    def read(self, ulBuffer, pDst, unBytes):
+    def read(self, buffer, dst, bytes_):
         """reads up to unBytes from buffer into *pDst, returning number of bytes read in *punRead"""
 
         fn = self.function_table.read
-        punRead = c_uint32()
-        error_code = fn(ulBuffer, byref(pDst), unBytes, byref(punRead))
+        read = c_uint32()
+        error_code = fn(buffer, byref(dst), bytes_, byref(read))
         IOBufferError.check_error_value(error_code)
-        return punRead.value
+        return read.value
 
-    def write(self, ulBuffer, pSrc, unBytes) -> None:
+    def write(self, buffer, src, bytes_) -> None:
         """writes unBytes of data from *pSrc into a buffer."""
 
         fn = self.function_table.write
-        error_code = fn(ulBuffer, byref(pSrc), unBytes)
+        error_code = fn(buffer, byref(src), bytes_)
         IOBufferError.check_error_value(error_code)
 
-    def propertyContainer(self, ulBuffer):
+    def propertyContainer(self, buffer):
         """retrieves the property container of an buffer."""
 
         fn = self.function_table.propertyContainer
-        result = fn(ulBuffer)
+        result = fn(buffer)
         return result
 
-    def hasReaders(self, ulBuffer):
+    def hasReaders(self, buffer):
         """inexpensively checks for readers to allow writers to fast-fail potentially expensive copies and writes."""
 
         fn = self.function_table.hasReaders
-        result = fn(ulBuffer)
+        result = fn(buffer)
         return result
 
 
@@ -8365,12 +8495,12 @@ class IVRSpatialAnchors(object):
         """
 
         fn = self.function_table.createSpatialAnchorFromDescriptor
-        pHandleOut = SpatialAnchorHandle_t()
-        error_code = fn(bytes(descriptor, encoding='utf-8'), byref(pHandleOut))
+        handleOut = SpatialAnchorHandle_t()
+        error_code = fn(bytes(descriptor, encoding='utf-8'), byref(handleOut))
         SpatialAnchorError.check_error_value(error_code)
-        return pHandleOut.value
+        return handleOut.value
 
-    def createSpatialAnchorFromPose(self, unDeviceIndex, eOrigin):
+    def createSpatialAnchorFromPose(self, deviceIndex, origin):
         """
         Returns a handle for an new spatial anchor at pPose.  On success, pHandle
         will contain a handle valid for this session.  Caller can wait for an event or occasionally
@@ -8388,25 +8518,25 @@ class IVRSpatialAnchors(object):
         """
 
         fn = self.function_table.createSpatialAnchorFromPose
-        pPose = SpatialAnchorPose_t()
-        pHandleOut = SpatialAnchorHandle_t()
-        error_code = fn(unDeviceIndex, eOrigin, byref(pPose), byref(pHandleOut))
+        pose = SpatialAnchorPose_t()
+        handleOut = SpatialAnchorHandle_t()
+        error_code = fn(deviceIndex, origin, byref(pose), byref(handleOut))
         SpatialAnchorError.check_error_value(error_code)
-        return pPose, pHandleOut.value
+        return pose, handleOut.value
 
-    def getSpatialAnchorPose(self, unHandle, eOrigin):
+    def getSpatialAnchorPose(self, handle, origin):
         """
         Get the pose for a given handle.  This is intended to be cheap enough to call every frame (or fairly often)
         so that the driver can refine this position when it has more information available.
         """
 
         fn = self.function_table.getSpatialAnchorPose
-        pPoseOut = SpatialAnchorPose_t()
-        error_code = fn(unHandle, eOrigin, byref(pPoseOut))
+        poseOut = SpatialAnchorPose_t()
+        error_code = fn(handle, origin, byref(poseOut))
         SpatialAnchorError.check_error_value(error_code)
-        return pPoseOut
+        return poseOut
 
-    def getSpatialAnchorDescriptor(self, unHandle):
+    def getSpatialAnchorDescriptor(self, handle):
         """
         Get the descriptor for a given handle.  This will be empty for handles where the driver has not
         yet built a descriptor.  It will be the application-supplied descriptor for previously saved anchors
@@ -8417,13 +8547,13 @@ class IVRSpatialAnchors(object):
         """
 
         fn = self.function_table.getSpatialAnchorDescriptor
-        punDescriptorBufferLenInOut = fn(unHandle, None, 0)
-        if punDescriptorBufferLenInOut == 0:
+        descriptorBufferLenInOut = fn(handle, None, 0)
+        if descriptorBufferLenInOut == 0:
             return b''
-        pchDescriptorOut = ctypes.create_string_buffer(punDescriptorBufferLenInOut)
-        error_code = fn(unHandle, pchDescriptorOut, punDescriptorBufferLenInOut)
+        descriptorOut = ctypes.create_string_buffer(descriptorBufferLenInOut)
+        error_code = fn(handle, descriptorOut, descriptorBufferLenInOut)
         SpatialAnchorError.check_error_value(error_code)
-        return bytes(pchDescriptorOut.value).decode('utf-8')
+        return bytes(descriptorOut.value).decode('utf-8')
 
 
 ####################
@@ -8524,13 +8654,13 @@ _openvr.VR_GetGenericInterface.restype = c_void_p
 _openvr.VR_GetGenericInterface.argtypes = [c_char_p, POINTER(EVRInitError)]
 
 
-def getGenericInterface(interfaceVersion):
+def getGenericInterface(pchInterfaceVersion):
     """
     Returns the interface of the specified version. This method must be called after VR_Init. The
     pointer returned is valid until VR_Shutdown is called.
     """
     peError = EVRInitError()
-    result = _openvr.VR_GetGenericInterface(interfaceVersion, byref(peError))
+    result = _openvr.VR_GetGenericInterface(pchInterfaceVersion, byref(peError))
     _checkInitError(peError.value)
     return result
 
@@ -8539,9 +8669,9 @@ _openvr.VR_IsInterfaceVersionValid.restype = openvr_bool
 _openvr.VR_IsInterfaceVersionValid.argtypes = [c_char_p]
 
 
-def isInterfaceVersionValid(interfaceVersion):
+def isInterfaceVersionValid(pchInterfaceVersion):
     """Returns whether the interface of the specified version exists."""
-    result = _openvr.VR_IsInterfaceVersionValid(interfaceVersion)
+    result = _openvr.VR_IsInterfaceVersionValid(pchInterfaceVersion)
     return result
 
 

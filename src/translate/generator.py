@@ -12,7 +12,7 @@ class CTypesGenerator(object):
         preamble = inspect.cleandoc(f'''
             #!/bin/env python
             
-            # Unofficial python bindings for OpenVR API version {".".join(str(v) for v in version)}
+            # Unofficial python bindings for OpenVR API version {".".join([str(v) for v in version])}
             # from https://github.com/cmbruns/pyopenvr
             # based on OpenVR C++ API at https://github.com/ValveSoftware/openvr
             
@@ -151,13 +151,15 @@ class CTypesGenerator(object):
             nm = declaration.name
             if nm.startswith('EVR'):
                 nm = nm[3:]  # Strip 'EVR'
-            elif nm.startswith('EIO'):
+            elif nm.startswith('E'):
                 nm = nm[1:]
             else:
                 continue
             if not nm.endswith('Error'):
                 continue
             error_category = nm
+            if error_category == 'TrackedPropertyError':  # avoid symbol conflict
+                error_category = 'TrackedProperty_Error'
             # General error type category class
             print(textwrap.dedent(f'''\
                 
@@ -173,6 +175,12 @@ class CTypesGenerator(object):
                 if error_name.startswith('IOBuffer_'):
                     # Avoid conflict with enum name
                     error_name = 'IOBufferError_' + error_name[9:]
+                if error_name.startswith('TrackedProp_'):
+                    # Avoid conflict with enum name
+                    error_name = 'TrackedProperty_' + error_name[12:]
+                if error_name.startswith('HDCPError_'):
+                    # Avoid conflict with enum name
+                    error_name = 'HDCP_Error_' + error_name[10:]
                 index += f'{error_category}._error_index[{c.value}] = {error_name}\n'
                 is_error = True
                 if error_name.endswith('_None'):
@@ -259,7 +267,7 @@ class CTypesGenerator(object):
         for declaration in declarations:
             if isinstance(declaration, model.COpenVRContext):
                 print(declaration, file=file_out)
-                print('\n', file=file_out)
+                print('', file=file_out)
 
         for declaration in declarations:
             if isinstance(declaration, model.IVRClass):

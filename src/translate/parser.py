@@ -4,7 +4,6 @@ Parses translate header files to create a model of the code to be generated
 
 import inspect
 import pkg_resources
-import re
 
 from clang.cindex import CursorKind, Index, TypeKind
 
@@ -127,17 +126,19 @@ class Parser(object):
                     is_c_function = True
         if is_c_function:
             restype = cursor.result_type
-            function = model.Function(name=name, type_=restype, docstring=clean_comment(cursor))
+            function_ = model.Function(name=name, type_=restype, docstring=clean_comment(cursor))
             for child in cursor.get_children():
                 if child.kind == CursorKind.DLLIMPORT_ATTR:
                     pass  # OK
                 elif child.kind == CursorKind.PARM_DECL:
                     parameter = self.parse_parameter(child)
                     if parameter is not None:
-                        function.add_parameter(parameter)
+                        function_.add_parameter(parameter)
+                elif child.kind == CursorKind.TYPE_REF:
+                    pass  # presumably the return type
                 else:
-                    x = 3
-            self.items.append(function)
+                    self.report_unparsed(child)
+            self.items.append(function_)
             return
         param_count = 0
         for child in cursor.get_children():
@@ -151,7 +152,7 @@ class Parser(object):
                 if pt.spelling.startswith('vr::IVR'):
                     is_ivr_instance_function = True
         if is_ivr_instance_function:
-            pass  # OK - we generate these from COpenVRConstext
+            pass  # OK - we generate these from COpenVRContext
         elif cursor.spelling == 'VR_Init':
             pass  # OK - we manually generate this one
         elif cursor.spelling == 'VR_Shutdown':
