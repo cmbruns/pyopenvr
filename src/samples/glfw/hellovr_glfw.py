@@ -218,10 +218,10 @@ class CMainApplication(object):
         self.action_analog_input = openvr.VRInput().getActionHandle('/actions/demo/in/AnalogInput')
         self.action_set_demo = openvr.VRInput().getActionSetHandle('/actions/demo')
         self.hand[Left].action_haptic = openvr.VRInput().getActionHandle('/actions/demo/out/Haptic_Left')
-        self.hand[Left].source = openvr.VRInput().getInputSourceHandle('/user/hand/left').value
+        self.hand[Left].source = openvr.VRInput().getInputSourceHandle('/user/hand/left')
         self.hand[Left].action_pose = openvr.VRInput().getActionHandle('/actions/demo/in/Hand_Left')
         self.hand[Right].action_haptic = openvr.VRInput().getActionHandle('/actions/demo/out/Haptic_Right')
-        self.hand[Right].source = openvr.VRInput().getInputSourceHandle('/user/hand/right').value
+        self.hand[Right].source = openvr.VRInput().getInputSourceHandle('/user/hand/right')
         self.hand[Right].action_pose = openvr.VRInput().getActionHandle('/actions/demo/in/Hand_Right')
         return True
 

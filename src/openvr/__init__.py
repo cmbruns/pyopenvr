@@ -6416,7 +6416,7 @@ class IVROverlay(object):
         pOverlayHandle = VROverlayHandle_t()
         error_code = fn(bytes(overlayKey, encoding='utf-8'), byref(pOverlayHandle))
         OverlayError.check_error_value(error_code)
-        return pOverlayHandle
+        return pOverlayHandle.value
 
     def createOverlay(self, overlayKey: str, overlayName: str):
         """Creates a new named overlay. All overlays start hidden and with default settings."""
@@ -6425,7 +6425,7 @@ class IVROverlay(object):
         pOverlayHandle = VROverlayHandle_t()
         error_code = fn(bytes(overlayKey, encoding='utf-8'), bytes(overlayName, encoding='utf-8'), byref(pOverlayHandle))
         OverlayError.check_error_value(error_code)
-        return pOverlayHandle
+        return pOverlayHandle.value
 
     def destroyOverlay(self, ulOverlayHandle) -> None:
         """
@@ -6808,7 +6808,7 @@ class IVROverlay(object):
         pmatParentOverlayToOverlayTransform = HmdMatrix34_t()
         error_code = fn(ulOverlayHandle, byref(ulOverlayHandleParent), byref(pmatParentOverlayToOverlayTransform))
         OverlayError.check_error_value(error_code)
-        return ulOverlayHandleParent, pmatParentOverlayToOverlayTransform
+        return ulOverlayHandleParent.value, pmatParentOverlayToOverlayTransform
 
     def setOverlayTransformOverlayRelative(self, ulOverlayHandle, ulOverlayHandleParent, pmatParentOverlayToOverlayTransform) -> None:
         """Sets the transform to relative to the transform of the specified overlay. This overlays visibility will also track the parents visibility"""
@@ -7061,7 +7061,7 @@ class IVROverlay(object):
         pThumbnailHandle = VROverlayHandle_t()
         error_code = fn(bytes(overlayKey, encoding='utf-8'), bytes(overlayFriendlyName, encoding='utf-8'), byref(pMainHandle), byref(pThumbnailHandle))
         OverlayError.check_error_value(error_code)
-        return pMainHandle, pThumbnailHandle
+        return pMainHandle.value, pThumbnailHandle.value
 
     def isDashboardVisible(self):
         """Returns true if the dashboard is visible"""
@@ -7976,7 +7976,7 @@ class IVRInput(object):
         pHandle = VRActionSetHandle_t()
         error_code = fn(bytes(actionSetName, encoding='utf-8'), byref(pHandle))
         InputError.check_error_value(error_code)
-        return pHandle
+        return pHandle.value
 
     def getActionHandle(self, actionName: str):
         """Returns a handle for an action. This handle is used for all performance-sensitive calls."""
@@ -7985,7 +7985,7 @@ class IVRInput(object):
         pHandle = VRActionHandle_t()
         error_code = fn(bytes(actionName, encoding='utf-8'), byref(pHandle))
         InputError.check_error_value(error_code)
-        return pHandle
+        return pHandle.value
 
     def getInputSourceHandle(self, inputSourcePath: str):
         """Returns a handle for any path in the input system. E.g. /user/hand/right"""
@@ -7994,7 +7994,7 @@ class IVRInput(object):
         pHandle = VRInputValueHandle_t()
         error_code = fn(bytes(inputSourcePath, encoding='utf-8'), byref(pHandle))
         InputError.check_error_value(error_code)
-        return pHandle
+        return pHandle.value
 
     def updateActionState(self, pSets):
         """
@@ -8203,7 +8203,7 @@ class IVRInput(object):
             originsOutArg = byref(originsOut[0])
         error_code = fn(actionSetHandle, digitalActionHandle, originsOutArg, originOutCount)
         InputError.check_error_value(error_code)
-        return originsOut
+        return originsOut.value
 
     def getOriginLocalizedName(self, origin, unStringSectionsToInclude):
         """
@@ -8368,7 +8368,7 @@ class IVRSpatialAnchors(object):
         pHandleOut = SpatialAnchorHandle_t()
         error_code = fn(bytes(descriptor, encoding='utf-8'), byref(pHandleOut))
         SpatialAnchorError.check_error_value(error_code)
-        return pHandleOut
+        return pHandleOut.value
 
     def createSpatialAnchorFromPose(self, unDeviceIndex, eOrigin):
         """
@@ -8392,7 +8392,7 @@ class IVRSpatialAnchors(object):
         pHandleOut = SpatialAnchorHandle_t()
         error_code = fn(unDeviceIndex, eOrigin, byref(pPose), byref(pHandleOut))
         SpatialAnchorError.check_error_value(error_code)
-        return pPose, pHandleOut
+        return pPose, pHandleOut.value
 
     def getSpatialAnchorPose(self, unHandle, eOrigin):
         """

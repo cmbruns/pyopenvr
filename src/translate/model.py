@@ -577,8 +577,14 @@ class Parameter(Declaration):
         if not self.is_output():
             return None
         result = self.name
-        pt = translate_type(self.type.get_pointee().spelling)
+        pt0 = self.type.get_pointee()
+        extract_value = False
+        if pt0.kind == TypeKind.TYPEDEF and pt0.spelling.endswith('Handle_t'):
+            extract_value = True
+        pt = translate_type(pt0.spelling)
         if pt.startswith('c_'):
+            extract_value = True
+        if extract_value:
             result += '.value'
         return result
 
