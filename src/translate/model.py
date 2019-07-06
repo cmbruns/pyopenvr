@@ -30,6 +30,8 @@ class FunctionBase(Declaration):
             self._count_parameter_names.add(m.group(1))
         if parameter.name in self._count_parameter_names:
             parameter.is_count = True
+        if parameter.name in ('punRequiredBufferSize', ):
+            parameter.is_required_count = True  # getRuntimePath()
         self.parameters.append(parameter)
 
     def annotate_parameters(self):
@@ -70,20 +72,42 @@ class FunctionBase(Declaration):
                     len_param = self.parameters[pix + 2]
                 len_param.is_count = True
                 call_params0 = []
+                # Treat VR_GetRuntimePath specially...
+                initial_buffer_size = 0
+                length_is_retval = True
+                required_len_param = None
+                if len(self.parameters) >= 3 and self.parameters[2].name == 'punRequiredBufferSize':
+                    initial_buffer_size = 1
+                    length_is_retval = False
+                    required_len_param = self.parameters[2]
+                if initial_buffer_size > 0:
+                    pre_call_statements += f'{p.py_name} = ctypes.create_string_buffer({initial_buffer_size})\n'
                 for p2 in self.parameters:
                     if p2 is p:
-                        call_params0.append('None')
+                        if initial_buffer_size == 0:
+                            call_params0.append('None')
+                        else:
+                            call_params0.append(p2.call_param_name())
                     elif p2 is len_param:
-                        call_params0.append('0')
+                        call_params0.append(str(initial_buffer_size))
                     elif p2.call_param_name():
                         call_params0.append(p2.call_param_name())
                 param_list = ', '.join(call_params0)
-                pre_call_statements += textwrap.dedent(f'''\
-                    {len_param.py_name} = fn({param_list})
-                    if {len_param.py_name} == 0:
-                        return b''
-                    {p.py_name} = ctypes.create_string_buffer({len_param.py_name})
-                ''')
+                if length_is_retval:
+                    pre_call_statements += textwrap.dedent(f'''\
+                        {len_param.py_name} = fn({param_list})
+                        if {len_param.py_name} == 0:
+                            return ''
+                        {p.py_name} = ctypes.create_string_buffer({len_param.py_name})
+                    ''')
+                else:  # getRuntimePath()
+                    pre_call_statements += textwrap.dedent(f'''\
+                        fn({param_list})
+                        {len_param.py_name} = {required_len_param.py_name}.value
+                        if {len_param.py_name} == 0:
+                            return ''
+                        {p.py_name} = ctypes.create_string_buffer({len_param.py_name})
+                    ''')
         param_list1 = ', '.join(in_params)
         # pythonically downcase first letter of method name
         result_annotation = ''
@@ -325,6 +349,7 @@ class Parameter(Declaration):
         self.default_value = default_value
         self.annotation = annotation
         self.is_count = False
+        self.is_required_count = False
         self.py_name = self.get_py_name(self.name)
 
     @staticmethod
@@ -389,6 +414,8 @@ class Parameter(Declaration):
     def is_output(self):
         if self.is_count:
             return False
+        if self.is_required_count:
+            return False
         if not self.type.kind == TypeKind.POINTER:
             return False
         pt = self.type.get_pointee()
@@ -406,6 +433,8 @@ class Parameter(Declaration):
 
     def is_input(self):
         if self.is_count:
+            return False
+        if self.is_required_count:
             return False
         elif self.is_array():
             return True

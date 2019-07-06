@@ -4783,7 +4783,7 @@ class IVRSystem(object):
         error = ETrackedPropertyError()
         bufferSize = fn(deviceIndex, prop, None, 0, byref(error))
         if bufferSize == 0:
-            return b''
+            return ''
         value = ctypes.create_string_buffer(bufferSize)
         fn(deviceIndex, prop, value, bufferSize, byref(error))
         TrackedProperty_Error.check_error_value(error.value)
@@ -4930,7 +4930,7 @@ class IVRSystem(object):
         fn = self.function_table.driverDebugRequest
         responseBufferSize = fn(deviceIndex, bytes(request, encoding='utf-8'), None, 0)
         if responseBufferSize == 0:
-            return b''
+            return ''
         responseBuffer = ctypes.create_string_buffer(responseBufferSize)
         fn(deviceIndex, bytes(request, encoding='utf-8'), responseBuffer, responseBufferSize)
         return bytes(responseBuffer.value).decode('utf-8')
@@ -5049,7 +5049,7 @@ class IVRApplications(object):
         fn = self.function_table.getApplicationKeyByIndex
         appKeyBufferLen = fn(applicationIndex, None, 0)
         if appKeyBufferLen == 0:
-            return b''
+            return ''
         appKeyBuffer = ctypes.create_string_buffer(appKeyBufferLen)
         error_code = fn(applicationIndex, appKeyBuffer, appKeyBufferLen)
         ApplicationError.check_error_value(error_code)
@@ -5063,7 +5063,7 @@ class IVRApplications(object):
         fn = self.function_table.getApplicationKeyByProcessId
         appKeyBufferLen = fn(processId, None, 0)
         if appKeyBufferLen == 0:
-            return b''
+            return ''
         appKeyBuffer = ctypes.create_string_buffer(appKeyBufferLen)
         error_code = fn(processId, appKeyBuffer, appKeyBufferLen)
         ApplicationError.check_error_value(error_code)
@@ -5147,7 +5147,7 @@ class IVRApplications(object):
         error = EVRApplicationError()
         propertyValueBufferLen = fn(bytes(appKey, encoding='utf-8'), property_, None, 0, byref(error))
         if propertyValueBufferLen == 0:
-            return b''
+            return ''
         propertyValueBuffer = ctypes.create_string_buffer(propertyValueBufferLen)
         fn(bytes(appKey, encoding='utf-8'), property_, propertyValueBuffer, propertyValueBufferLen, byref(error))
         ApplicationError.check_error_value(error.value)
@@ -5192,7 +5192,7 @@ class IVRApplications(object):
         fn = self.function_table.getDefaultApplicationForMimeType
         appKeyBufferLen = fn(bytes(mimeType, encoding='utf-8'), None, 0)
         if appKeyBufferLen == 0:
-            return b''
+            return ''
         appKeyBuffer = ctypes.create_string_buffer(appKeyBufferLen)
         fn(bytes(mimeType, encoding='utf-8'), appKeyBuffer, appKeyBufferLen)
         return bytes(appKeyBuffer.value).decode('utf-8')
@@ -5202,7 +5202,7 @@ class IVRApplications(object):
         fn = self.function_table.getApplicationSupportedMimeTypes
         mimeTypesBuffer = fn(bytes(appKey, encoding='utf-8'), None, 0)
         if mimeTypesBuffer == 0:
-            return b''
+            return ''
         mimeTypesBuffer = ctypes.create_string_buffer(mimeTypesBuffer)
         fn(bytes(appKey, encoding='utf-8'), mimeTypesBuffer, mimeTypesBuffer)
         return bytes(mimeTypesBuffer.value).decode('utf-8')
@@ -5212,7 +5212,7 @@ class IVRApplications(object):
         fn = self.function_table.getApplicationsThatSupportMimeType
         appKeysThatSupportBuffer = fn(bytes(mimeType, encoding='utf-8'), None, 0)
         if appKeysThatSupportBuffer == 0:
-            return b''
+            return ''
         appKeysThatSupportBuffer = ctypes.create_string_buffer(appKeysThatSupportBuffer)
         fn(bytes(mimeType, encoding='utf-8'), appKeysThatSupportBuffer, appKeysThatSupportBuffer)
         return bytes(appKeysThatSupportBuffer.value).decode('utf-8')
@@ -5222,7 +5222,7 @@ class IVRApplications(object):
         fn = self.function_table.getApplicationLaunchArguments
         args = fn(handle, None, 0)
         if args == 0:
-            return b''
+            return ''
         args = ctypes.create_string_buffer(args)
         fn(handle, args, args)
         return bytes(args.value).decode('utf-8')
@@ -5232,7 +5232,7 @@ class IVRApplications(object):
         fn = self.function_table.getStartingApplication
         appKeyBufferLen = fn(None, 0)
         if appKeyBufferLen == 0:
-            return b''
+            return ''
         appKeyBuffer = ctypes.create_string_buffer(appKeyBufferLen)
         error_code = fn(appKeyBuffer, appKeyBufferLen)
         ApplicationError.check_error_value(error_code)
@@ -5390,7 +5390,7 @@ class IVRSettings(object):
         error = EVRSettingsError()
         valueLen = fn(bytes(section, encoding='utf-8'), bytes(settingsKey, encoding='utf-8'), None, 0, byref(error))
         if valueLen == 0:
-            return b''
+            return ''
         value = ctypes.create_string_buffer(valueLen)
         fn(bytes(section, encoding='utf-8'), bytes(settingsKey, encoding='utf-8'), value, valueLen, byref(error))
         SettingsError.check_error_value(error.value)
@@ -5685,7 +5685,7 @@ class IVRChaperoneSetup(object):
         fn = self.function_table.exportLiveToBuffer
         bufferLength = fn(None, 0)
         if bufferLength == 0:
-            return b''
+            return ''
         buffer = ctypes.create_string_buffer(bufferLength)
         fn(buffer, bufferLength)
         return bytes(buffer.value).decode('utf-8')
@@ -6138,7 +6138,7 @@ class IVRCompositor(object):
         fn = self.function_table.getVulkanInstanceExtensionsRequired
         bufferSize = fn(None, 0)
         if bufferSize == 0:
-            return b''
+            return ''
         value = ctypes.create_string_buffer(bufferSize)
         fn(value, bufferSize)
         return bytes(value.value).decode('utf-8')
@@ -6153,7 +6153,7 @@ class IVRCompositor(object):
         physicalDevice = VkPhysicalDevice_T()
         bufferSize = fn(byref(physicalDevice), None, 0)
         if bufferSize == 0:
-            return b''
+            return ''
         value = ctypes.create_string_buffer(bufferSize)
         fn(byref(physicalDevice), value, bufferSize)
         return physicalDevice, bytes(value.value).decode('utf-8')
@@ -6419,7 +6419,7 @@ class IVROverlay(object):
         error = EVROverlayError()
         bufferSize = fn(overlayHandle, None, 0, byref(error))
         if bufferSize == 0:
-            return b''
+            return ''
         value = ctypes.create_string_buffer(bufferSize)
         fn(overlayHandle, value, bufferSize, byref(error))
         OverlayError.check_error_value(error.value)
@@ -6434,7 +6434,7 @@ class IVROverlay(object):
         error = EVROverlayError()
         bufferSize = fn(overlayHandle, None, 0, byref(error))
         if bufferSize == 0:
-            return b''
+            return ''
         value = ctypes.create_string_buffer(bufferSize)
         fn(overlayHandle, value, bufferSize, byref(error))
         OverlayError.check_error_value(error.value)
@@ -6639,7 +6639,7 @@ class IVROverlay(object):
         error = EVROverlayError()
         bufferSize = fn(overlayHandle, None, 0, byref(color), byref(error))
         if bufferSize == 0:
-            return b''
+            return ''
         value = ctypes.create_string_buffer(bufferSize)
         fn(overlayHandle, value, bufferSize, byref(color), byref(error))
         OverlayError.check_error_value(error.value)
@@ -6707,7 +6707,7 @@ class IVROverlay(object):
         deviceIndex = TrackedDeviceIndex_t()
         componentNameSize = fn(overlayHandle, byref(deviceIndex), None, 0)
         if componentNameSize == 0:
-            return b''
+            return ''
         componentName = ctypes.create_string_buffer(componentNameSize)
         error_code = fn(overlayHandle, byref(deviceIndex), componentName, componentNameSize)
         OverlayError.check_error_value(error_code)
@@ -7002,7 +7002,7 @@ class IVROverlay(object):
         fn = self.function_table.getKeyboardText
         text = fn(None, 0)
         if text == 0:
-            return b''
+            return ''
         text = ctypes.create_string_buffer(text)
         fn(text, text)
         return bytes(text.value).decode('utf-8')
@@ -7166,7 +7166,7 @@ class IVRRenderModels(object):
         fn = self.function_table.getRenderModelName
         renderModelNameLen = fn(renderModelIndex, None, 0)
         if renderModelNameLen == 0:
-            return b''
+            return ''
         renderModelName = ctypes.create_string_buffer(renderModelNameLen)
         fn(renderModelIndex, renderModelName, renderModelNameLen)
         return bytes(renderModelName.value).decode('utf-8')
@@ -7200,7 +7200,7 @@ class IVRRenderModels(object):
         fn = self.function_table.getComponentName
         componentNameLen = fn(bytes(renderModelName, encoding='utf-8'), componentIndex, None, 0)
         if componentNameLen == 0:
-            return b''
+            return ''
         componentName = ctypes.create_string_buffer(componentNameLen)
         fn(bytes(renderModelName, encoding='utf-8'), componentIndex, componentName, componentNameLen)
         return bytes(componentName.value).decode('utf-8')
@@ -7225,7 +7225,7 @@ class IVRRenderModels(object):
         fn = self.function_table.getComponentRenderModelName
         componentRenderModelNameLen = fn(bytes(renderModelName, encoding='utf-8'), bytes(componentName, encoding='utf-8'), None, 0)
         if componentRenderModelNameLen == 0:
-            return b''
+            return ''
         componentRenderModelName = ctypes.create_string_buffer(componentRenderModelNameLen)
         fn(bytes(renderModelName, encoding='utf-8'), bytes(componentName, encoding='utf-8'), componentRenderModelName, componentRenderModelNameLen)
         return bytes(componentRenderModelName.value).decode('utf-8')
@@ -7265,7 +7265,7 @@ class IVRRenderModels(object):
         error = EVRRenderModelError()
         thumbnailURLLen = fn(bytes(renderModelName, encoding='utf-8'), None, 0, byref(error))
         if thumbnailURLLen == 0:
-            return b''
+            return ''
         thumbnailURL = ctypes.create_string_buffer(thumbnailURLLen)
         fn(bytes(renderModelName, encoding='utf-8'), thumbnailURL, thumbnailURLLen, byref(error))
         RenderModelError.check_error_value(error.value)
@@ -7281,7 +7281,7 @@ class IVRRenderModels(object):
         error = EVRRenderModelError()
         originalPathLen = fn(bytes(renderModelName, encoding='utf-8'), None, 0, byref(error))
         if originalPathLen == 0:
-            return b''
+            return ''
         originalPath = ctypes.create_string_buffer(originalPathLen)
         fn(bytes(renderModelName, encoding='utf-8'), originalPath, originalPathLen, byref(error))
         RenderModelError.check_error_value(error.value)
@@ -7609,7 +7609,7 @@ class IVRScreenshots(object):
         error = EVRScreenshotError()
         filename = fn(screenshotHandle, filenameType, None, 0, byref(error))
         if filename == 0:
-            return b''
+            return ''
         filename = ctypes.create_string_buffer(filename)
         fn(screenshotHandle, filenameType, filename, filename, byref(error))
         ScreenshotError.check_error_value(error.value)
@@ -7699,7 +7699,7 @@ class IVRResources(object):
         fn = self.function_table.getResourceFullPath
         bufferLen = fn(bytes(resourceName, encoding='utf-8'), bytes(resourceTypeDirectory, encoding='utf-8'), None, 0)
         if bufferLen == 0:
-            return b''
+            return ''
         pathBuffer = ctypes.create_string_buffer(bufferLen)
         fn(bytes(resourceName, encoding='utf-8'), bytes(resourceTypeDirectory, encoding='utf-8'), pathBuffer, bufferLen)
         return bytes(pathBuffer.value).decode('utf-8')
@@ -7735,7 +7735,7 @@ class IVRDriverManager(object):
         fn = self.function_table.getDriverName
         bufferSize = fn(driver, None, 0)
         if bufferSize == 0:
-            return b''
+            return ''
         value = ctypes.create_string_buffer(bufferSize)
         fn(driver, value, bufferSize)
         return bytes(value.value).decode('utf-8')
@@ -7932,7 +7932,7 @@ class IVRInput(object):
         fn = self.function_table.getBoneName
         nameBufferSize = fn(action, boneIndex, None, 0)
         if nameBufferSize == 0:
-            return b''
+            return ''
         boneName = ctypes.create_string_buffer(nameBufferSize)
         error_code = fn(action, boneIndex, boneName, nameBufferSize)
         InputError.check_error_value(error_code)
@@ -8048,7 +8048,7 @@ class IVRInput(object):
         fn = self.function_table.getOriginLocalizedName
         nameArraySize = fn(origin, None, 0, stringSectionsToInclude)
         if nameArraySize == 0:
-            return b''
+            return ''
         nameArray = ctypes.create_string_buffer(nameArraySize)
         error_code = fn(origin, nameArray, nameArraySize, stringSectionsToInclude)
         InputError.check_error_value(error_code)
@@ -8243,7 +8243,7 @@ class IVRSpatialAnchors(object):
         fn = self.function_table.getSpatialAnchorDescriptor
         descriptorBufferLenInOut = fn(handle, None, 0)
         if descriptorBufferLenInOut == 0:
-            return b''
+            return ''
         descriptorOut = ctypes.create_string_buffer(descriptorBufferLenInOut)
         error_code = fn(handle, descriptorOut, descriptorBufferLenInOut)
         SpatialAnchorError.check_error_value(error_code)
@@ -8321,12 +8321,14 @@ def getRuntimePath():
     """Returns where the OpenVR runtime is installed."""
     fn = _openvr.VR_GetRuntimePath
     requiredBufferSize = c_uint32()
-    bufferSize = fn(None, 0, byref(requiredBufferSize))
+    pathBuffer = ctypes.create_string_buffer(1)
+    fn(pathBuffer, 1, byref(requiredBufferSize))
+    bufferSize = requiredBufferSize.value
     if bufferSize == 0:
-        return b''
+        return ''
     pathBuffer = ctypes.create_string_buffer(bufferSize)
     fn(pathBuffer, bufferSize, byref(requiredBufferSize))
-    return bytes(pathBuffer.value).decode('utf-8'), requiredBufferSize.value
+    return bytes(pathBuffer.value).decode('utf-8')
 
 
 _openvr.VR_GetVRInitErrorAsSymbol.restype = c_char_p
