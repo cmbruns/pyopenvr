@@ -13,6 +13,136 @@ class Declaration(object):
         return f'{self.name}'
 
 
+class FunctionBase(Declaration):
+    def __init__(self, name, type_=None, docstring=None):
+        super().__init__(name=name, docstring=docstring)
+        self.type = type_
+        self.parameters = []
+        self._count_parameter_names = set()
+
+    def __str__(self):
+        return self.ctypes_string()
+
+    def add_parameter(self, parameter):
+        # Tag count parameters
+        m = parameter.is_array()
+        if m:
+            self._count_parameter_names.add(m.group(1))
+        if parameter.name in self._count_parameter_names:
+            parameter.is_count = True
+        self.parameters.append(parameter)
+
+    def annotate_parameters(self):
+        for pix, p in enumerate(self.parameters):
+            if p.is_output_string():
+                len_param = self.parameters[pix + 1]
+                len_param.is_count = True
+            if p.is_struct_size():
+                if pix > 0:
+                    sized_param = self.parameters[pix - 1]
+                    t = sized_param.type.get_pointee().spelling
+                    t = translate_type(t)
+                    p.always_value = f'sizeof({t})'
+
+    def ctypes_string(self, in_params=()):
+        in_params = list(in_params)
+        self.annotate_parameters()
+        call_params = []
+        out_params = []
+        if self.has_return() and not self.raise_error_code():
+            out_params.append('result')
+        pre_call_statements = ''
+        post_call_statements = ''
+        for p in self.parameters:
+            if p.input_param_name():
+                in_params.append(p.input_param_name())
+            if p.call_param_name():
+                call_params.append(p.call_param_name())
+            if p.return_param_name():
+                out_params.append(p.return_param_name())
+            pre_call_statements += p.pre_call_block()
+            post_call_statements += p.post_call_block()
+        # Handle output strings
+        for pix, p in enumerate(self.parameters):
+            if p.is_output_string():
+                len_param = self.parameters[pix + 1]
+                if len_param.is_struct_size():
+                    len_param = self.parameters[pix + 2]
+                len_param.is_count = True
+                call_params0 = []
+                for p2 in self.parameters:
+                    if p2 is p:
+                        call_params0.append('None')
+                    elif p2 is len_param:
+                        call_params0.append('0')
+                    elif p2.call_param_name():
+                        call_params0.append(p2.call_param_name())
+                param_list = ', '.join(call_params0)
+                pre_call_statements += textwrap.dedent(f'''\
+                    {len_param.py_name} = fn({param_list})
+                    if {len_param.py_name} == 0:
+                        return b''
+                    {p.py_name} = ctypes.create_string_buffer({len_param.py_name})
+                ''')
+        param_list1 = ', '.join(in_params)
+        # pythonically downcase first letter of method name
+        result_annotation = ''
+        if len(out_params) == 0:
+            result_annotation = ' -> None'
+        method_string = f'def {self.py_method_name()}({param_list1}){result_annotation}:\n'
+        body_string = ''
+        if self.docstring:
+            body_string += f'"""{self.docstring}"""\n'
+        body_string += f'fn = {self.inner_function_name()}\n'
+        body_string += pre_call_statements
+        param_list2 = ', '.join(call_params)
+        if self.raise_error_code():
+            body_string += f'error_code = fn({param_list2})'
+        elif self.has_return():
+            body_string += f'result = fn({param_list2})'
+        else:
+            body_string += f'fn({param_list2})'
+        if self.raise_error_code():
+            error_category = self.type.spelling
+            assert error_category.endswith('Error')
+            if error_category.startswith('vr::EVR'):
+                error_category = error_category[7:]
+            elif error_category.startswith('vr::E'):
+                error_category = error_category[5:]
+            else:
+                assert False
+            post_call_statements += f'\n{error_category}.check_error_value(error_code)'
+        body_string += post_call_statements
+        if self.py_method_name() == 'pollNextEvent':
+            body_string += '\nreturn result != 0'  # Custom return statement
+        elif len(out_params) > 0:
+            results = ', '.join(out_params)
+            body_string += f'\nreturn {results}'
+        body_string = textwrap.indent(body_string, ' '*4)
+        method_string += body_string
+        return method_string
+
+    def has_return(self):
+        if self.type.spelling == 'void':
+            return False
+        for p in self.parameters:
+            if p.is_output_string():
+                return False
+        return True
+
+    def inner_function_name(self):
+        return f'self.function_table.{self.py_method_name()}'
+
+    def py_method_name(self):
+        n = self.name
+        if n.startswith('VR_'):
+            n = n[3:]
+        return n[0].lower() + n[1:]
+
+    def raise_error_code(self):
+        return re.match(r'(?:vr::)?E\S+Error$', self.type.spelling)
+
+
 class COpenVRContext(Declaration):
     def __init__(self, name, docstring=None):
         super().__init__(name=name, docstring=docstring)
@@ -92,7 +222,7 @@ class IVRClass(Declaration):
         if len(self.methods) > 0:
             methods = '\n'
             for method in self.methods:
-                methods += textwrap.indent(str(method), 16*' ') + '\n'
+                methods += textwrap.indent(str(method), 16*' ') + '\n\n'
                 fn_table_methods += '\n' + ' '*20 + f'{method.ctypes_fntable_string()}'
         return inspect.cleandoc(f'''
             class {name}_FnTable(Structure):
@@ -153,202 +283,38 @@ class EnumConstant(Declaration):
         return f'{self.name} = ENUM_VALUE_TYPE({self.value})'
 
 
-class Function(Declaration):
-    def __init__(self, name, type_=None, docstring=None):
-        super().__init__(name=name, docstring=docstring)
-        self.type = type_
-        self.parameters = []
+class Function(FunctionBase):
+    def inner_function_name(self):
+        return f'_openvr.{self.name}'
 
-    def __str__(self):
-        py_name = self.name
-        if py_name.startswith('VR_'):
-            py_name = py_name[3:]
-        py_name = py_name[0].lower() + py_name[1:]
-        docstring = ''
-        if self.docstring:
-            docstring = f'\n"""{self.docstring}"""'
-            docstring = textwrap.indent(docstring, ' '*20)
-        params = []
-        call_params = []
-        param_types = []
-        error_param = None
-        for p in self.parameters:
-            if p.is_error():
-                error_param = p
-            else:
-                n = p.name
-                if p.default_value:
-                    n += f'={p.default_value}'
-                params.append(n)
-            if p.type.kind == TypeKind.POINTER:
-                pt = p.type.get_pointee()
-                if pt.is_const_qualified():
-                    call_params.append(p.name)
-                else:
-                    call_params.append(f'byref({p.name})')
-            else:
-                call_params.append(p.name)
-            param_types.append(translate_type(p.type.spelling))
+    def ctypes_string(self):
         restype = translate_type(self.type.spelling)
-        args = ', '.join(params)
-        call_args = ', '.join(call_params)
+        param_types = []
+        for p in self.parameters:
+            param_types.append(translate_type(p.type.spelling))
         arg_types = ', '.join(param_types)
-        if error_param is None:
-            method_string = f'''
+        result = textwrap.dedent(f'''\
                 _openvr.{self.name}.restype = {restype}
                 _openvr.{self.name}.argtypes = [{arg_types}]
-                
-                
-                def {py_name}({args}):{docstring}
-                    result = _openvr.{self.name}({call_args})
-                    return result
-            '''
-        else:
-            e_type = translate_type(error_param.type.get_pointee().spelling)
-            method_string = f'''
-                _openvr.{self.name}.restype = {restype}
-                _openvr.{self.name}.argtypes = [{arg_types}]
-                
-                
-                def {py_name}({args}):{docstring}
-                    {error_param.name} = {e_type}()
-                    result = _openvr.{self.name}({call_args})
-                    _checkInitError({error_param.name}.value)
-                    return result
-            '''
-        return inspect.cleandoc(method_string)
-
-    def add_parameter(self, parameter):
-        self.parameters.append(parameter)
 
 
-class Method(Declaration):
-    def __init__(self, name, type_=None, docstring=None):
-        super().__init__(name=name, docstring=docstring)
-        self.type = type_
-        self.parameters = []
-        self._count_parameter_names = set()
+        ''')
+        result += super().ctypes_string()
+        return result
 
-    def __str__(self):
-        return self.ctypes_string()
 
-    def add_parameter(self, parameter):
-        # Tag count parameters
-        m = parameter.is_array()
-        if m:
-            self._count_parameter_names.add(m.group(1))
-        if parameter.name in self._count_parameter_names:
-            parameter.is_count = True
-        self.parameters.append(parameter)
-
+class Method(FunctionBase):
     def ctypes_fntable_string(self):
         method_name = self.name[0].lower() + self.name[1:]
-        param_list = [translate_type(self.type), ]
+        param_list = [translate_type(self.type.spelling), ]
         for p in self.parameters:
             param_list.append(translate_type(p.type.spelling))
         params = ', '.join(param_list)
         result = f'("{method_name}", OPENVR_FNTABLE_CALLTYPE({params})),'
         return result
 
-    def has_return(self):
-        if self.type == 'void':
-            return False
-        for p in self.parameters:
-            if p.is_output_string():
-                return False
-        return True
-
     def ctypes_string(self):
-        in_params = ['self']
-        call_params = []
-        out_params = []
-        if self.has_return() and not self.raise_error_code():
-            out_params.append('result')
-        pre_call_statements = ''
-        post_call_statements = ''
-        # Annotate count params just in time
-        for pix, p in enumerate(self.parameters):
-            if p.is_output_string():
-                len_param = self.parameters[pix + 1]
-                len_param.is_count = True
-            if p.is_struct_size():
-                if pix > 0:
-                    sized_param = self.parameters[pix - 1]
-                    t = sized_param.type.get_pointee().spelling
-                    t = translate_type(t)
-                    p.always_value = f'sizeof({t})'
-        for p in self.parameters:
-            if p.input_param_name():
-                in_params.append(p.input_param_name())
-            if p.call_param_name():
-                call_params.append(p.call_param_name())
-            if p.return_param_name():
-                out_params.append(p.return_param_name())
-            pre_call_statements += p.pre_call_block()
-            post_call_statements += p.post_call_block()
-        # Handle output strings
-        for pix, p in enumerate(self.parameters):
-            if p.is_output_string():
-                len_param = self.parameters[pix + 1]
-                if len_param.is_struct_size():
-                    len_param = self.parameters[pix + 2]
-                len_param.is_count = True
-                call_params0 = []
-                for p2 in self.parameters:
-                    if p2 is p:
-                        call_params0.append('None')
-                    elif p2 is len_param:
-                        call_params0.append('0')
-                    elif p2.call_param_name():
-                        call_params0.append(p2.call_param_name())
-                param_list = ', '.join(call_params0)
-                pre_call_statements += textwrap.dedent(f'''\
-                    {len_param.py_name} = fn({param_list})
-                    if {len_param.py_name} == 0:
-                        return b''
-                    {p.py_name} = ctypes.create_string_buffer({len_param.py_name})
-                ''')
-        param_list1 = ', '.join(in_params)
-        # pythonically downcase first letter of method name
-        method_name = self.name[0].lower() + self.name[1:]
-        result_annotation = ''
-        if len(out_params) == 0:
-            result_annotation = ' -> None'
-        method_string = f'def {method_name}({param_list1}){result_annotation}:\n'
-        body_string = ''
-        if self.docstring:
-            body_string += f'"""{self.docstring}"""\n\n'
-        body_string += f'fn = self.function_table.{method_name}\n'
-        body_string += pre_call_statements
-        param_list2 = ', '.join(call_params)
-        if self.raise_error_code():
-            body_string += f'error_code = fn({param_list2})\n'
-        elif self.has_return():
-            body_string += f'result = fn({param_list2})\n'
-        else:
-            body_string += f'fn({param_list2})\n'
-        if self.raise_error_code():
-            error_category = self.type
-            assert error_category.endswith('Error')
-            if error_category.startswith('vr::EVR'):
-                error_category = error_category[7:]
-            elif error_category.startswith('vr::E'):
-                error_category = error_category[5:]
-            else:
-                assert False
-            post_call_statements += f'{error_category}.check_error_value(error_code)\n'
-        body_string += post_call_statements
-        if method_name == 'pollNextEvent':
-            body_string += 'return result != 0\n'  # Custom return statement
-        elif len(out_params) > 0:
-            results = ', '.join(out_params)
-            body_string += f'return {results}\n'
-        body_string = textwrap.indent(body_string, ' '*4)
-        method_string += body_string
-        return method_string
-
-    def raise_error_code(self):
-        return re.match(r'(?:vr::)?E\S+Error$', self.type)
+        return super().ctypes_string(in_params=['self', ])
 
 
 class Parameter(Declaration):
@@ -528,7 +494,7 @@ class Parameter(Declaration):
                 assert False
             if error_category == 'TrackedPropertyError':  # avoid symbol conflict
                 error_category = 'TrackedProperty_Error'
-            result += f'{error_category}.check_error_value({self.py_name}.value)\n'
+            result += f'\n{error_category}.check_error_value({self.py_name}.value)'
         if self.is_output() and self.type.kind == TypeKind.POINTER:
             pt = self.type.get_pointee()
             if pt.kind == TypeKind.POINTER:
@@ -536,11 +502,11 @@ class Parameter(Declaration):
                 if pt2.spelling.endswith('_t'):
                     n = self.py_name
                     result += textwrap.dedent(f'''\
+                        
                         if {n}:
                             {n} = {n}.contents
                         else:
-                            {n} = None
-                    ''')
+                            {n} = None''')
         return result
 
     def input_param_name(self):

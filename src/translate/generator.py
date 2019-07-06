@@ -316,6 +316,7 @@ class CTypesGenerator(object):
             if isinstance(declaration, model.Function):
                 print(declaration, file=file_out)
                 print('\n', file=file_out)
+
         print('Generate complete')
 
 

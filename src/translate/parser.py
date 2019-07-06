@@ -168,7 +168,7 @@ class Parser(object):
 
     def parse_method(self, cursor):
         name = cursor.spelling
-        method = model.Method(name=name, type_=cursor.result_type.spelling, docstring=clean_comment(cursor))
+        method = model.Method(name=name, type_=cursor.result_type, docstring=clean_comment(cursor))
         for child in cursor.get_children():
             if child.kind == CursorKind.PARM_DECL:
                 parameter = self.parse_parameter(child)
