@@ -4,9 +4,9 @@
 
 import sys
 
-from PySide.QtCore import Qt, QTimer
-from PySide.QtGui import QApplication, QMainWindow
-from PySide.QtOpenGL import QGLWidget, QGLFormat
+from PySide2.QtCore import Qt, QTimer
+from PySide2.QtWidgets import QApplication, QMainWindow
+from PySide2.QtOpenGL import QGLWidget, QGLFormat
 
 """
 Toy PySide application for use with "hello world" examples demonstrating pyopenvr

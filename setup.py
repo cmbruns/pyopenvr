@@ -38,11 +38,11 @@ Development Status :: 4 - Beta
 """.splitlines(),
     install_requires=[],
     extras_require={
-        'all': ['numpy', 'PyOpenGL', 'glfw', 'PyQt5', 'jinja2', 'wxPython', 'clang', 'PIL'],
         'glfw': ['numpy', 'PyOpenGL', 'glfw'],
         'opengl': ['numpy', 'PyOpenGL'],
         'PyQt5': ['numpy', 'PyOpenGL', 'PyQt5', 'jinja2'],
-        #  'PySide': ['PySide'], # does not support past python 3.5
+        'PySide2': ['numpy', 'PyOpenGL', 'PySide2'],
+        'sdl2': ['numpy', 'PyOpenGL', 'PySDL2'],
         'wx': ['numpy', 'PyOpenGL', 'wxPython'],
         'generate': ['clang', ]
     }

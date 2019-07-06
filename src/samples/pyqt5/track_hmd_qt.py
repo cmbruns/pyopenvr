@@ -12,7 +12,7 @@
 # SURFsara Visualization group
 import sys
 from PyQt5.QtWidgets import QApplication, QWidget, QPushButton, QVBoxLayout
-from PyQt5.QtCore import QTimer
+from PyQt5.QtCore import QTimer, pyqtSlot, QCoreApplication
 from PyQt5.QtWebEngineWidgets import QWebEngineView
 from jinja2 import Environment, FileSystemLoader
 import openvr
@@ -73,11 +73,14 @@ class MainWindow(QWidget):
         
         self.timer = QTimer()
         self.timer.timeout.connect(self.update_page)
-        self.timer.start(50)   # ms
+        self.timer.start(200)   # ms
                     
     def update_page(self):
+        try:
+            openvr.VRCompositor().waitGetPoses(self.poses, None)
+        except:
+            return
 
-        openvr.VRCompositor().waitGetPoses(self.poses, None)
         vrsys = openvr.VRSystem()
         
         poses = {}
@@ -113,9 +116,11 @@ class MainWindow(QWidget):
                 
         self.webview.setHtml(html)
         self.update()
-        
+
     def closeEvent(self, event):
+        self.timer.stop()
         openvr.shutdown()
+        super().closeEvent(event)
 
 if __name__ == '__main__':    
     

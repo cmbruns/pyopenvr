@@ -32,8 +32,9 @@ class TrackedDeviceMesh(object):
         self.vertexPositions = None
 
     def _try_load_model(self):
-        error, model = openvr.VRRenderModels().loadRenderModel_Async(self.model_name)
-        if error == openvr.VRRenderModelError_Loading:
+        try:
+            model = openvr.VRRenderModels().loadRenderModel_Async(self.model_name)
+        except openvr.error_code.RenderModelError_Loading:
             return
         vertices0 = list()
         indices0 = list()
@@ -78,8 +79,9 @@ class TrackedDeviceMesh(object):
 
     def _try_load_texture(self):
         # Surface texture
-        error, texture_map = openvr.VRRenderModels().loadTexture_Async(self.model.diffuseTextureId)
-        if error == openvr.VRRenderModelError_Loading:
+        try:
+            texture_map = openvr.VRRenderModels().loadTexture_Async(self.model.diffuseTextureId)
+        except openvr.error_code.RenderModelError_Loading:
             return
         self.texture_map = texture_map
         self.diffuse_texture = GL.glGenTextures(1)
