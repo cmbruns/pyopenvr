@@ -6,7 +6,7 @@ import openvr
 
 openvr.init(openvr.VRApplication_Scene)
 
-poses = None  # Let waitGetPoses populate the poses structure the first time
+poses = []  # Let waitGetPoses populate the poses structure the first time
 
 # Print out headset transform five times a second for 20 seconds
 for i in range(100):
