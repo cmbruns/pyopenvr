@@ -22,6 +22,8 @@ class CTypesGenerator(object):
             from ctypes import *
             
             from .version import __version__
+            import openvr.error_code
+            from openvr.error_code import OpenVRError
             
             
             class Pack4Structure(Structure):
@@ -83,6 +85,79 @@ class CTypesGenerator(object):
         print(preamble, file=file_out)
 
     @staticmethod
+    def generate_errors(declarations, file_out):
+        print(inspect.cleandoc('''
+            ############################################
+            # Python exceptions for openvr error codes #
+            ############################################
+
+
+            class OpenVRError(Exception):
+                """
+                OpenVRError is a custom exception type for when OpenVR functions return a failure code.
+                Such a specific exception type allows more precise exception handling that does just raising Exception().
+                """
+                pass
+            
+            
+            class ErrorCode(OpenVRError):
+                error_index = dict()
+                is_error = True  # FooError_None classes should override this
+            
+                @classmethod
+                def check_error_value(cls, error_value, message=''):
+                    error_class = cls.error_index[int(error_value)]
+                    if not error_class.is_error:
+                        return
+                    raise error_class(message)
+        '''), file=file_out)
+        for declaration in declarations:
+            if not isinstance(declaration, model.EnumDecl):
+                continue
+            nm = declaration.name
+            if nm.startswith('EVR'):
+                nm = nm[3:]  # Strip 'EVR'
+            elif nm.startswith('E'):
+                nm = nm[1:]
+            else:
+                continue
+            if not nm.endswith('Error'):
+                continue
+            error_category = nm
+            # General error_code type category class
+            print(textwrap.dedent(f'''\
+                
+                
+                class {error_category}(ErrorCode):
+                    error_index = dict()
+            '''), file=file_out)
+            index = ''
+            for c in declaration.constants:
+                # particular error_code type class
+                error_name = c.name
+                if error_name.startswith('VR'):
+                    error_name = error_name[2:]
+                index += f'\n{error_category}.error_index[{c.value}] = {error_name}'
+                is_error = True
+                if error_name.endswith('_None'):
+                    is_error = False
+                if error_name.endswith('_Success'):
+                    is_error = False
+                if is_error:
+                    print(textwrap.dedent(f'''\
+                        
+                        class {error_name}({error_category}):
+                            pass
+                    '''), file=file_out)
+                else:
+                    print(textwrap.dedent(f'''\
+                        
+                        class {error_name}({error_category}):
+                            is_error = False
+                    '''), file=file_out)
+            print(index, file=file_out)
+
+    @staticmethod
     def generate(declarations, file_out, version):
         CTypesGenerator.write_preamble(file_out=file_out, version=version)
         for declaration in declarations:
@@ -116,91 +191,6 @@ class CTypesGenerator(object):
             if isinstance(declaration, model.EnumDecl):
                 print(declaration, file=file_out)
                 print('', file=file_out)
-
-        # Python exceptions for error codes
-        print('', file=file_out)
-        print(inspect.cleandoc('''
-            ############################################
-            # Python exceptions for openvr error codes #
-            ############################################
-
-
-            class OpenVRError(Exception):
-                """
-                OpenVRError is a custom exception type for when OpenVR functions return a failure code.
-                Such a specific exception type allows more precise exception handling that does just raising Exception().
-                """
-                pass
-            
-            
-            class ErrorCode(OpenVRError):
-                _error_index = dict()
-                is_error = True  # FooError_None classes should override this
-            
-                @classmethod
-                def check_error_value(cls, error_value, message=''):
-                    error_class = cls._error_index[int(error_value)]
-                    if not error_class.is_error:
-                        return
-                    raise error_class(message)
-        '''), file=file_out)
-        print('', file=file_out)
-        for declaration in declarations:
-            if not isinstance(declaration, model.EnumDecl):
-                continue
-            nm = declaration.name
-            if nm.startswith('EVR'):
-                nm = nm[3:]  # Strip 'EVR'
-            elif nm.startswith('E'):
-                nm = nm[1:]
-            else:
-                continue
-            if not nm.endswith('Error'):
-                continue
-            error_category = nm
-            if error_category == 'TrackedPropertyError':  # avoid symbol conflict
-                error_category = 'TrackedProperty_Error'
-            # General error type category class
-            print(textwrap.dedent(f'''\
-                
-                class {error_category}(ErrorCode):
-                    _error_index = dict()
-            '''), file=file_out)
-            index = ''
-            for c in declaration.constants:
-                # particular error type class
-                error_name = c.name
-                if error_name.startswith('VR'):
-                    error_name = error_name[2:]
-                if error_name.startswith('IOBuffer_'):
-                    # Avoid conflict with enum name
-                    error_name = 'IOBufferError_' + error_name[9:]
-                if error_name.startswith('TrackedProp_'):
-                    # Avoid conflict with enum name
-                    error_name = 'TrackedProperty_' + error_name[12:]
-                if error_name.startswith('HDCPError_'):
-                    # Avoid conflict with enum name
-                    error_name = 'HDCP_Error_' + error_name[10:]
-                index += f'{error_category}._error_index[{c.value}] = {error_name}\n'
-                is_error = True
-                if error_name.endswith('_None'):
-                    is_error = False
-                if error_name.endswith('_Success'):
-                    is_error = False
-                if is_error:
-                    print(textwrap.dedent(f'''\
-                        
-                        class {error_name}({error_category}):
-                            pass
-                    '''), file=file_out)
-                else:
-                    print(textwrap.dedent(f'''\
-                        
-                        class {error_name}({error_category}):
-                            is_error = False
-                    '''), file=file_out)
-            print('', file=file_out)
-            print(index, file=file_out)
 
         print('', file=file_out)
         print(inspect.cleandoc('''
@@ -311,11 +301,10 @@ class CTypesGenerator(object):
                 """
                 shutdownInternal()  # OK, this is just like inline definition in openvr.h
         '''), file=file_out)
-        print('\n', file=file_out)
         for declaration in declarations:
             if isinstance(declaration, model.Function):
-                print(declaration, file=file_out)
                 print('\n', file=file_out)
+                print(declaration, file=file_out)
 
         print('Generate complete')
 
@@ -354,6 +343,10 @@ def main(sub_version=1):
         declarations=declarations,
         file_out=open('../openvr/__init__.py', 'w', newline=None),
         version=version,
+    )
+    generator.generate_errors(
+        declarations=declarations,
+        file_out=open('../openvr/error_code/__init__.py', 'w', newline=None),
     )
 
 

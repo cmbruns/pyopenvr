@@ -121,21 +121,14 @@ class FunctionBase(Declaration):
         body_string += pre_call_statements
         param_list2 = ', '.join(call_params)
         if self.raise_error_code():
-            body_string += f'error_code = fn({param_list2})'
+            body_string += f'error = fn({param_list2})'
         elif self.has_return():
             body_string += f'result = fn({param_list2})'
         else:
             body_string += f'fn({param_list2})'
         if self.raise_error_code():
-            error_category = self.type.spelling
-            assert error_category.endswith('Error')
-            if error_category.startswith('vr::EVR'):
-                error_category = error_category[7:]
-            elif error_category.startswith('vr::E'):
-                error_category = error_category[5:]
-            else:
-                assert False
-            post_call_statements += f'\n{error_category}.check_error_value(error_code)'
+            error_category = translate_error_category(self.type)
+            post_call_statements += f'\n{error_category}.check_error_value(error)'
         body_string += post_call_statements
         if self.py_method_name() == 'pollNextEvent':
             body_string += '\nreturn result != 0'  # Custom return statement
@@ -259,7 +252,7 @@ class IVRClass(Declaration):
                     version_key = {name}_Version
                     if not isInterfaceVersionValid(version_key):
                         _checkInitError(VRInitError_Init_InterfaceNotFound)
-                    fn_key = b"FnTable:" + version_key
+                    fn_key = 'FnTable:' + version_key
                     fn_type = {name}_FnTable
                     fn_table_ptr = cast(getGenericInterface(fn_key), POINTER(fn_type))
                     if fn_table_ptr is None:
@@ -505,6 +498,12 @@ class Parameter(Declaration):
         elif not self.is_input():
             t = translate_type(self.type.get_pointee().spelling)
             return f'{self.py_name} = {t}()\n'
+        elif self.is_input_string():
+            result = textwrap.dedent(f'''\
+                if {self.py_name} is not None:
+                    {self.py_name} = bytes({self.py_name}, encoding='utf-8')
+            ''')
+            return result
         else:
             return ''
 
@@ -513,16 +512,7 @@ class Parameter(Declaration):
         if self.is_error():
             assert self.type.kind == TypeKind.POINTER
             pt = self.type.get_pointee()
-            error_category = pt.spelling
-            assert error_category.endswith('Error')
-            if error_category.startswith('vr::EVR'):
-                error_category = error_category[7:]
-            elif error_category.startswith('vr::E'):
-                error_category = error_category[5:]
-            else:
-                assert False
-            if error_category == 'TrackedPropertyError':  # avoid symbol conflict
-                error_category = 'TrackedProperty_Error'
+            error_category = translate_error_category(pt)
             result += f'\n{error_category}.check_error_value({self.py_name}.value)'
         if self.is_output() and self.type.kind == TypeKind.POINTER:
             pt = self.type.get_pointee()
@@ -557,8 +547,6 @@ class Parameter(Declaration):
             return f'{self.py_name}Arg'
         elif self.is_count:
             return self.py_name
-        elif self.is_input_string():
-            return f"bytes({self.py_name}, encoding='utf-8')"
         elif self.is_output_string():
             return self.py_name
         elif self.is_output():
@@ -658,6 +646,18 @@ class Typedef(Declaration):
         if self.name == orig:
             return ''
         return f'{self.name} = {orig}'
+
+
+def translate_error_category(type_):
+    error_category = type_.spelling
+    assert error_category.endswith('Error')
+    if error_category.startswith('vr::EVR'):
+        error_category = error_category[7:]
+    elif error_category.startswith('vr::E'):
+        error_category = error_category[5:]
+    else:
+        assert False
+    return f'openvr.error_code.{error_category}'
 
 
 def translate_type(type_name, bracket=False):

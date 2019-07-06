@@ -345,13 +345,13 @@ class CMainApplication(object):
             try:
                 model = openvr.VRRenderModels().loadRenderModel_Async(render_model_name)
                 break
-            except openvr.RenderModelError_Loading:
+            except openvr.error_code.RenderModelError_Loading:
                 time.sleep(1)
         while True:
             try:
                 texture = openvr.VRRenderModels().loadTexture_Async(model.diffuseTextureId)
                 break
-            except openvr.RenderModelError_Loading:
+            except openvr.error_code.RenderModelError_Loading:
                 time.sleep(1)
         render_model = CGLRenderModel(render_model_name, model, texture)
         self.render_models[render_model_name] = render_model
@@ -575,7 +575,7 @@ class CMainApplication(object):
             try:
                 openvr.VRCompositor().submit(openvr.Eye_Left, left_eye_texture)
                 openvr.VRCompositor().submit(openvr.Eye_Right, right_eye_texture)
-            except openvr.CompositorError_DoNotHaveFocus:
+            except openvr.error_code.CompositorError_DoNotHaveFocus:
                 pass  # First frame fails because waitGetPoses has not been called yet
 
         if (self.tracked_controller_count != self.tracked_controller_count_previous

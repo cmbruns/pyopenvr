@@ -34,6 +34,7 @@ def clean_comment(cursor):
     else:
         assert False
     docstring = inspect.cleandoc(docstring.strip())
+    docstring = docstring.replace('\\', '\\\\')  # Replace single backslash with double
     # flank multi-line comments with newlines
     if '\n' in docstring:
         docstring = f'\n{docstring}\n'
@@ -163,7 +164,8 @@ class Parser(object):
     def parse_literal(self, cursor):
         value = ''.join([str(t.spelling) for t in cursor.get_tokens()])
         if cursor.kind == CursorKind.STRING_LITERAL:
-            value = 'b' + value  # Ensure byte string for compatibility
+            value = "'" + value[1:-1] + "'"  # prefer single quotes
+            # value = 'b' + value  # Ensure byte string for compatibility
         return value
 
     def parse_method(self, cursor):

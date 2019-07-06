@@ -10,6 +10,8 @@ import ctypes
 from ctypes import *
 
 from .version import __version__
+import openvr.error_code
+from openvr.error_code import OpenVRError
 
 
 class Pack4Structure(Structure):
@@ -143,217 +145,217 @@ k_ulOverlayHandleInvalid = 0
 k_unInvalidBoneIndex = -1
 k_unMaxDistortionFunctionParameters = 8
 k_unScreenshotHandleInvalid = 0
-IVRSystem_Version = b"IVRSystem_019"
+IVRSystem_Version = 'IVRSystem_019'
 k_unMaxApplicationKeyLength = 128  # The maximum length of an application key
-k_pch_MimeType_HomeApp = b"vr/home"  # Currently recognized mime types
-k_pch_MimeType_GameTheater = b"vr/game_theater"
-IVRApplications_Version = b"IVRApplications_006"
+k_pch_MimeType_HomeApp = 'vr/home'  # Currently recognized mime types
+k_pch_MimeType_GameTheater = 'vr/game_theater'
+IVRApplications_Version = 'IVRApplications_006'
 k_unMaxSettingsKeyLength = 128  # The maximum length of a settings key
-IVRSettings_Version = b"IVRSettings_002"
-k_pch_SteamVR_Section = b"steamvr"
-k_pch_SteamVR_RequireHmd_String = b"requireHmd"
-k_pch_SteamVR_ForcedDriverKey_String = b"forcedDriver"
-k_pch_SteamVR_ForcedHmdKey_String = b"forcedHmd"
-k_pch_SteamVR_DisplayDebug_Bool = b"displayDebug"
-k_pch_SteamVR_DebugProcessPipe_String = b"debugProcessPipe"
-k_pch_SteamVR_DisplayDebugX_Int32 = b"displayDebugX"
-k_pch_SteamVR_DisplayDebugY_Int32 = b"displayDebugY"
-k_pch_SteamVR_SendSystemButtonToAllApps_Bool = b"sendSystemButtonToAllApps"
-k_pch_SteamVR_LogLevel_Int32 = b"loglevel"
-k_pch_SteamVR_IPD_Float = b"ipd"
-k_pch_SteamVR_Background_String = b"background"
-k_pch_SteamVR_BackgroundUseDomeProjection_Bool = b"backgroundUseDomeProjection"
-k_pch_SteamVR_BackgroundCameraHeight_Float = b"backgroundCameraHeight"
-k_pch_SteamVR_BackgroundDomeRadius_Float = b"backgroundDomeRadius"
-k_pch_SteamVR_GridColor_String = b"gridColor"
-k_pch_SteamVR_PlayAreaColor_String = b"playAreaColor"
-k_pch_SteamVR_ShowStage_Bool = b"showStage"
-k_pch_SteamVR_ActivateMultipleDrivers_Bool = b"activateMultipleDrivers"
-k_pch_SteamVR_UsingSpeakers_Bool = b"usingSpeakers"
-k_pch_SteamVR_SpeakersForwardYawOffsetDegrees_Float = b"speakersForwardYawOffsetDegrees"
-k_pch_SteamVR_BaseStationPowerManagement_Bool = b"basestationPowerManagement"
-k_pch_SteamVR_NeverKillProcesses_Bool = b"neverKillProcesses"
-k_pch_SteamVR_SupersampleScale_Float = b"supersampleScale"
-k_pch_SteamVR_MaxRecommendedResolution_Int32 = b"maxRecommendedResolution"
-k_pch_SteamVR_MotionSmoothing_Bool = b"motionSmoothing"
-k_pch_SteamVR_MotionSmoothingOverride_Int32 = b"motionSmoothingOverride"
-k_pch_SteamVR_ForceFadeOnBadTracking_Bool = b"forceFadeOnBadTracking"
-k_pch_SteamVR_DefaultMirrorView_Int32 = b"mirrorView"
-k_pch_SteamVR_ShowMirrorView_Bool = b"showMirrorView"
-k_pch_SteamVR_MirrorViewGeometry_String = b"mirrorViewGeometry"
-k_pch_SteamVR_MirrorViewGeometryMaximized_String = b"mirrorViewGeometryMaximized"
-k_pch_SteamVR_StartMonitorFromAppLaunch = b"startMonitorFromAppLaunch"
-k_pch_SteamVR_StartCompositorFromAppLaunch_Bool = b"startCompositorFromAppLaunch"
-k_pch_SteamVR_StartDashboardFromAppLaunch_Bool = b"startDashboardFromAppLaunch"
-k_pch_SteamVR_StartOverlayAppsFromDashboard_Bool = b"startOverlayAppsFromDashboard"
-k_pch_SteamVR_EnableHomeApp = b"enableHomeApp"
-k_pch_SteamVR_CycleBackgroundImageTimeSec_Int32 = b"CycleBackgroundImageTimeSec"
-k_pch_SteamVR_RetailDemo_Bool = b"retailDemo"
-k_pch_SteamVR_IpdOffset_Float = b"ipdOffset"
-k_pch_SteamVR_AllowSupersampleFiltering_Bool = b"allowSupersampleFiltering"
-k_pch_SteamVR_SupersampleManualOverride_Bool = b"supersampleManualOverride"
-k_pch_SteamVR_EnableLinuxVulkanAsync_Bool = b"enableLinuxVulkanAsync"
-k_pch_SteamVR_AllowDisplayLockedMode_Bool = b"allowDisplayLockedMode"
-k_pch_SteamVR_HaveStartedTutorialForNativeChaperoneDriver_Bool = b"haveStartedTutorialForNativeChaperoneDriver"
-k_pch_SteamVR_ForceWindows32bitVRMonitor = b"forceWindows32BitVRMonitor"
-k_pch_SteamVR_DebugInput = b"debugInput"
-k_pch_SteamVR_DebugInputBinding = b"debugInputBinding"
-k_pch_SteamVR_DoNotFadeToGrid = b"doNotFadeToGrid"
-k_pch_SteamVR_InputBindingUIBlock = b"inputBindingUI"
-k_pch_SteamVR_RenderCameraMode = b"renderCameraMode"
-k_pch_SteamVR_EnableSharedResourceJournaling = b"enableSharedResourceJournaling"
-k_pch_SteamVR_EnableSafeMode = b"enableSafeMode"
-k_pch_SteamVR_PreferredRefreshRate = b"preferredRefreshRate"
-k_pch_SteamVR_LastVersionNotice = b"lastVersionNotice"
-k_pch_SteamVR_LastVersionNoticeDate = b"lastVersionNoticeDate"
-k_pch_DirectMode_Section = b"direct_mode"
-k_pch_DirectMode_Enable_Bool = b"enable"
-k_pch_DirectMode_Count_Int32 = b"count"
-k_pch_DirectMode_EdidVid_Int32 = b"edidVid"
-k_pch_DirectMode_EdidPid_Int32 = b"edidPid"
-k_pch_Lighthouse_Section = b"driver_lighthouse"
-k_pch_Lighthouse_DisableIMU_Bool = b"disableimu"
-k_pch_Lighthouse_DisableIMUExceptHMD_Bool = b"disableimuexcepthmd"
-k_pch_Lighthouse_UseDisambiguation_String = b"usedisambiguation"
-k_pch_Lighthouse_DisambiguationDebug_Int32 = b"disambiguationdebug"
-k_pch_Lighthouse_PrimaryBasestation_Int32 = b"primarybasestation"
-k_pch_Lighthouse_DBHistory_Bool = b"dbhistory"
-k_pch_Lighthouse_EnableBluetooth_Bool = b"enableBluetooth"
-k_pch_Lighthouse_PowerManagedBaseStations_String = b"PowerManagedBaseStations"
-k_pch_Lighthouse_PowerManagedBaseStations2_String = b"PowerManagedBaseStations2"
-k_pch_Lighthouse_InactivityTimeoutForBaseStations_Int32 = b"InactivityTimeoutForBaseStations"
-k_pch_Lighthouse_EnableImuFallback_Bool = b"enableImuFallback"
-k_pch_Lighthouse_NewPairing_Bool = b"newPairing"
-k_pch_Null_Section = b"driver_null"
-k_pch_Null_SerialNumber_String = b"serialNumber"
-k_pch_Null_ModelNumber_String = b"modelNumber"
-k_pch_Null_WindowX_Int32 = b"windowX"
-k_pch_Null_WindowY_Int32 = b"windowY"
-k_pch_Null_WindowWidth_Int32 = b"windowWidth"
-k_pch_Null_WindowHeight_Int32 = b"windowHeight"
-k_pch_Null_RenderWidth_Int32 = b"renderWidth"
-k_pch_Null_RenderHeight_Int32 = b"renderHeight"
-k_pch_Null_SecondsFromVsyncToPhotons_Float = b"secondsFromVsyncToPhotons"
-k_pch_Null_DisplayFrequency_Float = b"displayFrequency"
-k_pch_UserInterface_Section = b"userinterface"
-k_pch_UserInterface_StatusAlwaysOnTop_Bool = b"StatusAlwaysOnTop"
-k_pch_UserInterface_MinimizeToTray_Bool = b"MinimizeToTray"
-k_pch_UserInterface_HidePopupsWhenStatusMinimized_Bool = b"HidePopupsWhenStatusMinimized"
-k_pch_UserInterface_Screenshots_Bool = b"screenshots"
-k_pch_UserInterface_ScreenshotType_Int = b"screenshotType"
-k_pch_Notifications_Section = b"notifications"
-k_pch_Notifications_DoNotDisturb_Bool = b"DoNotDisturb"
-k_pch_Keyboard_Section = b"keyboard"
-k_pch_Keyboard_TutorialCompletions = b"TutorialCompletions"
-k_pch_Keyboard_ScaleX = b"ScaleX"
-k_pch_Keyboard_ScaleY = b"ScaleY"
-k_pch_Keyboard_OffsetLeftX = b"OffsetLeftX"
-k_pch_Keyboard_OffsetRightX = b"OffsetRightX"
-k_pch_Keyboard_OffsetY = b"OffsetY"
-k_pch_Keyboard_Smoothing = b"Smoothing"
-k_pch_Perf_Section = b"perfcheck"
-k_pch_Perf_PerfGraphInHMD_Bool = b"perfGraphInHMD"
-k_pch_Perf_AllowTimingStore_Bool = b"allowTimingStore"
-k_pch_Perf_SaveTimingsOnExit_Bool = b"saveTimingsOnExit"
-k_pch_Perf_TestData_Float = b"perfTestData"
-k_pch_Perf_GPUProfiling_Bool = b"GPUProfiling"
-k_pch_CollisionBounds_Section = b"collisionBounds"
-k_pch_CollisionBounds_Style_Int32 = b"CollisionBoundsStyle"
-k_pch_CollisionBounds_GroundPerimeterOn_Bool = b"CollisionBoundsGroundPerimeterOn"
-k_pch_CollisionBounds_CenterMarkerOn_Bool = b"CollisionBoundsCenterMarkerOn"
-k_pch_CollisionBounds_PlaySpaceOn_Bool = b"CollisionBoundsPlaySpaceOn"
-k_pch_CollisionBounds_FadeDistance_Float = b"CollisionBoundsFadeDistance"
-k_pch_CollisionBounds_ColorGammaR_Int32 = b"CollisionBoundsColorGammaR"
-k_pch_CollisionBounds_ColorGammaG_Int32 = b"CollisionBoundsColorGammaG"
-k_pch_CollisionBounds_ColorGammaB_Int32 = b"CollisionBoundsColorGammaB"
-k_pch_CollisionBounds_ColorGammaA_Int32 = b"CollisionBoundsColorGammaA"
-k_pch_Camera_Section = b"camera"
-k_pch_Camera_EnableCamera_Bool = b"enableCamera"
-k_pch_Camera_EnableCameraInDashboard_Bool = b"enableCameraInDashboard"
-k_pch_Camera_EnableCameraForCollisionBounds_Bool = b"enableCameraForCollisionBounds"
-k_pch_Camera_EnableCameraForRoomView_Bool = b"enableCameraForRoomView"
-k_pch_Camera_BoundsColorGammaR_Int32 = b"cameraBoundsColorGammaR"
-k_pch_Camera_BoundsColorGammaG_Int32 = b"cameraBoundsColorGammaG"
-k_pch_Camera_BoundsColorGammaB_Int32 = b"cameraBoundsColorGammaB"
-k_pch_Camera_BoundsColorGammaA_Int32 = b"cameraBoundsColorGammaA"
-k_pch_Camera_BoundsStrength_Int32 = b"cameraBoundsStrength"
-k_pch_Camera_RoomViewMode_Int32 = b"cameraRoomViewMode"
-k_pch_audio_Section = b"audio"
-k_pch_audio_OnPlaybackDevice_String = b"onPlaybackDevice"
-k_pch_audio_OnRecordDevice_String = b"onRecordDevice"
-k_pch_audio_OnPlaybackMirrorDevice_String = b"onPlaybackMirrorDevice"
-k_pch_audio_OffPlaybackDevice_String = b"offPlaybackDevice"
-k_pch_audio_OffRecordDevice_String = b"offRecordDevice"
-k_pch_audio_VIVEHDMIGain = b"viveHDMIGain"
-k_pch_Power_Section = b"power"
-k_pch_Power_PowerOffOnExit_Bool = b"powerOffOnExit"
-k_pch_Power_TurnOffScreensTimeout_Float = b"turnOffScreensTimeout"
-k_pch_Power_TurnOffControllersTimeout_Float = b"turnOffControllersTimeout"
-k_pch_Power_ReturnToWatchdogTimeout_Float = b"returnToWatchdogTimeout"
-k_pch_Power_AutoLaunchSteamVROnButtonPress = b"autoLaunchSteamVROnButtonPress"
-k_pch_Power_PauseCompositorOnStandby_Bool = b"pauseCompositorOnStandby"
-k_pch_Dashboard_Section = b"dashboard"
-k_pch_Dashboard_EnableDashboard_Bool = b"enableDashboard"
-k_pch_Dashboard_ArcadeMode_Bool = b"arcadeMode"
-k_pch_Dashboard_UseWebDashboard = b"useWebDashboard"
-k_pch_Dashboard_UseWebSettings = b"useWebSettings"
-k_pch_Dashboard_UseWebIPD = b"useWebIPD"
-k_pch_Dashboard_UseWebPowerMenu = b"useWebPowerMenu"
-k_pch_modelskin_Section = b"modelskins"
-k_pch_Driver_Enable_Bool = b"enable"
-k_pch_WebInterface_Section = b"WebInterface"
-k_pch_WebInterface_WebEnable_Bool = b"WebEnable"
-k_pch_WebInterface_WebPort_String = b"WebPort"
-k_pch_VRWebHelper_Section = b"VRWebHelper"
-k_pch_VRWebHelper_DebuggerEnabled_Bool = b"DebuggerEnabled"
-k_pch_VRWebHelper_DebuggerPort_Int32 = b"DebuggerPort"
-k_pch_TrackingOverride_Section = b"TrackingOverrides"
-k_pch_App_BindingAutosaveURLSuffix_String = b"AutosaveURL"
-k_pch_App_BindingCurrentURLSuffix_String = b"CurrentURL"
-k_pch_App_NeedToUpdateAutosaveSuffix_Bool = b"NeedToUpdateAutosave"
-k_pch_Trackers_Section = b"trackers"
-k_pch_DesktopUI_Section = b"DesktopUI"
-k_pch_LastKnown_Section = b"LastKnown"
-k_pch_LastKnown_HMDManufacturer_String = b"HMDManufacturer"
-k_pch_LastKnown_HMDModel_String = b"HMDModel"
-k_pch_DismissedWarnings_Section = b"DismissedWarnings"
-IVRChaperone_Version = b"IVRChaperone_003"
-IVRChaperoneSetup_Version = b"IVRChaperoneSetup_006"
+IVRSettings_Version = 'IVRSettings_002'
+k_pch_SteamVR_Section = 'steamvr'
+k_pch_SteamVR_RequireHmd_String = 'requireHmd'
+k_pch_SteamVR_ForcedDriverKey_String = 'forcedDriver'
+k_pch_SteamVR_ForcedHmdKey_String = 'forcedHmd'
+k_pch_SteamVR_DisplayDebug_Bool = 'displayDebug'
+k_pch_SteamVR_DebugProcessPipe_String = 'debugProcessPipe'
+k_pch_SteamVR_DisplayDebugX_Int32 = 'displayDebugX'
+k_pch_SteamVR_DisplayDebugY_Int32 = 'displayDebugY'
+k_pch_SteamVR_SendSystemButtonToAllApps_Bool = 'sendSystemButtonToAllApps'
+k_pch_SteamVR_LogLevel_Int32 = 'loglevel'
+k_pch_SteamVR_IPD_Float = 'ipd'
+k_pch_SteamVR_Background_String = 'background'
+k_pch_SteamVR_BackgroundUseDomeProjection_Bool = 'backgroundUseDomeProjection'
+k_pch_SteamVR_BackgroundCameraHeight_Float = 'backgroundCameraHeight'
+k_pch_SteamVR_BackgroundDomeRadius_Float = 'backgroundDomeRadius'
+k_pch_SteamVR_GridColor_String = 'gridColor'
+k_pch_SteamVR_PlayAreaColor_String = 'playAreaColor'
+k_pch_SteamVR_ShowStage_Bool = 'showStage'
+k_pch_SteamVR_ActivateMultipleDrivers_Bool = 'activateMultipleDrivers'
+k_pch_SteamVR_UsingSpeakers_Bool = 'usingSpeakers'
+k_pch_SteamVR_SpeakersForwardYawOffsetDegrees_Float = 'speakersForwardYawOffsetDegrees'
+k_pch_SteamVR_BaseStationPowerManagement_Bool = 'basestationPowerManagement'
+k_pch_SteamVR_NeverKillProcesses_Bool = 'neverKillProcesses'
+k_pch_SteamVR_SupersampleScale_Float = 'supersampleScale'
+k_pch_SteamVR_MaxRecommendedResolution_Int32 = 'maxRecommendedResolution'
+k_pch_SteamVR_MotionSmoothing_Bool = 'motionSmoothing'
+k_pch_SteamVR_MotionSmoothingOverride_Int32 = 'motionSmoothingOverride'
+k_pch_SteamVR_ForceFadeOnBadTracking_Bool = 'forceFadeOnBadTracking'
+k_pch_SteamVR_DefaultMirrorView_Int32 = 'mirrorView'
+k_pch_SteamVR_ShowMirrorView_Bool = 'showMirrorView'
+k_pch_SteamVR_MirrorViewGeometry_String = 'mirrorViewGeometry'
+k_pch_SteamVR_MirrorViewGeometryMaximized_String = 'mirrorViewGeometryMaximized'
+k_pch_SteamVR_StartMonitorFromAppLaunch = 'startMonitorFromAppLaunch'
+k_pch_SteamVR_StartCompositorFromAppLaunch_Bool = 'startCompositorFromAppLaunch'
+k_pch_SteamVR_StartDashboardFromAppLaunch_Bool = 'startDashboardFromAppLaunch'
+k_pch_SteamVR_StartOverlayAppsFromDashboard_Bool = 'startOverlayAppsFromDashboard'
+k_pch_SteamVR_EnableHomeApp = 'enableHomeApp'
+k_pch_SteamVR_CycleBackgroundImageTimeSec_Int32 = 'CycleBackgroundImageTimeSec'
+k_pch_SteamVR_RetailDemo_Bool = 'retailDemo'
+k_pch_SteamVR_IpdOffset_Float = 'ipdOffset'
+k_pch_SteamVR_AllowSupersampleFiltering_Bool = 'allowSupersampleFiltering'
+k_pch_SteamVR_SupersampleManualOverride_Bool = 'supersampleManualOverride'
+k_pch_SteamVR_EnableLinuxVulkanAsync_Bool = 'enableLinuxVulkanAsync'
+k_pch_SteamVR_AllowDisplayLockedMode_Bool = 'allowDisplayLockedMode'
+k_pch_SteamVR_HaveStartedTutorialForNativeChaperoneDriver_Bool = 'haveStartedTutorialForNativeChaperoneDriver'
+k_pch_SteamVR_ForceWindows32bitVRMonitor = 'forceWindows32BitVRMonitor'
+k_pch_SteamVR_DebugInput = 'debugInput'
+k_pch_SteamVR_DebugInputBinding = 'debugInputBinding'
+k_pch_SteamVR_DoNotFadeToGrid = 'doNotFadeToGrid'
+k_pch_SteamVR_InputBindingUIBlock = 'inputBindingUI'
+k_pch_SteamVR_RenderCameraMode = 'renderCameraMode'
+k_pch_SteamVR_EnableSharedResourceJournaling = 'enableSharedResourceJournaling'
+k_pch_SteamVR_EnableSafeMode = 'enableSafeMode'
+k_pch_SteamVR_PreferredRefreshRate = 'preferredRefreshRate'
+k_pch_SteamVR_LastVersionNotice = 'lastVersionNotice'
+k_pch_SteamVR_LastVersionNoticeDate = 'lastVersionNoticeDate'
+k_pch_DirectMode_Section = 'direct_mode'
+k_pch_DirectMode_Enable_Bool = 'enable'
+k_pch_DirectMode_Count_Int32 = 'count'
+k_pch_DirectMode_EdidVid_Int32 = 'edidVid'
+k_pch_DirectMode_EdidPid_Int32 = 'edidPid'
+k_pch_Lighthouse_Section = 'driver_lighthouse'
+k_pch_Lighthouse_DisableIMU_Bool = 'disableimu'
+k_pch_Lighthouse_DisableIMUExceptHMD_Bool = 'disableimuexcepthmd'
+k_pch_Lighthouse_UseDisambiguation_String = 'usedisambiguation'
+k_pch_Lighthouse_DisambiguationDebug_Int32 = 'disambiguationdebug'
+k_pch_Lighthouse_PrimaryBasestation_Int32 = 'primarybasestation'
+k_pch_Lighthouse_DBHistory_Bool = 'dbhistory'
+k_pch_Lighthouse_EnableBluetooth_Bool = 'enableBluetooth'
+k_pch_Lighthouse_PowerManagedBaseStations_String = 'PowerManagedBaseStations'
+k_pch_Lighthouse_PowerManagedBaseStations2_String = 'PowerManagedBaseStations2'
+k_pch_Lighthouse_InactivityTimeoutForBaseStations_Int32 = 'InactivityTimeoutForBaseStations'
+k_pch_Lighthouse_EnableImuFallback_Bool = 'enableImuFallback'
+k_pch_Lighthouse_NewPairing_Bool = 'newPairing'
+k_pch_Null_Section = 'driver_null'
+k_pch_Null_SerialNumber_String = 'serialNumber'
+k_pch_Null_ModelNumber_String = 'modelNumber'
+k_pch_Null_WindowX_Int32 = 'windowX'
+k_pch_Null_WindowY_Int32 = 'windowY'
+k_pch_Null_WindowWidth_Int32 = 'windowWidth'
+k_pch_Null_WindowHeight_Int32 = 'windowHeight'
+k_pch_Null_RenderWidth_Int32 = 'renderWidth'
+k_pch_Null_RenderHeight_Int32 = 'renderHeight'
+k_pch_Null_SecondsFromVsyncToPhotons_Float = 'secondsFromVsyncToPhotons'
+k_pch_Null_DisplayFrequency_Float = 'displayFrequency'
+k_pch_UserInterface_Section = 'userinterface'
+k_pch_UserInterface_StatusAlwaysOnTop_Bool = 'StatusAlwaysOnTop'
+k_pch_UserInterface_MinimizeToTray_Bool = 'MinimizeToTray'
+k_pch_UserInterface_HidePopupsWhenStatusMinimized_Bool = 'HidePopupsWhenStatusMinimized'
+k_pch_UserInterface_Screenshots_Bool = 'screenshots'
+k_pch_UserInterface_ScreenshotType_Int = 'screenshotType'
+k_pch_Notifications_Section = 'notifications'
+k_pch_Notifications_DoNotDisturb_Bool = 'DoNotDisturb'
+k_pch_Keyboard_Section = 'keyboard'
+k_pch_Keyboard_TutorialCompletions = 'TutorialCompletions'
+k_pch_Keyboard_ScaleX = 'ScaleX'
+k_pch_Keyboard_ScaleY = 'ScaleY'
+k_pch_Keyboard_OffsetLeftX = 'OffsetLeftX'
+k_pch_Keyboard_OffsetRightX = 'OffsetRightX'
+k_pch_Keyboard_OffsetY = 'OffsetY'
+k_pch_Keyboard_Smoothing = 'Smoothing'
+k_pch_Perf_Section = 'perfcheck'
+k_pch_Perf_PerfGraphInHMD_Bool = 'perfGraphInHMD'
+k_pch_Perf_AllowTimingStore_Bool = 'allowTimingStore'
+k_pch_Perf_SaveTimingsOnExit_Bool = 'saveTimingsOnExit'
+k_pch_Perf_TestData_Float = 'perfTestData'
+k_pch_Perf_GPUProfiling_Bool = 'GPUProfiling'
+k_pch_CollisionBounds_Section = 'collisionBounds'
+k_pch_CollisionBounds_Style_Int32 = 'CollisionBoundsStyle'
+k_pch_CollisionBounds_GroundPerimeterOn_Bool = 'CollisionBoundsGroundPerimeterOn'
+k_pch_CollisionBounds_CenterMarkerOn_Bool = 'CollisionBoundsCenterMarkerOn'
+k_pch_CollisionBounds_PlaySpaceOn_Bool = 'CollisionBoundsPlaySpaceOn'
+k_pch_CollisionBounds_FadeDistance_Float = 'CollisionBoundsFadeDistance'
+k_pch_CollisionBounds_ColorGammaR_Int32 = 'CollisionBoundsColorGammaR'
+k_pch_CollisionBounds_ColorGammaG_Int32 = 'CollisionBoundsColorGammaG'
+k_pch_CollisionBounds_ColorGammaB_Int32 = 'CollisionBoundsColorGammaB'
+k_pch_CollisionBounds_ColorGammaA_Int32 = 'CollisionBoundsColorGammaA'
+k_pch_Camera_Section = 'camera'
+k_pch_Camera_EnableCamera_Bool = 'enableCamera'
+k_pch_Camera_EnableCameraInDashboard_Bool = 'enableCameraInDashboard'
+k_pch_Camera_EnableCameraForCollisionBounds_Bool = 'enableCameraForCollisionBounds'
+k_pch_Camera_EnableCameraForRoomView_Bool = 'enableCameraForRoomView'
+k_pch_Camera_BoundsColorGammaR_Int32 = 'cameraBoundsColorGammaR'
+k_pch_Camera_BoundsColorGammaG_Int32 = 'cameraBoundsColorGammaG'
+k_pch_Camera_BoundsColorGammaB_Int32 = 'cameraBoundsColorGammaB'
+k_pch_Camera_BoundsColorGammaA_Int32 = 'cameraBoundsColorGammaA'
+k_pch_Camera_BoundsStrength_Int32 = 'cameraBoundsStrength'
+k_pch_Camera_RoomViewMode_Int32 = 'cameraRoomViewMode'
+k_pch_audio_Section = 'audio'
+k_pch_audio_OnPlaybackDevice_String = 'onPlaybackDevice'
+k_pch_audio_OnRecordDevice_String = 'onRecordDevice'
+k_pch_audio_OnPlaybackMirrorDevice_String = 'onPlaybackMirrorDevice'
+k_pch_audio_OffPlaybackDevice_String = 'offPlaybackDevice'
+k_pch_audio_OffRecordDevice_String = 'offRecordDevice'
+k_pch_audio_VIVEHDMIGain = 'viveHDMIGain'
+k_pch_Power_Section = 'power'
+k_pch_Power_PowerOffOnExit_Bool = 'powerOffOnExit'
+k_pch_Power_TurnOffScreensTimeout_Float = 'turnOffScreensTimeout'
+k_pch_Power_TurnOffControllersTimeout_Float = 'turnOffControllersTimeout'
+k_pch_Power_ReturnToWatchdogTimeout_Float = 'returnToWatchdogTimeout'
+k_pch_Power_AutoLaunchSteamVROnButtonPress = 'autoLaunchSteamVROnButtonPress'
+k_pch_Power_PauseCompositorOnStandby_Bool = 'pauseCompositorOnStandby'
+k_pch_Dashboard_Section = 'dashboard'
+k_pch_Dashboard_EnableDashboard_Bool = 'enableDashboard'
+k_pch_Dashboard_ArcadeMode_Bool = 'arcadeMode'
+k_pch_Dashboard_UseWebDashboard = 'useWebDashboard'
+k_pch_Dashboard_UseWebSettings = 'useWebSettings'
+k_pch_Dashboard_UseWebIPD = 'useWebIPD'
+k_pch_Dashboard_UseWebPowerMenu = 'useWebPowerMenu'
+k_pch_modelskin_Section = 'modelskins'
+k_pch_Driver_Enable_Bool = 'enable'
+k_pch_WebInterface_Section = 'WebInterface'
+k_pch_WebInterface_WebEnable_Bool = 'WebEnable'
+k_pch_WebInterface_WebPort_String = 'WebPort'
+k_pch_VRWebHelper_Section = 'VRWebHelper'
+k_pch_VRWebHelper_DebuggerEnabled_Bool = 'DebuggerEnabled'
+k_pch_VRWebHelper_DebuggerPort_Int32 = 'DebuggerPort'
+k_pch_TrackingOverride_Section = 'TrackingOverrides'
+k_pch_App_BindingAutosaveURLSuffix_String = 'AutosaveURL'
+k_pch_App_BindingCurrentURLSuffix_String = 'CurrentURL'
+k_pch_App_NeedToUpdateAutosaveSuffix_Bool = 'NeedToUpdateAutosave'
+k_pch_Trackers_Section = 'trackers'
+k_pch_DesktopUI_Section = 'DesktopUI'
+k_pch_LastKnown_Section = 'LastKnown'
+k_pch_LastKnown_HMDManufacturer_String = 'HMDManufacturer'
+k_pch_LastKnown_HMDModel_String = 'HMDModel'
+k_pch_DismissedWarnings_Section = 'DismissedWarnings'
+IVRChaperone_Version = 'IVRChaperone_003'
+IVRChaperoneSetup_Version = 'IVRChaperoneSetup_006'
 VRCompositor_ReprojectionReason_Cpu = 0x01
 VRCompositor_ReprojectionReason_Gpu = 0x02
 VRCompositor_ReprojectionAsync = 0x04  # This flag indicates the async reprojection mode is active,
 VRCompositor_ReprojectionMotion = 0x08  # This flag indicates whether or not motion smoothing was triggered for this frame
 VRCompositor_PredictionMask = 0x30  # The runtime may predict more than one frame (up to four) ahead if
 VRCompositor_ThrottleMask = 0xC0  # Number of frames the compositor is throttling the application.
-IVRCompositor_Version = b"IVRCompositor_022"
+IVRCompositor_Version = 'IVRCompositor_022'
 k_unNotificationTextMaxSize = 256
-IVRNotifications_Version = b"IVRNotifications_002"
+IVRNotifications_Version = 'IVRNotifications_002'
 k_unVROverlayMaxKeyLength = 128  # The maximum length of an overlay key in bytes, counting the terminating null character.
 k_unVROverlayMaxNameLength = 128  # The maximum length of an overlay name in bytes, counting the terminating null character.
 k_unMaxOverlayCount = 64  # The maximum number of overlays that can exist in the system at one time.
 k_unMaxOverlayIntersectionMaskPrimitivesCount = 32  # The maximum number of overlay intersection mask primitives per overlay
-IVROverlay_Version = b"IVROverlay_019"
-k_pch_Controller_Component_GDC2015 = b"gdc2015"  # Canonical coordinate system of the gdc 2015 wired controller, provided for backwards compatibility
-k_pch_Controller_Component_Base = b"base"  # For controllers with an unambiguous 'base'.
-k_pch_Controller_Component_Tip = b"tip"  # For controllers with an unambiguous 'tip' (used for 'laser-pointing')
-k_pch_Controller_Component_HandGrip = b"handgrip"  # Neutral, ambidextrous hand-pose when holding controller. On plane between neutrally posed index finger and thumb
-k_pch_Controller_Component_Status = b"status"  # 1:1 aspect ratio status area, with canonical [0,1] uv mapping
+IVROverlay_Version = 'IVROverlay_019'
+k_pch_Controller_Component_GDC2015 = 'gdc2015'  # Canonical coordinate system of the gdc 2015 wired controller, provided for backwards compatibility
+k_pch_Controller_Component_Base = 'base'  # For controllers with an unambiguous 'base'.
+k_pch_Controller_Component_Tip = 'tip'  # For controllers with an unambiguous 'tip' (used for 'laser-pointing')
+k_pch_Controller_Component_HandGrip = 'handgrip'  # Neutral, ambidextrous hand-pose when holding controller. On plane between neutrally posed index finger and thumb
+k_pch_Controller_Component_Status = 'status'  # 1:1 aspect ratio status area, with canonical [0,1] uv mapping
 INVALID_TEXTURE_ID = -1
-IVRRenderModels_Version = b"IVRRenderModels_006"
-IVRExtendedDisplay_Version = b"IVRExtendedDisplay_001"
-IVRTrackedCamera_Version = b"IVRTrackedCamera_005"
-IVRScreenshots_Version = b"IVRScreenshots_001"
-IVRResources_Version = b"IVRResources_001"
-IVRDriverManager_Version = b"IVRDriverManager_001"
+IVRRenderModels_Version = 'IVRRenderModels_006'
+IVRExtendedDisplay_Version = 'IVRExtendedDisplay_001'
+IVRTrackedCamera_Version = 'IVRTrackedCamera_005'
+IVRScreenshots_Version = 'IVRScreenshots_001'
+IVRResources_Version = 'IVRResources_001'
+IVRDriverManager_Version = 'IVRDriverManager_001'
 k_unMaxActionNameLength = 64
 k_unMaxActionSetNameLength = 64
 k_unMaxActionOriginCount = 16
 k_unMaxBoneNameLength = 32
-IVRInput_Version = b"IVRInput_006"
+IVRInput_Version = 'IVRInput_006'
 k_ulInvalidIOBufferHandle = 0
-IVRIOBuffer_Version = b"IVRIOBuffer_002"
+IVRIOBuffer_Version = 'IVRIOBuffer_002'
 k_ulInvalidSpatialAnchorHandle = 0
-IVRSpatialAnchors_Version = b"IVRSpatialAnchors_001"
+IVRSpatialAnchors_Version = 'IVRSpatialAnchors_001'
 
 #########################
 # Expose enum constants #
@@ -1457,1801 +1459,6 @@ EIOBufferMode = ENUM_TYPE
 IOBufferMode_Read = ENUM_VALUE_TYPE(1)
 IOBufferMode_Write = ENUM_VALUE_TYPE(2)
 IOBufferMode_Create = ENUM_VALUE_TYPE(512)
-
-
-############################################
-# Python exceptions for openvr error codes #
-############################################
-
-
-class OpenVRError(Exception):
-    """
-    OpenVRError is a custom exception type for when OpenVR functions return a failure code.
-    Such a specific exception type allows more precise exception handling that does just raising Exception().
-    """
-    pass
-
-
-class ErrorCode(OpenVRError):
-    _error_index = dict()
-    is_error = True  # FooError_None classes should override this
-
-    @classmethod
-    def check_error_value(cls, error_value, message=''):
-        error_class = cls._error_index[int(error_value)]
-        if not error_class.is_error:
-            return
-        raise error_class(message)
-
-
-class TrackedProperty_Error(ErrorCode):
-    _error_index = dict()
-
-
-class TrackedProperty_Success(TrackedProperty_Error):
-    is_error = False
-
-
-class TrackedProperty_WrongDataType(TrackedProperty_Error):
-    pass
-
-
-class TrackedProperty_WrongDeviceClass(TrackedProperty_Error):
-    pass
-
-
-class TrackedProperty_BufferTooSmall(TrackedProperty_Error):
-    pass
-
-
-class TrackedProperty_UnknownProperty(TrackedProperty_Error):
-    pass
-
-
-class TrackedProperty_InvalidDevice(TrackedProperty_Error):
-    pass
-
-
-class TrackedProperty_CouldNotContactServer(TrackedProperty_Error):
-    pass
-
-
-class TrackedProperty_ValueNotProvidedByDevice(TrackedProperty_Error):
-    pass
-
-
-class TrackedProperty_StringExceedsMaximumLength(TrackedProperty_Error):
-    pass
-
-
-class TrackedProperty_NotYetAvailable(TrackedProperty_Error):
-    pass
-
-
-class TrackedProperty_PermissionDenied(TrackedProperty_Error):
-    pass
-
-
-class TrackedProperty_InvalidOperation(TrackedProperty_Error):
-    pass
-
-
-class TrackedProperty_CannotWriteToWildcards(TrackedProperty_Error):
-    pass
-
-
-class TrackedProperty_IPCReadFailure(TrackedProperty_Error):
-    pass
-
-
-TrackedProperty_Error._error_index[0] = TrackedProperty_Success
-TrackedProperty_Error._error_index[1] = TrackedProperty_WrongDataType
-TrackedProperty_Error._error_index[2] = TrackedProperty_WrongDeviceClass
-TrackedProperty_Error._error_index[3] = TrackedProperty_BufferTooSmall
-TrackedProperty_Error._error_index[4] = TrackedProperty_UnknownProperty
-TrackedProperty_Error._error_index[5] = TrackedProperty_InvalidDevice
-TrackedProperty_Error._error_index[6] = TrackedProperty_CouldNotContactServer
-TrackedProperty_Error._error_index[7] = TrackedProperty_ValueNotProvidedByDevice
-TrackedProperty_Error._error_index[8] = TrackedProperty_StringExceedsMaximumLength
-TrackedProperty_Error._error_index[9] = TrackedProperty_NotYetAvailable
-TrackedProperty_Error._error_index[10] = TrackedProperty_PermissionDenied
-TrackedProperty_Error._error_index[11] = TrackedProperty_InvalidOperation
-TrackedProperty_Error._error_index[12] = TrackedProperty_CannotWriteToWildcards
-TrackedProperty_Error._error_index[13] = TrackedProperty_IPCReadFailure
-
-
-class HDCPError(ErrorCode):
-    _error_index = dict()
-
-
-class HDCP_Error_None(HDCPError):
-    is_error = False
-
-
-class HDCP_Error_LinkLost(HDCPError):
-    pass
-
-
-class HDCP_Error_Tampered(HDCPError):
-    pass
-
-
-class HDCP_Error_DeviceRevoked(HDCPError):
-    pass
-
-
-class HDCP_Error_Unknown(HDCPError):
-    pass
-
-
-HDCPError._error_index[0] = HDCP_Error_None
-HDCPError._error_index[1] = HDCP_Error_LinkLost
-HDCPError._error_index[2] = HDCP_Error_Tampered
-HDCPError._error_index[3] = HDCP_Error_DeviceRevoked
-HDCPError._error_index[4] = HDCP_Error_Unknown
-
-
-class InputError(ErrorCode):
-    _error_index = dict()
-
-
-class InputError_None(InputError):
-    is_error = False
-
-
-class InputError_NameNotFound(InputError):
-    pass
-
-
-class InputError_WrongType(InputError):
-    pass
-
-
-class InputError_InvalidHandle(InputError):
-    pass
-
-
-class InputError_InvalidParam(InputError):
-    pass
-
-
-class InputError_NoSteam(InputError):
-    pass
-
-
-class InputError_MaxCapacityReached(InputError):
-    pass
-
-
-class InputError_IPCError(InputError):
-    pass
-
-
-class InputError_NoActiveActionSet(InputError):
-    pass
-
-
-class InputError_InvalidDevice(InputError):
-    pass
-
-
-class InputError_InvalidSkeleton(InputError):
-    pass
-
-
-class InputError_InvalidBoneCount(InputError):
-    pass
-
-
-class InputError_InvalidCompressedData(InputError):
-    pass
-
-
-class InputError_NoData(InputError):
-    pass
-
-
-class InputError_BufferTooSmall(InputError):
-    pass
-
-
-class InputError_MismatchedActionManifest(InputError):
-    pass
-
-
-class InputError_MissingSkeletonData(InputError):
-    pass
-
-
-class InputError_InvalidBoneIndex(InputError):
-    pass
-
-
-InputError._error_index[0] = InputError_None
-InputError._error_index[1] = InputError_NameNotFound
-InputError._error_index[2] = InputError_WrongType
-InputError._error_index[3] = InputError_InvalidHandle
-InputError._error_index[4] = InputError_InvalidParam
-InputError._error_index[5] = InputError_NoSteam
-InputError._error_index[6] = InputError_MaxCapacityReached
-InputError._error_index[7] = InputError_IPCError
-InputError._error_index[8] = InputError_NoActiveActionSet
-InputError._error_index[9] = InputError_InvalidDevice
-InputError._error_index[10] = InputError_InvalidSkeleton
-InputError._error_index[11] = InputError_InvalidBoneCount
-InputError._error_index[12] = InputError_InvalidCompressedData
-InputError._error_index[13] = InputError_NoData
-InputError._error_index[14] = InputError_BufferTooSmall
-InputError._error_index[15] = InputError_MismatchedActionManifest
-InputError._error_index[16] = InputError_MissingSkeletonData
-InputError._error_index[17] = InputError_InvalidBoneIndex
-
-
-class SpatialAnchorError(ErrorCode):
-    _error_index = dict()
-
-
-class SpatialAnchorError_Success(SpatialAnchorError):
-    is_error = False
-
-
-class SpatialAnchorError_Internal(SpatialAnchorError):
-    pass
-
-
-class SpatialAnchorError_UnknownHandle(SpatialAnchorError):
-    pass
-
-
-class SpatialAnchorError_ArrayTooSmall(SpatialAnchorError):
-    pass
-
-
-class SpatialAnchorError_InvalidDescriptorChar(SpatialAnchorError):
-    pass
-
-
-class SpatialAnchorError_NotYetAvailable(SpatialAnchorError):
-    pass
-
-
-class SpatialAnchorError_NotAvailableInThisUniverse(SpatialAnchorError):
-    pass
-
-
-class SpatialAnchorError_PermanentlyUnavailable(SpatialAnchorError):
-    pass
-
-
-class SpatialAnchorError_WrongDriver(SpatialAnchorError):
-    pass
-
-
-class SpatialAnchorError_DescriptorTooLong(SpatialAnchorError):
-    pass
-
-
-class SpatialAnchorError_Unknown(SpatialAnchorError):
-    pass
-
-
-class SpatialAnchorError_NoRoomCalibration(SpatialAnchorError):
-    pass
-
-
-class SpatialAnchorError_InvalidArgument(SpatialAnchorError):
-    pass
-
-
-class SpatialAnchorError_UnknownDriver(SpatialAnchorError):
-    pass
-
-
-SpatialAnchorError._error_index[0] = SpatialAnchorError_Success
-SpatialAnchorError._error_index[1] = SpatialAnchorError_Internal
-SpatialAnchorError._error_index[2] = SpatialAnchorError_UnknownHandle
-SpatialAnchorError._error_index[3] = SpatialAnchorError_ArrayTooSmall
-SpatialAnchorError._error_index[4] = SpatialAnchorError_InvalidDescriptorChar
-SpatialAnchorError._error_index[5] = SpatialAnchorError_NotYetAvailable
-SpatialAnchorError._error_index[6] = SpatialAnchorError_NotAvailableInThisUniverse
-SpatialAnchorError._error_index[7] = SpatialAnchorError_PermanentlyUnavailable
-SpatialAnchorError._error_index[8] = SpatialAnchorError_WrongDriver
-SpatialAnchorError._error_index[9] = SpatialAnchorError_DescriptorTooLong
-SpatialAnchorError._error_index[10] = SpatialAnchorError_Unknown
-SpatialAnchorError._error_index[11] = SpatialAnchorError_NoRoomCalibration
-SpatialAnchorError._error_index[12] = SpatialAnchorError_InvalidArgument
-SpatialAnchorError._error_index[13] = SpatialAnchorError_UnknownDriver
-
-
-class OverlayError(ErrorCode):
-    _error_index = dict()
-
-
-class OverlayError_None(OverlayError):
-    is_error = False
-
-
-class OverlayError_UnknownOverlay(OverlayError):
-    pass
-
-
-class OverlayError_InvalidHandle(OverlayError):
-    pass
-
-
-class OverlayError_PermissionDenied(OverlayError):
-    pass
-
-
-class OverlayError_OverlayLimitExceeded(OverlayError):
-    pass
-
-
-class OverlayError_WrongVisibilityType(OverlayError):
-    pass
-
-
-class OverlayError_KeyTooLong(OverlayError):
-    pass
-
-
-class OverlayError_NameTooLong(OverlayError):
-    pass
-
-
-class OverlayError_KeyInUse(OverlayError):
-    pass
-
-
-class OverlayError_WrongTransformType(OverlayError):
-    pass
-
-
-class OverlayError_InvalidTrackedDevice(OverlayError):
-    pass
-
-
-class OverlayError_InvalidParameter(OverlayError):
-    pass
-
-
-class OverlayError_ThumbnailCantBeDestroyed(OverlayError):
-    pass
-
-
-class OverlayError_ArrayTooSmall(OverlayError):
-    pass
-
-
-class OverlayError_RequestFailed(OverlayError):
-    pass
-
-
-class OverlayError_InvalidTexture(OverlayError):
-    pass
-
-
-class OverlayError_UnableToLoadFile(OverlayError):
-    pass
-
-
-class OverlayError_KeyboardAlreadyInUse(OverlayError):
-    pass
-
-
-class OverlayError_NoNeighbor(OverlayError):
-    pass
-
-
-class OverlayError_TooManyMaskPrimitives(OverlayError):
-    pass
-
-
-class OverlayError_BadMaskPrimitive(OverlayError):
-    pass
-
-
-class OverlayError_TextureAlreadyLocked(OverlayError):
-    pass
-
-
-class OverlayError_TextureLockCapacityReached(OverlayError):
-    pass
-
-
-class OverlayError_TextureNotLocked(OverlayError):
-    pass
-
-
-OverlayError._error_index[0] = OverlayError_None
-OverlayError._error_index[10] = OverlayError_UnknownOverlay
-OverlayError._error_index[11] = OverlayError_InvalidHandle
-OverlayError._error_index[12] = OverlayError_PermissionDenied
-OverlayError._error_index[13] = OverlayError_OverlayLimitExceeded
-OverlayError._error_index[14] = OverlayError_WrongVisibilityType
-OverlayError._error_index[15] = OverlayError_KeyTooLong
-OverlayError._error_index[16] = OverlayError_NameTooLong
-OverlayError._error_index[17] = OverlayError_KeyInUse
-OverlayError._error_index[18] = OverlayError_WrongTransformType
-OverlayError._error_index[19] = OverlayError_InvalidTrackedDevice
-OverlayError._error_index[20] = OverlayError_InvalidParameter
-OverlayError._error_index[21] = OverlayError_ThumbnailCantBeDestroyed
-OverlayError._error_index[22] = OverlayError_ArrayTooSmall
-OverlayError._error_index[23] = OverlayError_RequestFailed
-OverlayError._error_index[24] = OverlayError_InvalidTexture
-OverlayError._error_index[25] = OverlayError_UnableToLoadFile
-OverlayError._error_index[26] = OverlayError_KeyboardAlreadyInUse
-OverlayError._error_index[27] = OverlayError_NoNeighbor
-OverlayError._error_index[29] = OverlayError_TooManyMaskPrimitives
-OverlayError._error_index[30] = OverlayError_BadMaskPrimitive
-OverlayError._error_index[31] = OverlayError_TextureAlreadyLocked
-OverlayError._error_index[32] = OverlayError_TextureLockCapacityReached
-OverlayError._error_index[33] = OverlayError_TextureNotLocked
-
-
-class FirmwareError(ErrorCode):
-    _error_index = dict()
-
-
-class FirmwareError_None(FirmwareError):
-    is_error = False
-
-
-class FirmwareError_Success(FirmwareError):
-    is_error = False
-
-
-class FirmwareError_Fail(FirmwareError):
-    pass
-
-
-FirmwareError._error_index[0] = FirmwareError_None
-FirmwareError._error_index[1] = FirmwareError_Success
-FirmwareError._error_index[2] = FirmwareError_Fail
-
-
-class NotificationError(ErrorCode):
-    _error_index = dict()
-
-
-class NotificationError_OK(NotificationError):
-    pass
-
-
-class NotificationError_InvalidNotificationId(NotificationError):
-    pass
-
-
-class NotificationError_NotificationQueueFull(NotificationError):
-    pass
-
-
-class NotificationError_InvalidOverlayHandle(NotificationError):
-    pass
-
-
-class NotificationError_SystemWithUserValueAlreadyExists(NotificationError):
-    pass
-
-
-NotificationError._error_index[0] = NotificationError_OK
-NotificationError._error_index[100] = NotificationError_InvalidNotificationId
-NotificationError._error_index[101] = NotificationError_NotificationQueueFull
-NotificationError._error_index[102] = NotificationError_InvalidOverlayHandle
-NotificationError._error_index[103] = NotificationError_SystemWithUserValueAlreadyExists
-
-
-class InitError(ErrorCode):
-    _error_index = dict()
-
-
-class InitError_None(InitError):
-    is_error = False
-
-
-class InitError_Unknown(InitError):
-    pass
-
-
-class InitError_Init_InstallationNotFound(InitError):
-    pass
-
-
-class InitError_Init_InstallationCorrupt(InitError):
-    pass
-
-
-class InitError_Init_VRClientDLLNotFound(InitError):
-    pass
-
-
-class InitError_Init_FileNotFound(InitError):
-    pass
-
-
-class InitError_Init_FactoryNotFound(InitError):
-    pass
-
-
-class InitError_Init_InterfaceNotFound(InitError):
-    pass
-
-
-class InitError_Init_InvalidInterface(InitError):
-    pass
-
-
-class InitError_Init_UserConfigDirectoryInvalid(InitError):
-    pass
-
-
-class InitError_Init_HmdNotFound(InitError):
-    pass
-
-
-class InitError_Init_NotInitialized(InitError):
-    pass
-
-
-class InitError_Init_PathRegistryNotFound(InitError):
-    pass
-
-
-class InitError_Init_NoConfigPath(InitError):
-    pass
-
-
-class InitError_Init_NoLogPath(InitError):
-    pass
-
-
-class InitError_Init_PathRegistryNotWritable(InitError):
-    pass
-
-
-class InitError_Init_AppInfoInitFailed(InitError):
-    pass
-
-
-class InitError_Init_Retry(InitError):
-    pass
-
-
-class InitError_Init_InitCanceledByUser(InitError):
-    pass
-
-
-class InitError_Init_AnotherAppLaunching(InitError):
-    pass
-
-
-class InitError_Init_SettingsInitFailed(InitError):
-    pass
-
-
-class InitError_Init_ShuttingDown(InitError):
-    pass
-
-
-class InitError_Init_TooManyObjects(InitError):
-    pass
-
-
-class InitError_Init_NoServerForBackgroundApp(InitError):
-    pass
-
-
-class InitError_Init_NotSupportedWithCompositor(InitError):
-    pass
-
-
-class InitError_Init_NotAvailableToUtilityApps(InitError):
-    pass
-
-
-class InitError_Init_Internal(InitError):
-    pass
-
-
-class InitError_Init_HmdDriverIdIsNone(InitError):
-    pass
-
-
-class InitError_Init_HmdNotFoundPresenceFailed(InitError):
-    pass
-
-
-class InitError_Init_VRMonitorNotFound(InitError):
-    pass
-
-
-class InitError_Init_VRMonitorStartupFailed(InitError):
-    pass
-
-
-class InitError_Init_LowPowerWatchdogNotSupported(InitError):
-    pass
-
-
-class InitError_Init_InvalidApplicationType(InitError):
-    pass
-
-
-class InitError_Init_NotAvailableToWatchdogApps(InitError):
-    pass
-
-
-class InitError_Init_WatchdogDisabledInSettings(InitError):
-    pass
-
-
-class InitError_Init_VRDashboardNotFound(InitError):
-    pass
-
-
-class InitError_Init_VRDashboardStartupFailed(InitError):
-    pass
-
-
-class InitError_Init_VRHomeNotFound(InitError):
-    pass
-
-
-class InitError_Init_VRHomeStartupFailed(InitError):
-    pass
-
-
-class InitError_Init_RebootingBusy(InitError):
-    pass
-
-
-class InitError_Init_FirmwareUpdateBusy(InitError):
-    pass
-
-
-class InitError_Init_FirmwareRecoveryBusy(InitError):
-    pass
-
-
-class InitError_Init_USBServiceBusy(InitError):
-    pass
-
-
-class InitError_Init_VRWebHelperStartupFailed(InitError):
-    pass
-
-
-class InitError_Init_TrackerManagerInitFailed(InitError):
-    pass
-
-
-class InitError_Init_AlreadyRunning(InitError):
-    pass
-
-
-class InitError_Init_FailedForVrMonitor(InitError):
-    pass
-
-
-class InitError_Driver_Failed(InitError):
-    pass
-
-
-class InitError_Driver_Unknown(InitError):
-    pass
-
-
-class InitError_Driver_HmdUnknown(InitError):
-    pass
-
-
-class InitError_Driver_NotLoaded(InitError):
-    pass
-
-
-class InitError_Driver_RuntimeOutOfDate(InitError):
-    pass
-
-
-class InitError_Driver_HmdInUse(InitError):
-    pass
-
-
-class InitError_Driver_NotCalibrated(InitError):
-    pass
-
-
-class InitError_Driver_CalibrationInvalid(InitError):
-    pass
-
-
-class InitError_Driver_HmdDisplayNotFound(InitError):
-    pass
-
-
-class InitError_Driver_TrackedDeviceInterfaceUnknown(InitError):
-    pass
-
-
-class InitError_Driver_HmdDriverIdOutOfBounds(InitError):
-    pass
-
-
-class InitError_Driver_HmdDisplayMirrored(InitError):
-    pass
-
-
-class InitError_Driver_HmdDisplayNotFoundLaptop(InitError):
-    pass
-
-
-class InitError_IPC_ServerInitFailed(InitError):
-    pass
-
-
-class InitError_IPC_ConnectFailed(InitError):
-    pass
-
-
-class InitError_IPC_SharedStateInitFailed(InitError):
-    pass
-
-
-class InitError_IPC_CompositorInitFailed(InitError):
-    pass
-
-
-class InitError_IPC_MutexInitFailed(InitError):
-    pass
-
-
-class InitError_IPC_Failed(InitError):
-    pass
-
-
-class InitError_IPC_CompositorConnectFailed(InitError):
-    pass
-
-
-class InitError_IPC_CompositorInvalidConnectResponse(InitError):
-    pass
-
-
-class InitError_IPC_ConnectFailedAfterMultipleAttempts(InitError):
-    pass
-
-
-class InitError_Compositor_Failed(InitError):
-    pass
-
-
-class InitError_Compositor_D3D11HardwareRequired(InitError):
-    pass
-
-
-class InitError_Compositor_FirmwareRequiresUpdate(InitError):
-    pass
-
-
-class InitError_Compositor_OverlayInitFailed(InitError):
-    pass
-
-
-class InitError_Compositor_ScreenshotsInitFailed(InitError):
-    pass
-
-
-class InitError_Compositor_UnableToCreateDevice(InitError):
-    pass
-
-
-class InitError_Compositor_SharedStateIsNull(InitError):
-    pass
-
-
-class InitError_Compositor_NotificationManagerIsNull(InitError):
-    pass
-
-
-class InitError_Compositor_ResourceManagerClientIsNull(InitError):
-    pass
-
-
-class InitError_Compositor_MessageOverlaySharedStateInitFailure(InitError):
-    pass
-
-
-class InitError_Compositor_PropertiesInterfaceIsNull(InitError):
-    pass
-
-
-class InitError_Compositor_CreateFullscreenWindowFailed(InitError):
-    pass
-
-
-class InitError_Compositor_SettingsInterfaceIsNull(InitError):
-    pass
-
-
-class InitError_Compositor_FailedToShowWindow(InitError):
-    pass
-
-
-class InitError_Compositor_DistortInterfaceIsNull(InitError):
-    pass
-
-
-class InitError_Compositor_DisplayFrequencyFailure(InitError):
-    pass
-
-
-class InitError_Compositor_RendererInitializationFailed(InitError):
-    pass
-
-
-class InitError_Compositor_DXGIFactoryInterfaceIsNull(InitError):
-    pass
-
-
-class InitError_Compositor_DXGIFactoryCreateFailed(InitError):
-    pass
-
-
-class InitError_Compositor_DXGIFactoryQueryFailed(InitError):
-    pass
-
-
-class InitError_Compositor_InvalidAdapterDesktop(InitError):
-    pass
-
-
-class InitError_Compositor_InvalidHmdAttachment(InitError):
-    pass
-
-
-class InitError_Compositor_InvalidOutputDesktop(InitError):
-    pass
-
-
-class InitError_Compositor_InvalidDeviceProvided(InitError):
-    pass
-
-
-class InitError_Compositor_D3D11RendererInitializationFailed(InitError):
-    pass
-
-
-class InitError_Compositor_FailedToFindDisplayMode(InitError):
-    pass
-
-
-class InitError_Compositor_FailedToCreateSwapChain(InitError):
-    pass
-
-
-class InitError_Compositor_FailedToGetBackBuffer(InitError):
-    pass
-
-
-class InitError_Compositor_FailedToCreateRenderTarget(InitError):
-    pass
-
-
-class InitError_Compositor_FailedToCreateDXGI2SwapChain(InitError):
-    pass
-
-
-class InitError_Compositor_FailedtoGetDXGI2BackBuffer(InitError):
-    pass
-
-
-class InitError_Compositor_FailedToCreateDXGI2RenderTarget(InitError):
-    pass
-
-
-class InitError_Compositor_FailedToGetDXGIDeviceInterface(InitError):
-    pass
-
-
-class InitError_Compositor_SelectDisplayMode(InitError):
-    pass
-
-
-class InitError_Compositor_FailedToCreateNvAPIRenderTargets(InitError):
-    pass
-
-
-class InitError_Compositor_NvAPISetDisplayMode(InitError):
-    pass
-
-
-class InitError_Compositor_FailedToCreateDirectModeDisplay(InitError):
-    pass
-
-
-class InitError_Compositor_InvalidHmdPropertyContainer(InitError):
-    pass
-
-
-class InitError_Compositor_UpdateDisplayFrequency(InitError):
-    pass
-
-
-class InitError_Compositor_CreateRasterizerState(InitError):
-    pass
-
-
-class InitError_Compositor_CreateWireframeRasterizerState(InitError):
-    pass
-
-
-class InitError_Compositor_CreateSamplerState(InitError):
-    pass
-
-
-class InitError_Compositor_CreateClampToBorderSamplerState(InitError):
-    pass
-
-
-class InitError_Compositor_CreateAnisoSamplerState(InitError):
-    pass
-
-
-class InitError_Compositor_CreateOverlaySamplerState(InitError):
-    pass
-
-
-class InitError_Compositor_CreatePanoramaSamplerState(InitError):
-    pass
-
-
-class InitError_Compositor_CreateFontSamplerState(InitError):
-    pass
-
-
-class InitError_Compositor_CreateNoBlendState(InitError):
-    pass
-
-
-class InitError_Compositor_CreateBlendState(InitError):
-    pass
-
-
-class InitError_Compositor_CreateAlphaBlendState(InitError):
-    pass
-
-
-class InitError_Compositor_CreateBlendStateMaskR(InitError):
-    pass
-
-
-class InitError_Compositor_CreateBlendStateMaskG(InitError):
-    pass
-
-
-class InitError_Compositor_CreateBlendStateMaskB(InitError):
-    pass
-
-
-class InitError_Compositor_CreateDepthStencilState(InitError):
-    pass
-
-
-class InitError_Compositor_CreateDepthStencilStateNoWrite(InitError):
-    pass
-
-
-class InitError_Compositor_CreateDepthStencilStateNoDepth(InitError):
-    pass
-
-
-class InitError_Compositor_CreateFlushTexture(InitError):
-    pass
-
-
-class InitError_Compositor_CreateDistortionSurfaces(InitError):
-    pass
-
-
-class InitError_Compositor_CreateConstantBuffer(InitError):
-    pass
-
-
-class InitError_Compositor_CreateHmdPoseConstantBuffer(InitError):
-    pass
-
-
-class InitError_Compositor_CreateHmdPoseStagingConstantBuffer(InitError):
-    pass
-
-
-class InitError_Compositor_CreateSharedFrameInfoConstantBuffer(InitError):
-    pass
-
-
-class InitError_Compositor_CreateOverlayConstantBuffer(InitError):
-    pass
-
-
-class InitError_Compositor_CreateSceneTextureIndexConstantBuffer(InitError):
-    pass
-
-
-class InitError_Compositor_CreateReadableSceneTextureIndexConstantBuffer(InitError):
-    pass
-
-
-class InitError_Compositor_CreateLayerGraphicsTextureIndexConstantBuffer(InitError):
-    pass
-
-
-class InitError_Compositor_CreateLayerComputeTextureIndexConstantBuffer(InitError):
-    pass
-
-
-class InitError_Compositor_CreateLayerComputeSceneTextureIndexConstantBuffer(InitError):
-    pass
-
-
-class InitError_Compositor_CreateComputeHmdPoseConstantBuffer(InitError):
-    pass
-
-
-class InitError_Compositor_CreateGeomConstantBuffer(InitError):
-    pass
-
-
-class InitError_Compositor_CreatePanelMaskConstantBuffer(InitError):
-    pass
-
-
-class InitError_Compositor_CreatePixelSimUBO(InitError):
-    pass
-
-
-class InitError_Compositor_CreateMSAARenderTextures(InitError):
-    pass
-
-
-class InitError_Compositor_CreateResolveRenderTextures(InitError):
-    pass
-
-
-class InitError_Compositor_CreateComputeResolveRenderTextures(InitError):
-    pass
-
-
-class InitError_Compositor_CreateDriverDirectModeResolveTextures(InitError):
-    pass
-
-
-class InitError_Compositor_OpenDriverDirectModeResolveTextures(InitError):
-    pass
-
-
-class InitError_Compositor_CreateFallbackSyncTexture(InitError):
-    pass
-
-
-class InitError_Compositor_ShareFallbackSyncTexture(InitError):
-    pass
-
-
-class InitError_Compositor_CreateOverlayIndexBuffer(InitError):
-    pass
-
-
-class InitError_Compositor_CreateOverlayVertextBuffer(InitError):
-    pass
-
-
-class InitError_Compositor_CreateTextVertexBuffer(InitError):
-    pass
-
-
-class InitError_Compositor_CreateTextIndexBuffer(InitError):
-    pass
-
-
-class InitError_Compositor_CreateMirrorTextures(InitError):
-    pass
-
-
-class InitError_Compositor_CreateLastFrameRenderTexture(InitError):
-    pass
-
-
-class InitError_VendorSpecific_UnableToConnectToOculusRuntime(InitError):
-    pass
-
-
-class InitError_VendorSpecific_WindowsNotInDevMode(InitError):
-    pass
-
-
-class InitError_VendorSpecific_HmdFound_CantOpenDevice(InitError):
-    pass
-
-
-class InitError_VendorSpecific_HmdFound_UnableToRequestConfigStart(InitError):
-    pass
-
-
-class InitError_VendorSpecific_HmdFound_NoStoredConfig(InitError):
-    pass
-
-
-class InitError_VendorSpecific_HmdFound_ConfigTooBig(InitError):
-    pass
-
-
-class InitError_VendorSpecific_HmdFound_ConfigTooSmall(InitError):
-    pass
-
-
-class InitError_VendorSpecific_HmdFound_UnableToInitZLib(InitError):
-    pass
-
-
-class InitError_VendorSpecific_HmdFound_CantReadFirmwareVersion(InitError):
-    pass
-
-
-class InitError_VendorSpecific_HmdFound_UnableToSendUserDataStart(InitError):
-    pass
-
-
-class InitError_VendorSpecific_HmdFound_UnableToGetUserDataStart(InitError):
-    pass
-
-
-class InitError_VendorSpecific_HmdFound_UnableToGetUserDataNext(InitError):
-    pass
-
-
-class InitError_VendorSpecific_HmdFound_UserDataAddressRange(InitError):
-    pass
-
-
-class InitError_VendorSpecific_HmdFound_UserDataError(InitError):
-    pass
-
-
-class InitError_VendorSpecific_HmdFound_ConfigFailedSanityCheck(InitError):
-    pass
-
-
-class InitError_Steam_SteamInstallationNotFound(InitError):
-    pass
-
-
-class InitError_LastError(InitError):
-    pass
-
-
-InitError._error_index[0] = InitError_None
-InitError._error_index[1] = InitError_Unknown
-InitError._error_index[100] = InitError_Init_InstallationNotFound
-InitError._error_index[101] = InitError_Init_InstallationCorrupt
-InitError._error_index[102] = InitError_Init_VRClientDLLNotFound
-InitError._error_index[103] = InitError_Init_FileNotFound
-InitError._error_index[104] = InitError_Init_FactoryNotFound
-InitError._error_index[105] = InitError_Init_InterfaceNotFound
-InitError._error_index[106] = InitError_Init_InvalidInterface
-InitError._error_index[107] = InitError_Init_UserConfigDirectoryInvalid
-InitError._error_index[108] = InitError_Init_HmdNotFound
-InitError._error_index[109] = InitError_Init_NotInitialized
-InitError._error_index[110] = InitError_Init_PathRegistryNotFound
-InitError._error_index[111] = InitError_Init_NoConfigPath
-InitError._error_index[112] = InitError_Init_NoLogPath
-InitError._error_index[113] = InitError_Init_PathRegistryNotWritable
-InitError._error_index[114] = InitError_Init_AppInfoInitFailed
-InitError._error_index[115] = InitError_Init_Retry
-InitError._error_index[116] = InitError_Init_InitCanceledByUser
-InitError._error_index[117] = InitError_Init_AnotherAppLaunching
-InitError._error_index[118] = InitError_Init_SettingsInitFailed
-InitError._error_index[119] = InitError_Init_ShuttingDown
-InitError._error_index[120] = InitError_Init_TooManyObjects
-InitError._error_index[121] = InitError_Init_NoServerForBackgroundApp
-InitError._error_index[122] = InitError_Init_NotSupportedWithCompositor
-InitError._error_index[123] = InitError_Init_NotAvailableToUtilityApps
-InitError._error_index[124] = InitError_Init_Internal
-InitError._error_index[125] = InitError_Init_HmdDriverIdIsNone
-InitError._error_index[126] = InitError_Init_HmdNotFoundPresenceFailed
-InitError._error_index[127] = InitError_Init_VRMonitorNotFound
-InitError._error_index[128] = InitError_Init_VRMonitorStartupFailed
-InitError._error_index[129] = InitError_Init_LowPowerWatchdogNotSupported
-InitError._error_index[130] = InitError_Init_InvalidApplicationType
-InitError._error_index[131] = InitError_Init_NotAvailableToWatchdogApps
-InitError._error_index[132] = InitError_Init_WatchdogDisabledInSettings
-InitError._error_index[133] = InitError_Init_VRDashboardNotFound
-InitError._error_index[134] = InitError_Init_VRDashboardStartupFailed
-InitError._error_index[135] = InitError_Init_VRHomeNotFound
-InitError._error_index[136] = InitError_Init_VRHomeStartupFailed
-InitError._error_index[137] = InitError_Init_RebootingBusy
-InitError._error_index[138] = InitError_Init_FirmwareUpdateBusy
-InitError._error_index[139] = InitError_Init_FirmwareRecoveryBusy
-InitError._error_index[140] = InitError_Init_USBServiceBusy
-InitError._error_index[141] = InitError_Init_VRWebHelperStartupFailed
-InitError._error_index[142] = InitError_Init_TrackerManagerInitFailed
-InitError._error_index[143] = InitError_Init_AlreadyRunning
-InitError._error_index[144] = InitError_Init_FailedForVrMonitor
-InitError._error_index[200] = InitError_Driver_Failed
-InitError._error_index[201] = InitError_Driver_Unknown
-InitError._error_index[202] = InitError_Driver_HmdUnknown
-InitError._error_index[203] = InitError_Driver_NotLoaded
-InitError._error_index[204] = InitError_Driver_RuntimeOutOfDate
-InitError._error_index[205] = InitError_Driver_HmdInUse
-InitError._error_index[206] = InitError_Driver_NotCalibrated
-InitError._error_index[207] = InitError_Driver_CalibrationInvalid
-InitError._error_index[208] = InitError_Driver_HmdDisplayNotFound
-InitError._error_index[209] = InitError_Driver_TrackedDeviceInterfaceUnknown
-InitError._error_index[211] = InitError_Driver_HmdDriverIdOutOfBounds
-InitError._error_index[212] = InitError_Driver_HmdDisplayMirrored
-InitError._error_index[213] = InitError_Driver_HmdDisplayNotFoundLaptop
-InitError._error_index[300] = InitError_IPC_ServerInitFailed
-InitError._error_index[301] = InitError_IPC_ConnectFailed
-InitError._error_index[302] = InitError_IPC_SharedStateInitFailed
-InitError._error_index[303] = InitError_IPC_CompositorInitFailed
-InitError._error_index[304] = InitError_IPC_MutexInitFailed
-InitError._error_index[305] = InitError_IPC_Failed
-InitError._error_index[306] = InitError_IPC_CompositorConnectFailed
-InitError._error_index[307] = InitError_IPC_CompositorInvalidConnectResponse
-InitError._error_index[308] = InitError_IPC_ConnectFailedAfterMultipleAttempts
-InitError._error_index[400] = InitError_Compositor_Failed
-InitError._error_index[401] = InitError_Compositor_D3D11HardwareRequired
-InitError._error_index[402] = InitError_Compositor_FirmwareRequiresUpdate
-InitError._error_index[403] = InitError_Compositor_OverlayInitFailed
-InitError._error_index[404] = InitError_Compositor_ScreenshotsInitFailed
-InitError._error_index[405] = InitError_Compositor_UnableToCreateDevice
-InitError._error_index[406] = InitError_Compositor_SharedStateIsNull
-InitError._error_index[407] = InitError_Compositor_NotificationManagerIsNull
-InitError._error_index[408] = InitError_Compositor_ResourceManagerClientIsNull
-InitError._error_index[409] = InitError_Compositor_MessageOverlaySharedStateInitFailure
-InitError._error_index[410] = InitError_Compositor_PropertiesInterfaceIsNull
-InitError._error_index[411] = InitError_Compositor_CreateFullscreenWindowFailed
-InitError._error_index[412] = InitError_Compositor_SettingsInterfaceIsNull
-InitError._error_index[413] = InitError_Compositor_FailedToShowWindow
-InitError._error_index[414] = InitError_Compositor_DistortInterfaceIsNull
-InitError._error_index[415] = InitError_Compositor_DisplayFrequencyFailure
-InitError._error_index[416] = InitError_Compositor_RendererInitializationFailed
-InitError._error_index[417] = InitError_Compositor_DXGIFactoryInterfaceIsNull
-InitError._error_index[418] = InitError_Compositor_DXGIFactoryCreateFailed
-InitError._error_index[419] = InitError_Compositor_DXGIFactoryQueryFailed
-InitError._error_index[420] = InitError_Compositor_InvalidAdapterDesktop
-InitError._error_index[421] = InitError_Compositor_InvalidHmdAttachment
-InitError._error_index[422] = InitError_Compositor_InvalidOutputDesktop
-InitError._error_index[423] = InitError_Compositor_InvalidDeviceProvided
-InitError._error_index[424] = InitError_Compositor_D3D11RendererInitializationFailed
-InitError._error_index[425] = InitError_Compositor_FailedToFindDisplayMode
-InitError._error_index[426] = InitError_Compositor_FailedToCreateSwapChain
-InitError._error_index[427] = InitError_Compositor_FailedToGetBackBuffer
-InitError._error_index[428] = InitError_Compositor_FailedToCreateRenderTarget
-InitError._error_index[429] = InitError_Compositor_FailedToCreateDXGI2SwapChain
-InitError._error_index[430] = InitError_Compositor_FailedtoGetDXGI2BackBuffer
-InitError._error_index[431] = InitError_Compositor_FailedToCreateDXGI2RenderTarget
-InitError._error_index[432] = InitError_Compositor_FailedToGetDXGIDeviceInterface
-InitError._error_index[433] = InitError_Compositor_SelectDisplayMode
-InitError._error_index[434] = InitError_Compositor_FailedToCreateNvAPIRenderTargets
-InitError._error_index[435] = InitError_Compositor_NvAPISetDisplayMode
-InitError._error_index[436] = InitError_Compositor_FailedToCreateDirectModeDisplay
-InitError._error_index[437] = InitError_Compositor_InvalidHmdPropertyContainer
-InitError._error_index[438] = InitError_Compositor_UpdateDisplayFrequency
-InitError._error_index[439] = InitError_Compositor_CreateRasterizerState
-InitError._error_index[440] = InitError_Compositor_CreateWireframeRasterizerState
-InitError._error_index[441] = InitError_Compositor_CreateSamplerState
-InitError._error_index[442] = InitError_Compositor_CreateClampToBorderSamplerState
-InitError._error_index[443] = InitError_Compositor_CreateAnisoSamplerState
-InitError._error_index[444] = InitError_Compositor_CreateOverlaySamplerState
-InitError._error_index[445] = InitError_Compositor_CreatePanoramaSamplerState
-InitError._error_index[446] = InitError_Compositor_CreateFontSamplerState
-InitError._error_index[447] = InitError_Compositor_CreateNoBlendState
-InitError._error_index[448] = InitError_Compositor_CreateBlendState
-InitError._error_index[449] = InitError_Compositor_CreateAlphaBlendState
-InitError._error_index[450] = InitError_Compositor_CreateBlendStateMaskR
-InitError._error_index[451] = InitError_Compositor_CreateBlendStateMaskG
-InitError._error_index[452] = InitError_Compositor_CreateBlendStateMaskB
-InitError._error_index[453] = InitError_Compositor_CreateDepthStencilState
-InitError._error_index[454] = InitError_Compositor_CreateDepthStencilStateNoWrite
-InitError._error_index[455] = InitError_Compositor_CreateDepthStencilStateNoDepth
-InitError._error_index[456] = InitError_Compositor_CreateFlushTexture
-InitError._error_index[457] = InitError_Compositor_CreateDistortionSurfaces
-InitError._error_index[458] = InitError_Compositor_CreateConstantBuffer
-InitError._error_index[459] = InitError_Compositor_CreateHmdPoseConstantBuffer
-InitError._error_index[460] = InitError_Compositor_CreateHmdPoseStagingConstantBuffer
-InitError._error_index[461] = InitError_Compositor_CreateSharedFrameInfoConstantBuffer
-InitError._error_index[462] = InitError_Compositor_CreateOverlayConstantBuffer
-InitError._error_index[463] = InitError_Compositor_CreateSceneTextureIndexConstantBuffer
-InitError._error_index[464] = InitError_Compositor_CreateReadableSceneTextureIndexConstantBuffer
-InitError._error_index[465] = InitError_Compositor_CreateLayerGraphicsTextureIndexConstantBuffer
-InitError._error_index[466] = InitError_Compositor_CreateLayerComputeTextureIndexConstantBuffer
-InitError._error_index[467] = InitError_Compositor_CreateLayerComputeSceneTextureIndexConstantBuffer
-InitError._error_index[468] = InitError_Compositor_CreateComputeHmdPoseConstantBuffer
-InitError._error_index[469] = InitError_Compositor_CreateGeomConstantBuffer
-InitError._error_index[470] = InitError_Compositor_CreatePanelMaskConstantBuffer
-InitError._error_index[471] = InitError_Compositor_CreatePixelSimUBO
-InitError._error_index[472] = InitError_Compositor_CreateMSAARenderTextures
-InitError._error_index[473] = InitError_Compositor_CreateResolveRenderTextures
-InitError._error_index[474] = InitError_Compositor_CreateComputeResolveRenderTextures
-InitError._error_index[475] = InitError_Compositor_CreateDriverDirectModeResolveTextures
-InitError._error_index[476] = InitError_Compositor_OpenDriverDirectModeResolveTextures
-InitError._error_index[477] = InitError_Compositor_CreateFallbackSyncTexture
-InitError._error_index[478] = InitError_Compositor_ShareFallbackSyncTexture
-InitError._error_index[479] = InitError_Compositor_CreateOverlayIndexBuffer
-InitError._error_index[480] = InitError_Compositor_CreateOverlayVertextBuffer
-InitError._error_index[481] = InitError_Compositor_CreateTextVertexBuffer
-InitError._error_index[482] = InitError_Compositor_CreateTextIndexBuffer
-InitError._error_index[483] = InitError_Compositor_CreateMirrorTextures
-InitError._error_index[484] = InitError_Compositor_CreateLastFrameRenderTexture
-InitError._error_index[1000] = InitError_VendorSpecific_UnableToConnectToOculusRuntime
-InitError._error_index[1001] = InitError_VendorSpecific_WindowsNotInDevMode
-InitError._error_index[1101] = InitError_VendorSpecific_HmdFound_CantOpenDevice
-InitError._error_index[1102] = InitError_VendorSpecific_HmdFound_UnableToRequestConfigStart
-InitError._error_index[1103] = InitError_VendorSpecific_HmdFound_NoStoredConfig
-InitError._error_index[1104] = InitError_VendorSpecific_HmdFound_ConfigTooBig
-InitError._error_index[1105] = InitError_VendorSpecific_HmdFound_ConfigTooSmall
-InitError._error_index[1106] = InitError_VendorSpecific_HmdFound_UnableToInitZLib
-InitError._error_index[1107] = InitError_VendorSpecific_HmdFound_CantReadFirmwareVersion
-InitError._error_index[1108] = InitError_VendorSpecific_HmdFound_UnableToSendUserDataStart
-InitError._error_index[1109] = InitError_VendorSpecific_HmdFound_UnableToGetUserDataStart
-InitError._error_index[1110] = InitError_VendorSpecific_HmdFound_UnableToGetUserDataNext
-InitError._error_index[1111] = InitError_VendorSpecific_HmdFound_UserDataAddressRange
-InitError._error_index[1112] = InitError_VendorSpecific_HmdFound_UserDataError
-InitError._error_index[1113] = InitError_VendorSpecific_HmdFound_ConfigFailedSanityCheck
-InitError._error_index[2000] = InitError_Steam_SteamInstallationNotFound
-InitError._error_index[2001] = InitError_LastError
-
-
-class TrackedCameraError(ErrorCode):
-    _error_index = dict()
-
-
-class TrackedCameraError_None(TrackedCameraError):
-    is_error = False
-
-
-class TrackedCameraError_OperationFailed(TrackedCameraError):
-    pass
-
-
-class TrackedCameraError_InvalidHandle(TrackedCameraError):
-    pass
-
-
-class TrackedCameraError_InvalidFrameHeaderVersion(TrackedCameraError):
-    pass
-
-
-class TrackedCameraError_OutOfHandles(TrackedCameraError):
-    pass
-
-
-class TrackedCameraError_IPCFailure(TrackedCameraError):
-    pass
-
-
-class TrackedCameraError_NotSupportedForThisDevice(TrackedCameraError):
-    pass
-
-
-class TrackedCameraError_SharedMemoryFailure(TrackedCameraError):
-    pass
-
-
-class TrackedCameraError_FrameBufferingFailure(TrackedCameraError):
-    pass
-
-
-class TrackedCameraError_StreamSetupFailure(TrackedCameraError):
-    pass
-
-
-class TrackedCameraError_InvalidGLTextureId(TrackedCameraError):
-    pass
-
-
-class TrackedCameraError_InvalidSharedTextureHandle(TrackedCameraError):
-    pass
-
-
-class TrackedCameraError_FailedToGetGLTextureId(TrackedCameraError):
-    pass
-
-
-class TrackedCameraError_SharedTextureFailure(TrackedCameraError):
-    pass
-
-
-class TrackedCameraError_NoFrameAvailable(TrackedCameraError):
-    pass
-
-
-class TrackedCameraError_InvalidArgument(TrackedCameraError):
-    pass
-
-
-class TrackedCameraError_InvalidFrameBufferSize(TrackedCameraError):
-    pass
-
-
-TrackedCameraError._error_index[0] = TrackedCameraError_None
-TrackedCameraError._error_index[100] = TrackedCameraError_OperationFailed
-TrackedCameraError._error_index[101] = TrackedCameraError_InvalidHandle
-TrackedCameraError._error_index[102] = TrackedCameraError_InvalidFrameHeaderVersion
-TrackedCameraError._error_index[103] = TrackedCameraError_OutOfHandles
-TrackedCameraError._error_index[104] = TrackedCameraError_IPCFailure
-TrackedCameraError._error_index[105] = TrackedCameraError_NotSupportedForThisDevice
-TrackedCameraError._error_index[106] = TrackedCameraError_SharedMemoryFailure
-TrackedCameraError._error_index[107] = TrackedCameraError_FrameBufferingFailure
-TrackedCameraError._error_index[108] = TrackedCameraError_StreamSetupFailure
-TrackedCameraError._error_index[109] = TrackedCameraError_InvalidGLTextureId
-TrackedCameraError._error_index[110] = TrackedCameraError_InvalidSharedTextureHandle
-TrackedCameraError._error_index[111] = TrackedCameraError_FailedToGetGLTextureId
-TrackedCameraError._error_index[112] = TrackedCameraError_SharedTextureFailure
-TrackedCameraError._error_index[113] = TrackedCameraError_NoFrameAvailable
-TrackedCameraError._error_index[114] = TrackedCameraError_InvalidArgument
-TrackedCameraError._error_index[115] = TrackedCameraError_InvalidFrameBufferSize
-
-
-class ApplicationError(ErrorCode):
-    _error_index = dict()
-
-
-class ApplicationError_None(ApplicationError):
-    is_error = False
-
-
-class ApplicationError_AppKeyAlreadyExists(ApplicationError):
-    pass
-
-
-class ApplicationError_NoManifest(ApplicationError):
-    pass
-
-
-class ApplicationError_NoApplication(ApplicationError):
-    pass
-
-
-class ApplicationError_InvalidIndex(ApplicationError):
-    pass
-
-
-class ApplicationError_UnknownApplication(ApplicationError):
-    pass
-
-
-class ApplicationError_IPCFailed(ApplicationError):
-    pass
-
-
-class ApplicationError_ApplicationAlreadyRunning(ApplicationError):
-    pass
-
-
-class ApplicationError_InvalidManifest(ApplicationError):
-    pass
-
-
-class ApplicationError_InvalidApplication(ApplicationError):
-    pass
-
-
-class ApplicationError_LaunchFailed(ApplicationError):
-    pass
-
-
-class ApplicationError_ApplicationAlreadyStarting(ApplicationError):
-    pass
-
-
-class ApplicationError_LaunchInProgress(ApplicationError):
-    pass
-
-
-class ApplicationError_OldApplicationQuitting(ApplicationError):
-    pass
-
-
-class ApplicationError_TransitionAborted(ApplicationError):
-    pass
-
-
-class ApplicationError_IsTemplate(ApplicationError):
-    pass
-
-
-class ApplicationError_SteamVRIsExiting(ApplicationError):
-    pass
-
-
-class ApplicationError_BufferTooSmall(ApplicationError):
-    pass
-
-
-class ApplicationError_PropertyNotSet(ApplicationError):
-    pass
-
-
-class ApplicationError_UnknownProperty(ApplicationError):
-    pass
-
-
-class ApplicationError_InvalidParameter(ApplicationError):
-    pass
-
-
-ApplicationError._error_index[0] = ApplicationError_None
-ApplicationError._error_index[100] = ApplicationError_AppKeyAlreadyExists
-ApplicationError._error_index[101] = ApplicationError_NoManifest
-ApplicationError._error_index[102] = ApplicationError_NoApplication
-ApplicationError._error_index[103] = ApplicationError_InvalidIndex
-ApplicationError._error_index[104] = ApplicationError_UnknownApplication
-ApplicationError._error_index[105] = ApplicationError_IPCFailed
-ApplicationError._error_index[106] = ApplicationError_ApplicationAlreadyRunning
-ApplicationError._error_index[107] = ApplicationError_InvalidManifest
-ApplicationError._error_index[108] = ApplicationError_InvalidApplication
-ApplicationError._error_index[109] = ApplicationError_LaunchFailed
-ApplicationError._error_index[110] = ApplicationError_ApplicationAlreadyStarting
-ApplicationError._error_index[111] = ApplicationError_LaunchInProgress
-ApplicationError._error_index[112] = ApplicationError_OldApplicationQuitting
-ApplicationError._error_index[113] = ApplicationError_TransitionAborted
-ApplicationError._error_index[114] = ApplicationError_IsTemplate
-ApplicationError._error_index[115] = ApplicationError_SteamVRIsExiting
-ApplicationError._error_index[200] = ApplicationError_BufferTooSmall
-ApplicationError._error_index[201] = ApplicationError_PropertyNotSet
-ApplicationError._error_index[202] = ApplicationError_UnknownProperty
-ApplicationError._error_index[203] = ApplicationError_InvalidParameter
-
-
-class SettingsError(ErrorCode):
-    _error_index = dict()
-
-
-class SettingsError_None(SettingsError):
-    is_error = False
-
-
-class SettingsError_IPCFailed(SettingsError):
-    pass
-
-
-class SettingsError_WriteFailed(SettingsError):
-    pass
-
-
-class SettingsError_ReadFailed(SettingsError):
-    pass
-
-
-class SettingsError_JsonParseFailed(SettingsError):
-    pass
-
-
-class SettingsError_UnsetSettingHasNoDefault(SettingsError):
-    pass
-
-
-SettingsError._error_index[0] = SettingsError_None
-SettingsError._error_index[1] = SettingsError_IPCFailed
-SettingsError._error_index[2] = SettingsError_WriteFailed
-SettingsError._error_index[3] = SettingsError_ReadFailed
-SettingsError._error_index[4] = SettingsError_JsonParseFailed
-SettingsError._error_index[5] = SettingsError_UnsetSettingHasNoDefault
-
-
-class CompositorError(ErrorCode):
-    _error_index = dict()
-
-
-class CompositorError_None(CompositorError):
-    is_error = False
-
-
-class CompositorError_RequestFailed(CompositorError):
-    pass
-
-
-class CompositorError_IncompatibleVersion(CompositorError):
-    pass
-
-
-class CompositorError_DoNotHaveFocus(CompositorError):
-    pass
-
-
-class CompositorError_InvalidTexture(CompositorError):
-    pass
-
-
-class CompositorError_IsNotSceneApplication(CompositorError):
-    pass
-
-
-class CompositorError_TextureIsOnWrongDevice(CompositorError):
-    pass
-
-
-class CompositorError_TextureUsesUnsupportedFormat(CompositorError):
-    pass
-
-
-class CompositorError_SharedTexturesNotSupported(CompositorError):
-    pass
-
-
-class CompositorError_IndexOutOfRange(CompositorError):
-    pass
-
-
-class CompositorError_AlreadySubmitted(CompositorError):
-    pass
-
-
-class CompositorError_InvalidBounds(CompositorError):
-    pass
-
-
-CompositorError._error_index[0] = CompositorError_None
-CompositorError._error_index[1] = CompositorError_RequestFailed
-CompositorError._error_index[100] = CompositorError_IncompatibleVersion
-CompositorError._error_index[101] = CompositorError_DoNotHaveFocus
-CompositorError._error_index[102] = CompositorError_InvalidTexture
-CompositorError._error_index[103] = CompositorError_IsNotSceneApplication
-CompositorError._error_index[104] = CompositorError_TextureIsOnWrongDevice
-CompositorError._error_index[105] = CompositorError_TextureUsesUnsupportedFormat
-CompositorError._error_index[106] = CompositorError_SharedTexturesNotSupported
-CompositorError._error_index[107] = CompositorError_IndexOutOfRange
-CompositorError._error_index[108] = CompositorError_AlreadySubmitted
-CompositorError._error_index[109] = CompositorError_InvalidBounds
-
-
-class RenderModelError(ErrorCode):
-    _error_index = dict()
-
-
-class RenderModelError_None(RenderModelError):
-    is_error = False
-
-
-class RenderModelError_Loading(RenderModelError):
-    pass
-
-
-class RenderModelError_NotSupported(RenderModelError):
-    pass
-
-
-class RenderModelError_InvalidArg(RenderModelError):
-    pass
-
-
-class RenderModelError_InvalidModel(RenderModelError):
-    pass
-
-
-class RenderModelError_NoShapes(RenderModelError):
-    pass
-
-
-class RenderModelError_MultipleShapes(RenderModelError):
-    pass
-
-
-class RenderModelError_TooManyVertices(RenderModelError):
-    pass
-
-
-class RenderModelError_MultipleTextures(RenderModelError):
-    pass
-
-
-class RenderModelError_BufferTooSmall(RenderModelError):
-    pass
-
-
-class RenderModelError_NotEnoughNormals(RenderModelError):
-    pass
-
-
-class RenderModelError_NotEnoughTexCoords(RenderModelError):
-    pass
-
-
-class RenderModelError_InvalidTexture(RenderModelError):
-    pass
-
-
-RenderModelError._error_index[0] = RenderModelError_None
-RenderModelError._error_index[100] = RenderModelError_Loading
-RenderModelError._error_index[200] = RenderModelError_NotSupported
-RenderModelError._error_index[300] = RenderModelError_InvalidArg
-RenderModelError._error_index[301] = RenderModelError_InvalidModel
-RenderModelError._error_index[302] = RenderModelError_NoShapes
-RenderModelError._error_index[303] = RenderModelError_MultipleShapes
-RenderModelError._error_index[304] = RenderModelError_TooManyVertices
-RenderModelError._error_index[305] = RenderModelError_MultipleTextures
-RenderModelError._error_index[306] = RenderModelError_BufferTooSmall
-RenderModelError._error_index[307] = RenderModelError_NotEnoughNormals
-RenderModelError._error_index[308] = RenderModelError_NotEnoughTexCoords
-RenderModelError._error_index[400] = RenderModelError_InvalidTexture
-
-
-class ScreenshotError(ErrorCode):
-    _error_index = dict()
-
-
-class ScreenshotError_None(ScreenshotError):
-    is_error = False
-
-
-class ScreenshotError_RequestFailed(ScreenshotError):
-    pass
-
-
-class ScreenshotError_IncompatibleVersion(ScreenshotError):
-    pass
-
-
-class ScreenshotError_NotFound(ScreenshotError):
-    pass
-
-
-class ScreenshotError_BufferTooSmall(ScreenshotError):
-    pass
-
-
-class ScreenshotError_ScreenshotAlreadyInProgress(ScreenshotError):
-    pass
-
-
-ScreenshotError._error_index[0] = ScreenshotError_None
-ScreenshotError._error_index[1] = ScreenshotError_RequestFailed
-ScreenshotError._error_index[100] = ScreenshotError_IncompatibleVersion
-ScreenshotError._error_index[101] = ScreenshotError_NotFound
-ScreenshotError._error_index[102] = ScreenshotError_BufferTooSmall
-ScreenshotError._error_index[108] = ScreenshotError_ScreenshotAlreadyInProgress
-
-
-class IOBufferError(ErrorCode):
-    _error_index = dict()
-
-
-class IOBufferError_Success(IOBufferError):
-    is_error = False
-
-
-class IOBufferError_OperationFailed(IOBufferError):
-    pass
-
-
-class IOBufferError_InvalidHandle(IOBufferError):
-    pass
-
-
-class IOBufferError_InvalidArgument(IOBufferError):
-    pass
-
-
-class IOBufferError_PathExists(IOBufferError):
-    pass
-
-
-class IOBufferError_PathDoesNotExist(IOBufferError):
-    pass
-
-
-class IOBufferError_Permission(IOBufferError):
-    pass
-
-
-IOBufferError._error_index[0] = IOBufferError_Success
-IOBufferError._error_index[100] = IOBufferError_OperationFailed
-IOBufferError._error_index[101] = IOBufferError_InvalidHandle
-IOBufferError._error_index[102] = IOBufferError_InvalidArgument
-IOBufferError._error_index[103] = IOBufferError_PathExists
-IOBufferError._error_index[104] = IOBufferError_PathDoesNotExist
-IOBufferError._error_index[105] = IOBufferError_Permission
 
 
 ###################
@@ -4454,7 +2661,7 @@ class IVRSystem(object):
         version_key = IVRSystem_Version
         if not isInterfaceVersionValid(version_key):
             _checkInitError(VRInitError_Init_InterfaceNotFound)
-        fn_key = b"FnTable:" + version_key
+        fn_key = 'FnTable:' + version_key
         fn_type = IVRSystem_FnTable
         fn_table_ptr = cast(getGenericInterface(fn_key), POINTER(fn_type))
         if fn_table_ptr is None:
@@ -4726,7 +2933,7 @@ class IVRSystem(object):
         fn = self.function_table.getBoolTrackedDeviceProperty
         error = ETrackedPropertyError()
         result = fn(deviceIndex, prop, byref(error))
-        TrackedProperty_Error.check_error_value(error.value)
+        openvr.error_code.TrackedPropertyError.check_error_value(error.value)
         return result
 
     def getFloatTrackedDeviceProperty(self, deviceIndex, prop):
@@ -4734,7 +2941,7 @@ class IVRSystem(object):
         fn = self.function_table.getFloatTrackedDeviceProperty
         error = ETrackedPropertyError()
         result = fn(deviceIndex, prop, byref(error))
-        TrackedProperty_Error.check_error_value(error.value)
+        openvr.error_code.TrackedPropertyError.check_error_value(error.value)
         return result
 
     def getInt32TrackedDeviceProperty(self, deviceIndex, prop):
@@ -4742,7 +2949,7 @@ class IVRSystem(object):
         fn = self.function_table.getInt32TrackedDeviceProperty
         error = ETrackedPropertyError()
         result = fn(deviceIndex, prop, byref(error))
-        TrackedProperty_Error.check_error_value(error.value)
+        openvr.error_code.TrackedPropertyError.check_error_value(error.value)
         return result
 
     def getUint64TrackedDeviceProperty(self, deviceIndex, prop):
@@ -4750,7 +2957,7 @@ class IVRSystem(object):
         fn = self.function_table.getUint64TrackedDeviceProperty
         error = ETrackedPropertyError()
         result = fn(deviceIndex, prop, byref(error))
-        TrackedProperty_Error.check_error_value(error.value)
+        openvr.error_code.TrackedPropertyError.check_error_value(error.value)
         return result
 
     def getMatrix34TrackedDeviceProperty(self, deviceIndex, prop):
@@ -4758,7 +2965,7 @@ class IVRSystem(object):
         fn = self.function_table.getMatrix34TrackedDeviceProperty
         error = ETrackedPropertyError()
         result = fn(deviceIndex, prop, byref(error))
-        TrackedProperty_Error.check_error_value(error.value)
+        openvr.error_code.TrackedPropertyError.check_error_value(error.value)
         return result
 
     def getArrayTrackedDeviceProperty(self, deviceIndex, prop, type_, buffer, bufferSize):
@@ -4770,7 +2977,7 @@ class IVRSystem(object):
         fn = self.function_table.getArrayTrackedDeviceProperty
         error = ETrackedPropertyError()
         result = fn(deviceIndex, prop, type_, byref(buffer), bufferSize, byref(error))
-        TrackedProperty_Error.check_error_value(error.value)
+        openvr.error_code.TrackedPropertyError.check_error_value(error.value)
         return result
 
     def getStringTrackedDeviceProperty(self, deviceIndex, prop):
@@ -4786,7 +2993,7 @@ class IVRSystem(object):
             return ''
         value = ctypes.create_string_buffer(bufferSize)
         fn(deviceIndex, prop, value, bufferSize, byref(error))
-        TrackedProperty_Error.check_error_value(error.value)
+        openvr.error_code.TrackedPropertyError.check_error_value(error.value)
         return bytes(value.value).decode('utf-8')
 
     def getPropErrorNameFromEnum(self, error):
@@ -4928,11 +3135,13 @@ class IVRSystem(object):
         The size of the response including its terminating null is returned.
         """
         fn = self.function_table.driverDebugRequest
-        responseBufferSize = fn(deviceIndex, bytes(request, encoding='utf-8'), None, 0)
+        if request is not None:
+            request = bytes(request, encoding='utf-8')
+        responseBufferSize = fn(deviceIndex, request, None, 0)
         if responseBufferSize == 0:
             return ''
         responseBuffer = ctypes.create_string_buffer(responseBufferSize)
-        fn(deviceIndex, bytes(request, encoding='utf-8'), responseBuffer, responseBufferSize)
+        fn(deviceIndex, request, responseBuffer, responseBufferSize)
         return bytes(responseBuffer.value).decode('utf-8')
 
     def performFirmwareUpdate(self, deviceIndex) -> None:
@@ -4944,8 +3153,8 @@ class IVRSystem(object):
         Prop_Firmware_ManualUpdateURL_String should point to an URL describing the manual update process
         """
         fn = self.function_table.performFirmwareUpdate
-        error_code = fn(deviceIndex)
-        FirmwareError.check_error_value(error_code)
+        error = fn(deviceIndex)
+        openvr.error_code.FirmwareError.check_error_value(error)
 
     def acknowledgeQuit_Exiting(self) -> None:
         """
@@ -5006,7 +3215,7 @@ class IVRApplications(object):
         version_key = IVRApplications_Version
         if not isInterfaceVersionValid(version_key):
             _checkInitError(VRInitError_Init_InterfaceNotFound)
-        fn_key = b"FnTable:" + version_key
+        fn_key = 'FnTable:' + version_key
         fn_type = IVRApplications_FnTable
         fn_table_ptr = cast(getGenericInterface(fn_key), POINTER(fn_type))
         if fn_table_ptr is None:
@@ -5019,19 +3228,25 @@ class IVRApplications(object):
         Temporary manifests are not automatically loaded
         """
         fn = self.function_table.addApplicationManifest
-        error_code = fn(bytes(applicationManifestFullPath, encoding='utf-8'), temporary)
-        ApplicationError.check_error_value(error_code)
+        if applicationManifestFullPath is not None:
+            applicationManifestFullPath = bytes(applicationManifestFullPath, encoding='utf-8')
+        error = fn(applicationManifestFullPath, temporary)
+        openvr.error_code.ApplicationError.check_error_value(error)
 
     def removeApplicationManifest(self, applicationManifestFullPath: str) -> None:
         """Removes an application manifest from the list to load when building the list of installed applications."""
         fn = self.function_table.removeApplicationManifest
-        error_code = fn(bytes(applicationManifestFullPath, encoding='utf-8'))
-        ApplicationError.check_error_value(error_code)
+        if applicationManifestFullPath is not None:
+            applicationManifestFullPath = bytes(applicationManifestFullPath, encoding='utf-8')
+        error = fn(applicationManifestFullPath)
+        openvr.error_code.ApplicationError.check_error_value(error)
 
     def isApplicationInstalled(self, appKey: str):
         """Returns true if an application is installed"""
         fn = self.function_table.isApplicationInstalled
-        result = fn(bytes(appKey, encoding='utf-8'))
+        if appKey is not None:
+            appKey = bytes(appKey, encoding='utf-8')
+        result = fn(appKey)
         return result
 
     def getApplicationCount(self):
@@ -5051,8 +3266,8 @@ class IVRApplications(object):
         if appKeyBufferLen == 0:
             return ''
         appKeyBuffer = ctypes.create_string_buffer(appKeyBufferLen)
-        error_code = fn(applicationIndex, appKeyBuffer, appKeyBufferLen)
-        ApplicationError.check_error_value(error_code)
+        error = fn(applicationIndex, appKeyBuffer, appKeyBufferLen)
+        openvr.error_code.ApplicationError.check_error_value(error)
         return bytes(appKeyBuffer.value).decode('utf-8')
 
     def getApplicationKeyByProcessId(self, processId):
@@ -5065,8 +3280,8 @@ class IVRApplications(object):
         if appKeyBufferLen == 0:
             return ''
         appKeyBuffer = ctypes.create_string_buffer(appKeyBufferLen)
-        error_code = fn(processId, appKeyBuffer, appKeyBufferLen)
-        ApplicationError.check_error_value(error_code)
+        error = fn(processId, appKeyBuffer, appKeyBufferLen)
+        openvr.error_code.ApplicationError.check_error_value(error)
         return bytes(appKeyBuffer.value).decode('utf-8')
 
     def launchApplication(self, appKey: str) -> None:
@@ -5075,8 +3290,10 @@ class IVRApplications(object):
         This call is not valid for dashboard overlay applications.
         """
         fn = self.function_table.launchApplication
-        error_code = fn(bytes(appKey, encoding='utf-8'))
-        ApplicationError.check_error_value(error_code)
+        if appKey is not None:
+            appKey = bytes(appKey, encoding='utf-8')
+        error = fn(appKey)
+        openvr.error_code.ApplicationError.check_error_value(error)
 
     def launchTemplateApplication(self, templateAppKey: str, newAppKey: str, keys) -> None:
         """
@@ -5084,6 +3301,10 @@ class IVRApplications(object):
         from the manifest file via AppOverrideKeys_t
         """
         fn = self.function_table.launchTemplateApplication
+        if templateAppKey is not None:
+            templateAppKey = bytes(templateAppKey, encoding='utf-8')
+        if newAppKey is not None:
+            newAppKey = bytes(newAppKey, encoding='utf-8')
         if keys is None:
             keys = 0
             keysArg = None
@@ -5094,14 +3315,18 @@ class IVRApplications(object):
             keys = 1
             keys = (AppOverrideKeys_t * keys)()
             keysArg = byref(keys[0])
-        error_code = fn(bytes(templateAppKey, encoding='utf-8'), bytes(newAppKey, encoding='utf-8'), keysArg, keys)
-        ApplicationError.check_error_value(error_code)
+        error = fn(templateAppKey, newAppKey, keysArg, keys)
+        openvr.error_code.ApplicationError.check_error_value(error)
 
     def launchApplicationFromMimeType(self, mimeType: str, args: str) -> None:
         """launches the application currently associated with this mime type and passes it the option args, typically the filename or object name of the item being launched"""
         fn = self.function_table.launchApplicationFromMimeType
-        error_code = fn(bytes(mimeType, encoding='utf-8'), bytes(args, encoding='utf-8'))
-        ApplicationError.check_error_value(error_code)
+        if mimeType is not None:
+            mimeType = bytes(mimeType, encoding='utf-8')
+        if args is not None:
+            args = bytes(args, encoding='utf-8')
+        error = fn(mimeType, args)
+        openvr.error_code.ApplicationError.check_error_value(error)
 
     def launchDashboardOverlay(self, appKey: str) -> None:
         """
@@ -5109,13 +3334,17 @@ class IVRApplications(object):
         dashboard overlay applications.
         """
         fn = self.function_table.launchDashboardOverlay
-        error_code = fn(bytes(appKey, encoding='utf-8'))
-        ApplicationError.check_error_value(error_code)
+        if appKey is not None:
+            appKey = bytes(appKey, encoding='utf-8')
+        error = fn(appKey)
+        openvr.error_code.ApplicationError.check_error_value(error)
 
     def cancelApplicationLaunch(self, appKey: str):
         """Cancel a pending launch for an application"""
         fn = self.function_table.cancelApplicationLaunch
-        result = fn(bytes(appKey, encoding='utf-8'))
+        if appKey is not None:
+            appKey = bytes(appKey, encoding='utf-8')
+        result = fn(appKey)
         return result
 
     def identifyApplication(self, processId, appKey: str) -> None:
@@ -5126,13 +3355,17 @@ class IVRApplications(object):
         The application must be one that's known to the system via a call to AddApplicationManifest.
         """
         fn = self.function_table.identifyApplication
-        error_code = fn(processId, bytes(appKey, encoding='utf-8'))
-        ApplicationError.check_error_value(error_code)
+        if appKey is not None:
+            appKey = bytes(appKey, encoding='utf-8')
+        error = fn(processId, appKey)
+        openvr.error_code.ApplicationError.check_error_value(error)
 
     def getApplicationProcessId(self, appKey: str):
         """Returns the process ID for an application. Return 0 if the application was not found or is not running."""
         fn = self.function_table.getApplicationProcessId
-        result = fn(bytes(appKey, encoding='utf-8'))
+        if appKey is not None:
+            appKey = bytes(appKey, encoding='utf-8')
+        result = fn(appKey)
         return result
 
     def getApplicationsErrorNameFromEnum(self, error):
@@ -5144,77 +3377,97 @@ class IVRApplications(object):
     def getApplicationPropertyString(self, appKey: str, property_):
         """Returns a value for an application property. The required buffer size to fit this value will be returned."""
         fn = self.function_table.getApplicationPropertyString
+        if appKey is not None:
+            appKey = bytes(appKey, encoding='utf-8')
         error = EVRApplicationError()
-        propertyValueBufferLen = fn(bytes(appKey, encoding='utf-8'), property_, None, 0, byref(error))
+        propertyValueBufferLen = fn(appKey, property_, None, 0, byref(error))
         if propertyValueBufferLen == 0:
             return ''
         propertyValueBuffer = ctypes.create_string_buffer(propertyValueBufferLen)
-        fn(bytes(appKey, encoding='utf-8'), property_, propertyValueBuffer, propertyValueBufferLen, byref(error))
-        ApplicationError.check_error_value(error.value)
+        fn(appKey, property_, propertyValueBuffer, propertyValueBufferLen, byref(error))
+        openvr.error_code.ApplicationError.check_error_value(error.value)
         return bytes(propertyValueBuffer.value).decode('utf-8')
 
     def getApplicationPropertyBool(self, appKey: str, property_):
         """Returns a bool value for an application property. Returns false in all error cases."""
         fn = self.function_table.getApplicationPropertyBool
+        if appKey is not None:
+            appKey = bytes(appKey, encoding='utf-8')
         error = EVRApplicationError()
-        result = fn(bytes(appKey, encoding='utf-8'), property_, byref(error))
-        ApplicationError.check_error_value(error.value)
+        result = fn(appKey, property_, byref(error))
+        openvr.error_code.ApplicationError.check_error_value(error.value)
         return result
 
     def getApplicationPropertyUint64(self, appKey: str, property_):
         """Returns a uint64 value for an application property. Returns 0 in all error cases."""
         fn = self.function_table.getApplicationPropertyUint64
+        if appKey is not None:
+            appKey = bytes(appKey, encoding='utf-8')
         error = EVRApplicationError()
-        result = fn(bytes(appKey, encoding='utf-8'), property_, byref(error))
-        ApplicationError.check_error_value(error.value)
+        result = fn(appKey, property_, byref(error))
+        openvr.error_code.ApplicationError.check_error_value(error.value)
         return result
 
     def setApplicationAutoLaunch(self, appKey: str, autoLaunch) -> None:
         """Sets the application auto-launch flag. This is only valid for applications which return true for VRApplicationProperty_IsDashboardOverlay_Bool."""
         fn = self.function_table.setApplicationAutoLaunch
-        error_code = fn(bytes(appKey, encoding='utf-8'), autoLaunch)
-        ApplicationError.check_error_value(error_code)
+        if appKey is not None:
+            appKey = bytes(appKey, encoding='utf-8')
+        error = fn(appKey, autoLaunch)
+        openvr.error_code.ApplicationError.check_error_value(error)
 
     def getApplicationAutoLaunch(self, appKey: str):
         """Gets the application auto-launch flag. This is only valid for applications which return true for VRApplicationProperty_IsDashboardOverlay_Bool."""
         fn = self.function_table.getApplicationAutoLaunch
-        result = fn(bytes(appKey, encoding='utf-8'))
+        if appKey is not None:
+            appKey = bytes(appKey, encoding='utf-8')
+        result = fn(appKey)
         return result
 
     def setDefaultApplicationForMimeType(self, appKey: str, mimeType: str) -> None:
         """Adds this mime-type to the list of supported mime types for this application"""
         fn = self.function_table.setDefaultApplicationForMimeType
-        error_code = fn(bytes(appKey, encoding='utf-8'), bytes(mimeType, encoding='utf-8'))
-        ApplicationError.check_error_value(error_code)
+        if appKey is not None:
+            appKey = bytes(appKey, encoding='utf-8')
+        if mimeType is not None:
+            mimeType = bytes(mimeType, encoding='utf-8')
+        error = fn(appKey, mimeType)
+        openvr.error_code.ApplicationError.check_error_value(error)
 
     def getDefaultApplicationForMimeType(self, mimeType: str):
         """return the app key that will open this mime type"""
         fn = self.function_table.getDefaultApplicationForMimeType
-        appKeyBufferLen = fn(bytes(mimeType, encoding='utf-8'), None, 0)
+        if mimeType is not None:
+            mimeType = bytes(mimeType, encoding='utf-8')
+        appKeyBufferLen = fn(mimeType, None, 0)
         if appKeyBufferLen == 0:
             return ''
         appKeyBuffer = ctypes.create_string_buffer(appKeyBufferLen)
-        fn(bytes(mimeType, encoding='utf-8'), appKeyBuffer, appKeyBufferLen)
+        fn(mimeType, appKeyBuffer, appKeyBufferLen)
         return bytes(appKeyBuffer.value).decode('utf-8')
 
     def getApplicationSupportedMimeTypes(self, appKey: str):
         """Get the list of supported mime types for this application, comma-delimited"""
         fn = self.function_table.getApplicationSupportedMimeTypes
-        mimeTypesBuffer = fn(bytes(appKey, encoding='utf-8'), None, 0)
+        if appKey is not None:
+            appKey = bytes(appKey, encoding='utf-8')
+        mimeTypesBuffer = fn(appKey, None, 0)
         if mimeTypesBuffer == 0:
             return ''
         mimeTypesBuffer = ctypes.create_string_buffer(mimeTypesBuffer)
-        fn(bytes(appKey, encoding='utf-8'), mimeTypesBuffer, mimeTypesBuffer)
+        fn(appKey, mimeTypesBuffer, mimeTypesBuffer)
         return bytes(mimeTypesBuffer.value).decode('utf-8')
 
     def getApplicationsThatSupportMimeType(self, mimeType: str):
         """Get the list of app-keys that support this mime type, comma-delimited, the return value is number of bytes you need to return the full string"""
         fn = self.function_table.getApplicationsThatSupportMimeType
-        appKeysThatSupportBuffer = fn(bytes(mimeType, encoding='utf-8'), None, 0)
+        if mimeType is not None:
+            mimeType = bytes(mimeType, encoding='utf-8')
+        appKeysThatSupportBuffer = fn(mimeType, None, 0)
         if appKeysThatSupportBuffer == 0:
             return ''
         appKeysThatSupportBuffer = ctypes.create_string_buffer(appKeysThatSupportBuffer)
-        fn(bytes(mimeType, encoding='utf-8'), appKeysThatSupportBuffer, appKeysThatSupportBuffer)
+        fn(mimeType, appKeysThatSupportBuffer, appKeysThatSupportBuffer)
         return bytes(appKeysThatSupportBuffer.value).decode('utf-8')
 
     def getApplicationLaunchArguments(self, handle):
@@ -5234,8 +3487,8 @@ class IVRApplications(object):
         if appKeyBufferLen == 0:
             return ''
         appKeyBuffer = ctypes.create_string_buffer(appKeyBufferLen)
-        error_code = fn(appKeyBuffer, appKeyBufferLen)
-        ApplicationError.check_error_value(error_code)
+        error = fn(appKeyBuffer, appKeyBufferLen)
+        openvr.error_code.ApplicationError.check_error_value(error)
         return bytes(appKeyBuffer.value).decode('utf-8')
 
     def getTransitionState(self):
@@ -5256,8 +3509,10 @@ class IVRApplications(object):
           VRApplicationError_None                   - Go ahead and launch. Everything is clear.
         """
         fn = self.function_table.performApplicationPrelaunchCheck
-        error_code = fn(bytes(appKey, encoding='utf-8'))
-        ApplicationError.check_error_value(error_code)
+        if appKey is not None:
+            appKey = bytes(appKey, encoding='utf-8')
+        error = fn(appKey)
+        openvr.error_code.ApplicationError.check_error_value(error)
 
     def getApplicationsTransitionStateNameFromEnum(self, state):
         """Returns a string for an application transition state"""
@@ -5280,8 +3535,14 @@ class IVRApplications(object):
         the working directory.
         """
         fn = self.function_table.launchInternalProcess
-        error_code = fn(bytes(binaryPath, encoding='utf-8'), bytes(arguments, encoding='utf-8'), bytes(workingDirectory, encoding='utf-8'))
-        ApplicationError.check_error_value(error_code)
+        if binaryPath is not None:
+            binaryPath = bytes(binaryPath, encoding='utf-8')
+        if arguments is not None:
+            arguments = bytes(arguments, encoding='utf-8')
+        if workingDirectory is not None:
+            workingDirectory = bytes(workingDirectory, encoding='utf-8')
+        error = fn(binaryPath, arguments, workingDirectory)
+        openvr.error_code.ApplicationError.check_error_value(error)
 
     def getCurrentSceneProcessId(self):
         """
@@ -5316,7 +3577,7 @@ class IVRSettings(object):
         version_key = IVRSettings_Version
         if not isInterfaceVersionValid(version_key):
             _checkInitError(VRInitError_Init_InterfaceNotFound)
-        fn_key = b"FnTable:" + version_key
+        fn_key = 'FnTable:' + version_key
         fn_type = IVRSettings_FnTable
         fn_table_ptr = cast(getGenericInterface(fn_key), POINTER(fn_type))
         if fn_table_ptr is None:
@@ -5333,32 +3594,50 @@ class IVRSettings(object):
         fn = self.function_table.sync
         error = EVRSettingsError()
         result = fn(force, byref(error))
-        SettingsError.check_error_value(error.value)
+        openvr.error_code.SettingsError.check_error_value(error.value)
         return result
 
     def setBool(self, section: str, settingsKey: str, value) -> None:
         fn = self.function_table.setBool
+        if section is not None:
+            section = bytes(section, encoding='utf-8')
+        if settingsKey is not None:
+            settingsKey = bytes(settingsKey, encoding='utf-8')
         error = EVRSettingsError()
-        fn(bytes(section, encoding='utf-8'), bytes(settingsKey, encoding='utf-8'), value, byref(error))
-        SettingsError.check_error_value(error.value)
+        fn(section, settingsKey, value, byref(error))
+        openvr.error_code.SettingsError.check_error_value(error.value)
 
     def setInt32(self, section: str, settingsKey: str, value) -> None:
         fn = self.function_table.setInt32
+        if section is not None:
+            section = bytes(section, encoding='utf-8')
+        if settingsKey is not None:
+            settingsKey = bytes(settingsKey, encoding='utf-8')
         error = EVRSettingsError()
-        fn(bytes(section, encoding='utf-8'), bytes(settingsKey, encoding='utf-8'), value, byref(error))
-        SettingsError.check_error_value(error.value)
+        fn(section, settingsKey, value, byref(error))
+        openvr.error_code.SettingsError.check_error_value(error.value)
 
     def setFloat(self, section: str, settingsKey: str, value: float) -> None:
         fn = self.function_table.setFloat
+        if section is not None:
+            section = bytes(section, encoding='utf-8')
+        if settingsKey is not None:
+            settingsKey = bytes(settingsKey, encoding='utf-8')
         error = EVRSettingsError()
-        fn(bytes(section, encoding='utf-8'), bytes(settingsKey, encoding='utf-8'), value, byref(error))
-        SettingsError.check_error_value(error.value)
+        fn(section, settingsKey, value, byref(error))
+        openvr.error_code.SettingsError.check_error_value(error.value)
 
     def setString(self, section: str, settingsKey: str, value: str) -> None:
         fn = self.function_table.setString
+        if section is not None:
+            section = bytes(section, encoding='utf-8')
+        if settingsKey is not None:
+            settingsKey = bytes(settingsKey, encoding='utf-8')
+        if value is not None:
+            value = bytes(value, encoding='utf-8')
         error = EVRSettingsError()
-        fn(bytes(section, encoding='utf-8'), bytes(settingsKey, encoding='utf-8'), bytes(value, encoding='utf-8'), byref(error))
-        SettingsError.check_error_value(error.value)
+        fn(section, settingsKey, value, byref(error))
+        openvr.error_code.SettingsError.check_error_value(error.value)
 
     def getBool(self, section: str, settingsKey: str):
         """
@@ -5366,47 +3645,69 @@ class IVRSettings(object):
         of either the runtime or the driver_xxx directory. Otherwise the default will be false, 0, 0.0 or ""
         """
         fn = self.function_table.getBool
+        if section is not None:
+            section = bytes(section, encoding='utf-8')
+        if settingsKey is not None:
+            settingsKey = bytes(settingsKey, encoding='utf-8')
         error = EVRSettingsError()
-        result = fn(bytes(section, encoding='utf-8'), bytes(settingsKey, encoding='utf-8'), byref(error))
-        SettingsError.check_error_value(error.value)
+        result = fn(section, settingsKey, byref(error))
+        openvr.error_code.SettingsError.check_error_value(error.value)
         return result
 
     def getInt32(self, section: str, settingsKey: str):
         fn = self.function_table.getInt32
+        if section is not None:
+            section = bytes(section, encoding='utf-8')
+        if settingsKey is not None:
+            settingsKey = bytes(settingsKey, encoding='utf-8')
         error = EVRSettingsError()
-        result = fn(bytes(section, encoding='utf-8'), bytes(settingsKey, encoding='utf-8'), byref(error))
-        SettingsError.check_error_value(error.value)
+        result = fn(section, settingsKey, byref(error))
+        openvr.error_code.SettingsError.check_error_value(error.value)
         return result
 
     def getFloat(self, section: str, settingsKey: str):
         fn = self.function_table.getFloat
+        if section is not None:
+            section = bytes(section, encoding='utf-8')
+        if settingsKey is not None:
+            settingsKey = bytes(settingsKey, encoding='utf-8')
         error = EVRSettingsError()
-        result = fn(bytes(section, encoding='utf-8'), bytes(settingsKey, encoding='utf-8'), byref(error))
-        SettingsError.check_error_value(error.value)
+        result = fn(section, settingsKey, byref(error))
+        openvr.error_code.SettingsError.check_error_value(error.value)
         return result
 
     def getString(self, section: str, settingsKey: str):
         fn = self.function_table.getString
+        if section is not None:
+            section = bytes(section, encoding='utf-8')
+        if settingsKey is not None:
+            settingsKey = bytes(settingsKey, encoding='utf-8')
         error = EVRSettingsError()
-        valueLen = fn(bytes(section, encoding='utf-8'), bytes(settingsKey, encoding='utf-8'), None, 0, byref(error))
+        valueLen = fn(section, settingsKey, None, 0, byref(error))
         if valueLen == 0:
             return ''
         value = ctypes.create_string_buffer(valueLen)
-        fn(bytes(section, encoding='utf-8'), bytes(settingsKey, encoding='utf-8'), value, valueLen, byref(error))
-        SettingsError.check_error_value(error.value)
+        fn(section, settingsKey, value, valueLen, byref(error))
+        openvr.error_code.SettingsError.check_error_value(error.value)
         return bytes(value.value).decode('utf-8')
 
     def removeSection(self, section: str) -> None:
         fn = self.function_table.removeSection
+        if section is not None:
+            section = bytes(section, encoding='utf-8')
         error = EVRSettingsError()
-        fn(bytes(section, encoding='utf-8'), byref(error))
-        SettingsError.check_error_value(error.value)
+        fn(section, byref(error))
+        openvr.error_code.SettingsError.check_error_value(error.value)
 
     def removeKeyInSection(self, section: str, settingsKey: str) -> None:
         fn = self.function_table.removeKeyInSection
+        if section is not None:
+            section = bytes(section, encoding='utf-8')
+        if settingsKey is not None:
+            settingsKey = bytes(settingsKey, encoding='utf-8')
         error = EVRSettingsError()
-        fn(bytes(section, encoding='utf-8'), bytes(settingsKey, encoding='utf-8'), byref(error))
-        SettingsError.check_error_value(error.value)
+        fn(section, settingsKey, byref(error))
+        openvr.error_code.SettingsError.check_error_value(error.value)
 
 
 class IVRChaperone_FnTable(Structure):
@@ -5434,7 +3735,7 @@ class IVRChaperone(object):
         version_key = IVRChaperone_Version
         if not isInterfaceVersionValid(version_key):
             _checkInitError(VRInitError_Init_InterfaceNotFound)
-        fn_key = b"FnTable:" + version_key
+        fn_key = 'FnTable:' + version_key
         fn_type = IVRChaperone_FnTable
         fn_table_ptr = cast(getGenericInterface(fn_key), POINTER(fn_type))
         if fn_table_ptr is None:
@@ -5539,7 +3840,7 @@ class IVRChaperoneSetup(object):
         version_key = IVRChaperoneSetup_Version
         if not isInterfaceVersionValid(version_key):
             _checkInitError(VRInitError_Init_InterfaceNotFound)
-        fn_key = b"FnTable:" + version_key
+        fn_key = 'FnTable:' + version_key
         fn_type = IVRChaperoneSetup_FnTable
         fn_table_ptr = cast(getGenericInterface(fn_key), POINTER(fn_type))
         if fn_table_ptr is None:
@@ -5692,7 +3993,9 @@ class IVRChaperoneSetup(object):
 
     def importFromBufferToWorking(self, buffer: str, importFlags):
         fn = self.function_table.importFromBufferToWorking
-        result = fn(bytes(buffer, encoding='utf-8'), importFlags)
+        if buffer is not None:
+            buffer = bytes(buffer, encoding='utf-8')
+        result = fn(buffer, importFlags)
         return result
 
     def showWorkingSetPreview(self) -> None:
@@ -5773,7 +4076,7 @@ class IVRCompositor(object):
         version_key = IVRCompositor_Version
         if not isInterfaceVersionValid(version_key):
             _checkInitError(VRInitError_Init_InterfaceNotFound)
-        fn_key = b"FnTable:" + version_key
+        fn_key = 'FnTable:' + version_key
         fn_type = IVRCompositor_FnTable
         fn_table_ptr = cast(getGenericInterface(fn_key), POINTER(fn_type))
         if fn_table_ptr is None:
@@ -5822,8 +4125,8 @@ class IVRCompositor(object):
             gamePoseArrayCount = k_unMaxTrackedDeviceCount
             gamePoseArray = (TrackedDevicePose_t * gamePoseArrayCount)()
             gamePoseArrayArg = byref(gamePoseArray[0])
-        error_code = fn(renderPoseArrayArg, renderPoseArrayCount, gamePoseArrayArg, gamePoseArrayCount)
-        CompositorError.check_error_value(error_code)
+        error = fn(renderPoseArrayArg, renderPoseArrayCount, gamePoseArrayArg, gamePoseArrayCount)
+        openvr.error_code.CompositorError.check_error_value(error)
         return renderPoseArray, gamePoseArray
 
     def getLastPoses(self, renderPoseArray, gamePoseArray):
@@ -5849,8 +4152,8 @@ class IVRCompositor(object):
             gamePoseArrayCount = k_unMaxTrackedDeviceCount
             gamePoseArray = (TrackedDevicePose_t * gamePoseArrayCount)()
             gamePoseArrayArg = byref(gamePoseArray[0])
-        error_code = fn(renderPoseArrayArg, renderPoseArrayCount, gamePoseArrayArg, gamePoseArrayCount)
-        CompositorError.check_error_value(error_code)
+        error = fn(renderPoseArrayArg, renderPoseArrayCount, gamePoseArrayArg, gamePoseArrayCount)
+        openvr.error_code.CompositorError.check_error_value(error)
         return renderPoseArray, gamePoseArray
 
     def getLastPoseForTrackedDeviceIndex(self, deviceIndex):
@@ -5862,8 +4165,8 @@ class IVRCompositor(object):
         fn = self.function_table.getLastPoseForTrackedDeviceIndex
         outputPose = TrackedDevicePose_t()
         outputGamePose = TrackedDevicePose_t()
-        error_code = fn(deviceIndex, byref(outputPose), byref(outputGamePose))
-        CompositorError.check_error_value(error_code)
+        error = fn(deviceIndex, byref(outputPose), byref(outputGamePose))
+        openvr.error_code.CompositorError.check_error_value(error)
         return outputPose, outputGamePose
 
     def submit(self, eye, texture, bounds=None, submitFlags=Submit_Default) -> None:
@@ -5884,8 +4187,8 @@ class IVRCompositor(object):
           - AlreadySubmitted (app has submitted two left textures or two right textures in a single frame - i.e. before calling WaitGetPoses again)
         """
         fn = self.function_table.submit
-        error_code = fn(eye, byref(texture), byref(bounds), submitFlags)
-        CompositorError.check_error_value(error_code)
+        error = fn(eye, byref(texture), byref(bounds), submitFlags)
+        openvr.error_code.CompositorError.check_error_value(error)
 
     def clearLastSubmittedFrame(self) -> None:
         """
@@ -5994,8 +4297,8 @@ class IVRCompositor(object):
             textureCount = 1
             textures = (Texture_t * textureCount)()
             texturesArg = byref(textures[0])
-        error_code = fn(texturesArg, textureCount)
-        CompositorError.check_error_value(error_code)
+        error = fn(texturesArg, textureCount)
+        openvr.error_code.CompositorError.check_error_value(error)
 
     def clearSkyboxOverride(self) -> None:
         """Resets compositor skybox back to defaults."""
@@ -6099,8 +4402,8 @@ class IVRCompositor(object):
         """
         fn = self.function_table.getMirrorTextureD3D11
         d3D11ShaderResourceView = c_void_p()
-        error_code = fn(eye, byref(d3D11DeviceOrResource), byref(d3D11ShaderResourceView))
-        CompositorError.check_error_value(error_code)
+        error = fn(eye, byref(d3D11DeviceOrResource), byref(d3D11ShaderResourceView))
+        openvr.error_code.CompositorError.check_error_value(error)
         return d3D11ShaderResourceView.value
 
     def releaseMirrorTextureD3D11(self, d3D11ShaderResourceView) -> None:
@@ -6112,8 +4415,8 @@ class IVRCompositor(object):
         fn = self.function_table.getMirrorTextureGL
         textureId = glUInt_t()
         sharedTextureHandle = glSharedTextureHandle_t()
-        error_code = fn(eye, byref(textureId), byref(sharedTextureHandle))
-        CompositorError.check_error_value(error_code)
+        error = fn(eye, byref(textureId), byref(sharedTextureHandle))
+        openvr.error_code.CompositorError.check_error_value(error)
         return textureId, sharedTextureHandle
 
     def releaseSharedGLTexture(self, textureId, sharedTextureHandle):
@@ -6192,8 +4495,8 @@ class IVRCompositor(object):
         Returns VRCompositorError_RequestFailed if SetExplicitTimingMode is not enabled.
         """
         fn = self.function_table.submitExplicitTimingData
-        error_code = fn()
-        CompositorError.check_error_value(error_code)
+        error = fn()
+        openvr.error_code.CompositorError.check_error_value(error)
 
     def isMotionSmoothingEnabled(self):
         """
@@ -6238,7 +4541,7 @@ class IVRNotifications(object):
         version_key = IVRNotifications_Version
         if not isInterfaceVersionValid(version_key):
             _checkInitError(VRInitError_Init_InterfaceNotFound)
-        fn_key = b"FnTable:" + version_key
+        fn_key = 'FnTable:' + version_key
         fn_type = IVRNotifications_FnTable
         fn_table_ptr = cast(getGenericInterface(fn_key), POINTER(fn_type))
         if fn_table_ptr is None:
@@ -6249,20 +4552,22 @@ class IVRNotifications(object):
         """
         Create a notification and enqueue it to be shown to the user.
         An overlay handle is required to create a notification, as otherwise it would be impossible for a user to act on it.
-        To create a two-line notification, use a line break ('\n') to split the text into two lines.
+        To create a two-line notification, use a line break ('\\n') to split the text into two lines.
         The pImage argument may be NULL, in which case the specified overlay's icon will be used instead.
         """
         fn = self.function_table.createNotification
+        if text is not None:
+            text = bytes(text, encoding='utf-8')
         notificationId = VRNotificationId()
-        error_code = fn(overlayHandle, userValue, type_, bytes(text, encoding='utf-8'), style, byref(image), byref(notificationId))
-        NotificationError.check_error_value(error_code)
+        error = fn(overlayHandle, userValue, type_, text, style, byref(image), byref(notificationId))
+        openvr.error_code.NotificationError.check_error_value(error)
         return notificationId
 
     def removeNotification(self, notificationId) -> None:
         """Destroy a notification, hiding it first if it currently shown to the user."""
         fn = self.function_table.removeNotification
-        error_code = fn(notificationId)
-        NotificationError.check_error_value(error_code)
+        error = fn(notificationId)
+        openvr.error_code.NotificationError.check_error_value(error)
 
 
 class IVROverlay_FnTable(Structure):
@@ -6357,7 +4662,7 @@ class IVROverlay(object):
         version_key = IVROverlay_Version
         if not isInterfaceVersionValid(version_key):
             _checkInitError(VRInitError_Init_InterfaceNotFound)
-        fn_key = b"FnTable:" + version_key
+        fn_key = 'FnTable:' + version_key
         fn_type = IVROverlay_FnTable
         fn_table_ptr = cast(getGenericInterface(fn_key), POINTER(fn_type))
         if fn_table_ptr is None:
@@ -6367,17 +4672,23 @@ class IVROverlay(object):
     def findOverlay(self, overlayKey: str):
         """Finds an existing overlay with the specified key."""
         fn = self.function_table.findOverlay
+        if overlayKey is not None:
+            overlayKey = bytes(overlayKey, encoding='utf-8')
         overlayHandle = VROverlayHandle_t()
-        error_code = fn(bytes(overlayKey, encoding='utf-8'), byref(overlayHandle))
-        OverlayError.check_error_value(error_code)
+        error = fn(overlayKey, byref(overlayHandle))
+        openvr.error_code.OverlayError.check_error_value(error)
         return overlayHandle.value
 
     def createOverlay(self, overlayKey: str, overlayName: str):
         """Creates a new named overlay. All overlays start hidden and with default settings."""
         fn = self.function_table.createOverlay
+        if overlayKey is not None:
+            overlayKey = bytes(overlayKey, encoding='utf-8')
+        if overlayName is not None:
+            overlayName = bytes(overlayName, encoding='utf-8')
         overlayHandle = VROverlayHandle_t()
-        error_code = fn(bytes(overlayKey, encoding='utf-8'), bytes(overlayName, encoding='utf-8'), byref(overlayHandle))
-        OverlayError.check_error_value(error_code)
+        error = fn(overlayKey, overlayName, byref(overlayHandle))
+        openvr.error_code.OverlayError.check_error_value(error)
         return overlayHandle.value
 
     def destroyOverlay(self, overlayHandle) -> None:
@@ -6386,8 +4697,8 @@ class IVROverlay(object):
         automatically destroyed.
         """
         fn = self.function_table.destroyOverlay
-        error_code = fn(overlayHandle)
-        OverlayError.check_error_value(error_code)
+        error = fn(overlayHandle)
+        openvr.error_code.OverlayError.check_error_value(error)
 
     def setHighQualityOverlay(self, overlayHandle) -> None:
         """
@@ -6398,8 +4709,8 @@ class IVROverlay(object):
         This mode does not support mouse input to your overlay.
         """
         fn = self.function_table.setHighQualityOverlay
-        error_code = fn(overlayHandle)
-        OverlayError.check_error_value(error_code)
+        error = fn(overlayHandle)
+        openvr.error_code.OverlayError.check_error_value(error)
 
     def getHighQualityOverlay(self):
         """
@@ -6422,7 +4733,7 @@ class IVROverlay(object):
             return ''
         value = ctypes.create_string_buffer(bufferSize)
         fn(overlayHandle, value, bufferSize, byref(error))
-        OverlayError.check_error_value(error.value)
+        openvr.error_code.OverlayError.check_error_value(error.value)
         return bytes(value.value).decode('utf-8')
 
     def getOverlayName(self, overlayHandle):
@@ -6437,14 +4748,16 @@ class IVROverlay(object):
             return ''
         value = ctypes.create_string_buffer(bufferSize)
         fn(overlayHandle, value, bufferSize, byref(error))
-        OverlayError.check_error_value(error.value)
+        openvr.error_code.OverlayError.check_error_value(error.value)
         return bytes(value.value).decode('utf-8')
 
     def setOverlayName(self, overlayHandle, name: str) -> None:
         """set the name to use for this overlay"""
         fn = self.function_table.setOverlayName
-        error_code = fn(overlayHandle, bytes(name, encoding='utf-8'))
-        OverlayError.check_error_value(error_code)
+        if name is not None:
+            name = bytes(name, encoding='utf-8')
+        error = fn(overlayHandle, name)
+        openvr.error_code.OverlayError.check_error_value(error)
 
     def getOverlayImageData(self, overlayHandle, buffer, bufferSize):
         """
@@ -6454,8 +4767,8 @@ class IVROverlay(object):
         fn = self.function_table.getOverlayImageData
         width = c_uint32()
         height = c_uint32()
-        error_code = fn(overlayHandle, byref(buffer), bufferSize, byref(width), byref(height))
-        OverlayError.check_error_value(error_code)
+        error = fn(overlayHandle, byref(buffer), bufferSize, byref(width), byref(height))
+        openvr.error_code.OverlayError.check_error_value(error)
         return width.value, height.value
 
     def getOverlayErrorNameFromEnum(self, error):
@@ -6473,8 +4786,8 @@ class IVROverlay(object):
         by default this is the pid of the process that made the overlay
         """
         fn = self.function_table.setOverlayRenderingPid
-        error_code = fn(overlayHandle, pID)
-        OverlayError.check_error_value(error_code)
+        error = fn(overlayHandle, pID)
+        openvr.error_code.OverlayError.check_error_value(error)
 
     def getOverlayRenderingPid(self, overlayHandle):
         """Gets the pid that is allowed to render to this overlay"""
@@ -6485,22 +4798,22 @@ class IVROverlay(object):
     def setOverlayFlag(self, overlayHandle, overlayFlag, enabled) -> None:
         """Specify flag setting for a given overlay"""
         fn = self.function_table.setOverlayFlag
-        error_code = fn(overlayHandle, overlayFlag, enabled)
-        OverlayError.check_error_value(error_code)
+        error = fn(overlayHandle, overlayFlag, enabled)
+        openvr.error_code.OverlayError.check_error_value(error)
 
     def getOverlayFlag(self, overlayHandle, overlayFlag):
         """Sets flag setting for a given overlay"""
         fn = self.function_table.getOverlayFlag
         enabled = openvr_bool()
-        error_code = fn(overlayHandle, overlayFlag, byref(enabled))
-        OverlayError.check_error_value(error_code)
+        error = fn(overlayHandle, overlayFlag, byref(enabled))
+        openvr.error_code.OverlayError.check_error_value(error)
         return enabled
 
     def setOverlayColor(self, overlayHandle, red: float, green: float, blue: float) -> None:
         """Sets the color tint of the overlay quad. Use 0.0 to 1.0 per channel."""
         fn = self.function_table.setOverlayColor
-        error_code = fn(overlayHandle, red, green, blue)
-        OverlayError.check_error_value(error_code)
+        error = fn(overlayHandle, red, green, blue)
+        openvr.error_code.OverlayError.check_error_value(error)
 
     def getOverlayColor(self, overlayHandle):
         """Gets the color tint of the overlay quad."""
@@ -6508,22 +4821,22 @@ class IVROverlay(object):
         red = c_float()
         green = c_float()
         blue = c_float()
-        error_code = fn(overlayHandle, byref(red), byref(green), byref(blue))
-        OverlayError.check_error_value(error_code)
+        error = fn(overlayHandle, byref(red), byref(green), byref(blue))
+        openvr.error_code.OverlayError.check_error_value(error)
         return red.value, green.value, blue.value
 
     def setOverlayAlpha(self, overlayHandle, alpha: float) -> None:
         """Sets the alpha of the overlay quad. Use 1.0 for 100 percent opacity to 0.0 for 0 percent opacity."""
         fn = self.function_table.setOverlayAlpha
-        error_code = fn(overlayHandle, alpha)
-        OverlayError.check_error_value(error_code)
+        error = fn(overlayHandle, alpha)
+        openvr.error_code.OverlayError.check_error_value(error)
 
     def getOverlayAlpha(self, overlayHandle):
         """Gets the alpha of the overlay quad. By default overlays are rendering at 100 percent alpha (1.0)."""
         fn = self.function_table.getOverlayAlpha
         alpha = c_float()
-        error_code = fn(overlayHandle, byref(alpha))
-        OverlayError.check_error_value(error_code)
+        error = fn(overlayHandle, byref(alpha))
+        openvr.error_code.OverlayError.check_error_value(error)
         return alpha.value
 
     def setOverlayTexelAspect(self, overlayHandle, texelAspect: float) -> None:
@@ -6532,15 +4845,15 @@ class IVROverlay(object):
         are twice as wide as they are tall. Defaults to 1.0.
         """
         fn = self.function_table.setOverlayTexelAspect
-        error_code = fn(overlayHandle, texelAspect)
-        OverlayError.check_error_value(error_code)
+        error = fn(overlayHandle, texelAspect)
+        openvr.error_code.OverlayError.check_error_value(error)
 
     def getOverlayTexelAspect(self, overlayHandle):
         """Gets the aspect ratio of the texels in the overlay. Defaults to 1.0"""
         fn = self.function_table.getOverlayTexelAspect
         texelAspect = c_float()
-        error_code = fn(overlayHandle, byref(texelAspect))
-        OverlayError.check_error_value(error_code)
+        error = fn(overlayHandle, byref(texelAspect))
+        openvr.error_code.OverlayError.check_error_value(error)
         return texelAspect.value
 
     def setOverlaySortOrder(self, overlayHandle, sortOrder) -> None:
@@ -6555,29 +4868,29 @@ class IVROverlay(object):
         Sort order defaults to 0.
         """
         fn = self.function_table.setOverlaySortOrder
-        error_code = fn(overlayHandle, sortOrder)
-        OverlayError.check_error_value(error_code)
+        error = fn(overlayHandle, sortOrder)
+        openvr.error_code.OverlayError.check_error_value(error)
 
     def getOverlaySortOrder(self, overlayHandle):
         """Gets the sort order of the overlay. See SetOverlaySortOrder for how this works."""
         fn = self.function_table.getOverlaySortOrder
         sortOrder = c_uint32()
-        error_code = fn(overlayHandle, byref(sortOrder))
-        OverlayError.check_error_value(error_code)
+        error = fn(overlayHandle, byref(sortOrder))
+        openvr.error_code.OverlayError.check_error_value(error)
         return sortOrder.value
 
     def setOverlayWidthInMeters(self, overlayHandle, widthInMeters: float) -> None:
         """Sets the width of the overlay quad in meters. By default overlays are rendered on a quad that is 1 meter across"""
         fn = self.function_table.setOverlayWidthInMeters
-        error_code = fn(overlayHandle, widthInMeters)
-        OverlayError.check_error_value(error_code)
+        error = fn(overlayHandle, widthInMeters)
+        openvr.error_code.OverlayError.check_error_value(error)
 
     def getOverlayWidthInMeters(self, overlayHandle):
         """Returns the width of the overlay quad in meters. By default overlays are rendered on a quad that is 1 meter across"""
         fn = self.function_table.getOverlayWidthInMeters
         widthInMeters = c_float()
-        error_code = fn(overlayHandle, byref(widthInMeters))
-        OverlayError.check_error_value(error_code)
+        error = fn(overlayHandle, byref(widthInMeters))
+        openvr.error_code.OverlayError.check_error_value(error)
         return widthInMeters.value
 
     def setOverlayAutoCurveDistanceRangeInMeters(self, overlayHandle, minDistanceInMeters: float, maxDistanceInMeters: float) -> None:
@@ -6586,8 +4899,8 @@ class IVROverlay(object):
         the surface around the viewer.  Min is distance is when the surface will be most curved.  Max is when least curved.
         """
         fn = self.function_table.setOverlayAutoCurveDistanceRangeInMeters
-        error_code = fn(overlayHandle, minDistanceInMeters, maxDistanceInMeters)
-        OverlayError.check_error_value(error_code)
+        error = fn(overlayHandle, minDistanceInMeters, maxDistanceInMeters)
+        openvr.error_code.OverlayError.check_error_value(error)
 
     def getOverlayAutoCurveDistanceRangeInMeters(self, overlayHandle):
         """
@@ -6597,8 +4910,8 @@ class IVROverlay(object):
         fn = self.function_table.getOverlayAutoCurveDistanceRangeInMeters
         minDistanceInMeters = c_float()
         maxDistanceInMeters = c_float()
-        error_code = fn(overlayHandle, byref(minDistanceInMeters), byref(maxDistanceInMeters))
-        OverlayError.check_error_value(error_code)
+        error = fn(overlayHandle, byref(minDistanceInMeters), byref(maxDistanceInMeters))
+        openvr.error_code.OverlayError.check_error_value(error)
         return minDistanceInMeters.value, maxDistanceInMeters.value
 
     def setOverlayTextureColorSpace(self, overlayHandle, textureColorSpace) -> None:
@@ -6607,29 +4920,29 @@ class IVROverlay(object):
         If the texture needs to be resolved, you should call SetOverlayTexture with the appropriate colorspace instead.
         """
         fn = self.function_table.setOverlayTextureColorSpace
-        error_code = fn(overlayHandle, textureColorSpace)
-        OverlayError.check_error_value(error_code)
+        error = fn(overlayHandle, textureColorSpace)
+        openvr.error_code.OverlayError.check_error_value(error)
 
     def getOverlayTextureColorSpace(self, overlayHandle):
         """Gets the overlay's current colorspace setting."""
         fn = self.function_table.getOverlayTextureColorSpace
         textureColorSpace = EColorSpace()
-        error_code = fn(overlayHandle, byref(textureColorSpace))
-        OverlayError.check_error_value(error_code)
+        error = fn(overlayHandle, byref(textureColorSpace))
+        openvr.error_code.OverlayError.check_error_value(error)
         return textureColorSpace
 
     def setOverlayTextureBounds(self, overlayHandle, overlayTextureBounds) -> None:
         """Sets the part of the texture to use for the overlay. UV Min is the upper left corner and UV Max is the lower right corner."""
         fn = self.function_table.setOverlayTextureBounds
-        error_code = fn(overlayHandle, byref(overlayTextureBounds))
-        OverlayError.check_error_value(error_code)
+        error = fn(overlayHandle, byref(overlayTextureBounds))
+        openvr.error_code.OverlayError.check_error_value(error)
 
     def getOverlayTextureBounds(self, overlayHandle):
         """Gets the part of the texture to use for the overlay. UV Min is the upper left corner and UV Max is the lower right corner."""
         fn = self.function_table.getOverlayTextureBounds
         overlayTextureBounds = VRTextureBounds_t()
-        error_code = fn(overlayHandle, byref(overlayTextureBounds))
-        OverlayError.check_error_value(error_code)
+        error = fn(overlayHandle, byref(overlayTextureBounds))
+        openvr.error_code.OverlayError.check_error_value(error)
         return overlayTextureBounds
 
     def getOverlayRenderModel(self, overlayHandle):
@@ -6642,7 +4955,7 @@ class IVROverlay(object):
             return ''
         value = ctypes.create_string_buffer(bufferSize)
         fn(overlayHandle, value, bufferSize, byref(color), byref(error))
-        OverlayError.check_error_value(error.value)
+        openvr.error_code.OverlayError.check_error_value(error.value)
         return bytes(value.value).decode('utf-8'), color
 
     def setOverlayRenderModel(self, overlayHandle, renderModel: str, color) -> None:
@@ -6651,45 +4964,47 @@ class IVROverlay(object):
         The model is scaled by the same amount as the overlay, with a default of 1m.
         """
         fn = self.function_table.setOverlayRenderModel
-        error_code = fn(overlayHandle, bytes(renderModel, encoding='utf-8'), byref(color))
-        OverlayError.check_error_value(error_code)
+        if renderModel is not None:
+            renderModel = bytes(renderModel, encoding='utf-8')
+        error = fn(overlayHandle, renderModel, byref(color))
+        openvr.error_code.OverlayError.check_error_value(error)
 
     def getOverlayTransformType(self, overlayHandle):
         """Returns the transform type of this overlay."""
         fn = self.function_table.getOverlayTransformType
         transformType = VROverlayTransformType()
-        error_code = fn(overlayHandle, byref(transformType))
-        OverlayError.check_error_value(error_code)
+        error = fn(overlayHandle, byref(transformType))
+        openvr.error_code.OverlayError.check_error_value(error)
         return transformType
 
     def setOverlayTransformAbsolute(self, overlayHandle, trackingOrigin, trackingOriginToOverlayTransform) -> None:
         """Sets the transform to absolute tracking origin."""
         fn = self.function_table.setOverlayTransformAbsolute
-        error_code = fn(overlayHandle, trackingOrigin, byref(trackingOriginToOverlayTransform))
-        OverlayError.check_error_value(error_code)
+        error = fn(overlayHandle, trackingOrigin, byref(trackingOriginToOverlayTransform))
+        openvr.error_code.OverlayError.check_error_value(error)
 
     def getOverlayTransformAbsolute(self, overlayHandle):
         """Gets the transform if it is absolute. Returns an error if the transform is some other type."""
         fn = self.function_table.getOverlayTransformAbsolute
         trackingOrigin = ETrackingUniverseOrigin()
         trackingOriginToOverlayTransform = HmdMatrix34_t()
-        error_code = fn(overlayHandle, byref(trackingOrigin), byref(trackingOriginToOverlayTransform))
-        OverlayError.check_error_value(error_code)
+        error = fn(overlayHandle, byref(trackingOrigin), byref(trackingOriginToOverlayTransform))
+        openvr.error_code.OverlayError.check_error_value(error)
         return trackingOrigin, trackingOriginToOverlayTransform
 
     def setOverlayTransformTrackedDeviceRelative(self, overlayHandle, trackedDevice, trackedDeviceToOverlayTransform) -> None:
         """Sets the transform to relative to the transform of the specified tracked device."""
         fn = self.function_table.setOverlayTransformTrackedDeviceRelative
-        error_code = fn(overlayHandle, trackedDevice, byref(trackedDeviceToOverlayTransform))
-        OverlayError.check_error_value(error_code)
+        error = fn(overlayHandle, trackedDevice, byref(trackedDeviceToOverlayTransform))
+        openvr.error_code.OverlayError.check_error_value(error)
 
     def getOverlayTransformTrackedDeviceRelative(self, overlayHandle):
         """Gets the transform if it is relative to a tracked device. Returns an error if the transform is some other type."""
         fn = self.function_table.getOverlayTransformTrackedDeviceRelative
         trackedDevice = TrackedDeviceIndex_t()
         trackedDeviceToOverlayTransform = HmdMatrix34_t()
-        error_code = fn(overlayHandle, byref(trackedDevice), byref(trackedDeviceToOverlayTransform))
-        OverlayError.check_error_value(error_code)
+        error = fn(overlayHandle, byref(trackedDevice), byref(trackedDeviceToOverlayTransform))
+        openvr.error_code.OverlayError.check_error_value(error)
         return trackedDevice, trackedDeviceToOverlayTransform
 
     def setOverlayTransformTrackedDeviceComponent(self, overlayHandle, deviceIndex, componentName: str) -> None:
@@ -6698,8 +5013,10 @@ class IVROverlay(object):
         drawing the device. Overlays with this transform type cannot receive mouse events.
         """
         fn = self.function_table.setOverlayTransformTrackedDeviceComponent
-        error_code = fn(overlayHandle, deviceIndex, bytes(componentName, encoding='utf-8'))
-        OverlayError.check_error_value(error_code)
+        if componentName is not None:
+            componentName = bytes(componentName, encoding='utf-8')
+        error = fn(overlayHandle, deviceIndex, componentName)
+        openvr.error_code.OverlayError.check_error_value(error)
 
     def getOverlayTransformTrackedDeviceComponent(self, overlayHandle):
         """Gets the transform information when the overlay is rendering on a component."""
@@ -6709,8 +5026,8 @@ class IVROverlay(object):
         if componentNameSize == 0:
             return ''
         componentName = ctypes.create_string_buffer(componentNameSize)
-        error_code = fn(overlayHandle, byref(deviceIndex), componentName, componentNameSize)
-        OverlayError.check_error_value(error_code)
+        error = fn(overlayHandle, byref(deviceIndex), componentName, componentNameSize)
+        openvr.error_code.OverlayError.check_error_value(error)
         return deviceIndex, bytes(componentName.value).decode('utf-8')
 
     def getOverlayTransformOverlayRelative(self, overlayHandle):
@@ -6718,27 +5035,27 @@ class IVROverlay(object):
         fn = self.function_table.getOverlayTransformOverlayRelative
         overlayHandleParent = VROverlayHandle_t()
         parentOverlayToOverlayTransform = HmdMatrix34_t()
-        error_code = fn(overlayHandle, byref(overlayHandleParent), byref(parentOverlayToOverlayTransform))
-        OverlayError.check_error_value(error_code)
+        error = fn(overlayHandle, byref(overlayHandleParent), byref(parentOverlayToOverlayTransform))
+        openvr.error_code.OverlayError.check_error_value(error)
         return overlayHandleParent.value, parentOverlayToOverlayTransform
 
     def setOverlayTransformOverlayRelative(self, overlayHandle, overlayHandleParent, parentOverlayToOverlayTransform) -> None:
         """Sets the transform to relative to the transform of the specified overlay. This overlays visibility will also track the parents visibility"""
         fn = self.function_table.setOverlayTransformOverlayRelative
-        error_code = fn(overlayHandle, overlayHandleParent, byref(parentOverlayToOverlayTransform))
-        OverlayError.check_error_value(error_code)
+        error = fn(overlayHandle, overlayHandleParent, byref(parentOverlayToOverlayTransform))
+        openvr.error_code.OverlayError.check_error_value(error)
 
     def showOverlay(self, overlayHandle) -> None:
         """Shows the VR overlay.  For dashboard overlays, only the Dashboard Manager is allowed to call this."""
         fn = self.function_table.showOverlay
-        error_code = fn(overlayHandle)
-        OverlayError.check_error_value(error_code)
+        error = fn(overlayHandle)
+        openvr.error_code.OverlayError.check_error_value(error)
 
     def hideOverlay(self, overlayHandle) -> None:
         """Hides the VR overlay.  For dashboard overlays, only the Dashboard Manager is allowed to call this."""
         fn = self.function_table.hideOverlay
-        error_code = fn(overlayHandle)
-        OverlayError.check_error_value(error_code)
+        error = fn(overlayHandle)
+        openvr.error_code.OverlayError.check_error_value(error)
 
     def isOverlayVisible(self, overlayHandle):
         """Returns true if the overlay is visible."""
@@ -6750,8 +5067,8 @@ class IVROverlay(object):
         """Get the transform in 3d space associated with a specific 2d point in the overlay's coordinate space (where 0,0 is the lower left). -Z points out of the overlay"""
         fn = self.function_table.getTransformForOverlayCoordinates
         transform = HmdMatrix34_t()
-        error_code = fn(overlayHandle, trackingOrigin, coordinatesInOverlay, byref(transform))
-        OverlayError.check_error_value(error_code)
+        error = fn(overlayHandle, trackingOrigin, coordinatesInOverlay, byref(transform))
+        openvr.error_code.OverlayError.check_error_value(error)
         return transform
 
     def pollNextOverlayEvent(self, overlayHandle, event):
@@ -6768,15 +5085,15 @@ class IVROverlay(object):
         """Returns the current input settings for the specified overlay."""
         fn = self.function_table.getOverlayInputMethod
         inputMethod = VROverlayInputMethod()
-        error_code = fn(overlayHandle, byref(inputMethod))
-        OverlayError.check_error_value(error_code)
+        error = fn(overlayHandle, byref(inputMethod))
+        openvr.error_code.OverlayError.check_error_value(error)
         return inputMethod
 
     def setOverlayInputMethod(self, overlayHandle, inputMethod) -> None:
         """Sets the input settings for the specified overlay."""
         fn = self.function_table.setOverlayInputMethod
-        error_code = fn(overlayHandle, inputMethod)
-        OverlayError.check_error_value(error_code)
+        error = fn(overlayHandle, inputMethod)
+        openvr.error_code.OverlayError.check_error_value(error)
 
     def getOverlayMouseScale(self, overlayHandle):
         """
@@ -6785,8 +5102,8 @@ class IVROverlay(object):
         """
         fn = self.function_table.getOverlayMouseScale
         mouseScale = HmdVector2_t()
-        error_code = fn(overlayHandle, byref(mouseScale))
-        OverlayError.check_error_value(error_code)
+        error = fn(overlayHandle, byref(mouseScale))
+        openvr.error_code.OverlayError.check_error_value(error)
         return mouseScale
 
     def setOverlayMouseScale(self, overlayHandle, mouseScale) -> None:
@@ -6795,8 +5112,8 @@ class IVROverlay(object):
         typically the size of the underlying UI in pixels (not in world space).
         """
         fn = self.function_table.setOverlayMouseScale
-        error_code = fn(overlayHandle, byref(mouseScale))
-        OverlayError.check_error_value(error_code)
+        error = fn(overlayHandle, byref(mouseScale))
+        openvr.error_code.OverlayError.check_error_value(error)
 
     def computeOverlayIntersection(self, overlayHandle, params):
         """
@@ -6826,8 +5143,8 @@ class IVROverlay(object):
     def setGamepadFocusOverlay(self, newFocusOverlay) -> None:
         """Sets the current Gamepad focus overlay"""
         fn = self.function_table.setGamepadFocusOverlay
-        error_code = fn(newFocusOverlay)
-        OverlayError.check_error_value(error_code)
+        error = fn(newFocusOverlay)
+        openvr.error_code.OverlayError.check_error_value(error)
 
     def setOverlayNeighbor(self, direction, from_, to) -> None:
         """
@@ -6836,8 +5153,8 @@ class IVROverlay(object):
         ends will be cleared
         """
         fn = self.function_table.setOverlayNeighbor
-        error_code = fn(direction, from_, to)
-        OverlayError.check_error_value(error_code)
+        error = fn(direction, from_, to)
+        openvr.error_code.OverlayError.check_error_value(error)
 
     def moveGamepadFocusToNeighbor(self, direction, from_) -> None:
         """
@@ -6845,22 +5162,22 @@ class IVROverlay(object):
         neighbor in that direction
         """
         fn = self.function_table.moveGamepadFocusToNeighbor
-        error_code = fn(direction, from_)
-        OverlayError.check_error_value(error_code)
+        error = fn(direction, from_)
+        openvr.error_code.OverlayError.check_error_value(error)
 
     def setOverlayDualAnalogTransform(self, overlay, which, center, radius: float) -> None:
         """Sets the analog input to Dual Analog coordinate scale for the specified overlay."""
         fn = self.function_table.setOverlayDualAnalogTransform
-        error_code = fn(overlay, which, byref(center), radius)
-        OverlayError.check_error_value(error_code)
+        error = fn(overlay, which, byref(center), radius)
+        openvr.error_code.OverlayError.check_error_value(error)
 
     def getOverlayDualAnalogTransform(self, overlay, which):
         """Gets the analog input to Dual Analog coordinate scale for the specified overlay."""
         fn = self.function_table.getOverlayDualAnalogTransform
         center = HmdVector2_t()
         radius = c_float()
-        error_code = fn(overlay, which, byref(center), byref(radius))
-        OverlayError.check_error_value(error_code)
+        error = fn(overlay, which, byref(center), byref(radius))
+        openvr.error_code.OverlayError.check_error_value(error)
         return center, radius.value
 
     def setOverlayTexture(self, overlayHandle, texture) -> None:
@@ -6871,14 +5188,14 @@ class IVROverlay(object):
           glBindTexture
         """
         fn = self.function_table.setOverlayTexture
-        error_code = fn(overlayHandle, byref(texture))
-        OverlayError.check_error_value(error_code)
+        error = fn(overlayHandle, byref(texture))
+        openvr.error_code.OverlayError.check_error_value(error)
 
     def clearOverlayTexture(self, overlayHandle) -> None:
         """Use this to tell the overlay system to release the texture set for this overlay."""
         fn = self.function_table.clearOverlayTexture
-        error_code = fn(overlayHandle)
-        OverlayError.check_error_value(error_code)
+        error = fn(overlayHandle)
+        openvr.error_code.OverlayError.check_error_value(error)
 
     def setOverlayRaw(self, overlayHandle, buffer, width, height, depth) -> None:
         """
@@ -6886,8 +5203,8 @@ class IVROverlay(object):
         that can be sent. This function can only be called by the overlay's renderer process.
         """
         fn = self.function_table.setOverlayRaw
-        error_code = fn(overlayHandle, byref(buffer), width, height, depth)
-        OverlayError.check_error_value(error_code)
+        error = fn(overlayHandle, byref(buffer), width, height, depth)
+        openvr.error_code.OverlayError.check_error_value(error)
 
     def setOverlayFromFile(self, overlayHandle, filePath: str) -> None:
         """
@@ -6895,8 +5212,10 @@ class IVROverlay(object):
         This function can only be called by the overlay's renderer process
         """
         fn = self.function_table.setOverlayFromFile
-        error_code = fn(overlayHandle, bytes(filePath, encoding='utf-8'))
-        OverlayError.check_error_value(error_code)
+        if filePath is not None:
+            filePath = bytes(filePath, encoding='utf-8')
+        error = fn(overlayHandle, filePath)
+        openvr.error_code.OverlayError.check_error_value(error)
 
     def getOverlayTexture(self, overlayHandle, nativeTextureRef):
         """
@@ -6918,8 +5237,8 @@ class IVROverlay(object):
         aPIType = ETextureType()
         colorSpace = EColorSpace()
         textureBounds = VRTextureBounds_t()
-        error_code = fn(overlayHandle, byref(nativeTextureHandle), byref(nativeTextureRef), byref(width), byref(height), byref(nativeFormat), byref(aPIType), byref(colorSpace), byref(textureBounds))
-        OverlayError.check_error_value(error_code)
+        error = fn(overlayHandle, byref(nativeTextureHandle), byref(nativeTextureRef), byref(width), byref(height), byref(nativeFormat), byref(aPIType), byref(colorSpace), byref(textureBounds))
+        openvr.error_code.OverlayError.check_error_value(error)
         return nativeTextureHandle.value, width.value, height.value, nativeFormat.value, aPIType, colorSpace, textureBounds
 
     def releaseNativeOverlayHandle(self, overlayHandle, nativeTextureHandle) -> None:
@@ -6928,25 +5247,29 @@ class IVROverlay(object):
         so only do it once you stop rendering this texture.
         """
         fn = self.function_table.releaseNativeOverlayHandle
-        error_code = fn(overlayHandle, byref(nativeTextureHandle))
-        OverlayError.check_error_value(error_code)
+        error = fn(overlayHandle, byref(nativeTextureHandle))
+        openvr.error_code.OverlayError.check_error_value(error)
 
     def getOverlayTextureSize(self, overlayHandle):
         """Get the size of the overlay texture"""
         fn = self.function_table.getOverlayTextureSize
         width = c_uint32()
         height = c_uint32()
-        error_code = fn(overlayHandle, byref(width), byref(height))
-        OverlayError.check_error_value(error_code)
+        error = fn(overlayHandle, byref(width), byref(height))
+        openvr.error_code.OverlayError.check_error_value(error)
         return width.value, height.value
 
     def createDashboardOverlay(self, overlayKey: str, overlayFriendlyName: str):
         """Creates a dashboard overlay and returns its handle"""
         fn = self.function_table.createDashboardOverlay
+        if overlayKey is not None:
+            overlayKey = bytes(overlayKey, encoding='utf-8')
+        if overlayFriendlyName is not None:
+            overlayFriendlyName = bytes(overlayFriendlyName, encoding='utf-8')
         mainHandle = VROverlayHandle_t()
         thumbnailHandle = VROverlayHandle_t()
-        error_code = fn(bytes(overlayKey, encoding='utf-8'), bytes(overlayFriendlyName, encoding='utf-8'), byref(mainHandle), byref(thumbnailHandle))
-        OverlayError.check_error_value(error_code)
+        error = fn(overlayKey, overlayFriendlyName, byref(mainHandle), byref(thumbnailHandle))
+        openvr.error_code.OverlayError.check_error_value(error)
         return mainHandle.value, thumbnailHandle.value
 
     def isDashboardVisible(self):
@@ -6964,21 +5287,23 @@ class IVROverlay(object):
     def setDashboardOverlaySceneProcess(self, overlayHandle, processId) -> None:
         """Sets the dashboard overlay to only appear when the specified process ID has scene focus"""
         fn = self.function_table.setDashboardOverlaySceneProcess
-        error_code = fn(overlayHandle, processId)
-        OverlayError.check_error_value(error_code)
+        error = fn(overlayHandle, processId)
+        openvr.error_code.OverlayError.check_error_value(error)
 
     def getDashboardOverlaySceneProcess(self, overlayHandle):
         """Gets the process ID that this dashboard overlay requires to have scene focus"""
         fn = self.function_table.getDashboardOverlaySceneProcess
         processId = c_uint32()
-        error_code = fn(overlayHandle, byref(processId))
-        OverlayError.check_error_value(error_code)
+        error = fn(overlayHandle, byref(processId))
+        openvr.error_code.OverlayError.check_error_value(error)
         return processId.value
 
     def showDashboard(self, overlayToShow: str) -> None:
         """Shows the dashboard."""
         fn = self.function_table.showDashboard
-        fn(bytes(overlayToShow, encoding='utf-8'))
+        if overlayToShow is not None:
+            overlayToShow = bytes(overlayToShow, encoding='utf-8')
+        fn(overlayToShow)
 
     def getPrimaryDashboardDevice(self):
         """Returns the tracked device that has the laser pointer in the dashboard"""
@@ -6989,13 +5314,21 @@ class IVROverlay(object):
     def showKeyboard(self, inputMode, lineInputMode, description: str, charMax, existingText: str, useMinimalMode, userValue) -> None:
         """Show the virtual keyboard to accept input"""
         fn = self.function_table.showKeyboard
-        error_code = fn(inputMode, lineInputMode, bytes(description, encoding='utf-8'), charMax, bytes(existingText, encoding='utf-8'), useMinimalMode, userValue)
-        OverlayError.check_error_value(error_code)
+        if description is not None:
+            description = bytes(description, encoding='utf-8')
+        if existingText is not None:
+            existingText = bytes(existingText, encoding='utf-8')
+        error = fn(inputMode, lineInputMode, description, charMax, existingText, useMinimalMode, userValue)
+        openvr.error_code.OverlayError.check_error_value(error)
 
     def showKeyboardForOverlay(self, overlayHandle, inputMode, lineInputMode, description: str, charMax, existingText: str, useMinimalMode, userValue) -> None:
         fn = self.function_table.showKeyboardForOverlay
-        error_code = fn(overlayHandle, inputMode, lineInputMode, bytes(description, encoding='utf-8'), charMax, bytes(existingText, encoding='utf-8'), useMinimalMode, userValue)
-        OverlayError.check_error_value(error_code)
+        if description is not None:
+            description = bytes(description, encoding='utf-8')
+        if existingText is not None:
+            existingText = bytes(existingText, encoding='utf-8')
+        error = fn(overlayHandle, inputMode, lineInputMode, description, charMax, existingText, useMinimalMode, userValue)
+        openvr.error_code.OverlayError.check_error_value(error)
 
     def getKeyboardText(self):
         """Get the text that was entered into the text input"""
@@ -7029,21 +5362,33 @@ class IVROverlay(object):
         """
         fn = self.function_table.setOverlayIntersectionMask
         maskPrimitives = VROverlayIntersectionMaskPrimitive_t()
-        error_code = fn(overlayHandle, byref(maskPrimitives), numMaskPrimitives, primitiveSize)
-        OverlayError.check_error_value(error_code)
+        error = fn(overlayHandle, byref(maskPrimitives), numMaskPrimitives, primitiveSize)
+        openvr.error_code.OverlayError.check_error_value(error)
         return maskPrimitives
 
     def getOverlayFlags(self, overlayHandle):
         fn = self.function_table.getOverlayFlags
         flags = c_uint32()
-        error_code = fn(overlayHandle, byref(flags))
-        OverlayError.check_error_value(error_code)
+        error = fn(overlayHandle, byref(flags))
+        openvr.error_code.OverlayError.check_error_value(error)
         return flags.value
 
     def showMessageOverlay(self, text: str, caption: str, button0Text: str, button1Text: str=None, button2Text: str=None, button3Text: str=None):
         """Show the message overlay. This will block and return you a result."""
         fn = self.function_table.showMessageOverlay
-        result = fn(bytes(text, encoding='utf-8'), bytes(caption, encoding='utf-8'), bytes(button0Text, encoding='utf-8'), bytes(button1Text, encoding='utf-8'), bytes(button2Text, encoding='utf-8'), bytes(button3Text, encoding='utf-8'))
+        if text is not None:
+            text = bytes(text, encoding='utf-8')
+        if caption is not None:
+            caption = bytes(caption, encoding='utf-8')
+        if button0Text is not None:
+            button0Text = bytes(button0Text, encoding='utf-8')
+        if button1Text is not None:
+            button1Text = bytes(button1Text, encoding='utf-8')
+        if button2Text is not None:
+            button2Text = bytes(button2Text, encoding='utf-8')
+        if button3Text is not None:
+            button3Text = bytes(button3Text, encoding='utf-8')
+        result = fn(text, caption, button0Text, button1Text, button2Text, button3Text)
         return result
 
     def closeMessageOverlay(self) -> None:
@@ -7081,7 +5426,7 @@ class IVRRenderModels(object):
         version_key = IVRRenderModels_Version
         if not isInterfaceVersionValid(version_key):
             _checkInitError(VRInitError_Init_InterfaceNotFound)
-        fn_key = b"FnTable:" + version_key
+        fn_key = 'FnTable:' + version_key
         fn_type = IVRRenderModels_FnTable
         fn_table_ptr = cast(getGenericInterface(fn_key), POINTER(fn_type))
         if fn_table_ptr is None:
@@ -7101,13 +5446,15 @@ class IVRRenderModels(object):
         The method returns VRRenderModelError_None once loaded successfully, otherwise will return an error.
         """
         fn = self.function_table.loadRenderModel_Async
+        if renderModelName is not None:
+            renderModelName = bytes(renderModelName, encoding='utf-8')
         renderModel = POINTER(RenderModel_t)()
-        error_code = fn(bytes(renderModelName, encoding='utf-8'), byref(renderModel))
+        error = fn(renderModelName, byref(renderModel))
         if renderModel:
             renderModel = renderModel.contents
         else:
             renderModel = None
-        RenderModelError.check_error_value(error_code)
+        openvr.error_code.RenderModelError.check_error_value(error)
         return renderModel
 
     def freeRenderModel(self, renderModel) -> None:
@@ -7122,12 +5469,12 @@ class IVRRenderModels(object):
         """Loads and returns a texture for use in the application."""
         fn = self.function_table.loadTexture_Async
         texture = POINTER(RenderModel_TextureMap_t)()
-        error_code = fn(textureId, byref(texture))
+        error = fn(textureId, byref(texture))
         if texture:
             texture = texture.contents
         else:
             texture = None
-        RenderModelError.check_error_value(error_code)
+        openvr.error_code.RenderModelError.check_error_value(error)
         return texture
 
     def freeTexture(self, texture) -> None:
@@ -7142,15 +5489,15 @@ class IVRRenderModels(object):
         """Creates a D3D11 texture and loads data into it."""
         fn = self.function_table.loadTextureD3D11_Async
         d3D11Texture2D = c_void_p()
-        error_code = fn(textureId, byref(d3D11Device), byref(d3D11Texture2D))
-        RenderModelError.check_error_value(error_code)
+        error = fn(textureId, byref(d3D11Device), byref(d3D11Texture2D))
+        openvr.error_code.RenderModelError.check_error_value(error)
         return d3D11Texture2D.value
 
     def loadIntoTextureD3D11_Async(self, textureId, dstTexture) -> None:
         """Helper function to copy the bits into an existing texture."""
         fn = self.function_table.loadIntoTextureD3D11_Async
-        error_code = fn(textureId, byref(dstTexture))
-        RenderModelError.check_error_value(error_code)
+        error = fn(textureId, byref(dstTexture))
+        openvr.error_code.RenderModelError.check_error_value(error)
 
     def freeTextureD3D11(self, d3D11Texture2D) -> None:
         """Use this to free textures created with LoadTextureD3D11_Async instead of calling Release on them."""
@@ -7188,7 +5535,9 @@ class IVRRenderModels(object):
          Returns 0 if components not supported, >0 otherwise
         """
         fn = self.function_table.getComponentCount
-        result = fn(bytes(renderModelName, encoding='utf-8'))
+        if renderModelName is not None:
+            renderModelName = bytes(renderModelName, encoding='utf-8')
+        result = fn(renderModelName)
         return result
 
     def getComponentName(self, renderModelName: str, componentIndex):
@@ -7198,11 +5547,13 @@ class IVRRenderModels(object):
         Otherwise, it will return the size of the buffer required for the name.
         """
         fn = self.function_table.getComponentName
-        componentNameLen = fn(bytes(renderModelName, encoding='utf-8'), componentIndex, None, 0)
+        if renderModelName is not None:
+            renderModelName = bytes(renderModelName, encoding='utf-8')
+        componentNameLen = fn(renderModelName, componentIndex, None, 0)
         if componentNameLen == 0:
             return ''
         componentName = ctypes.create_string_buffer(componentNameLen)
-        fn(bytes(renderModelName, encoding='utf-8'), componentIndex, componentName, componentNameLen)
+        fn(renderModelName, componentIndex, componentName, componentNameLen)
         return bytes(componentName.value).decode('utf-8')
 
     def getComponentButtonMask(self, renderModelName: str, componentName: str):
@@ -7213,7 +5564,11 @@ class IVRRenderModels(object):
         Note: A single component may be associated with multiple buttons. Ex: A trackpad which also provides "D-pad" functionality
         """
         fn = self.function_table.getComponentButtonMask
-        result = fn(bytes(renderModelName, encoding='utf-8'), bytes(componentName, encoding='utf-8'))
+        if renderModelName is not None:
+            renderModelName = bytes(renderModelName, encoding='utf-8')
+        if componentName is not None:
+            componentName = bytes(componentName, encoding='utf-8')
+        result = fn(renderModelName, componentName)
         return result
 
     def getComponentRenderModelName(self, renderModelName: str, componentName: str):
@@ -7223,11 +5578,15 @@ class IVRRenderModels(object):
         Otherwise, it will return the size of the buffer required for the name.
         """
         fn = self.function_table.getComponentRenderModelName
-        componentRenderModelNameLen = fn(bytes(renderModelName, encoding='utf-8'), bytes(componentName, encoding='utf-8'), None, 0)
+        if renderModelName is not None:
+            renderModelName = bytes(renderModelName, encoding='utf-8')
+        if componentName is not None:
+            componentName = bytes(componentName, encoding='utf-8')
+        componentRenderModelNameLen = fn(renderModelName, componentName, None, 0)
         if componentRenderModelNameLen == 0:
             return ''
         componentRenderModelName = ctypes.create_string_buffer(componentRenderModelNameLen)
-        fn(bytes(renderModelName, encoding='utf-8'), bytes(componentName, encoding='utf-8'), componentRenderModelName, componentRenderModelNameLen)
+        fn(renderModelName, componentName, componentRenderModelName, componentRenderModelNameLen)
         return bytes(componentRenderModelName.value).decode('utf-8')
 
     def getComponentStateForDevicePath(self, renderModelName: str, componentName: str, devicePath, state):
@@ -7242,33 +5601,47 @@ class IVRRenderModels(object):
         Note: For dynamic objects, visibility may be dynamic. (I.e., true/false will be returned based on controller state and controller mode state )
         """
         fn = self.function_table.getComponentStateForDevicePath
+        if renderModelName is not None:
+            renderModelName = bytes(renderModelName, encoding='utf-8')
+        if componentName is not None:
+            componentName = bytes(componentName, encoding='utf-8')
         componentState = RenderModel_ComponentState_t()
-        result = fn(bytes(renderModelName, encoding='utf-8'), bytes(componentName, encoding='utf-8'), devicePath, byref(state), byref(componentState))
+        result = fn(renderModelName, componentName, devicePath, byref(state), byref(componentState))
         return result, componentState
 
     def getComponentState(self, renderModelName: str, componentName: str, controllerState, state):
         """This version of GetComponentState takes a controller state block instead of an action origin. This function is deprecated. You should use the new input system and GetComponentStateForDevicePath instead."""
         fn = self.function_table.getComponentState
+        if renderModelName is not None:
+            renderModelName = bytes(renderModelName, encoding='utf-8')
+        if componentName is not None:
+            componentName = bytes(componentName, encoding='utf-8')
         componentState = RenderModel_ComponentState_t()
-        result = fn(bytes(renderModelName, encoding='utf-8'), bytes(componentName, encoding='utf-8'), byref(controllerState), byref(state), byref(componentState))
+        result = fn(renderModelName, componentName, byref(controllerState), byref(state), byref(componentState))
         return result, componentState
 
     def renderModelHasComponent(self, renderModelName: str, componentName: str):
         """Returns true if the render model has a component with the specified name"""
         fn = self.function_table.renderModelHasComponent
-        result = fn(bytes(renderModelName, encoding='utf-8'), bytes(componentName, encoding='utf-8'))
+        if renderModelName is not None:
+            renderModelName = bytes(renderModelName, encoding='utf-8')
+        if componentName is not None:
+            componentName = bytes(componentName, encoding='utf-8')
+        result = fn(renderModelName, componentName)
         return result
 
     def getRenderModelThumbnailURL(self, renderModelName: str):
         """Returns the URL of the thumbnail image for this rendermodel"""
         fn = self.function_table.getRenderModelThumbnailURL
+        if renderModelName is not None:
+            renderModelName = bytes(renderModelName, encoding='utf-8')
         error = EVRRenderModelError()
-        thumbnailURLLen = fn(bytes(renderModelName, encoding='utf-8'), None, 0, byref(error))
+        thumbnailURLLen = fn(renderModelName, None, 0, byref(error))
         if thumbnailURLLen == 0:
             return ''
         thumbnailURL = ctypes.create_string_buffer(thumbnailURLLen)
-        fn(bytes(renderModelName, encoding='utf-8'), thumbnailURL, thumbnailURLLen, byref(error))
-        RenderModelError.check_error_value(error.value)
+        fn(renderModelName, thumbnailURL, thumbnailURLLen, byref(error))
+        openvr.error_code.RenderModelError.check_error_value(error.value)
         return bytes(thumbnailURL.value).decode('utf-8')
 
     def getRenderModelOriginalPath(self, renderModelName: str):
@@ -7278,13 +5651,15 @@ class IVRRenderModels(object):
         model.
         """
         fn = self.function_table.getRenderModelOriginalPath
+        if renderModelName is not None:
+            renderModelName = bytes(renderModelName, encoding='utf-8')
         error = EVRRenderModelError()
-        originalPathLen = fn(bytes(renderModelName, encoding='utf-8'), None, 0, byref(error))
+        originalPathLen = fn(renderModelName, None, 0, byref(error))
         if originalPathLen == 0:
             return ''
         originalPath = ctypes.create_string_buffer(originalPathLen)
-        fn(bytes(renderModelName, encoding='utf-8'), originalPath, originalPathLen, byref(error))
-        RenderModelError.check_error_value(error.value)
+        fn(renderModelName, originalPath, originalPathLen, byref(error))
+        openvr.error_code.RenderModelError.check_error_value(error.value)
         return bytes(originalPath.value).decode('utf-8')
 
     def getRenderModelErrorNameFromEnum(self, error):
@@ -7312,7 +5687,7 @@ class IVRExtendedDisplay(object):
         version_key = IVRExtendedDisplay_Version
         if not isInterfaceVersionValid(version_key):
             _checkInitError(VRInitError_Init_InterfaceNotFound)
-        fn_key = b"FnTable:" + version_key
+        fn_key = 'FnTable:' + version_key
         fn_type = IVRExtendedDisplay_FnTable
         fn_table_ptr = cast(getGenericInterface(fn_key), POINTER(fn_type))
         if fn_table_ptr is None:
@@ -7374,7 +5749,7 @@ class IVRTrackedCamera(object):
         version_key = IVRTrackedCamera_Version
         if not isInterfaceVersionValid(version_key):
             _checkInitError(VRInitError_Init_InterfaceNotFound)
-        fn_key = b"FnTable:" + version_key
+        fn_key = 'FnTable:' + version_key
         fn_type = IVRTrackedCamera_FnTable
         fn_table_ptr = cast(getGenericInterface(fn_key), POINTER(fn_type))
         if fn_table_ptr is None:
@@ -7391,8 +5766,8 @@ class IVRTrackedCamera(object):
         """For convenience, same as tracked property request Prop_HasCamera_Bool"""
         fn = self.function_table.hasCamera
         hasCamera = openvr_bool()
-        error_code = fn(deviceIndex, byref(hasCamera))
-        TrackedCameraError.check_error_value(error_code)
+        error = fn(deviceIndex, byref(hasCamera))
+        openvr.error_code.TrackedCameraError.check_error_value(error)
         return hasCamera
 
     def getCameraFrameSize(self, deviceIndex, frameType):
@@ -7401,23 +5776,23 @@ class IVRTrackedCamera(object):
         width = c_uint32()
         height = c_uint32()
         frameBufferSize = c_uint32()
-        error_code = fn(deviceIndex, frameType, byref(width), byref(height), byref(frameBufferSize))
-        TrackedCameraError.check_error_value(error_code)
+        error = fn(deviceIndex, frameType, byref(width), byref(height), byref(frameBufferSize))
+        openvr.error_code.TrackedCameraError.check_error_value(error)
         return width.value, height.value, frameBufferSize.value
 
     def getCameraIntrinsics(self, deviceIndex, cameraIndex, frameType):
         fn = self.function_table.getCameraIntrinsics
         focalLength = HmdVector2_t()
         center = HmdVector2_t()
-        error_code = fn(deviceIndex, cameraIndex, frameType, byref(focalLength), byref(center))
-        TrackedCameraError.check_error_value(error_code)
+        error = fn(deviceIndex, cameraIndex, frameType, byref(focalLength), byref(center))
+        openvr.error_code.TrackedCameraError.check_error_value(error)
         return focalLength, center
 
     def getCameraProjection(self, deviceIndex, cameraIndex, frameType, zNear: float, zFar: float):
         fn = self.function_table.getCameraProjection
         projection = HmdMatrix44_t()
-        error_code = fn(deviceIndex, cameraIndex, frameType, zNear, zFar, byref(projection))
-        TrackedCameraError.check_error_value(error_code)
+        error = fn(deviceIndex, cameraIndex, frameType, zNear, zFar, byref(projection))
+        openvr.error_code.TrackedCameraError.check_error_value(error)
         return projection
 
     def acquireVideoStreamingService(self, deviceIndex):
@@ -7429,14 +5804,14 @@ class IVRTrackedCamera(object):
         """
         fn = self.function_table.acquireVideoStreamingService
         handle = TrackedCameraHandle_t()
-        error_code = fn(deviceIndex, byref(handle))
-        TrackedCameraError.check_error_value(error_code)
+        error = fn(deviceIndex, byref(handle))
+        openvr.error_code.TrackedCameraError.check_error_value(error)
         return handle
 
     def releaseVideoStreamingService(self, trackedCamera) -> None:
         fn = self.function_table.releaseVideoStreamingService
-        error_code = fn(trackedCamera)
-        TrackedCameraError.check_error_value(error_code)
+        error = fn(trackedCamera)
+        openvr.error_code.TrackedCameraError.check_error_value(error)
 
     def getVideoStreamFrameBuffer(self, trackedCamera, frameType, frameBuffer, frameBufferSize):
         """
@@ -7449,8 +5824,8 @@ class IVRTrackedCamera(object):
         fn = self.function_table.getVideoStreamFrameBuffer
         frameHeader = CameraVideoStreamFrameHeader_t()
         frameHeaderSize = sizeof(CameraVideoStreamFrameHeader_t)
-        error_code = fn(trackedCamera, frameType, byref(frameBuffer), frameBufferSize, byref(frameHeader), frameHeaderSize)
-        TrackedCameraError.check_error_value(error_code)
+        error = fn(trackedCamera, frameType, byref(frameBuffer), frameBufferSize, byref(frameHeader), frameHeaderSize)
+        openvr.error_code.TrackedCameraError.check_error_value(error)
         return frameHeader
 
     def getVideoStreamTextureSize(self, deviceIndex, frameType):
@@ -7459,8 +5834,8 @@ class IVRTrackedCamera(object):
         textureBounds = VRTextureBounds_t()
         width = c_uint32()
         height = c_uint32()
-        error_code = fn(deviceIndex, frameType, byref(textureBounds), byref(width), byref(height))
-        TrackedCameraError.check_error_value(error_code)
+        error = fn(deviceIndex, frameType, byref(textureBounds), byref(width), byref(height))
+        openvr.error_code.TrackedCameraError.check_error_value(error)
         return textureBounds, width.value, height.value
 
     def getVideoStreamTextureD3D11(self, trackedCamera, frameType, d3D11DeviceOrResource):
@@ -7476,8 +5851,8 @@ class IVRTrackedCamera(object):
         d3D11ShaderResourceView = c_void_p()
         frameHeader = CameraVideoStreamFrameHeader_t()
         frameHeaderSize = sizeof(CameraVideoStreamFrameHeader_t)
-        error_code = fn(trackedCamera, frameType, byref(d3D11DeviceOrResource), byref(d3D11ShaderResourceView), byref(frameHeader), frameHeaderSize)
-        TrackedCameraError.check_error_value(error_code)
+        error = fn(trackedCamera, frameType, byref(d3D11DeviceOrResource), byref(d3D11ShaderResourceView), byref(frameHeader), frameHeaderSize)
+        openvr.error_code.TrackedCameraError.check_error_value(error)
         return d3D11ShaderResourceView.value, frameHeader
 
     def getVideoStreamTextureGL(self, trackedCamera, frameType):
@@ -7486,14 +5861,14 @@ class IVRTrackedCamera(object):
         textureId = glUInt_t()
         frameHeader = CameraVideoStreamFrameHeader_t()
         frameHeaderSize = sizeof(CameraVideoStreamFrameHeader_t)
-        error_code = fn(trackedCamera, frameType, byref(textureId), byref(frameHeader), frameHeaderSize)
-        TrackedCameraError.check_error_value(error_code)
+        error = fn(trackedCamera, frameType, byref(textureId), byref(frameHeader), frameHeaderSize)
+        openvr.error_code.TrackedCameraError.check_error_value(error)
         return textureId, frameHeader
 
     def releaseVideoStreamTextureGL(self, trackedCamera, textureId) -> None:
         fn = self.function_table.releaseVideoStreamTextureGL
-        error_code = fn(trackedCamera, textureId)
-        TrackedCameraError.check_error_value(error_code)
+        error = fn(trackedCamera, textureId)
+        openvr.error_code.TrackedCameraError.check_error_value(error)
 
 
 class IVRScreenshots_FnTable(Structure):
@@ -7515,7 +5890,7 @@ class IVRScreenshots(object):
         version_key = IVRScreenshots_Version
         if not isInterfaceVersionValid(version_key):
             _checkInitError(VRInitError_Init_InterfaceNotFound)
-        fn_key = b"FnTable:" + version_key
+        fn_key = 'FnTable:' + version_key
         fn_type = IVRScreenshots_FnTable
         fn_table_ptr = cast(getGenericInterface(fn_key), POINTER(fn_type))
         if fn_table_ptr is None:
@@ -7549,7 +5924,7 @@ class IVRScreenshots(object):
         Steam's screenshot library for the running application
         once SubmitScreenshot() is called.
         If Steam is not running, the paths will be in the user's
-        documents folder under Documents\SteamVR\Screenshots.
+        documents folder under Documents\\SteamVR\\Screenshots.
         Other VR applications can call this to initiate a
         screenshot outside of user control.
         The destination file names do not need an extension,
@@ -7558,8 +5933,12 @@ class IVRScreenshots(object):
         """
         fn = self.function_table.requestScreenshot
         outScreenshotHandle = ScreenshotHandle_t()
-        error_code = fn(byref(outScreenshotHandle), type_, bytes(previewFilename, encoding='utf-8'), bytes(vRFilename, encoding='utf-8'))
-        ScreenshotError.check_error_value(error_code)
+        if previewFilename is not None:
+            previewFilename = bytes(previewFilename, encoding='utf-8')
+        if vRFilename is not None:
+            vRFilename = bytes(vRFilename, encoding='utf-8')
+        error = fn(byref(outScreenshotHandle), type_, previewFilename, vRFilename)
+        openvr.error_code.ScreenshotError.check_error_value(error)
         return outScreenshotHandle
 
     def hookScreenshot(self, supportedTypes) -> None:
@@ -7584,8 +5963,8 @@ class IVRScreenshots(object):
             types = 1
             supportedTypes = (EVRScreenshotType * types)()
             supportedTypesArg = byref(supportedTypes[0])
-        error_code = fn(supportedTypesArg, types)
-        ScreenshotError.check_error_value(error_code)
+        error = fn(supportedTypesArg, types)
+        openvr.error_code.ScreenshotError.check_error_value(error)
 
     def getScreenshotPropertyType(self, screenshotHandle):
         """
@@ -7596,7 +5975,7 @@ class IVRScreenshots(object):
         fn = self.function_table.getScreenshotPropertyType
         error = EVRScreenshotError()
         result = fn(screenshotHandle, byref(error))
-        ScreenshotError.check_error_value(error.value)
+        openvr.error_code.ScreenshotError.check_error_value(error.value)
         return result
 
     def getScreenshotPropertyFilename(self, screenshotHandle, filenameType):
@@ -7612,7 +5991,7 @@ class IVRScreenshots(object):
             return ''
         filename = ctypes.create_string_buffer(filename)
         fn(screenshotHandle, filenameType, filename, filename, byref(error))
-        ScreenshotError.check_error_value(error.value)
+        openvr.error_code.ScreenshotError.check_error_value(error.value)
         return bytes(filename.value).decode('utf-8')
 
     def updateScreenshotProgress(self, screenshotHandle, progress: float) -> None:
@@ -7623,8 +6002,8 @@ class IVRScreenshots(object):
         bar.
         """
         fn = self.function_table.updateScreenshotProgress
-        error_code = fn(screenshotHandle, progress)
-        ScreenshotError.check_error_value(error_code)
+        error = fn(screenshotHandle, progress)
+        openvr.error_code.ScreenshotError.check_error_value(error)
 
     def takeStereoScreenshot(self, previewFilename: str, vRFilename: str):
         """
@@ -7638,8 +6017,12 @@ class IVRScreenshots(object):
         """
         fn = self.function_table.takeStereoScreenshot
         outScreenshotHandle = ScreenshotHandle_t()
-        error_code = fn(byref(outScreenshotHandle), bytes(previewFilename, encoding='utf-8'), bytes(vRFilename, encoding='utf-8'))
-        ScreenshotError.check_error_value(error_code)
+        if previewFilename is not None:
+            previewFilename = bytes(previewFilename, encoding='utf-8')
+        if vRFilename is not None:
+            vRFilename = bytes(vRFilename, encoding='utf-8')
+        error = fn(byref(outScreenshotHandle), previewFilename, vRFilename)
+        openvr.error_code.ScreenshotError.check_error_value(error)
         return outScreenshotHandle
 
     def submitScreenshot(self, screenshotHandle, type_, sourcePreviewFilename: str, sourceVRFilename: str) -> None:
@@ -7657,8 +6040,12 @@ class IVRScreenshots(object):
         initiated by a user (achievement earned or something)
         """
         fn = self.function_table.submitScreenshot
-        error_code = fn(screenshotHandle, type_, bytes(sourcePreviewFilename, encoding='utf-8'), bytes(sourceVRFilename, encoding='utf-8'))
-        ScreenshotError.check_error_value(error_code)
+        if sourcePreviewFilename is not None:
+            sourcePreviewFilename = bytes(sourcePreviewFilename, encoding='utf-8')
+        if sourceVRFilename is not None:
+            sourceVRFilename = bytes(sourceVRFilename, encoding='utf-8')
+        error = fn(screenshotHandle, type_, sourcePreviewFilename, sourceVRFilename)
+        openvr.error_code.ScreenshotError.check_error_value(error)
 
 
 class IVRResources_FnTable(Structure):
@@ -7673,7 +6060,7 @@ class IVRResources(object):
         version_key = IVRResources_Version
         if not isInterfaceVersionValid(version_key):
             _checkInitError(VRInitError_Init_InterfaceNotFound)
-        fn_key = b"FnTable:" + version_key
+        fn_key = 'FnTable:' + version_key
         fn_type = IVRResources_FnTable
         fn_table_ptr = cast(getGenericInterface(fn_key), POINTER(fn_type))
         if fn_table_ptr is None:
@@ -7686,8 +6073,10 @@ class IVRResources(object):
         Returns the size in bytes of the buffer required to hold the specified resource.
         """
         fn = self.function_table.loadSharedResource
+        if resourceName is not None:
+            resourceName = bytes(resourceName, encoding='utf-8')
         buffer = c_char()
-        result = fn(bytes(resourceName, encoding='utf-8'), byref(buffer), bufferLen)
+        result = fn(resourceName, byref(buffer), bufferLen)
         return result, buffer.value
 
     def getResourceFullPath(self, resourceName: str, resourceTypeDirectory: str):
@@ -7697,11 +6086,15 @@ class IVRResources(object):
         pchResourceTypeDirectory is the subdirectory of resources to look in.
         """
         fn = self.function_table.getResourceFullPath
-        bufferLen = fn(bytes(resourceName, encoding='utf-8'), bytes(resourceTypeDirectory, encoding='utf-8'), None, 0)
+        if resourceName is not None:
+            resourceName = bytes(resourceName, encoding='utf-8')
+        if resourceTypeDirectory is not None:
+            resourceTypeDirectory = bytes(resourceTypeDirectory, encoding='utf-8')
+        bufferLen = fn(resourceName, resourceTypeDirectory, None, 0)
         if bufferLen == 0:
             return ''
         pathBuffer = ctypes.create_string_buffer(bufferLen)
-        fn(bytes(resourceName, encoding='utf-8'), bytes(resourceTypeDirectory, encoding='utf-8'), pathBuffer, bufferLen)
+        fn(resourceName, resourceTypeDirectory, pathBuffer, bufferLen)
         return bytes(pathBuffer.value).decode('utf-8')
 
 
@@ -7718,7 +6111,7 @@ class IVRDriverManager(object):
         version_key = IVRDriverManager_Version
         if not isInterfaceVersionValid(version_key):
             _checkInitError(VRInitError_Init_InterfaceNotFound)
-        fn_key = b"FnTable:" + version_key
+        fn_key = 'FnTable:' + version_key
         fn_type = IVRDriverManager_FnTable
         fn_table_ptr = cast(getGenericInterface(fn_key), POINTER(fn_type))
         if fn_table_ptr is None:
@@ -7742,7 +6135,9 @@ class IVRDriverManager(object):
 
     def getDriverHandle(self, driverName: str):
         fn = self.function_table.getDriverHandle
-        result = fn(bytes(driverName, encoding='utf-8'))
+        if driverName is not None:
+            driverName = bytes(driverName, encoding='utf-8')
+        result = fn(driverName)
         return result
 
 
@@ -7782,7 +6177,7 @@ class IVRInput(object):
         version_key = IVRInput_Version
         if not isInterfaceVersionValid(version_key):
             _checkInitError(VRInitError_Init_InterfaceNotFound)
-        fn_key = b"FnTable:" + version_key
+        fn_key = 'FnTable:' + version_key
         fn_type = IVRInput_FnTable
         fn_table_ptr = cast(getGenericInterface(fn_key), POINTER(fn_type))
         if fn_table_ptr is None:
@@ -7797,31 +6192,39 @@ class IVRInput(object):
         This call must be made before the first call to UpdateActionState or IVRSystem::PollNextEvent.
         """
         fn = self.function_table.setActionManifestPath
-        error_code = fn(bytes(actionManifestPath, encoding='utf-8'))
-        InputError.check_error_value(error_code)
+        if actionManifestPath is not None:
+            actionManifestPath = bytes(actionManifestPath, encoding='utf-8')
+        error = fn(actionManifestPath)
+        openvr.error_code.InputError.check_error_value(error)
 
     def getActionSetHandle(self, actionSetName: str):
         """Returns a handle for an action set. This handle is used for all performance-sensitive calls."""
         fn = self.function_table.getActionSetHandle
+        if actionSetName is not None:
+            actionSetName = bytes(actionSetName, encoding='utf-8')
         handle = VRActionSetHandle_t()
-        error_code = fn(bytes(actionSetName, encoding='utf-8'), byref(handle))
-        InputError.check_error_value(error_code)
+        error = fn(actionSetName, byref(handle))
+        openvr.error_code.InputError.check_error_value(error)
         return handle.value
 
     def getActionHandle(self, actionName: str):
         """Returns a handle for an action. This handle is used for all performance-sensitive calls."""
         fn = self.function_table.getActionHandle
+        if actionName is not None:
+            actionName = bytes(actionName, encoding='utf-8')
         handle = VRActionHandle_t()
-        error_code = fn(bytes(actionName, encoding='utf-8'), byref(handle))
-        InputError.check_error_value(error_code)
+        error = fn(actionName, byref(handle))
+        openvr.error_code.InputError.check_error_value(error)
         return handle.value
 
     def getInputSourceHandle(self, inputSourcePath: str):
         """Returns a handle for any path in the input system. E.g. /user/hand/right"""
         fn = self.function_table.getInputSourceHandle
+        if inputSourcePath is not None:
+            inputSourcePath = bytes(inputSourcePath, encoding='utf-8')
         handle = VRInputValueHandle_t()
-        error_code = fn(bytes(inputSourcePath, encoding='utf-8'), byref(handle))
-        InputError.check_error_value(error_code)
+        error = fn(inputSourcePath, byref(handle))
+        openvr.error_code.InputError.check_error_value(error)
         return handle.value
 
     def updateActionState(self, sets):
@@ -7841,8 +6244,8 @@ class IVRInput(object):
             sets = (VRActiveActionSet_t * setCount)()
             setsArg = byref(sets[0])
         sizeOfVRSelectedActionSet_t = sizeof(VRActiveActionSet_t)
-        error_code = fn(setsArg, sizeOfVRSelectedActionSet_t, setCount)
-        InputError.check_error_value(error_code)
+        error = fn(setsArg, sizeOfVRSelectedActionSet_t, setCount)
+        openvr.error_code.InputError.check_error_value(error)
         return sets
 
     def getDigitalActionData(self, action, restrictToDevice):
@@ -7853,8 +6256,8 @@ class IVRInput(object):
         fn = self.function_table.getDigitalActionData
         actionData = InputDigitalActionData_t()
         actionDataSize = sizeof(InputDigitalActionData_t)
-        error_code = fn(action, byref(actionData), actionDataSize, restrictToDevice)
-        InputError.check_error_value(error_code)
+        error = fn(action, byref(actionData), actionDataSize, restrictToDevice)
+        openvr.error_code.InputError.check_error_value(error)
         return actionData
 
     def getAnalogActionData(self, action, restrictToDevice):
@@ -7865,8 +6268,8 @@ class IVRInput(object):
         fn = self.function_table.getAnalogActionData
         actionData = InputAnalogActionData_t()
         actionDataSize = sizeof(InputAnalogActionData_t)
-        error_code = fn(action, byref(actionData), actionDataSize, restrictToDevice)
-        InputError.check_error_value(error_code)
+        error = fn(action, byref(actionData), actionDataSize, restrictToDevice)
+        openvr.error_code.InputError.check_error_value(error)
         return actionData
 
     def getPoseActionDataRelativeToNow(self, action, origin, predictedSecondsFromNow: float, restrictToDevice):
@@ -7877,8 +6280,8 @@ class IVRInput(object):
         fn = self.function_table.getPoseActionDataRelativeToNow
         actionData = InputPoseActionData_t()
         actionDataSize = sizeof(InputPoseActionData_t)
-        error_code = fn(action, origin, predictedSecondsFromNow, byref(actionData), actionDataSize, restrictToDevice)
-        InputError.check_error_value(error_code)
+        error = fn(action, origin, predictedSecondsFromNow, byref(actionData), actionDataSize, restrictToDevice)
+        openvr.error_code.InputError.check_error_value(error)
         return actionData
 
     def getPoseActionDataForNextFrame(self, action, origin, restrictToDevice):
@@ -7889,8 +6292,8 @@ class IVRInput(object):
         fn = self.function_table.getPoseActionDataForNextFrame
         actionData = InputPoseActionData_t()
         actionDataSize = sizeof(InputPoseActionData_t)
-        error_code = fn(action, origin, byref(actionData), actionDataSize, restrictToDevice)
-        InputError.check_error_value(error_code)
+        error = fn(action, origin, byref(actionData), actionDataSize, restrictToDevice)
+        openvr.error_code.InputError.check_error_value(error)
         return actionData
 
     def getSkeletalActionData(self, action):
@@ -7898,16 +6301,16 @@ class IVRInput(object):
         fn = self.function_table.getSkeletalActionData
         actionData = InputSkeletalActionData_t()
         actionDataSize = sizeof(InputSkeletalActionData_t)
-        error_code = fn(action, byref(actionData), actionDataSize)
-        InputError.check_error_value(error_code)
+        error = fn(action, byref(actionData), actionDataSize)
+        openvr.error_code.InputError.check_error_value(error)
         return actionData
 
     def getBoneCount(self, action):
         """Reads the number of bones in skeleton associated with the given action"""
         fn = self.function_table.getBoneCount
         boneCount = c_uint32()
-        error_code = fn(action, byref(boneCount))
-        InputError.check_error_value(error_code)
+        error = fn(action, byref(boneCount))
+        openvr.error_code.InputError.check_error_value(error)
         return boneCount.value
 
     def getBoneHierarchy(self, action, parentIndices):
@@ -7923,8 +6326,8 @@ class IVRInput(object):
             indexArayCount = 1
             parentIndices = (BoneIndex_t * indexArayCount)()
             parentIndicesArg = byref(parentIndices[0])
-        error_code = fn(action, parentIndicesArg, indexArayCount)
-        InputError.check_error_value(error_code)
+        error = fn(action, parentIndicesArg, indexArayCount)
+        openvr.error_code.InputError.check_error_value(error)
         return parentIndices
 
     def getBoneName(self, action, boneIndex):
@@ -7934,8 +6337,8 @@ class IVRInput(object):
         if nameBufferSize == 0:
             return ''
         boneName = ctypes.create_string_buffer(nameBufferSize)
-        error_code = fn(action, boneIndex, boneName, nameBufferSize)
-        InputError.check_error_value(error_code)
+        error = fn(action, boneIndex, boneName, nameBufferSize)
+        openvr.error_code.InputError.check_error_value(error)
         return bytes(boneName.value).decode('utf-8')
 
     def getSkeletalReferenceTransforms(self, action, transformSpace, referencePose, transformArray):
@@ -7951,16 +6354,16 @@ class IVRInput(object):
             transformArrayCount = 1
             transformArray = (VRBoneTransform_t * transformArrayCount)()
             transformArrayArg = byref(transformArray[0])
-        error_code = fn(action, transformSpace, referencePose, transformArrayArg, transformArrayCount)
-        InputError.check_error_value(error_code)
+        error = fn(action, transformSpace, referencePose, transformArrayArg, transformArrayCount)
+        openvr.error_code.InputError.check_error_value(error)
         return transformArray
 
     def getSkeletalTrackingLevel(self, action):
         """Reads the level of accuracy to which the controller is able to track the user to recreate a skeletal pose"""
         fn = self.function_table.getSkeletalTrackingLevel
         skeletalTrackingLevel = EVRSkeletalTrackingLevel()
-        error_code = fn(action, byref(skeletalTrackingLevel))
-        InputError.check_error_value(error_code)
+        error = fn(action, byref(skeletalTrackingLevel))
+        openvr.error_code.InputError.check_error_value(error)
         return skeletalTrackingLevel
 
     def getSkeletalBoneData(self, action, transformSpace, motionRange, transformArray):
@@ -7976,16 +6379,16 @@ class IVRInput(object):
             transformArrayCount = 1
             transformArray = (VRBoneTransform_t * transformArrayCount)()
             transformArrayArg = byref(transformArray[0])
-        error_code = fn(action, transformSpace, motionRange, transformArrayArg, transformArrayCount)
-        InputError.check_error_value(error_code)
+        error = fn(action, transformSpace, motionRange, transformArrayArg, transformArrayCount)
+        openvr.error_code.InputError.check_error_value(error)
         return transformArray
 
     def getSkeletalSummaryData(self, action, summaryType):
         """Reads summary information about the current pose of the skeleton associated with the given action."""
         fn = self.function_table.getSkeletalSummaryData
         skeletalSummaryData = VRSkeletalSummaryData_t()
-        error_code = fn(action, summaryType, byref(skeletalSummaryData))
-        InputError.check_error_value(error_code)
+        error = fn(action, summaryType, byref(skeletalSummaryData))
+        openvr.error_code.InputError.check_error_value(error)
         return skeletalSummaryData
 
     def getSkeletalBoneDataCompressed(self, action, motionRange, compressedData, compressedSize):
@@ -7996,8 +6399,8 @@ class IVRInput(object):
         """
         fn = self.function_table.getSkeletalBoneDataCompressed
         requiredCompressedSize = c_uint32()
-        error_code = fn(action, motionRange, byref(compressedData), compressedSize, byref(requiredCompressedSize))
-        InputError.check_error_value(error_code)
+        error = fn(action, motionRange, byref(compressedData), compressedSize, byref(requiredCompressedSize))
+        openvr.error_code.InputError.check_error_value(error)
         return requiredCompressedSize.value
 
     def decompressSkeletalBoneData(self, compressedBuffer, compressedBufferSize, transformSpace, transformArray):
@@ -8013,15 +6416,15 @@ class IVRInput(object):
             transformArrayCount = 1
             transformArray = (VRBoneTransform_t * transformArrayCount)()
             transformArrayArg = byref(transformArray[0])
-        error_code = fn(byref(compressedBuffer), compressedBufferSize, transformSpace, transformArrayArg, transformArrayCount)
-        InputError.check_error_value(error_code)
+        error = fn(byref(compressedBuffer), compressedBufferSize, transformSpace, transformArrayArg, transformArrayCount)
+        openvr.error_code.InputError.check_error_value(error)
         return transformArray
 
     def triggerHapticVibrationAction(self, action, startSecondsFromNow: float, durationSeconds: float, frequency: float, amplitude: float, restrictToDevice) -> None:
         """Triggers a haptic event as described by the specified action"""
         fn = self.function_table.triggerHapticVibrationAction
-        error_code = fn(action, startSecondsFromNow, durationSeconds, frequency, amplitude, restrictToDevice)
-        InputError.check_error_value(error_code)
+        error = fn(action, startSecondsFromNow, durationSeconds, frequency, amplitude, restrictToDevice)
+        openvr.error_code.InputError.check_error_value(error)
 
     def getActionOrigins(self, actionSetHandle, digitalActionHandle, originsOut):
         """Retrieve origin handles for an action"""
@@ -8036,8 +6439,8 @@ class IVRInput(object):
             originOutCount = 1
             originsOut = (VRInputValueHandle_t * originOutCount)()
             originsOutArg = byref(originsOut[0])
-        error_code = fn(actionSetHandle, digitalActionHandle, originsOutArg, originOutCount)
-        InputError.check_error_value(error_code)
+        error = fn(actionSetHandle, digitalActionHandle, originsOutArg, originOutCount)
+        openvr.error_code.InputError.check_error_value(error)
         return originsOut.value
 
     def getOriginLocalizedName(self, origin, stringSectionsToInclude):
@@ -8050,8 +6453,8 @@ class IVRInput(object):
         if nameArraySize == 0:
             return ''
         nameArray = ctypes.create_string_buffer(nameArraySize)
-        error_code = fn(origin, nameArray, nameArraySize, stringSectionsToInclude)
-        InputError.check_error_value(error_code)
+        error = fn(origin, nameArray, nameArraySize, stringSectionsToInclude)
+        openvr.error_code.InputError.check_error_value(error)
         return bytes(nameArray.value).decode('utf-8')
 
     def getOriginTrackedDeviceInfo(self, origin):
@@ -8059,15 +6462,15 @@ class IVRInput(object):
         fn = self.function_table.getOriginTrackedDeviceInfo
         originInfo = InputOriginInfo_t()
         originInfoSize = sizeof(InputOriginInfo_t)
-        error_code = fn(origin, byref(originInfo), originInfoSize)
-        InputError.check_error_value(error_code)
+        error = fn(origin, byref(originInfo), originInfoSize)
+        openvr.error_code.InputError.check_error_value(error)
         return originInfo
 
     def showActionOrigins(self, actionSetHandle, actionHandle) -> None:
         """Shows the current binding for the action in-headset"""
         fn = self.function_table.showActionOrigins
-        error_code = fn(actionSetHandle, actionHandle)
-        InputError.check_error_value(error_code)
+        error = fn(actionSetHandle, actionHandle)
+        openvr.error_code.InputError.check_error_value(error)
 
     def showBindingsForActionSet(self, sets, originToHighlight):
         """Shows the current binding all the actions in the specified action sets"""
@@ -8083,8 +6486,8 @@ class IVRInput(object):
             sets = (VRActiveActionSet_t * setCount)()
             setsArg = byref(sets[0])
         sizeOfVRSelectedActionSet_t = sizeof(VRActiveActionSet_t)
-        error_code = fn(setsArg, sizeOfVRSelectedActionSet_t, setCount, originToHighlight)
-        InputError.check_error_value(error_code)
+        error = fn(setsArg, sizeOfVRSelectedActionSet_t, setCount, originToHighlight)
+        openvr.error_code.InputError.check_error_value(error)
         return sets
 
     def isUsingLegacyInput(self):
@@ -8116,7 +6519,7 @@ class IVRIOBuffer(object):
         version_key = IVRIOBuffer_Version
         if not isInterfaceVersionValid(version_key):
             _checkInitError(VRInitError_Init_InterfaceNotFound)
-        fn_key = b"FnTable:" + version_key
+        fn_key = 'FnTable:' + version_key
         fn_type = IVRIOBuffer_FnTable
         fn_table_ptr = cast(getGenericInterface(fn_key), POINTER(fn_type))
         if fn_table_ptr is None:
@@ -8126,30 +6529,32 @@ class IVRIOBuffer(object):
     def open(self, path: str, mode, elementSize, elements):
         """opens an existing or creates a new IOBuffer of unSize bytes"""
         fn = self.function_table.open
+        if path is not None:
+            path = bytes(path, encoding='utf-8')
         buffer = IOBufferHandle_t()
-        error_code = fn(bytes(path, encoding='utf-8'), mode, elementSize, elements, byref(buffer))
-        IOBufferError.check_error_value(error_code)
+        error = fn(path, mode, elementSize, elements, byref(buffer))
+        openvr.error_code.IOBufferError.check_error_value(error)
         return buffer
 
     def close(self, buffer) -> None:
         """closes a previously opened or created buffer"""
         fn = self.function_table.close
-        error_code = fn(buffer)
-        IOBufferError.check_error_value(error_code)
+        error = fn(buffer)
+        openvr.error_code.IOBufferError.check_error_value(error)
 
     def read(self, buffer, dst, bytes_):
         """reads up to unBytes from buffer into *pDst, returning number of bytes read in *punRead"""
         fn = self.function_table.read
         read = c_uint32()
-        error_code = fn(buffer, byref(dst), bytes_, byref(read))
-        IOBufferError.check_error_value(error_code)
+        error = fn(buffer, byref(dst), bytes_, byref(read))
+        openvr.error_code.IOBufferError.check_error_value(error)
         return read.value
 
     def write(self, buffer, src, bytes_) -> None:
         """writes unBytes of data from *pSrc into a buffer."""
         fn = self.function_table.write
-        error_code = fn(buffer, byref(src), bytes_)
-        IOBufferError.check_error_value(error_code)
+        error = fn(buffer, byref(src), bytes_)
+        openvr.error_code.IOBufferError.check_error_value(error)
 
     def propertyContainer(self, buffer):
         """retrieves the property container of an buffer."""
@@ -8178,7 +6583,7 @@ class IVRSpatialAnchors(object):
         version_key = IVRSpatialAnchors_Version
         if not isInterfaceVersionValid(version_key):
             _checkInitError(VRInitError_Init_InterfaceNotFound)
-        fn_key = b"FnTable:" + version_key
+        fn_key = 'FnTable:' + version_key
         fn_type = IVRSpatialAnchors_FnTable
         fn_table_ptr = cast(getGenericInterface(fn_key), POINTER(fn_type))
         if fn_table_ptr is None:
@@ -8192,9 +6597,11 @@ class IVRSpatialAnchors(object):
         poll GetSpatialAnchorPose() to find the virtual coordinate associated with this anchor.
         """
         fn = self.function_table.createSpatialAnchorFromDescriptor
+        if descriptor is not None:
+            descriptor = bytes(descriptor, encoding='utf-8')
         handleOut = SpatialAnchorHandle_t()
-        error_code = fn(bytes(descriptor, encoding='utf-8'), byref(handleOut))
-        SpatialAnchorError.check_error_value(error_code)
+        error = fn(descriptor, byref(handleOut))
+        openvr.error_code.SpatialAnchorError.check_error_value(error)
         return handleOut.value
 
     def createSpatialAnchorFromPose(self, deviceIndex, origin):
@@ -8216,8 +6623,8 @@ class IVRSpatialAnchors(object):
         fn = self.function_table.createSpatialAnchorFromPose
         pose = SpatialAnchorPose_t()
         handleOut = SpatialAnchorHandle_t()
-        error_code = fn(deviceIndex, origin, byref(pose), byref(handleOut))
-        SpatialAnchorError.check_error_value(error_code)
+        error = fn(deviceIndex, origin, byref(pose), byref(handleOut))
+        openvr.error_code.SpatialAnchorError.check_error_value(error)
         return pose, handleOut.value
 
     def getSpatialAnchorPose(self, handle, origin):
@@ -8227,8 +6634,8 @@ class IVRSpatialAnchors(object):
         """
         fn = self.function_table.getSpatialAnchorPose
         poseOut = SpatialAnchorPose_t()
-        error_code = fn(handle, origin, byref(poseOut))
-        SpatialAnchorError.check_error_value(error_code)
+        error = fn(handle, origin, byref(poseOut))
+        openvr.error_code.SpatialAnchorError.check_error_value(error)
         return poseOut
 
     def getSpatialAnchorDescriptor(self, handle):
@@ -8245,8 +6652,8 @@ class IVRSpatialAnchors(object):
         if descriptorBufferLenInOut == 0:
             return ''
         descriptorOut = ctypes.create_string_buffer(descriptorBufferLenInOut)
-        error_code = fn(handle, descriptorOut, descriptorBufferLenInOut)
-        SpatialAnchorError.check_error_value(error_code)
+        error = fn(handle, descriptorOut, descriptorBufferLenInOut)
+        openvr.error_code.SpatialAnchorError.check_error_value(error)
         return bytes(descriptorOut.value).decode('utf-8')
 
 
@@ -8366,9 +6773,11 @@ def getGenericInterface(interfaceVersion: str):
     pointer returned is valid until VR_Shutdown is called.
     """
     fn = _openvr.VR_GetGenericInterface
+    if interfaceVersion is not None:
+        interfaceVersion = bytes(interfaceVersion, encoding='utf-8')
     error = EVRInitError()
-    result = fn(bytes(interfaceVersion, encoding='utf-8'), byref(error))
-    InitError.check_error_value(error.value)
+    result = fn(interfaceVersion, byref(error))
+    openvr.error_code.InitError.check_error_value(error.value)
     return result
 
 
@@ -8379,7 +6788,9 @@ _openvr.VR_IsInterfaceVersionValid.argtypes = [c_char_p]
 def isInterfaceVersionValid(interfaceVersion: str):
     """Returns whether the interface of the specified version exists."""
     fn = _openvr.VR_IsInterfaceVersionValid
-    result = fn(bytes(interfaceVersion, encoding='utf-8'))
+    if interfaceVersion is not None:
+        interfaceVersion = bytes(interfaceVersion, encoding='utf-8')
+    result = fn(interfaceVersion)
     return result
 
 
@@ -8401,8 +6812,10 @@ _openvr.VR_InitInternal2.argtypes = [POINTER(EVRInitError), EVRApplicationType, 
 def initInternal2(applicationType, startupInfo: str):
     fn = _openvr.VR_InitInternal2
     error = EVRInitError()
-    result = fn(byref(error), applicationType, bytes(startupInfo, encoding='utf-8'))
-    InitError.check_error_value(error.value)
+    if startupInfo is not None:
+        startupInfo = bytes(startupInfo, encoding='utf-8')
+    result = fn(byref(error), applicationType, startupInfo)
+    openvr.error_code.InitError.check_error_value(error.value)
     return result
 
 
@@ -8413,5 +6826,3 @@ _openvr.VR_ShutdownInternal.argtypes = []
 def shutdownInternal() -> None:
     fn = _openvr.VR_ShutdownInternal
     fn()
-
-
