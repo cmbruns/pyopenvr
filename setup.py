@@ -16,7 +16,7 @@ setup(
     url='https://github.com/cmbruns/pyopenvr',
     download_url='https://github.com/cmbruns/pyopenvr/tarball/' + __version__,
     package_dir={'': 'src'},
-    packages=['openvr', 'openvr.glframework'],
+    packages=['openvr', 'openvr.glframework', 'openvr.error_code'],
     package_data={'openvr': ['*.dll', '*.so', '*.dylib']},
     keywords='openvr valve htc vive vr virtual reality 3d graphics',
     license='BSD',
