@@ -24,3 +24,5 @@ for i in range(100):
 openvr.shutdown()
 ```
 
+
+For more advanced usage, consult the example at https://github.com/cmbruns/pyopenvr/blob/master/src/samples/glfw/hellovr_glfw.py, which is a complete faithful translation into python from the original C++ sample at https://github.com/ValveSoftware/openvr/tree/master/samples/hellovr_opengl
