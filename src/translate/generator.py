@@ -364,4 +364,4 @@ def write_version(version, file_out):
 
 if __name__ == '__main__':
     # Increase sub_version for additional python-only releases within a single openvr version
-    main(sub_version=2)
+    main(sub_version=1)

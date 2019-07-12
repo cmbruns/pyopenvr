@@ -1100,6 +1100,14 @@ class InitError_Compositor_CreateLastFrameRenderTexture(InitError):
     pass
 
 
+class InitError_Compositor_CreateMirrorOverlay(InitError):
+    pass
+
+
+class InitError_Compositor_FailedToCreateVirtualDisplayBackbuffer(InitError):
+    pass
+
+
 class InitError_VendorSpecific_UnableToConnectToOculusRuntime(InitError):
     pass
 
@@ -1157,6 +1165,10 @@ class InitError_VendorSpecific_HmdFound_UserDataError(InitError):
 
 
 class InitError_VendorSpecific_HmdFound_ConfigFailedSanityCheck(InitError):
+    pass
+
+
+class InitError_VendorSpecific_OculusRuntimeBadInstall(InitError):
     pass
 
 
@@ -1322,6 +1334,8 @@ InitError.error_index[481] = InitError_Compositor_CreateTextVertexBuffer
 InitError.error_index[482] = InitError_Compositor_CreateTextIndexBuffer
 InitError.error_index[483] = InitError_Compositor_CreateMirrorTextures
 InitError.error_index[484] = InitError_Compositor_CreateLastFrameRenderTexture
+InitError.error_index[485] = InitError_Compositor_CreateMirrorOverlay
+InitError.error_index[486] = InitError_Compositor_FailedToCreateVirtualDisplayBackbuffer
 InitError.error_index[1000] = InitError_VendorSpecific_UnableToConnectToOculusRuntime
 InitError.error_index[1001] = InitError_VendorSpecific_WindowsNotInDevMode
 InitError.error_index[1101] = InitError_VendorSpecific_HmdFound_CantOpenDevice
@@ -1337,6 +1351,7 @@ InitError.error_index[1110] = InitError_VendorSpecific_HmdFound_UnableToGetUserD
 InitError.error_index[1111] = InitError_VendorSpecific_HmdFound_UserDataAddressRange
 InitError.error_index[1112] = InitError_VendorSpecific_HmdFound_UserDataError
 InitError.error_index[1113] = InitError_VendorSpecific_HmdFound_ConfigFailedSanityCheck
+InitError.error_index[1114] = InitError_VendorSpecific_OculusRuntimeBadInstall
 InitError.error_index[2000] = InitError_Steam_SteamInstallationNotFound
 InitError.error_index[2001] = InitError_LastError
 
@@ -1791,3 +1806,19 @@ IOBufferError.error_index[102] = IOBuffer_InvalidArgument
 IOBufferError.error_index[103] = IOBuffer_PathExists
 IOBufferError.error_index[104] = IOBuffer_PathDoesNotExist
 IOBufferError.error_index[105] = IOBuffer_Permission
+
+
+class DebugError(ErrorCode):
+    error_index = dict()
+
+
+class DebugError_Success(DebugError):
+    is_error = False
+
+
+class DebugError_BadParameter(DebugError):
+    pass
+
+
+DebugError.error_index[0] = DebugError_Success
+DebugError.error_index[1] = DebugError_BadParameter

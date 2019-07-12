@@ -1,6 +1,6 @@
 #!/bin/env python
 
-# Unofficial python bindings for OpenVR API version 1.4.18
+# Unofficial python bindings for OpenVR API version 1.5.17
 # from https://github.com/cmbruns/pyopenvr
 # based on OpenVR C++ API at https://github.com/ValveSoftware/openvr
 
@@ -102,8 +102,8 @@ class ID3D12CommandQueue(Structure):
 ####################
 
 k_nSteamVRVersionMajor = 1
-k_nSteamVRVersionMinor = 4
-k_nSteamVRVersionBuild = 18
+k_nSteamVRVersionMinor = 5
+k_nSteamVRVersionBuild = 17
 k_nDriverNone = 0xFFFFFFFF
 k_unMaxDriverDebugResponseSize = 32768
 k_unTrackedDeviceIndex_Hmd = 0
@@ -145,7 +145,7 @@ k_ulOverlayHandleInvalid = 0
 k_unInvalidBoneIndex = -1
 k_unMaxDistortionFunctionParameters = 8
 k_unScreenshotHandleInvalid = 0
-IVRSystem_Version = 'IVRSystem_019'
+IVRSystem_Version = 'IVRSystem_020'
 k_unMaxApplicationKeyLength = 128  # The maximum length of an application key
 k_pch_MimeType_HomeApp = 'vr/home'  # Currently recognized mime types
 k_pch_MimeType_GameTheater = 'vr/game_theater'
@@ -303,6 +303,7 @@ k_pch_Dashboard_UseWebIPD = 'useWebIPD'
 k_pch_Dashboard_UseWebPowerMenu = 'useWebPowerMenu'
 k_pch_modelskin_Section = 'modelskins'
 k_pch_Driver_Enable_Bool = 'enable'
+k_pch_Driver_LoadPriority_Int32 = 'loadPriority'
 k_pch_WebInterface_Section = 'WebInterface'
 k_pch_WebInterface_WebEnable_Bool = 'WebEnable'
 k_pch_WebInterface_WebPort_String = 'WebPort'
@@ -351,11 +352,12 @@ k_unMaxActionNameLength = 64
 k_unMaxActionSetNameLength = 64
 k_unMaxActionOriginCount = 16
 k_unMaxBoneNameLength = 32
-IVRInput_Version = 'IVRInput_006'
+IVRInput_Version = 'IVRInput_007'
 k_ulInvalidIOBufferHandle = 0
 IVRIOBuffer_Version = 'IVRIOBuffer_002'
 k_ulInvalidSpatialAnchorHandle = 0
 IVRSpatialAnchors_Version = 'IVRSpatialAnchors_001'
+IVRDebug_Version = 'IVRDebug_001'
 
 #########################
 # Expose enum constants #
@@ -468,6 +470,7 @@ Prop_Identifiable_Bool = ENUM_VALUE_TYPE(1043)
 Prop_BootloaderVersion_Uint64 = ENUM_VALUE_TYPE(1044)
 Prop_AdditionalSystemReportData_String = ENUM_VALUE_TYPE(1045)
 Prop_CompositeFirmwareVersion_String = ENUM_VALUE_TYPE(1046)
+Prop_Firmware_RemindUpdate_Bool = ENUM_VALUE_TYPE(1047)
 Prop_ReportsTimeSinceVSync_Bool = ENUM_VALUE_TYPE(2000)
 Prop_SecondsFromVsyncToPhotons_Float = ENUM_VALUE_TYPE(2001)
 Prop_DisplayFrequency_Float = ENUM_VALUE_TYPE(2002)
@@ -540,6 +543,8 @@ Prop_CameraWhiteBalance_Vector4_Array = ENUM_VALUE_TYPE(2071)
 Prop_CameraDistortionFunction_Int32_Array = ENUM_VALUE_TYPE(2072)
 Prop_CameraDistortionCoefficients_Float_Array = ENUM_VALUE_TYPE(2073)
 Prop_ExpectedControllerType_String = ENUM_VALUE_TYPE(2074)
+Prop_HmdTrackingStyle_Int32 = ENUM_VALUE_TYPE(2075)
+Prop_DriverProvidedChaperoneVisibility_Bool = ENUM_VALUE_TYPE(2076)
 Prop_DisplayAvailableFrameRates_Float_Array = ENUM_VALUE_TYPE(2080)
 Prop_DisplaySupportsMultipleFramerates_Bool = ENUM_VALUE_TYPE(2081)
 Prop_DashboardLayoutPathName_String = ENUM_VALUE_TYPE(2090)
@@ -610,6 +615,12 @@ TrackedProp_PermissionDenied = ENUM_VALUE_TYPE(10)
 TrackedProp_InvalidOperation = ENUM_VALUE_TYPE(11)
 TrackedProp_CannotWriteToWildcards = ENUM_VALUE_TYPE(12)
 TrackedProp_IPCReadFailure = ENUM_VALUE_TYPE(13)
+
+EHmdTrackingStyle = ENUM_TYPE
+HmdTrackingStyle_Unknown = ENUM_VALUE_TYPE(0)
+HmdTrackingStyle_Lighthouse = ENUM_VALUE_TYPE(1)
+HmdTrackingStyle_OutsideInCameras = ENUM_VALUE_TYPE(2)
+HmdTrackingStyle_InsideOutCameras = ENUM_VALUE_TYPE(3)
 
 EVRSubmitFlags = ENUM_TYPE
 Submit_Default = ENUM_VALUE_TYPE(0)
@@ -843,6 +854,7 @@ ShowUI_ControllerBinding = ENUM_VALUE_TYPE(0)
 ShowUI_ManageTrackers = ENUM_VALUE_TYPE(1)
 ShowUI_Pairing = ENUM_VALUE_TYPE(3)
 ShowUI_Settings = ENUM_VALUE_TYPE(4)
+ShowUI_DebugCommands = ENUM_VALUE_TYPE(5)
 
 EHDCPError = ENUM_TYPE
 HDCPError_None = ENUM_VALUE_TYPE(0)
@@ -1127,6 +1139,8 @@ VRInitError_Compositor_CreateTextVertexBuffer = ENUM_VALUE_TYPE(481)
 VRInitError_Compositor_CreateTextIndexBuffer = ENUM_VALUE_TYPE(482)
 VRInitError_Compositor_CreateMirrorTextures = ENUM_VALUE_TYPE(483)
 VRInitError_Compositor_CreateLastFrameRenderTexture = ENUM_VALUE_TYPE(484)
+VRInitError_Compositor_CreateMirrorOverlay = ENUM_VALUE_TYPE(485)
+VRInitError_Compositor_FailedToCreateVirtualDisplayBackbuffer = ENUM_VALUE_TYPE(486)
 VRInitError_VendorSpecific_UnableToConnectToOculusRuntime = ENUM_VALUE_TYPE(1000)
 VRInitError_VendorSpecific_WindowsNotInDevMode = ENUM_VALUE_TYPE(1001)
 VRInitError_VendorSpecific_HmdFound_CantOpenDevice = ENUM_VALUE_TYPE(1101)
@@ -1142,6 +1156,7 @@ VRInitError_VendorSpecific_HmdFound_UnableToGetUserDataNext = ENUM_VALUE_TYPE(11
 VRInitError_VendorSpecific_HmdFound_UserDataAddressRange = ENUM_VALUE_TYPE(1111)
 VRInitError_VendorSpecific_HmdFound_UserDataError = ENUM_VALUE_TYPE(1112)
 VRInitError_VendorSpecific_HmdFound_ConfigFailedSanityCheck = ENUM_VALUE_TYPE(1113)
+VRInitError_VendorSpecific_OculusRuntimeBadInstall = ENUM_VALUE_TYPE(1114)
 VRInitError_Steam_SteamInstallationNotFound = ENUM_VALUE_TYPE(2000)
 VRInitError_LastError = ENUM_VALUE_TYPE(2001)
 
@@ -1460,6 +1475,10 @@ IOBufferMode_Read = ENUM_VALUE_TYPE(1)
 IOBufferMode_Write = ENUM_VALUE_TYPE(2)
 IOBufferMode_Create = ENUM_VALUE_TYPE(512)
 
+EVRDebugError = ENUM_TYPE
+VRDebugError_Success = ENUM_VALUE_TYPE(0)
+VRDebugError_BadParameter = ENUM_VALUE_TYPE(1)
+
 
 ###################
 # Expose Typedefs #
@@ -1490,6 +1509,7 @@ VRNotificationId = c_uint32
 VRComponentProperties = c_uint32
 TextureID_t = c_int32
 IOBufferHandle_t = c_uint64
+VrProfilerEventHandle_t = c_uint64
 HmdError = EVRInitError
 Hmd_Eye = EVREye
 ColorSpace = EColorSpace
@@ -2358,6 +2378,15 @@ class InputOriginInfo_t(Structure):
     ]
 
 
+class InputBindingInfo_t(Structure):
+    _fields_ = [
+        ("rchDevicePathName", c_char * 128),
+        ("rchInputPathName", c_char * 128),
+        ("rchModeName", c_char * 128),
+        ("rchSlotName", c_char * 128),
+    ]
+
+
 class VRActiveActionSet_t(Structure):
     _fields_ = [
         ("ulActionSet", VRActionSetHandle_t),
@@ -2401,6 +2430,7 @@ class COpenVRContext(object):
         self.m_pVRInput = None
         self.m_pVRIOBuffer = None
         self.m_pVRSpatialAnchors = None
+        self.m_pVRDebug = None
         self.m_pVRNotifications = None
 
     def checkClear(self):
@@ -2426,6 +2456,7 @@ class COpenVRContext(object):
         self.m_pVRInput = None
         self.m_pVRIOBuffer = None
         self.m_pVRSpatialAnchors = None
+        self.m_pVRDebug = None
         self.m_pVRNotifications = None
 
     def VRSystem(self):
@@ -2524,6 +2555,12 @@ class COpenVRContext(object):
             self.m_pVRSpatialAnchors = IVRSpatialAnchors()
         return self.m_pVRSpatialAnchors
 
+    def VRDebug(self):
+        self.checkClear()
+        if self.m_pVRDebug is None:
+            self.m_pVRDebug = IVRDebug()
+        return self.m_pVRDebug
+
     def VRNotifications(self):
         self.checkClear()
         if self.m_pVRNotifications is None:
@@ -2600,6 +2637,10 @@ def VRSpatialAnchors():
     return _internal_module_context.VRSpatialAnchors()
 
 
+def VRDebug():
+    return _internal_module_context.VRDebug()
+
+
 def VRNotifications():
     return _internal_module_context.VRNotifications()
 
@@ -2649,7 +2690,6 @@ class IVRSystem_FnTable(Structure):
         ("isSteamVRDrawingControllers", OPENVR_FNTABLE_CALLTYPE(openvr_bool)),
         ("shouldApplicationPause", OPENVR_FNTABLE_CALLTYPE(openvr_bool)),
         ("shouldApplicationReduceRenderingWork", OPENVR_FNTABLE_CALLTYPE(openvr_bool)),
-        ("driverDebugRequest", OPENVR_FNTABLE_CALLTYPE(c_uint32, TrackedDeviceIndex_t, c_char_p, c_char_p, c_uint32)),
         ("performFirmwareUpdate", OPENVR_FNTABLE_CALLTYPE(EVRFirmwareError, TrackedDeviceIndex_t)),
         ("acknowledgeQuit_Exiting", OPENVR_FNTABLE_CALLTYPE(None)),
         ("acknowledgeQuit_UserPrompt", OPENVR_FNTABLE_CALLTYPE(None)),
@@ -3127,22 +3167,6 @@ class IVRSystem(object):
         fn = self.function_table.shouldApplicationReduceRenderingWork
         result = fn()
         return result
-
-    def driverDebugRequest(self, deviceIndex, request: str):
-        """
-        Sends a request to the driver for the specified device and returns the response. The maximum response size is 32k,
-        but this method can be called with a smaller buffer. If the response exceeds the size of the buffer, it is truncated. 
-        The size of the response including its terminating null is returned.
-        """
-        fn = self.function_table.driverDebugRequest
-        if request is not None:
-            request = bytes(request, encoding='utf-8')
-        responseBufferSize = fn(deviceIndex, request, None, 0)
-        if responseBufferSize == 0:
-            return ''
-        responseBuffer = ctypes.create_string_buffer(responseBufferSize)
-        fn(deviceIndex, request, responseBuffer, responseBufferSize)
-        return bytes(responseBuffer.value).decode('utf-8')
 
     def performFirmwareUpdate(self, deviceIndex) -> None:
         """
@@ -4354,17 +4378,20 @@ class IVRCompositor(object):
         return result
 
     def showMirrorWindow(self) -> None:
-        """Creates a window on the primary monitor to display what is being shown in the headset."""
+        """
+        Opens the headset view (as either a window or docked widget depending on user's preferences) that displays what the user
+        sees in the headset.
+        """
         fn = self.function_table.showMirrorWindow
         fn()
 
     def hideMirrorWindow(self) -> None:
-        """Closes the mirror window."""
+        """Closes the headset view, either as a window or docked widget."""
         fn = self.function_table.hideMirrorWindow
         fn()
 
     def isMirrorWindowVisible(self):
-        """Returns true if the mirror window is shown."""
+        """Returns true if the headset view (either as a window or docked widget) is shown."""
         fn = self.function_table.isMirrorWindowVisible
         result = fn()
         return result
@@ -6103,6 +6130,7 @@ class IVRDriverManager_FnTable(Structure):
         ("getDriverCount", OPENVR_FNTABLE_CALLTYPE(c_uint32)),
         ("getDriverName", OPENVR_FNTABLE_CALLTYPE(c_uint32, DriverId_t, c_char_p, c_uint32)),
         ("getDriverHandle", OPENVR_FNTABLE_CALLTYPE(DriverHandle_t, c_char_p)),
+        ("isEnabled", OPENVR_FNTABLE_CALLTYPE(openvr_bool, DriverId_t)),
     ]
 
 
@@ -6140,6 +6168,11 @@ class IVRDriverManager(object):
         result = fn(driverName)
         return result
 
+    def isEnabled(self, driver):
+        fn = self.function_table.isEnabled
+        result = fn(driver)
+        return result
+
 
 class IVRInput_FnTable(Structure):
     _fields_ = [
@@ -6166,6 +6199,7 @@ class IVRInput_FnTable(Structure):
         ("getActionOrigins", OPENVR_FNTABLE_CALLTYPE(EVRInputError, VRActionSetHandle_t, VRActionHandle_t, POINTER(VRInputValueHandle_t), c_uint32)),
         ("getOriginLocalizedName", OPENVR_FNTABLE_CALLTYPE(EVRInputError, VRInputValueHandle_t, c_char_p, c_uint32, c_int32)),
         ("getOriginTrackedDeviceInfo", OPENVR_FNTABLE_CALLTYPE(EVRInputError, VRInputValueHandle_t, POINTER(InputOriginInfo_t), c_uint32)),
+        ("getActionBindingInfo", OPENVR_FNTABLE_CALLTYPE(EVRInputError, VRActionHandle_t, POINTER(InputBindingInfo_t), c_uint32, c_uint32, POINTER(c_uint32))),
         ("showActionOrigins", OPENVR_FNTABLE_CALLTYPE(EVRInputError, VRActionSetHandle_t, VRActionHandle_t)),
         ("showBindingsForActionSet", OPENVR_FNTABLE_CALLTYPE(EVRInputError, POINTER(VRActiveActionSet_t), c_uint32, c_uint32, VRInputValueHandle_t)),
         ("isUsingLegacyInput", OPENVR_FNTABLE_CALLTYPE(openvr_bool)),
@@ -6466,6 +6500,16 @@ class IVRInput(object):
         openvr.error_code.InputError.check_error_value(error)
         return originInfo
 
+    def getActionBindingInfo(self, action, bindingInfoCount):
+        """Retrieves useful information about the bindings for an action"""
+        fn = self.function_table.getActionBindingInfo
+        originInfo = InputBindingInfo_t()
+        bindingInfoSize = sizeof(InputBindingInfo_t)
+        returnedBindingInfoCount = c_uint32()
+        error = fn(action, byref(originInfo), bindingInfoSize, bindingInfoCount, byref(returnedBindingInfoCount))
+        openvr.error_code.InputError.check_error_value(error)
+        return originInfo, returnedBindingInfoCount.value
+
     def showActionOrigins(self, actionSetHandle, actionHandle) -> None:
         """Shows the current binding for the action in-headset"""
         fn = self.function_table.showActionOrigins
@@ -6655,6 +6699,81 @@ class IVRSpatialAnchors(object):
         error = fn(handle, descriptorOut, descriptorBufferLenInOut)
         openvr.error_code.SpatialAnchorError.check_error_value(error)
         return bytes(descriptorOut.value).decode('utf-8')
+
+
+class IVRDebug_FnTable(Structure):
+    _fields_ = [
+        ("emitVrProfilerEvent", OPENVR_FNTABLE_CALLTYPE(EVRDebugError, c_char_p)),
+        ("beginVrProfilerEvent", OPENVR_FNTABLE_CALLTYPE(EVRDebugError, POINTER(VrProfilerEventHandle_t))),
+        ("finishVrProfilerEvent", OPENVR_FNTABLE_CALLTYPE(EVRDebugError, VrProfilerEventHandle_t, c_char_p)),
+        ("driverDebugRequest", OPENVR_FNTABLE_CALLTYPE(c_uint32, TrackedDeviceIndex_t, c_char_p, c_char_p, c_uint32)),
+    ]
+
+
+class IVRDebug(object):
+    def __init__(self):
+        version_key = IVRDebug_Version
+        if not isInterfaceVersionValid(version_key):
+            _checkInitError(VRInitError_Init_InterfaceNotFound)
+        fn_key = 'FnTable:' + version_key
+        fn_type = IVRDebug_FnTable
+        fn_table_ptr = cast(getGenericInterface(fn_key), POINTER(fn_type))
+        if fn_table_ptr is None:
+            raise OpenVRError("Error retrieving VR API for IVRDebug")
+        self.function_table = fn_table_ptr.contents
+
+    def emitVrProfilerEvent(self, message: str) -> None:
+        """
+        Create a vr profiler discrete event (point)
+        The event will be associated with the message provided in pchMessage, and the current
+        time will be used as the event timestamp.
+        """
+        fn = self.function_table.emitVrProfilerEvent
+        if message is not None:
+            message = bytes(message, encoding='utf-8')
+        error = fn(message)
+        openvr.error_code.DebugError.check_error_value(error)
+
+    def beginVrProfilerEvent(self):
+        """
+        Create an vr profiler duration event (line)
+        The current time will be used as the timestamp for the start of the line.
+        On success, pHandleOut will contain a handle valid for terminating this event.
+        """
+        fn = self.function_table.beginVrProfilerEvent
+        handleOut = VrProfilerEventHandle_t()
+        error = fn(byref(handleOut))
+        openvr.error_code.DebugError.check_error_value(error)
+        return handleOut.value
+
+    def finishVrProfilerEvent(self, handle, message: str) -> None:
+        """
+        Terminate a vr profiler event
+        The event associated with hHandle will be considered completed when this method is called.
+        The current time will be used assocaited to the termination time of the event, and
+        pchMessage will be used as the event title.
+        """
+        fn = self.function_table.finishVrProfilerEvent
+        if message is not None:
+            message = bytes(message, encoding='utf-8')
+        error = fn(handle, message)
+        openvr.error_code.DebugError.check_error_value(error)
+
+    def driverDebugRequest(self, deviceIndex, request: str):
+        """
+        Sends a request to the driver for the specified device and returns the response. The maximum response size is 32k,
+        but this method can be called with a smaller buffer. If the response exceeds the size of the buffer, it is truncated.
+        The size of the response including its terminating null is returned.
+        """
+        fn = self.function_table.driverDebugRequest
+        if request is not None:
+            request = bytes(request, encoding='utf-8')
+        responseBufferSize = fn(deviceIndex, request, None, 0)
+        if responseBufferSize == 0:
+            return ''
+        responseBuffer = ctypes.create_string_buffer(responseBufferSize)
+        fn(deviceIndex, request, responseBuffer, responseBufferSize)
+        return bytes(responseBuffer.value).decode('utf-8')
 
 
 ####################
