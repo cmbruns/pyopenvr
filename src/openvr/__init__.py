@@ -3042,7 +3042,7 @@ class IVRSystem(object):
         of the error enum value for all valid error codes
         """
         fn = self.function_table.getPropErrorNameFromEnum
-        result = fn(error)
+        result = fn(error).decode('utf-8')
         return result
 
     def pollNextEvent(self, event):

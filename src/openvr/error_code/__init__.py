@@ -20,7 +20,11 @@ class ErrorCode(OpenVRError):
         error_class = cls.error_index[int(error_value)]
         if not error_class.is_error:
             return
-        raise error_class(message)
+        raise error_class(error_value, message)
+
+    def __init__(this, error_value, message=''):
+        this.error_value = error_value
+        OpenVRError.__init__(this, message)
 
 
 class TrackedPropertyError(ErrorCode):
