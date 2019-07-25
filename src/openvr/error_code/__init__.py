@@ -23,6 +23,10 @@ class ErrorCode(OpenVRError):
         raise error_class(message)
 
 
+class BufferTooSmallError(ErrorCode):
+    pass
+
+
 class TrackedPropertyError(ErrorCode):
     error_index = dict()
 
@@ -39,7 +43,7 @@ class TrackedProp_WrongDeviceClass(TrackedPropertyError):
     pass
 
 
-class TrackedProp_BufferTooSmall(TrackedPropertyError):
+class TrackedProp_BufferTooSmall(TrackedPropertyError, BufferTooSmallError):
     pass
 
 
@@ -190,7 +194,7 @@ class InputError_NoData(InputError):
     pass
 
 
-class InputError_BufferTooSmall(InputError):
+class InputError_BufferTooSmall(InputError, BufferTooSmallError):
     pass
 
 
@@ -1519,7 +1523,7 @@ class ApplicationError_SteamVRIsExiting(ApplicationError):
     pass
 
 
-class ApplicationError_BufferTooSmall(ApplicationError):
+class ApplicationError_BufferTooSmall(ApplicationError, BufferTooSmallError):
     pass
 
 
@@ -1700,7 +1704,7 @@ class RenderModelError_MultipleTextures(RenderModelError):
     pass
 
 
-class RenderModelError_BufferTooSmall(RenderModelError):
+class RenderModelError_BufferTooSmall(RenderModelError, BufferTooSmallError):
     pass
 
 
@@ -1751,7 +1755,7 @@ class ScreenshotError_NotFound(ScreenshotError):
     pass
 
 
-class ScreenshotError_BufferTooSmall(ScreenshotError):
+class ScreenshotError_BufferTooSmall(ScreenshotError, BufferTooSmallError):
     pass
 
 

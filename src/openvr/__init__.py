@@ -3029,7 +3029,11 @@ class IVRSystem(object):
         fn = self.function_table.getStringTrackedDeviceProperty
         error = ETrackedPropertyError()
         bufferSize = fn(deviceIndex, prop, None, 0, byref(error))
-        if bufferSize == 0:
+        try:
+            openvr.error_code.TrackedPropertyError.check_error_value(error.value)
+        except openvr.error_code.BufferTooSmallError:
+            pass
+        if bufferSize < 2:
             return ''
         value = ctypes.create_string_buffer(bufferSize)
         fn(deviceIndex, prop, value, bufferSize, byref(error))
