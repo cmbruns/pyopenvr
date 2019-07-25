@@ -112,7 +112,8 @@ class WxApp(wx.App):
 			# print ("closing")
 			self.window.Close()
 			sys.exit(0) # In non-debug mode, Frame.Close() does not seem to close the application
-			return		#self.window.Refresh(False)
+			return
+		#self.window.Refresh(False)
 		event.Skip()
 	
 	def run_loop ( self ):

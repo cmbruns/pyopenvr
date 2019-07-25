@@ -110,6 +110,10 @@ class CTypesGenerator(object):
                     if not error_class.is_error:
                         return
                     raise error_class(message)
+            
+            
+            class BufferTooSmallError(ErrorCode):
+                pass
         '''), file=file_out)
         for declaration in declarations:
             if not isinstance(declaration, model.EnumDecl):
