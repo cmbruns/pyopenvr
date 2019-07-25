@@ -109,7 +109,11 @@ class CTypesGenerator(object):
                     error_class = cls.error_index[int(error_value)]
                     if not error_class.is_error:
                         return
-                    raise error_class(message)
+                    raise error_class(error_value, message)
+                    
+                def __init__(this, error_value, message=''):
+                    super().__init__(message)
+                    this.error_value = error_value
             
             
             class BufferTooSmallError(ErrorCode):
@@ -147,16 +151,19 @@ class CTypesGenerator(object):
                     is_error = False
                 if error_name.endswith('_Success'):
                     is_error = False
+                base_classes = f'{error_category}'
+                if error_name.endswith('BufferTooSmall'):
+                    base_classes += ', BufferTooSmallError'
                 if is_error:
                     print(textwrap.dedent(f'''\
                         
-                        class {error_name}({error_category}):
+                        class {error_name}({base_classes}):
                             pass
                     '''), file=file_out)
                 else:
                     print(textwrap.dedent(f'''\
                         
-                        class {error_name}({error_category}):
+                        class {error_name}({base_classes}):
                             is_error = False
                     '''), file=file_out)
             print(index, file=file_out)
