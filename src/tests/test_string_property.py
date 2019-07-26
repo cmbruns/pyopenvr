@@ -10,7 +10,7 @@ class TestStringProperties(unittest.TestCase):
         self.vr_sys = openvr.init(openvr.VRApplication_Other)
 
     def tearDown(self):
-        pass
+        openvr.shutdown()
 
     def get_string_raises(self):
         #  1009 : Prop_ConnectedWirelessDongle_String = [error: TrackedProp_UnknownProperty]
