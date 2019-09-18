@@ -680,6 +680,10 @@ class InitError_Init_FailedForVrMonitor(InitError):
     pass
 
 
+class InitError_Init_PropertyManagerInitFailed(InitError):
+    pass
+
+
 class InitError_Driver_Failed(InitError):
     pass
 
@@ -765,6 +769,14 @@ class InitError_IPC_CompositorInvalidConnectResponse(InitError):
 
 
 class InitError_IPC_ConnectFailedAfterMultipleAttempts(InitError):
+    pass
+
+
+class InitError_IPC_ConnectFailedAfterTargetExited(InitError):
+    pass
+
+
+class InitError_IPC_NamespaceUnavailable(InitError):
     pass
 
 
@@ -1235,6 +1247,7 @@ InitError.error_index[141] = InitError_Init_VRWebHelperStartupFailed
 InitError.error_index[142] = InitError_Init_TrackerManagerInitFailed
 InitError.error_index[143] = InitError_Init_AlreadyRunning
 InitError.error_index[144] = InitError_Init_FailedForVrMonitor
+InitError.error_index[145] = InitError_Init_PropertyManagerInitFailed
 InitError.error_index[200] = InitError_Driver_Failed
 InitError.error_index[201] = InitError_Driver_Unknown
 InitError.error_index[202] = InitError_Driver_HmdUnknown
@@ -1257,6 +1270,8 @@ InitError.error_index[305] = InitError_IPC_Failed
 InitError.error_index[306] = InitError_IPC_CompositorConnectFailed
 InitError.error_index[307] = InitError_IPC_CompositorInvalidConnectResponse
 InitError.error_index[308] = InitError_IPC_ConnectFailedAfterMultipleAttempts
+InitError.error_index[309] = InitError_IPC_ConnectFailedAfterTargetExited
+InitError.error_index[310] = InitError_IPC_NamespaceUnavailable
 InitError.error_index[400] = InitError_Compositor_Failed
 InitError.error_index[401] = InitError_Compositor_D3D11HardwareRequired
 InitError.error_index[402] = InitError_Compositor_FirmwareRequiresUpdate

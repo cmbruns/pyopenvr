@@ -1,6 +1,6 @@
 #!/bin/env python
 
-# Unofficial python bindings for OpenVR API version 1.5.17
+# Unofficial python bindings for OpenVR API version 1.7.15
 # from https://github.com/cmbruns/pyopenvr
 # based on OpenVR C++ API at https://github.com/ValveSoftware/openvr
 
@@ -102,8 +102,8 @@ class ID3D12CommandQueue(Structure):
 ####################
 
 k_nSteamVRVersionMajor = 1
-k_nSteamVRVersionMinor = 5
-k_nSteamVRVersionBuild = 17
+k_nSteamVRVersionMinor = 7
+k_nSteamVRVersionBuild = 15
 k_nDriverNone = 0xFFFFFFFF
 k_unMaxDriverDebugResponseSize = 32768
 k_unTrackedDeviceIndex_Hmd = 0
@@ -145,6 +145,12 @@ k_ulOverlayHandleInvalid = 0
 k_unInvalidBoneIndex = -1
 k_unMaxDistortionFunctionParameters = 8
 k_unScreenshotHandleInvalid = 0
+VRCompositor_ReprojectionReason_Cpu = 0x01  # Compositor frame timing reprojection flags.
+VRCompositor_ReprojectionReason_Gpu = 0x02
+VRCompositor_ReprojectionAsync = 0x04  # This flag indicates the async reprojection mode is active,
+VRCompositor_ReprojectionMotion = 0x08  # This flag indicates whether or not motion smoothing was triggered for this frame
+VRCompositor_PredictionMask = 0x30  # The runtime may predict more than one frame (up to four) ahead if
+VRCompositor_ThrottleMask = 0xC0  # Number of frames the compositor is throttling the application.
 IVRSystem_Version = 'IVRSystem_020'
 k_unMaxApplicationKeyLength = 128  # The maximum length of an application key
 k_pch_MimeType_HomeApp = 'vr/home'  # Currently recognized mime types
@@ -173,7 +179,7 @@ k_pch_SteamVR_ShowStage_Bool = 'showStage'
 k_pch_SteamVR_ActivateMultipleDrivers_Bool = 'activateMultipleDrivers'
 k_pch_SteamVR_UsingSpeakers_Bool = 'usingSpeakers'
 k_pch_SteamVR_SpeakersForwardYawOffsetDegrees_Float = 'speakersForwardYawOffsetDegrees'
-k_pch_SteamVR_BaseStationPowerManagement_Bool = 'basestationPowerManagement'
+k_pch_SteamVR_BaseStationPowerManagement_Int32 = 'basestationPowerManagement'
 k_pch_SteamVR_NeverKillProcesses_Bool = 'neverKillProcesses'
 k_pch_SteamVR_SupersampleScale_Float = 'supersampleScale'
 k_pch_SteamVR_MaxRecommendedResolution_Int32 = 'maxRecommendedResolution'
@@ -181,7 +187,10 @@ k_pch_SteamVR_MotionSmoothing_Bool = 'motionSmoothing'
 k_pch_SteamVR_MotionSmoothingOverride_Int32 = 'motionSmoothingOverride'
 k_pch_SteamVR_ForceFadeOnBadTracking_Bool = 'forceFadeOnBadTracking'
 k_pch_SteamVR_DefaultMirrorView_Int32 = 'mirrorView'
-k_pch_SteamVR_ShowMirrorView_Bool = 'showMirrorView'
+k_pch_SteamVR_ShowLegacyMirrorView_Bool = 'showLegacyMirrorView'
+k_pch_SteamVR_MirrorViewVisibility_Bool = 'showMirrorView'
+k_pch_SteamVR_MirrorViewDisplayMode_Int32 = 'mirrorViewDisplayMode'
+k_pch_SteamVR_MirrorViewEye_Int32 = 'mirrorViewEye'
 k_pch_SteamVR_MirrorViewGeometry_String = 'mirrorViewGeometry'
 k_pch_SteamVR_MirrorViewGeometryMaximized_String = 'mirrorViewGeometryMaximized'
 k_pch_SteamVR_StartMonitorFromAppLaunch = 'startMonitorFromAppLaunch'
@@ -201,13 +210,18 @@ k_pch_SteamVR_ForceWindows32bitVRMonitor = 'forceWindows32BitVRMonitor'
 k_pch_SteamVR_DebugInput = 'debugInput'
 k_pch_SteamVR_DebugInputBinding = 'debugInputBinding'
 k_pch_SteamVR_DoNotFadeToGrid = 'doNotFadeToGrid'
-k_pch_SteamVR_InputBindingUIBlock = 'inputBindingUI'
 k_pch_SteamVR_RenderCameraMode = 'renderCameraMode'
 k_pch_SteamVR_EnableSharedResourceJournaling = 'enableSharedResourceJournaling'
 k_pch_SteamVR_EnableSafeMode = 'enableSafeMode'
 k_pch_SteamVR_PreferredRefreshRate = 'preferredRefreshRate'
 k_pch_SteamVR_LastVersionNotice = 'lastVersionNotice'
 k_pch_SteamVR_LastVersionNoticeDate = 'lastVersionNoticeDate'
+k_pch_SteamVR_HmdDisplayColorGainR_Float = 'hmdDisplayColorGainR'
+k_pch_SteamVR_HmdDisplayColorGainG_Float = 'hmdDisplayColorGainG'
+k_pch_SteamVR_HmdDisplayColorGainB_Float = 'hmdDisplayColorGainB'
+k_pch_SteamVR_CustomIconStyle_String = 'customIconStyle'
+k_pch_SteamVR_CustomOffIconStyle_String = 'customOffIconStyle'
+k_pch_SteamVR_CustomIconForceUpdate_String = 'customIconForceUpdate'
 k_pch_DirectMode_Section = 'direct_mode'
 k_pch_DirectMode_Enable_Bool = 'enable'
 k_pch_DirectMode_Count_Int32 = 'count'
@@ -301,6 +315,7 @@ k_pch_Dashboard_UseWebDashboard = 'useWebDashboard'
 k_pch_Dashboard_UseWebSettings = 'useWebSettings'
 k_pch_Dashboard_UseWebIPD = 'useWebIPD'
 k_pch_Dashboard_UseWebPowerMenu = 'useWebPowerMenu'
+k_pch_Dashboard_UseWebNotifications = 'useWebNotifications'
 k_pch_modelskin_Section = 'modelskins'
 k_pch_Driver_Enable_Bool = 'enable'
 k_pch_Driver_LoadPriority_Int32 = 'loadPriority'
@@ -320,14 +335,12 @@ k_pch_LastKnown_Section = 'LastKnown'
 k_pch_LastKnown_HMDManufacturer_String = 'HMDManufacturer'
 k_pch_LastKnown_HMDModel_String = 'HMDModel'
 k_pch_DismissedWarnings_Section = 'DismissedWarnings'
+k_pch_Input_Section = 'input'
+k_pch_Input_LeftThumbstickRotation_Float = 'leftThumbstickRotation'
+k_pch_Input_RightThumbstickRotation_Float = 'rightThumbstickRotation'
+k_pch_Input_ThumbstickDeadzone_Float = 'thumbstickDeadzone'
 IVRChaperone_Version = 'IVRChaperone_003'
 IVRChaperoneSetup_Version = 'IVRChaperoneSetup_006'
-VRCompositor_ReprojectionReason_Cpu = 0x01
-VRCompositor_ReprojectionReason_Gpu = 0x02
-VRCompositor_ReprojectionAsync = 0x04  # This flag indicates the async reprojection mode is active,
-VRCompositor_ReprojectionMotion = 0x08  # This flag indicates whether or not motion smoothing was triggered for this frame
-VRCompositor_PredictionMask = 0x30  # The runtime may predict more than one frame (up to four) ahead if
-VRCompositor_ThrottleMask = 0xC0  # Number of frames the compositor is throttling the application.
 IVRCompositor_Version = 'IVRCompositor_022'
 k_unNotificationTextMaxSize = 256
 IVRNotifications_Version = 'IVRNotifications_002'
@@ -335,7 +348,7 @@ k_unVROverlayMaxKeyLength = 128  # The maximum length of an overlay key in bytes
 k_unVROverlayMaxNameLength = 128  # The maximum length of an overlay name in bytes, counting the terminating null character.
 k_unMaxOverlayCount = 64  # The maximum number of overlays that can exist in the system at one time.
 k_unMaxOverlayIntersectionMaskPrimitivesCount = 32  # The maximum number of overlay intersection mask primitives per overlay
-IVROverlay_Version = 'IVROverlay_019'
+IVROverlay_Version = 'IVROverlay_020'
 k_pch_Controller_Component_GDC2015 = 'gdc2015'  # Canonical coordinate system of the gdc 2015 wired controller, provided for backwards compatibility
 k_pch_Controller_Component_Base = 'base'  # For controllers with an unambiguous 'base'.
 k_pch_Controller_Component_Tip = 'tip'  # For controllers with an unambiguous 'tip' (used for 'laser-pointing')
@@ -344,7 +357,7 @@ k_pch_Controller_Component_Status = 'status'  # 1:1 aspect ratio status area, wi
 INVALID_TEXTURE_ID = -1
 IVRRenderModels_Version = 'IVRRenderModels_006'
 IVRExtendedDisplay_Version = 'IVRExtendedDisplay_001'
-IVRTrackedCamera_Version = 'IVRTrackedCamera_005'
+IVRTrackedCamera_Version = 'IVRTrackedCamera_006'
 IVRScreenshots_Version = 'IVRScreenshots_001'
 IVRResources_Version = 'IVRResources_001'
 IVRDriverManager_Version = 'IVRDriverManager_001'
@@ -545,8 +558,11 @@ Prop_CameraDistortionCoefficients_Float_Array = ENUM_VALUE_TYPE(2073)
 Prop_ExpectedControllerType_String = ENUM_VALUE_TYPE(2074)
 Prop_HmdTrackingStyle_Int32 = ENUM_VALUE_TYPE(2075)
 Prop_DriverProvidedChaperoneVisibility_Bool = ENUM_VALUE_TYPE(2076)
+Prop_HmdProvidesDisplaySettings_Bool = ENUM_VALUE_TYPE(2077)
 Prop_DisplayAvailableFrameRates_Float_Array = ENUM_VALUE_TYPE(2080)
 Prop_DisplaySupportsMultipleFramerates_Bool = ENUM_VALUE_TYPE(2081)
+Prop_DisplayColorMultLeft_Vector3 = ENUM_VALUE_TYPE(2082)
+Prop_DisplayColorMultRight_Vector3 = ENUM_VALUE_TYPE(2083)
 Prop_DashboardLayoutPathName_String = ENUM_VALUE_TYPE(2090)
 Prop_DriverRequestedMuraCorrectionMode_Int32 = ENUM_VALUE_TYPE(2200)
 Prop_DriverRequestedMuraFeather_InnerLeft_Int32 = ENUM_VALUE_TYPE(2201)
@@ -583,9 +599,11 @@ Prop_NamedIconPathDeviceReadyAlert_String = ENUM_VALUE_TYPE(5005)
 Prop_NamedIconPathDeviceNotReady_String = ENUM_VALUE_TYPE(5006)
 Prop_NamedIconPathDeviceStandby_String = ENUM_VALUE_TYPE(5007)
 Prop_NamedIconPathDeviceAlertLow_String = ENUM_VALUE_TYPE(5008)
+Prop_NamedIconPathDeviceStandbyAlert_String = ENUM_VALUE_TYPE(5009)
 Prop_DisplayHiddenArea_Binary_Start = ENUM_VALUE_TYPE(5100)
 Prop_DisplayHiddenArea_Binary_End = ENUM_VALUE_TYPE(5150)
 Prop_ParentContainer = ENUM_VALUE_TYPE(5151)
+Prop_OverrideContainer_Uint64 = ENUM_VALUE_TYPE(5152)
 Prop_UserConfigPath_String = ENUM_VALUE_TYPE(6000)
 Prop_InstallPath_String = ENUM_VALUE_TYPE(6001)
 Prop_HasDisplayComponent_Bool = ENUM_VALUE_TYPE(6002)
@@ -774,8 +792,6 @@ VREvent_ApplicationMimeTypeLoad = ENUM_VALUE_TYPE(1304)
 VREvent_ApplicationTransitionNewAppLaunchComplete = ENUM_VALUE_TYPE(1305)
 VREvent_ProcessConnected = ENUM_VALUE_TYPE(1306)
 VREvent_ProcessDisconnected = ENUM_VALUE_TYPE(1307)
-VREvent_Compositor_MirrorWindowShown = ENUM_VALUE_TYPE(1400)
-VREvent_Compositor_MirrorWindowHidden = ENUM_VALUE_TYPE(1401)
 VREvent_Compositor_ChaperoneBoundsShown = ENUM_VALUE_TYPE(1410)
 VREvent_Compositor_ChaperoneBoundsHidden = ENUM_VALUE_TYPE(1411)
 VREvent_Compositor_DisplayDisconnected = ENUM_VALUE_TYPE(1412)
@@ -807,6 +823,8 @@ VREvent_SpatialAnchors_DescriptorUpdated = ENUM_VALUE_TYPE(1801)
 VREvent_SpatialAnchors_RequestPoseUpdate = ENUM_VALUE_TYPE(1802)
 VREvent_SpatialAnchors_RequestDescriptorUpdate = ENUM_VALUE_TYPE(1803)
 VREvent_SystemReport_Started = ENUM_VALUE_TYPE(1900)
+VREvent_Monitor_ShowHeadsetView = ENUM_VALUE_TYPE(2000)
+VREvent_Monitor_HideHeadsetView = ENUM_VALUE_TYPE(2001)
 VREvent_VendorSpecific_Reserved_Start = ENUM_VALUE_TYPE(10000)
 VREvent_VendorSpecific_Reserved_End = ENUM_VALUE_TYPE(19999)
 
@@ -1032,6 +1050,7 @@ VRInitError_Init_VRWebHelperStartupFailed = ENUM_VALUE_TYPE(141)
 VRInitError_Init_TrackerManagerInitFailed = ENUM_VALUE_TYPE(142)
 VRInitError_Init_AlreadyRunning = ENUM_VALUE_TYPE(143)
 VRInitError_Init_FailedForVrMonitor = ENUM_VALUE_TYPE(144)
+VRInitError_Init_PropertyManagerInitFailed = ENUM_VALUE_TYPE(145)
 VRInitError_Driver_Failed = ENUM_VALUE_TYPE(200)
 VRInitError_Driver_Unknown = ENUM_VALUE_TYPE(201)
 VRInitError_Driver_HmdUnknown = ENUM_VALUE_TYPE(202)
@@ -1054,6 +1073,8 @@ VRInitError_IPC_Failed = ENUM_VALUE_TYPE(305)
 VRInitError_IPC_CompositorConnectFailed = ENUM_VALUE_TYPE(306)
 VRInitError_IPC_CompositorInvalidConnectResponse = ENUM_VALUE_TYPE(307)
 VRInitError_IPC_ConnectFailedAfterMultipleAttempts = ENUM_VALUE_TYPE(308)
+VRInitError_IPC_ConnectFailedAfterTargetExited = ENUM_VALUE_TYPE(309)
+VRInitError_IPC_NamespaceUnavailable = ENUM_VALUE_TYPE(310)
 VRInitError_Compositor_Failed = ENUM_VALUE_TYPE(400)
 VRInitError_Compositor_D3D11HardwareRequired = ENUM_VALUE_TYPE(401)
 VRInitError_Compositor_FirmwareRequiresUpdate = ENUM_VALUE_TYPE(402)
@@ -1266,6 +1287,7 @@ VRApplicationProperty_IsTemplate_Bool = ENUM_VALUE_TYPE(61)
 VRApplicationProperty_IsInstanced_Bool = ENUM_VALUE_TYPE(62)
 VRApplicationProperty_IsInternal_Bool = ENUM_VALUE_TYPE(63)
 VRApplicationProperty_WantsCompositorPauseInStandby_Bool = ENUM_VALUE_TYPE(64)
+VRApplicationProperty_IsHidden_Bool = ENUM_VALUE_TYPE(65)
 VRApplicationProperty_LastLaunchTime_Uint64 = ENUM_VALUE_TYPE(70)
 
 EVRApplicationTransitionState = ENUM_TYPE
@@ -1345,8 +1367,6 @@ VROverlayTransform_TrackedComponent = ENUM_VALUE_TYPE(3)
 
 VROverlayFlags = ENUM_TYPE
 VROverlayFlags_None = ENUM_VALUE_TYPE(0)
-VROverlayFlags_Curved = ENUM_VALUE_TYPE(1)
-VROverlayFlags_RGSS4X = ENUM_VALUE_TYPE(2)
 VROverlayFlags_NoDashboardTab = ENUM_VALUE_TYPE(3)
 VROverlayFlags_AcceptsGamepadEvents = ENUM_VALUE_TYPE(4)
 VROverlayFlags_ShowGamepadFocus = ENUM_VALUE_TYPE(5)
@@ -1362,6 +1382,8 @@ VROverlayFlags_SortWithNonSceneOverlays = ENUM_VALUE_TYPE(14)
 VROverlayFlags_VisibleInDashboard = ENUM_VALUE_TYPE(15)
 VROverlayFlags_MakeOverlaysInteractiveIfVisible = ENUM_VALUE_TYPE(16)
 VROverlayFlags_SendVRSmoothScrollEvents = ENUM_VALUE_TYPE(17)
+VROverlayFlags_ProtectedContent = ENUM_VALUE_TYPE(18)
+VROverlayFlags_Max = ENUM_VALUE_TYPE(19)
 
 VRMessageOverlayResponse = ENUM_TYPE
 VRMessageOverlayResponse_ButtonPress_0 = ENUM_VALUE_TYPE(0)
@@ -2135,36 +2157,8 @@ class CameraVideoStreamFrameHeader_t(Structure):
         ("nHeight", c_uint32),
         ("nBytesPerPixel", c_uint32),
         ("nFrameSequence", c_uint32),
-        ("standingTrackedDevicePose", TrackedDevicePose_t),
+        ("trackedDevicePose", TrackedDevicePose_t),
         ("ulFrameExposureTime", c_uint64),
-    ]
-
-
-class DriverDirectMode_FrameTiming(Structure):
-    """Frame timing data provided by direct mode drivers."""
-
-    _fields_ = [
-        ("m_nSize", c_uint32),
-        ("m_nNumFramePresents", c_uint32),
-        ("m_nNumMisPresented", c_uint32),
-        ("m_nNumDroppedFrames", c_uint32),
-        ("m_nReprojectionFlags", c_uint32),
-    ]
-
-
-class ImuSample_t(Structure):
-    _fields_ = [
-        ("fSampleTime", c_double),
-        ("vAccel", HmdVector3d_t),
-        ("vGyro", HmdVector3d_t),
-        ("unOffScaleFlags", c_uint32),
-    ]
-
-
-class AppOverrideKeys_t(Structure):
-    _fields_ = [
-        ("pchKey", c_char_p),
-        ("pchValue", c_char_p),
     ]
 
 
@@ -2198,6 +2192,34 @@ class Compositor_FrameTiming(Structure):
         ("m_HmdPose", TrackedDevicePose_t),
         ("m_nNumVSyncsReadyForUse", c_uint32),
         ("m_nNumVSyncsToFirstView", c_uint32),
+    ]
+
+
+class DriverDirectMode_FrameTiming(Structure):
+    """Frame timing data provided by direct mode drivers."""
+
+    _fields_ = [
+        ("m_nSize", c_uint32),
+        ("m_nNumFramePresents", c_uint32),
+        ("m_nNumMisPresented", c_uint32),
+        ("m_nNumDroppedFrames", c_uint32),
+        ("m_nReprojectionFlags", c_uint32),
+    ]
+
+
+class ImuSample_t(Structure):
+    _fields_ = [
+        ("fSampleTime", c_double),
+        ("vAccel", HmdVector3d_t),
+        ("vGyro", HmdVector3d_t),
+        ("unOffScaleFlags", c_uint32),
+    ]
+
+
+class AppOverrideKeys_t(Structure):
+    _fields_ = [
+        ("pchKey", c_char_p),
+        ("pchValue", c_char_p),
     ]
 
 
@@ -2693,6 +2715,8 @@ class IVRSystem_FnTable(Structure):
         ("performFirmwareUpdate", OPENVR_FNTABLE_CALLTYPE(EVRFirmwareError, TrackedDeviceIndex_t)),
         ("acknowledgeQuit_Exiting", OPENVR_FNTABLE_CALLTYPE(None)),
         ("acknowledgeQuit_UserPrompt", OPENVR_FNTABLE_CALLTYPE(None)),
+        ("getAppContainerFilePaths", OPENVR_FNTABLE_CALLTYPE(c_uint32, c_char_p, c_uint32)),
+        ("getRuntimeVersion", OPENVR_FNTABLE_CALLTYPE(c_char_p)),
     ]
 
 
@@ -3198,6 +3222,30 @@ class IVRSystem(object):
         """
         fn = self.function_table.acknowledgeQuit_UserPrompt
         fn()
+
+    def getAppContainerFilePaths(self):
+        """
+        Retrieves a null-terminated, semicolon-delimited list of UTF8 file paths that an application 
+        must have read access to when running inside of an app container. Returns the number of bytes
+        needed to hold the list.
+        """
+        fn = self.function_table.getAppContainerFilePaths
+        bufferSize = fn(None, 0)
+        buffer = ctypes.create_string_buffer(bufferSize)
+        fn(buffer, bufferSize)
+        return bytes(buffer.value).decode('utf-8')
+
+    def getRuntimeVersion(self):
+        """
+        Returns the current version of the SteamVR runtime. The returned string will remain valid until VR_Shutdown is called.
+
+        NOTE: Is it not appropriate to use this version to test for the presence of any SteamVR feature. Only use this version
+        number for logging or showing to a user, and not to try to detect anything at runtime. When appropriate, feature-specific
+        presence information is provided by other APIs.
+        """
+        fn = self.function_table.getRuntimeVersion
+        result = fn()
+        return result.decode('utf-8')
 
 
 class IVRApplications_FnTable(Structure):
@@ -4381,19 +4429,19 @@ class IVRCompositor(object):
 
     def showMirrorWindow(self) -> None:
         """
-        Opens the headset view (as either a window or docked widget depending on user's preferences) that displays what the user
+        DEPRECATED: Opens the headset view (as either a window or docked widget depending on user's preferences) that displays what the user
         sees in the headset.
         """
         fn = self.function_table.showMirrorWindow
         fn()
 
     def hideMirrorWindow(self) -> None:
-        """Closes the headset view, either as a window or docked widget."""
+        """DEPRECATED: Closes the headset view, either as a window or docked widget."""
         fn = self.function_table.hideMirrorWindow
         fn()
 
     def isMirrorWindowVisible(self):
-        """Returns true if the headset view (either as a window or docked widget) is shown."""
+        """DEPRECATED: Returns true if the headset view (either as a window or docked widget) is shown."""
         fn = self.function_table.isMirrorWindowVisible
         result = fn()
         return result
@@ -4600,8 +4648,6 @@ class IVROverlay_FnTable(Structure):
         ("findOverlay", OPENVR_FNTABLE_CALLTYPE(EVROverlayError, c_char_p, POINTER(VROverlayHandle_t))),
         ("createOverlay", OPENVR_FNTABLE_CALLTYPE(EVROverlayError, c_char_p, c_char_p, POINTER(VROverlayHandle_t))),
         ("destroyOverlay", OPENVR_FNTABLE_CALLTYPE(EVROverlayError, VROverlayHandle_t)),
-        ("setHighQualityOverlay", OPENVR_FNTABLE_CALLTYPE(EVROverlayError, VROverlayHandle_t)),
-        ("getHighQualityOverlay", OPENVR_FNTABLE_CALLTYPE(VROverlayHandle_t)),
         ("getOverlayKey", OPENVR_FNTABLE_CALLTYPE(c_uint32, VROverlayHandle_t, c_char_p, c_uint32, POINTER(EVROverlayError))),
         ("getOverlayName", OPENVR_FNTABLE_CALLTYPE(c_uint32, VROverlayHandle_t, c_char_p, c_uint32, POINTER(EVROverlayError))),
         ("setOverlayName", OPENVR_FNTABLE_CALLTYPE(EVROverlayError, VROverlayHandle_t, c_char_p)),
@@ -4724,27 +4770,6 @@ class IVROverlay(object):
         fn = self.function_table.destroyOverlay
         error = fn(overlayHandle)
         openvr.error_code.OverlayError.check_error_value(error)
-
-    def setHighQualityOverlay(self, overlayHandle) -> None:
-        """
-        Specify which overlay to use the high quality render path.  This overlay will be composited in during the distortion pass which
-        results in it drawing on top of everything else, but also at a higher quality as it samples the source texture directly rather than
-        rasterizing into each eye's render texture first.  Because if this, only one of these is supported at any given time.  It is most useful
-        for overlays that are expected to take up most of the user's view (e.g. streaming video).
-        This mode does not support mouse input to your overlay.
-        """
-        fn = self.function_table.setHighQualityOverlay
-        error = fn(overlayHandle)
-        openvr.error_code.OverlayError.check_error_value(error)
-
-    def getHighQualityOverlay(self):
-        """
-        Returns the overlay handle of the current overlay being rendered using the single high quality overlay render path.
-        Otherwise it will return k_ulOverlayHandleInvalid.
-        """
-        fn = self.function_table.getHighQualityOverlay
-        result = fn()
-        return result
 
     def getOverlayKey(self, overlayHandle):
         """
@@ -5770,6 +5795,8 @@ class IVRTrackedCamera_FnTable(Structure):
         ("getVideoStreamTextureD3D11", OPENVR_FNTABLE_CALLTYPE(EVRTrackedCameraError, TrackedCameraHandle_t, EVRTrackedCameraFrameType, c_void_p, POINTER(c_void_p), POINTER(CameraVideoStreamFrameHeader_t), c_uint32)),
         ("getVideoStreamTextureGL", OPENVR_FNTABLE_CALLTYPE(EVRTrackedCameraError, TrackedCameraHandle_t, EVRTrackedCameraFrameType, POINTER(glUInt_t), POINTER(CameraVideoStreamFrameHeader_t), c_uint32)),
         ("releaseVideoStreamTextureGL", OPENVR_FNTABLE_CALLTYPE(EVRTrackedCameraError, TrackedCameraHandle_t, glUInt_t)),
+        ("setCameraTrackingSpace", OPENVR_FNTABLE_CALLTYPE(None, ETrackingUniverseOrigin)),
+        ("getCameraTrackingSpace", OPENVR_FNTABLE_CALLTYPE(ETrackingUniverseOrigin)),
     ]
 
 
@@ -5898,6 +5925,15 @@ class IVRTrackedCamera(object):
         fn = self.function_table.releaseVideoStreamTextureGL
         error = fn(trackedCamera, textureId)
         openvr.error_code.TrackedCameraError.check_error_value(error)
+
+    def setCameraTrackingSpace(self, universe) -> None:
+        fn = self.function_table.setCameraTrackingSpace
+        fn(universe)
+
+    def getCameraTrackingSpace(self):
+        fn = self.function_table.getCameraTrackingSpace
+        result = fn()
+        return result
 
 
 class IVRScreenshots_FnTable(Structure):
