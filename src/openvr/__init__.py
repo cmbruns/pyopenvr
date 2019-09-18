@@ -3029,8 +3029,10 @@ class IVRSystem(object):
         fn = self.function_table.getStringTrackedDeviceProperty
         error = ETrackedPropertyError()
         bufferSize = fn(deviceIndex, prop, None, 0, byref(error))
-        if bufferSize == 0:
-            return ''
+        try:
+            openvr.error_code.TrackedPropertyError.check_error_value(error.value)
+        except openvr.error_code.BufferTooSmallError:
+            pass
         value = ctypes.create_string_buffer(bufferSize)
         fn(deviceIndex, prop, value, bufferSize, byref(error))
         openvr.error_code.TrackedPropertyError.check_error_value(error.value)
@@ -3043,7 +3045,7 @@ class IVRSystem(object):
         """
         fn = self.function_table.getPropErrorNameFromEnum
         result = fn(error)
-        return result
+        return result.decode('utf-8')
 
     def pollNextEvent(self, event):
         """
@@ -3072,7 +3074,7 @@ class IVRSystem(object):
         """returns the name of an EVREvent enum value"""
         fn = self.function_table.getEventTypeNameFromEnum
         result = fn(type_)
-        return result
+        return result.decode('utf-8')
 
     def getHiddenAreaMesh(self, eye, type_=k_eHiddenAreaMesh_Standard):
         """
@@ -3124,13 +3126,13 @@ class IVRSystem(object):
         """returns the name of an EVRButtonId enum value. This function is deprecated in favor of the new IVRInput system."""
         fn = self.function_table.getButtonIdNameFromEnum
         result = fn(buttonId)
-        return result
+        return result.decode('utf-8')
 
     def getControllerAxisTypeNameFromEnum(self, axisType):
         """returns the name of an EVRControllerAxisType enum value. This function is deprecated in favor of the new IVRInput system."""
         fn = self.function_table.getControllerAxisTypeNameFromEnum
         result = fn(axisType)
-        return result
+        return result.decode('utf-8')
 
     def isInputAvailable(self):
         """
@@ -3287,8 +3289,10 @@ class IVRApplications(object):
         """
         fn = self.function_table.getApplicationKeyByIndex
         appKeyBufferLen = fn(applicationIndex, None, 0)
-        if appKeyBufferLen == 0:
-            return ''
+        try:
+            openvr.error_code.ApplicationError.check_error_value(error.value)
+        except openvr.error_code.BufferTooSmallError:
+            pass
         appKeyBuffer = ctypes.create_string_buffer(appKeyBufferLen)
         error = fn(applicationIndex, appKeyBuffer, appKeyBufferLen)
         openvr.error_code.ApplicationError.check_error_value(error)
@@ -3301,8 +3305,10 @@ class IVRApplications(object):
         """
         fn = self.function_table.getApplicationKeyByProcessId
         appKeyBufferLen = fn(processId, None, 0)
-        if appKeyBufferLen == 0:
-            return ''
+        try:
+            openvr.error_code.ApplicationError.check_error_value(error.value)
+        except openvr.error_code.BufferTooSmallError:
+            pass
         appKeyBuffer = ctypes.create_string_buffer(appKeyBufferLen)
         error = fn(processId, appKeyBuffer, appKeyBufferLen)
         openvr.error_code.ApplicationError.check_error_value(error)
@@ -3396,7 +3402,7 @@ class IVRApplications(object):
         """Returns a string for an applications error"""
         fn = self.function_table.getApplicationsErrorNameFromEnum
         result = fn(error)
-        return result
+        return result.decode('utf-8')
 
     def getApplicationPropertyString(self, appKey: str, property_):
         """Returns a value for an application property. The required buffer size to fit this value will be returned."""
@@ -3405,8 +3411,10 @@ class IVRApplications(object):
             appKey = bytes(appKey, encoding='utf-8')
         error = EVRApplicationError()
         propertyValueBufferLen = fn(appKey, property_, None, 0, byref(error))
-        if propertyValueBufferLen == 0:
-            return ''
+        try:
+            openvr.error_code.ApplicationError.check_error_value(error.value)
+        except openvr.error_code.BufferTooSmallError:
+            pass
         propertyValueBuffer = ctypes.create_string_buffer(propertyValueBufferLen)
         fn(appKey, property_, propertyValueBuffer, propertyValueBufferLen, byref(error))
         openvr.error_code.ApplicationError.check_error_value(error.value)
@@ -3464,8 +3472,6 @@ class IVRApplications(object):
         if mimeType is not None:
             mimeType = bytes(mimeType, encoding='utf-8')
         appKeyBufferLen = fn(mimeType, None, 0)
-        if appKeyBufferLen == 0:
-            return ''
         appKeyBuffer = ctypes.create_string_buffer(appKeyBufferLen)
         fn(mimeType, appKeyBuffer, appKeyBufferLen)
         return bytes(appKeyBuffer.value).decode('utf-8')
@@ -3476,8 +3482,6 @@ class IVRApplications(object):
         if appKey is not None:
             appKey = bytes(appKey, encoding='utf-8')
         mimeTypesBuffer = fn(appKey, None, 0)
-        if mimeTypesBuffer == 0:
-            return ''
         mimeTypesBuffer = ctypes.create_string_buffer(mimeTypesBuffer)
         fn(appKey, mimeTypesBuffer, mimeTypesBuffer)
         return bytes(mimeTypesBuffer.value).decode('utf-8')
@@ -3488,8 +3492,6 @@ class IVRApplications(object):
         if mimeType is not None:
             mimeType = bytes(mimeType, encoding='utf-8')
         appKeysThatSupportBuffer = fn(mimeType, None, 0)
-        if appKeysThatSupportBuffer == 0:
-            return ''
         appKeysThatSupportBuffer = ctypes.create_string_buffer(appKeysThatSupportBuffer)
         fn(mimeType, appKeysThatSupportBuffer, appKeysThatSupportBuffer)
         return bytes(appKeysThatSupportBuffer.value).decode('utf-8')
@@ -3498,8 +3500,6 @@ class IVRApplications(object):
         """Get the args list from an app launch that had the process already running, you call this when you get a VREvent_ApplicationMimeTypeLoad"""
         fn = self.function_table.getApplicationLaunchArguments
         args = fn(handle, None, 0)
-        if args == 0:
-            return ''
         args = ctypes.create_string_buffer(args)
         fn(handle, args, args)
         return bytes(args.value).decode('utf-8')
@@ -3508,8 +3508,10 @@ class IVRApplications(object):
         """Returns the app key for the application that is starting up"""
         fn = self.function_table.getStartingApplication
         appKeyBufferLen = fn(None, 0)
-        if appKeyBufferLen == 0:
-            return ''
+        try:
+            openvr.error_code.ApplicationError.check_error_value(error.value)
+        except openvr.error_code.BufferTooSmallError:
+            pass
         appKeyBuffer = ctypes.create_string_buffer(appKeyBufferLen)
         error = fn(appKeyBuffer, appKeyBufferLen)
         openvr.error_code.ApplicationError.check_error_value(error)
@@ -3542,7 +3544,7 @@ class IVRApplications(object):
         """Returns a string for an application transition state"""
         fn = self.function_table.getApplicationsTransitionStateNameFromEnum
         result = fn(state)
-        return result
+        return result.decode('utf-8')
 
     def isQuitUserPromptRequested(self):
         """Returns true if the outgoing scene app has requested a save prompt before exiting"""
@@ -3611,7 +3613,7 @@ class IVRSettings(object):
     def getSettingsErrorNameFromEnum(self, error):
         fn = self.function_table.getSettingsErrorNameFromEnum
         result = fn(error)
-        return result
+        return result.decode('utf-8')
 
     def sync(self, force=False):
         """Returns true if file sync occurred (force or settings dirty)"""
@@ -3708,8 +3710,10 @@ class IVRSettings(object):
             settingsKey = bytes(settingsKey, encoding='utf-8')
         error = EVRSettingsError()
         valueLen = fn(section, settingsKey, None, 0, byref(error))
-        if valueLen == 0:
-            return ''
+        try:
+            openvr.error_code.SettingsError.check_error_value(error.value)
+        except openvr.error_code.BufferTooSmallError:
+            pass
         value = ctypes.create_string_buffer(valueLen)
         fn(section, settingsKey, value, valueLen, byref(error))
         openvr.error_code.SettingsError.check_error_value(error.value)
@@ -4009,8 +4013,6 @@ class IVRChaperoneSetup(object):
     def exportLiveToBuffer(self):
         fn = self.function_table.exportLiveToBuffer
         bufferLength = fn(None, 0)
-        if bufferLength == 0:
-            return ''
         buffer = ctypes.create_string_buffer(bufferLength)
         fn(buffer, bufferLength)
         return bytes(buffer.value).decode('utf-8')
@@ -4467,8 +4469,6 @@ class IVRCompositor(object):
         """
         fn = self.function_table.getVulkanInstanceExtensionsRequired
         bufferSize = fn(None, 0)
-        if bufferSize == 0:
-            return ''
         value = ctypes.create_string_buffer(bufferSize)
         fn(value, bufferSize)
         return bytes(value.value).decode('utf-8')
@@ -4482,8 +4482,6 @@ class IVRCompositor(object):
         fn = self.function_table.getVulkanDeviceExtensionsRequired
         physicalDevice = VkPhysicalDevice_T()
         bufferSize = fn(byref(physicalDevice), None, 0)
-        if bufferSize == 0:
-            return ''
         value = ctypes.create_string_buffer(bufferSize)
         fn(byref(physicalDevice), value, bufferSize)
         return physicalDevice, bytes(value.value).decode('utf-8')
@@ -4756,8 +4754,10 @@ class IVROverlay(object):
         fn = self.function_table.getOverlayKey
         error = EVROverlayError()
         bufferSize = fn(overlayHandle, None, 0, byref(error))
-        if bufferSize == 0:
-            return ''
+        try:
+            openvr.error_code.OverlayError.check_error_value(error.value)
+        except openvr.error_code.BufferTooSmallError:
+            pass
         value = ctypes.create_string_buffer(bufferSize)
         fn(overlayHandle, value, bufferSize, byref(error))
         openvr.error_code.OverlayError.check_error_value(error.value)
@@ -4771,8 +4771,10 @@ class IVROverlay(object):
         fn = self.function_table.getOverlayName
         error = EVROverlayError()
         bufferSize = fn(overlayHandle, None, 0, byref(error))
-        if bufferSize == 0:
-            return ''
+        try:
+            openvr.error_code.OverlayError.check_error_value(error.value)
+        except openvr.error_code.BufferTooSmallError:
+            pass
         value = ctypes.create_string_buffer(bufferSize)
         fn(overlayHandle, value, bufferSize, byref(error))
         openvr.error_code.OverlayError.check_error_value(error.value)
@@ -4805,7 +4807,7 @@ class IVROverlay(object):
         """
         fn = self.function_table.getOverlayErrorNameFromEnum
         result = fn(error)
-        return result
+        return result.decode('utf-8')
 
     def setOverlayRenderingPid(self, overlayHandle, pID) -> None:
         """
@@ -4978,8 +4980,10 @@ class IVROverlay(object):
         color = HmdColor_t()
         error = EVROverlayError()
         bufferSize = fn(overlayHandle, None, 0, byref(color), byref(error))
-        if bufferSize == 0:
-            return ''
+        try:
+            openvr.error_code.OverlayError.check_error_value(error.value)
+        except openvr.error_code.BufferTooSmallError:
+            pass
         value = ctypes.create_string_buffer(bufferSize)
         fn(overlayHandle, value, bufferSize, byref(color), byref(error))
         openvr.error_code.OverlayError.check_error_value(error.value)
@@ -5050,8 +5054,10 @@ class IVROverlay(object):
         fn = self.function_table.getOverlayTransformTrackedDeviceComponent
         deviceIndex = TrackedDeviceIndex_t()
         componentNameSize = fn(overlayHandle, byref(deviceIndex), None, 0)
-        if componentNameSize == 0:
-            return ''
+        try:
+            openvr.error_code.OverlayError.check_error_value(error.value)
+        except openvr.error_code.BufferTooSmallError:
+            pass
         componentName = ctypes.create_string_buffer(componentNameSize)
         error = fn(overlayHandle, byref(deviceIndex), componentName, componentNameSize)
         openvr.error_code.OverlayError.check_error_value(error)
@@ -5361,8 +5367,6 @@ class IVROverlay(object):
         """Get the text that was entered into the text input"""
         fn = self.function_table.getKeyboardText
         text = fn(None, 0)
-        if text == 0:
-            return ''
         text = ctypes.create_string_buffer(text)
         fn(text, text)
         return bytes(text.value).decode('utf-8')
@@ -5539,8 +5543,6 @@ class IVRRenderModels(object):
         """
         fn = self.function_table.getRenderModelName
         renderModelNameLen = fn(renderModelIndex, None, 0)
-        if renderModelNameLen == 0:
-            return ''
         renderModelName = ctypes.create_string_buffer(renderModelNameLen)
         fn(renderModelIndex, renderModelName, renderModelNameLen)
         return bytes(renderModelName.value).decode('utf-8')
@@ -5577,8 +5579,6 @@ class IVRRenderModels(object):
         if renderModelName is not None:
             renderModelName = bytes(renderModelName, encoding='utf-8')
         componentNameLen = fn(renderModelName, componentIndex, None, 0)
-        if componentNameLen == 0:
-            return ''
         componentName = ctypes.create_string_buffer(componentNameLen)
         fn(renderModelName, componentIndex, componentName, componentNameLen)
         return bytes(componentName.value).decode('utf-8')
@@ -5610,8 +5610,6 @@ class IVRRenderModels(object):
         if componentName is not None:
             componentName = bytes(componentName, encoding='utf-8')
         componentRenderModelNameLen = fn(renderModelName, componentName, None, 0)
-        if componentRenderModelNameLen == 0:
-            return ''
         componentRenderModelName = ctypes.create_string_buffer(componentRenderModelNameLen)
         fn(renderModelName, componentName, componentRenderModelName, componentRenderModelNameLen)
         return bytes(componentRenderModelName.value).decode('utf-8')
@@ -5664,8 +5662,10 @@ class IVRRenderModels(object):
             renderModelName = bytes(renderModelName, encoding='utf-8')
         error = EVRRenderModelError()
         thumbnailURLLen = fn(renderModelName, None, 0, byref(error))
-        if thumbnailURLLen == 0:
-            return ''
+        try:
+            openvr.error_code.RenderModelError.check_error_value(error.value)
+        except openvr.error_code.BufferTooSmallError:
+            pass
         thumbnailURL = ctypes.create_string_buffer(thumbnailURLLen)
         fn(renderModelName, thumbnailURL, thumbnailURLLen, byref(error))
         openvr.error_code.RenderModelError.check_error_value(error.value)
@@ -5682,8 +5682,10 @@ class IVRRenderModels(object):
             renderModelName = bytes(renderModelName, encoding='utf-8')
         error = EVRRenderModelError()
         originalPathLen = fn(renderModelName, None, 0, byref(error))
-        if originalPathLen == 0:
-            return ''
+        try:
+            openvr.error_code.RenderModelError.check_error_value(error.value)
+        except openvr.error_code.BufferTooSmallError:
+            pass
         originalPath = ctypes.create_string_buffer(originalPathLen)
         fn(renderModelName, originalPath, originalPathLen, byref(error))
         openvr.error_code.RenderModelError.check_error_value(error.value)
@@ -5693,7 +5695,7 @@ class IVRRenderModels(object):
         """Returns a string for a render model error"""
         fn = self.function_table.getRenderModelErrorNameFromEnum
         result = fn(error)
-        return result
+        return result.decode('utf-8')
 
 
 class IVRExtendedDisplay_FnTable(Structure):
@@ -5787,7 +5789,7 @@ class IVRTrackedCamera(object):
         """Returns a string for an error"""
         fn = self.function_table.getCameraErrorNameFromEnum
         result = fn(cameraError)
-        return result
+        return result.decode('utf-8')
 
     def hasCamera(self, deviceIndex):
         """For convenience, same as tracked property request Prop_HasCamera_Bool"""
@@ -6014,8 +6016,10 @@ class IVRScreenshots(object):
         fn = self.function_table.getScreenshotPropertyFilename
         error = EVRScreenshotError()
         filename = fn(screenshotHandle, filenameType, None, 0, byref(error))
-        if filename == 0:
-            return ''
+        try:
+            openvr.error_code.ScreenshotError.check_error_value(error.value)
+        except openvr.error_code.BufferTooSmallError:
+            pass
         filename = ctypes.create_string_buffer(filename)
         fn(screenshotHandle, filenameType, filename, filename, byref(error))
         openvr.error_code.ScreenshotError.check_error_value(error.value)
@@ -6118,8 +6122,6 @@ class IVRResources(object):
         if resourceTypeDirectory is not None:
             resourceTypeDirectory = bytes(resourceTypeDirectory, encoding='utf-8')
         bufferLen = fn(resourceName, resourceTypeDirectory, None, 0)
-        if bufferLen == 0:
-            return ''
         pathBuffer = ctypes.create_string_buffer(bufferLen)
         fn(resourceName, resourceTypeDirectory, pathBuffer, bufferLen)
         return bytes(pathBuffer.value).decode('utf-8')
@@ -6155,8 +6157,6 @@ class IVRDriverManager(object):
         """Returns the length of the number of bytes necessary to hold this string including the trailing null."""
         fn = self.function_table.getDriverName
         bufferSize = fn(driver, None, 0)
-        if bufferSize == 0:
-            return ''
         value = ctypes.create_string_buffer(bufferSize)
         fn(driver, value, bufferSize)
         return bytes(value.value).decode('utf-8')
@@ -6368,8 +6368,10 @@ class IVRInput(object):
         """Fills the given buffer with the name of the bone at the given index in the skeleton associated with the given action"""
         fn = self.function_table.getBoneName
         nameBufferSize = fn(action, boneIndex, None, 0)
-        if nameBufferSize == 0:
-            return ''
+        try:
+            openvr.error_code.InputError.check_error_value(error.value)
+        except openvr.error_code.BufferTooSmallError:
+            pass
         boneName = ctypes.create_string_buffer(nameBufferSize)
         error = fn(action, boneIndex, boneName, nameBufferSize)
         openvr.error_code.InputError.check_error_value(error)
@@ -6484,8 +6486,10 @@ class IVRInput(object):
         """
         fn = self.function_table.getOriginLocalizedName
         nameArraySize = fn(origin, None, 0, stringSectionsToInclude)
-        if nameArraySize == 0:
-            return ''
+        try:
+            openvr.error_code.InputError.check_error_value(error.value)
+        except openvr.error_code.BufferTooSmallError:
+            pass
         nameArray = ctypes.create_string_buffer(nameArraySize)
         error = fn(origin, nameArray, nameArraySize, stringSectionsToInclude)
         openvr.error_code.InputError.check_error_value(error)
@@ -6693,8 +6697,10 @@ class IVRSpatialAnchors(object):
         """
         fn = self.function_table.getSpatialAnchorDescriptor
         descriptorBufferLenInOut = fn(handle, None, 0)
-        if descriptorBufferLenInOut == 0:
-            return ''
+        try:
+            openvr.error_code.SpatialAnchorError.check_error_value(error.value)
+        except openvr.error_code.BufferTooSmallError:
+            pass
         descriptorOut = ctypes.create_string_buffer(descriptorBufferLenInOut)
         error = fn(handle, descriptorOut, descriptorBufferLenInOut)
         openvr.error_code.SpatialAnchorError.check_error_value(error)
@@ -6769,8 +6775,6 @@ class IVRDebug(object):
         if request is not None:
             request = bytes(request, encoding='utf-8')
         responseBufferSize = fn(deviceIndex, request, None, 0)
-        if responseBufferSize == 0:
-            return ''
         responseBuffer = ctypes.create_string_buffer(responseBufferSize)
         fn(deviceIndex, request, responseBuffer, responseBufferSize)
         return bytes(responseBuffer.value).decode('utf-8')
@@ -6850,8 +6854,6 @@ def getRuntimePath():
     pathBuffer = ctypes.create_string_buffer(1)
     fn(pathBuffer, 1, byref(requiredBufferSize))
     bufferSize = requiredBufferSize.value
-    if bufferSize == 0:
-        return ''
     pathBuffer = ctypes.create_string_buffer(bufferSize)
     fn(pathBuffer, bufferSize, byref(requiredBufferSize))
     return bytes(pathBuffer.value).decode('utf-8')
@@ -6865,7 +6867,7 @@ def getVRInitErrorAsSymbol(error):
     """Returns the name of the enum value for an EVRInitError. This function may be called outside of VR_Init()/VR_Shutdown()."""
     fn = _openvr.VR_GetVRInitErrorAsSymbol
     result = fn(error)
-    return result
+    return result.decode('utf-8')
 
 
 _openvr.VR_GetVRInitErrorAsEnglishDescription.restype = c_char_p
@@ -6879,7 +6881,7 @@ def getVRInitErrorAsEnglishDescription(error):
     """
     fn = _openvr.VR_GetVRInitErrorAsEnglishDescription
     result = fn(error)
-    return result
+    return result.decode('utf-8')
 
 
 _openvr.VR_GetGenericInterface.restype = c_void_p

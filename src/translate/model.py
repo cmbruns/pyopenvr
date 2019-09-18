@@ -52,7 +52,10 @@ class FunctionBase(Declaration):
         call_params = []
         out_params = []
         if self.has_return() and not self.raise_error_code():
-            out_params.append('result')
+            param = 'result'
+            if self.returns_const_string():
+                param = f"{param}.decode('utf-8')"
+            out_params.append(param)
         pre_call_statements = ''
         post_call_statements = ''
         for p in self.parameters:
@@ -96,16 +99,32 @@ class FunctionBase(Declaration):
                 if length_is_retval:
                     pre_call_statements += textwrap.dedent(f'''\
                         {len_param.py_name} = fn({param_list})
-                        if {len_param.py_name} == 0:
-                            return ''
+                    ''')
+                    error_category = None
+                    error_param_name = 'error'
+                    if self.raise_error_code():
+                        error_category = translate_error_category(self.type)
+                    else:
+                        for p2 in self.parameters:
+                            if p2.is_error():
+                                assert p2.type.kind == TypeKind.POINTER
+                                pt = p2.type.get_pointee()
+                                error_category = translate_error_category(pt)
+                                break
+                    if error_category is not None:
+                        pre_call_statements += textwrap.dedent(f'''\
+                            try:
+                                {error_category}.check_error_value(error.value)
+                            except openvr.error_code.BufferTooSmallError:
+                                pass
+                        ''')
+                    pre_call_statements += textwrap.dedent(f'''\
                         {p.py_name} = ctypes.create_string_buffer({len_param.py_name})
                     ''')
                 else:  # getRuntimePath()
                     pre_call_statements += textwrap.dedent(f'''\
                         fn({param_list})
                         {len_param.py_name} = {required_len_param.py_name}.value
-                        if {len_param.py_name} == 0:
-                            return ''
                         {p.py_name} = ctypes.create_string_buffer({len_param.py_name})
                     ''')
         param_list1 = ', '.join(in_params)
@@ -158,6 +177,14 @@ class FunctionBase(Declaration):
 
     def raise_error_code(self):
         return re.match(r'(?:vr::)?E\S+Error$', self.type.spelling)
+
+    def returns_const_string(self):
+        if not self.type.kind == TypeKind.POINTER:
+            return False
+        pt = self.type.get_pointee()
+        if not pt.is_const_qualified():
+            return False
+        return pt.kind == TypeKind.CHAR_S
 
 
 class COpenVRContext(Declaration):
