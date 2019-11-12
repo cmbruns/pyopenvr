@@ -62,8 +62,14 @@ class CTypesGenerator(object):
             
             # Load library
             if platform.system() == 'Windows':
-                # Add current directory to PATH, so we can load the DLL from right here.
-                os.environ['PATH'] += os.pathsep + os.path.dirname(__file__)
+                # in Python >= 3.8.0, new logic is used to load Windows DLL
+                # see (https://docs.python.org/3/whatsnew/3.8.html#ctypes)
+                # and (https://docs.python.org/3/library/os.html#os.add_dll_directory)
+                if hasattr(os, 'add_dll_directory'):
+                    os.add_dll_directory(os.path.dirname(__file__))
+                else:
+                    # Add current directory to PATH, so we can load the DLL from right here.
+                    os.environ['PATH'] += os.pathsep + os.path.dirname(__file__)
             else:
                 _openvr_lib_name = os.path.join(os.path.dirname(__file__), _openvr_lib_name)
             
