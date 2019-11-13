@@ -1,6 +1,6 @@
 #!/bin/env python
 
-# Unofficial python bindings for OpenVR API version 1.7.15
+# Unofficial python bindings for OpenVR API version 1.8.19
 # from https://github.com/cmbruns/pyopenvr
 # based on OpenVR C++ API at https://github.com/ValveSoftware/openvr
 
@@ -50,8 +50,14 @@ else:
 
 # Load library
 if platform.system() == 'Windows':
-    # Add current directory to PATH, so we can load the DLL from right here.
-    os.environ['PATH'] += os.pathsep + os.path.dirname(__file__)
+    # in Python >= 3.8.0, new logic is used to load Windows DLL
+    # see (https://docs.python.org/3/whatsnew/3.8.html#ctypes)
+    # and (https://docs.python.org/3/library/os.html#os.add_dll_directory)
+    if hasattr(os, 'add_dll_directory'):
+        os.add_dll_directory(os.path.dirname(__file__))
+    else:
+        # Add current directory to PATH, so we can load the DLL from right here.
+        os.environ['PATH'] += os.pathsep + os.path.dirname(__file__)
 else:
     _openvr_lib_name = os.path.join(os.path.dirname(__file__), _openvr_lib_name)
 
@@ -102,8 +108,8 @@ class ID3D12CommandQueue(Structure):
 ####################
 
 k_nSteamVRVersionMajor = 1
-k_nSteamVRVersionMinor = 7
-k_nSteamVRVersionBuild = 15
+k_nSteamVRVersionMinor = 8
+k_nSteamVRVersionBuild = 19
 k_nDriverNone = 0xFFFFFFFF
 k_unMaxDriverDebugResponseSize = 32768
 k_unTrackedDeviceIndex_Hmd = 0
@@ -151,11 +157,11 @@ VRCompositor_ReprojectionAsync = 0x04  # This flag indicates the async reproject
 VRCompositor_ReprojectionMotion = 0x08  # This flag indicates whether or not motion smoothing was triggered for this frame
 VRCompositor_PredictionMask = 0x30  # The runtime may predict more than one frame (up to four) ahead if
 VRCompositor_ThrottleMask = 0xC0  # Number of frames the compositor is throttling the application.
-IVRSystem_Version = 'IVRSystem_020'
+IVRSystem_Version = 'IVRSystem_021'
 k_unMaxApplicationKeyLength = 128  # The maximum length of an application key
 k_pch_MimeType_HomeApp = 'vr/home'  # Currently recognized mime types
 k_pch_MimeType_GameTheater = 'vr/game_theater'
-IVRApplications_Version = 'IVRApplications_006'
+IVRApplications_Version = 'IVRApplications_007'
 k_unMaxSettingsKeyLength = 128  # The maximum length of a settings key
 IVRSettings_Version = 'IVRSettings_002'
 k_pch_SteamVR_Section = 'steamvr'
@@ -175,16 +181,19 @@ k_pch_SteamVR_BackgroundCameraHeight_Float = 'backgroundCameraHeight'
 k_pch_SteamVR_BackgroundDomeRadius_Float = 'backgroundDomeRadius'
 k_pch_SteamVR_GridColor_String = 'gridColor'
 k_pch_SteamVR_PlayAreaColor_String = 'playAreaColor'
+k_pch_SteamVR_TrackingLossColor_String = 'trackingLossColor'
 k_pch_SteamVR_ShowStage_Bool = 'showStage'
 k_pch_SteamVR_ActivateMultipleDrivers_Bool = 'activateMultipleDrivers'
 k_pch_SteamVR_UsingSpeakers_Bool = 'usingSpeakers'
 k_pch_SteamVR_SpeakersForwardYawOffsetDegrees_Float = 'speakersForwardYawOffsetDegrees'
 k_pch_SteamVR_BaseStationPowerManagement_Int32 = 'basestationPowerManagement'
+k_pch_SteamVR_ShowBaseStationPowerManagementTip_Int32 = 'ShowBaseStationPowerManagementTip'
 k_pch_SteamVR_NeverKillProcesses_Bool = 'neverKillProcesses'
 k_pch_SteamVR_SupersampleScale_Float = 'supersampleScale'
 k_pch_SteamVR_MaxRecommendedResolution_Int32 = 'maxRecommendedResolution'
 k_pch_SteamVR_MotionSmoothing_Bool = 'motionSmoothing'
 k_pch_SteamVR_MotionSmoothingOverride_Int32 = 'motionSmoothingOverride'
+k_pch_SteamVR_DisableAsyncReprojection_Bool = 'disableAsync'
 k_pch_SteamVR_ForceFadeOnBadTracking_Bool = 'forceFadeOnBadTracking'
 k_pch_SteamVR_DefaultMirrorView_Int32 = 'mirrorView'
 k_pch_SteamVR_ShowLegacyMirrorView_Bool = 'showLegacyMirrorView'
@@ -239,7 +248,6 @@ k_pch_Lighthouse_PowerManagedBaseStations_String = 'PowerManagedBaseStations'
 k_pch_Lighthouse_PowerManagedBaseStations2_String = 'PowerManagedBaseStations2'
 k_pch_Lighthouse_InactivityTimeoutForBaseStations_Int32 = 'InactivityTimeoutForBaseStations'
 k_pch_Lighthouse_EnableImuFallback_Bool = 'enableImuFallback'
-k_pch_Lighthouse_NewPairing_Bool = 'newPairing'
 k_pch_Null_Section = 'driver_null'
 k_pch_Null_SerialNumber_String = 'serialNumber'
 k_pch_Null_ModelNumber_String = 'modelNumber'
@@ -283,6 +291,7 @@ k_pch_CollisionBounds_ColorGammaR_Int32 = 'CollisionBoundsColorGammaR'
 k_pch_CollisionBounds_ColorGammaG_Int32 = 'CollisionBoundsColorGammaG'
 k_pch_CollisionBounds_ColorGammaB_Int32 = 'CollisionBoundsColorGammaB'
 k_pch_CollisionBounds_ColorGammaA_Int32 = 'CollisionBoundsColorGammaA'
+k_pch_CollisionBounds_EnableDriverImport = 'enableDriverBoundsImport'
 k_pch_Camera_Section = 'camera'
 k_pch_Camera_EnableCamera_Bool = 'enableCamera'
 k_pch_Camera_EnableCameraInDashboard_Bool = 'enableCameraInDashboard'
@@ -295,11 +304,19 @@ k_pch_Camera_BoundsColorGammaA_Int32 = 'cameraBoundsColorGammaA'
 k_pch_Camera_BoundsStrength_Int32 = 'cameraBoundsStrength'
 k_pch_Camera_RoomViewMode_Int32 = 'cameraRoomViewMode'
 k_pch_audio_Section = 'audio'
-k_pch_audio_OnPlaybackDevice_String = 'onPlaybackDevice'
-k_pch_audio_OnRecordDevice_String = 'onRecordDevice'
-k_pch_audio_OnPlaybackMirrorDevice_String = 'onPlaybackMirrorDevice'
-k_pch_audio_OffPlaybackDevice_String = 'offPlaybackDevice'
-k_pch_audio_OffRecordDevice_String = 'offRecordDevice'
+k_pch_audio_SetOsDefaultPlaybackDevice_Bool = 'setOsDefaultPlaybackDevice'
+k_pch_audio_EnablePlaybackDeviceOverride_Bool = 'enablePlaybackDeviceOverride'
+k_pch_audio_PlaybackDeviceOverride_String = 'playbackDeviceOverride'
+k_pch_audio_PlaybackDeviceOverrideName_String = 'playbackDeviceOverrideName'
+k_pch_audio_SetOsDefaultRecordingDevice_Bool = 'setOsDefaultRecordingDevice'
+k_pch_audio_EnableRecordingDeviceOverride_Bool = 'enableRecordingDeviceOverride'
+k_pch_audio_RecordingDeviceOverride_String = 'recordingDeviceOverride'
+k_pch_audio_RecordingDeviceOverrideName_String = 'recordingDeviceOverrideName'
+k_pch_audio_EnablePlaybackMirror_Bool = 'enablePlaybackMirror'
+k_pch_audio_PlaybackMirrorDevice_String = 'playbackMirrorDevice'
+k_pch_audio_PlaybackMirrorDeviceName_String = 'playbackMirrorDeviceName'
+k_pch_audio_OldPlaybackMirrorDevice_String = 'onPlaybackMirrorDevice'
+k_pch_audio_LastHmdPlaybackDeviceId_String = 'lastHmdPlaybackDeviceId'
 k_pch_audio_VIVEHDMIGain = 'viveHDMIGain'
 k_pch_Power_Section = 'power'
 k_pch_Power_PowerOffOnExit_Bool = 'powerOffOnExit'
@@ -311,17 +328,12 @@ k_pch_Power_PauseCompositorOnStandby_Bool = 'pauseCompositorOnStandby'
 k_pch_Dashboard_Section = 'dashboard'
 k_pch_Dashboard_EnableDashboard_Bool = 'enableDashboard'
 k_pch_Dashboard_ArcadeMode_Bool = 'arcadeMode'
-k_pch_Dashboard_UseWebDashboard = 'useWebDashboard'
+k_pch_Dashboard_UseWebKeyboard = 'useWebKeyboard'
 k_pch_Dashboard_UseWebSettings = 'useWebSettings'
-k_pch_Dashboard_UseWebIPD = 'useWebIPD'
-k_pch_Dashboard_UseWebPowerMenu = 'useWebPowerMenu'
-k_pch_Dashboard_UseWebNotifications = 'useWebNotifications'
 k_pch_modelskin_Section = 'modelskins'
 k_pch_Driver_Enable_Bool = 'enable'
 k_pch_Driver_LoadPriority_Int32 = 'loadPriority'
 k_pch_WebInterface_Section = 'WebInterface'
-k_pch_WebInterface_WebEnable_Bool = 'WebEnable'
-k_pch_WebInterface_WebPort_String = 'WebPort'
 k_pch_VRWebHelper_Section = 'VRWebHelper'
 k_pch_VRWebHelper_DebuggerEnabled_Bool = 'DebuggerEnabled'
 k_pch_VRWebHelper_DebuggerPort_Int32 = 'DebuggerPort'
@@ -348,7 +360,7 @@ k_unVROverlayMaxKeyLength = 128  # The maximum length of an overlay key in bytes
 k_unVROverlayMaxNameLength = 128  # The maximum length of an overlay name in bytes, counting the terminating null character.
 k_unMaxOverlayCount = 64  # The maximum number of overlays that can exist in the system at one time.
 k_unMaxOverlayIntersectionMaskPrimitivesCount = 32  # The maximum number of overlay intersection mask primitives per overlay
-IVROverlay_Version = 'IVROverlay_020'
+IVROverlay_Version = 'IVROverlay_021'
 k_pch_Controller_Component_GDC2015 = 'gdc2015'  # Canonical coordinate system of the gdc 2015 wired controller, provided for backwards compatibility
 k_pch_Controller_Component_Base = 'base'  # For controllers with an unambiguous 'base'.
 k_pch_Controller_Component_Tip = 'tip'  # For controllers with an unambiguous 'tip' (used for 'laser-pointing')
@@ -564,6 +576,9 @@ Prop_DisplaySupportsMultipleFramerates_Bool = ENUM_VALUE_TYPE(2081)
 Prop_DisplayColorMultLeft_Vector3 = ENUM_VALUE_TYPE(2082)
 Prop_DisplayColorMultRight_Vector3 = ENUM_VALUE_TYPE(2083)
 Prop_DashboardLayoutPathName_String = ENUM_VALUE_TYPE(2090)
+Prop_DashboardScale_Float = ENUM_VALUE_TYPE(2091)
+Prop_IpdUIRangeMinMeters_Float = ENUM_VALUE_TYPE(2100)
+Prop_IpdUIRangeMaxMeters_Float = ENUM_VALUE_TYPE(2101)
 Prop_DriverRequestedMuraCorrectionMode_Int32 = ENUM_VALUE_TYPE(2200)
 Prop_DriverRequestedMuraFeather_InnerLeft_Int32 = ENUM_VALUE_TYPE(2201)
 Prop_DriverRequestedMuraFeather_InnerRight_Int32 = ENUM_VALUE_TYPE(2202)
@@ -573,6 +588,9 @@ Prop_DriverRequestedMuraFeather_OuterLeft_Int32 = ENUM_VALUE_TYPE(2205)
 Prop_DriverRequestedMuraFeather_OuterRight_Int32 = ENUM_VALUE_TYPE(2206)
 Prop_DriverRequestedMuraFeather_OuterTop_Int32 = ENUM_VALUE_TYPE(2207)
 Prop_DriverRequestedMuraFeather_OuterBottom_Int32 = ENUM_VALUE_TYPE(2208)
+Prop_Audio_DefaultPlaybackDeviceId_String = ENUM_VALUE_TYPE(2300)
+Prop_Audio_DefaultRecordingDeviceId_String = ENUM_VALUE_TYPE(2301)
+Prop_Audio_DefaultPlaybackDeviceVolume_Float = ENUM_VALUE_TYPE(2302)
 Prop_AttachedDeviceId_String = ENUM_VALUE_TYPE(3000)
 Prop_SupportedButtons_Uint64 = ENUM_VALUE_TYPE(3001)
 Prop_Axis0Type_Int32 = ENUM_VALUE_TYPE(3002)
@@ -699,16 +717,14 @@ VREvent_ReloadOverlays = ENUM_VALUE_TYPE(308)
 VREvent_ScrollSmooth = ENUM_VALUE_TYPE(309)
 VREvent_InputFocusCaptured = ENUM_VALUE_TYPE(400)
 VREvent_InputFocusReleased = ENUM_VALUE_TYPE(401)
-VREvent_SceneFocusLost = ENUM_VALUE_TYPE(402)
-VREvent_SceneFocusGained = ENUM_VALUE_TYPE(403)
 VREvent_SceneApplicationChanged = ENUM_VALUE_TYPE(404)
 VREvent_SceneFocusChanged = ENUM_VALUE_TYPE(405)
 VREvent_InputFocusChanged = ENUM_VALUE_TYPE(406)
-VREvent_SceneApplicationSecondaryRenderingStarted = ENUM_VALUE_TYPE(407)
 VREvent_SceneApplicationUsingWrongGraphicsAdapter = ENUM_VALUE_TYPE(408)
 VREvent_ActionBindingReloaded = ENUM_VALUE_TYPE(409)
 VREvent_HideRenderModels = ENUM_VALUE_TYPE(410)
 VREvent_ShowRenderModels = ENUM_VALUE_TYPE(411)
+VREvent_SceneApplicationStateChanged = ENUM_VALUE_TYPE(412)
 VREvent_ConsoleOpened = ENUM_VALUE_TYPE(420)
 VREvent_ConsoleClosed = ENUM_VALUE_TYPE(421)
 VREvent_OverlayShown = ENUM_VALUE_TYPE(500)
@@ -744,7 +760,6 @@ VREvent_Notification_BeginInteraction = ENUM_VALUE_TYPE(602)
 VREvent_Notification_Destroyed = ENUM_VALUE_TYPE(603)
 VREvent_Quit = ENUM_VALUE_TYPE(700)
 VREvent_ProcessQuit = ENUM_VALUE_TYPE(701)
-VREvent_QuitAborted_UserPrompt = ENUM_VALUE_TYPE(702)
 VREvent_QuitAcknowledged = ENUM_VALUE_TYPE(703)
 VREvent_DriverRequestedQuit = ENUM_VALUE_TYPE(704)
 VREvent_RestartRequested = ENUM_VALUE_TYPE(705)
@@ -784,12 +799,8 @@ VREvent_FirmwareUpdateFinished = ENUM_VALUE_TYPE(1101)
 VREvent_KeyboardClosed = ENUM_VALUE_TYPE(1200)
 VREvent_KeyboardCharInput = ENUM_VALUE_TYPE(1201)
 VREvent_KeyboardDone = ENUM_VALUE_TYPE(1202)
-VREvent_ApplicationTransitionStarted = ENUM_VALUE_TYPE(1300)
-VREvent_ApplicationTransitionAborted = ENUM_VALUE_TYPE(1301)
-VREvent_ApplicationTransitionNewAppStarted = ENUM_VALUE_TYPE(1302)
 VREvent_ApplicationListUpdated = ENUM_VALUE_TYPE(1303)
 VREvent_ApplicationMimeTypeLoad = ENUM_VALUE_TYPE(1304)
-VREvent_ApplicationTransitionNewAppLaunchComplete = ENUM_VALUE_TYPE(1305)
 VREvent_ProcessConnected = ENUM_VALUE_TYPE(1306)
 VREvent_ProcessDisconnected = ENUM_VALUE_TYPE(1307)
 VREvent_Compositor_ChaperoneBoundsShown = ENUM_VALUE_TYPE(1410)
@@ -800,6 +811,7 @@ VREvent_Compositor_HDCPError = ENUM_VALUE_TYPE(1414)
 VREvent_Compositor_ApplicationNotResponding = ENUM_VALUE_TYPE(1415)
 VREvent_Compositor_ApplicationResumed = ENUM_VALUE_TYPE(1416)
 VREvent_Compositor_OutOfVideoMemory = ENUM_VALUE_TYPE(1417)
+VREvent_Compositor_DisplayModeNotSupported = ENUM_VALUE_TYPE(1418)
 VREvent_TrackedCamera_StartVideoStream = ENUM_VALUE_TYPE(1500)
 VREvent_TrackedCamera_StopVideoStream = ENUM_VALUE_TYPE(1501)
 VREvent_TrackedCamera_PauseVideoStream = ENUM_VALUE_TYPE(1502)
@@ -834,6 +846,7 @@ k_EDeviceActivityLevel_Idle = ENUM_VALUE_TYPE(0)
 k_EDeviceActivityLevel_UserInteraction = ENUM_VALUE_TYPE(1)
 k_EDeviceActivityLevel_UserInteraction_Timeout = ENUM_VALUE_TYPE(2)
 k_EDeviceActivityLevel_Standby = ENUM_VALUE_TYPE(3)
+k_EDeviceActivityLevel_Idle_Timeout = ENUM_VALUE_TYPE(4)
 
 EVRButtonId = ENUM_TYPE
 k_EButton_System = ENUM_VALUE_TYPE(0)
@@ -1051,6 +1064,7 @@ VRInitError_Init_TrackerManagerInitFailed = ENUM_VALUE_TYPE(142)
 VRInitError_Init_AlreadyRunning = ENUM_VALUE_TYPE(143)
 VRInitError_Init_FailedForVrMonitor = ENUM_VALUE_TYPE(144)
 VRInitError_Init_PropertyManagerInitFailed = ENUM_VALUE_TYPE(145)
+VRInitError_Init_WebServerFailed = ENUM_VALUE_TYPE(146)
 VRInitError_Driver_Failed = ENUM_VALUE_TYPE(200)
 VRInitError_Driver_Unknown = ENUM_VALUE_TYPE(201)
 VRInitError_Driver_HmdUnknown = ENUM_VALUE_TYPE(202)
@@ -1162,6 +1176,7 @@ VRInitError_Compositor_CreateMirrorTextures = ENUM_VALUE_TYPE(483)
 VRInitError_Compositor_CreateLastFrameRenderTexture = ENUM_VALUE_TYPE(484)
 VRInitError_Compositor_CreateMirrorOverlay = ENUM_VALUE_TYPE(485)
 VRInitError_Compositor_FailedToCreateVirtualDisplayBackbuffer = ENUM_VALUE_TYPE(486)
+VRInitError_Compositor_DisplayModeNotSupported = ENUM_VALUE_TYPE(487)
 VRInitError_VendorSpecific_UnableToConnectToOculusRuntime = ENUM_VALUE_TYPE(1000)
 VRInitError_VendorSpecific_WindowsNotInDevMode = ENUM_VALUE_TYPE(1001)
 VRInitError_VendorSpecific_HmdFound_CantOpenDevice = ENUM_VALUE_TYPE(1101)
@@ -1290,11 +1305,12 @@ VRApplicationProperty_WantsCompositorPauseInStandby_Bool = ENUM_VALUE_TYPE(64)
 VRApplicationProperty_IsHidden_Bool = ENUM_VALUE_TYPE(65)
 VRApplicationProperty_LastLaunchTime_Uint64 = ENUM_VALUE_TYPE(70)
 
-EVRApplicationTransitionState = ENUM_TYPE
-VRApplicationTransition_None = ENUM_VALUE_TYPE(0)
-VRApplicationTransition_OldAppQuitSent = ENUM_VALUE_TYPE(10)
-VRApplicationTransition_WaitingForExternalLaunch = ENUM_VALUE_TYPE(11)
-VRApplicationTransition_NewAppLaunched = ENUM_VALUE_TYPE(20)
+EVRSceneApplicationState = ENUM_TYPE
+EVRSceneApplicationState_None = ENUM_VALUE_TYPE(0)
+EVRSceneApplicationState_Starting = ENUM_VALUE_TYPE(1)
+EVRSceneApplicationState_Quitting = ENUM_VALUE_TYPE(2)
+EVRSceneApplicationState_Running = ENUM_VALUE_TYPE(3)
+EVRSceneApplicationState_Waiting = ENUM_VALUE_TYPE(4)
 
 EVRSettingsError = ENUM_TYPE
 VRSettingsError_None = ENUM_VALUE_TYPE(0)
@@ -1366,24 +1382,21 @@ VROverlayTransform_SystemOverlay = ENUM_VALUE_TYPE(2)
 VROverlayTransform_TrackedComponent = ENUM_VALUE_TYPE(3)
 
 VROverlayFlags = ENUM_TYPE
-VROverlayFlags_None = ENUM_VALUE_TYPE(0)
-VROverlayFlags_NoDashboardTab = ENUM_VALUE_TYPE(3)
-VROverlayFlags_AcceptsGamepadEvents = ENUM_VALUE_TYPE(4)
-VROverlayFlags_ShowGamepadFocus = ENUM_VALUE_TYPE(5)
-VROverlayFlags_SendVRDiscreteScrollEvents = ENUM_VALUE_TYPE(6)
-VROverlayFlags_SendVRTouchpadEvents = ENUM_VALUE_TYPE(7)
-VROverlayFlags_ShowTouchPadScrollWheel = ENUM_VALUE_TYPE(8)
-VROverlayFlags_TransferOwnershipToInternalProcess = ENUM_VALUE_TYPE(9)
-VROverlayFlags_SideBySide_Parallel = ENUM_VALUE_TYPE(10)
-VROverlayFlags_SideBySide_Crossed = ENUM_VALUE_TYPE(11)
-VROverlayFlags_Panorama = ENUM_VALUE_TYPE(12)
-VROverlayFlags_StereoPanorama = ENUM_VALUE_TYPE(13)
-VROverlayFlags_SortWithNonSceneOverlays = ENUM_VALUE_TYPE(14)
-VROverlayFlags_VisibleInDashboard = ENUM_VALUE_TYPE(15)
-VROverlayFlags_MakeOverlaysInteractiveIfVisible = ENUM_VALUE_TYPE(16)
-VROverlayFlags_SendVRSmoothScrollEvents = ENUM_VALUE_TYPE(17)
-VROverlayFlags_ProtectedContent = ENUM_VALUE_TYPE(18)
-VROverlayFlags_Max = ENUM_VALUE_TYPE(19)
+VROverlayFlags_NoDashboardTab = ENUM_VALUE_TYPE(8)
+VROverlayFlags_SendVRDiscreteScrollEvents = ENUM_VALUE_TYPE(64)
+VROverlayFlags_SendVRTouchpadEvents = ENUM_VALUE_TYPE(128)
+VROverlayFlags_ShowTouchPadScrollWheel = ENUM_VALUE_TYPE(256)
+VROverlayFlags_TransferOwnershipToInternalProcess = ENUM_VALUE_TYPE(512)
+VROverlayFlags_SideBySide_Parallel = ENUM_VALUE_TYPE(1024)
+VROverlayFlags_SideBySide_Crossed = ENUM_VALUE_TYPE(2048)
+VROverlayFlags_Panorama = ENUM_VALUE_TYPE(4096)
+VROverlayFlags_StereoPanorama = ENUM_VALUE_TYPE(8192)
+VROverlayFlags_SortWithNonSceneOverlays = ENUM_VALUE_TYPE(16384)
+VROverlayFlags_VisibleInDashboard = ENUM_VALUE_TYPE(32768)
+VROverlayFlags_MakeOverlaysInteractiveIfVisible = ENUM_VALUE_TYPE(65536)
+VROverlayFlags_SendVRSmoothScrollEvents = ENUM_VALUE_TYPE(131072)
+VROverlayFlags_ProtectedContent = ENUM_VALUE_TYPE(262144)
+VROverlayFlags_HideLaserIntersection = ENUM_VALUE_TYPE(524288)
 
 VRMessageOverlayResponse = ENUM_TYPE
 VRMessageOverlayResponse_ButtonPress_0 = ENUM_VALUE_TYPE(0)
@@ -1402,13 +1415,6 @@ k_EGamepadTextInputModeSubmit = ENUM_VALUE_TYPE(2)
 EGamepadTextInputLineMode = ENUM_TYPE
 k_EGamepadTextInputLineModeSingleLine = ENUM_VALUE_TYPE(0)
 k_EGamepadTextInputLineModeMultipleLines = ENUM_VALUE_TYPE(1)
-
-EOverlayDirection = ENUM_TYPE
-OverlayDirection_Up = ENUM_VALUE_TYPE(0)
-OverlayDirection_Down = ENUM_VALUE_TYPE(1)
-OverlayDirection_Left = ENUM_VALUE_TYPE(2)
-OverlayDirection_Right = ENUM_VALUE_TYPE(3)
-OverlayDirection_Count = ENUM_VALUE_TYPE(4)
 
 EVROverlayIntersectionMaskPrimitiveType = ENUM_TYPE
 OverlayIntersectionPrimitiveType_Rectangle = ENUM_VALUE_TYPE(0)
@@ -2714,7 +2720,6 @@ class IVRSystem_FnTable(Structure):
         ("shouldApplicationReduceRenderingWork", OPENVR_FNTABLE_CALLTYPE(openvr_bool)),
         ("performFirmwareUpdate", OPENVR_FNTABLE_CALLTYPE(EVRFirmwareError, TrackedDeviceIndex_t)),
         ("acknowledgeQuit_Exiting", OPENVR_FNTABLE_CALLTYPE(None)),
-        ("acknowledgeQuit_UserPrompt", OPENVR_FNTABLE_CALLTYPE(None)),
         ("getAppContainerFilePaths", OPENVR_FNTABLE_CALLTYPE(c_uint32, c_char_p, c_uint32)),
         ("getRuntimeVersion", OPENVR_FNTABLE_CALLTYPE(c_char_p)),
     ]
@@ -3214,15 +3219,6 @@ class IVRSystem(object):
         fn = self.function_table.acknowledgeQuit_Exiting
         fn()
 
-    def acknowledgeQuit_UserPrompt(self) -> None:
-        """
-        Call this to tell the system that the user is being prompted to save data. This
-        halts the timeout and dismisses the dashboard (if it was up). Applications should be sure to actually 
-        prompt the user to save and then exit afterward, otherwise the user will be left in a confusing state.
-        """
-        fn = self.function_table.acknowledgeQuit_UserPrompt
-        fn()
-
     def getAppContainerFilePaths(self):
         """
         Retrieves a null-terminated, semicolon-delimited list of UTF8 file paths that an application 
@@ -3275,10 +3271,9 @@ class IVRApplications_FnTable(Structure):
         ("getApplicationsThatSupportMimeType", OPENVR_FNTABLE_CALLTYPE(c_uint32, c_char_p, c_char_p, c_uint32)),
         ("getApplicationLaunchArguments", OPENVR_FNTABLE_CALLTYPE(c_uint32, c_uint32, c_char_p, c_uint32)),
         ("getStartingApplication", OPENVR_FNTABLE_CALLTYPE(EVRApplicationError, c_char_p, c_uint32)),
-        ("getTransitionState", OPENVR_FNTABLE_CALLTYPE(EVRApplicationTransitionState)),
+        ("getSceneApplicationState", OPENVR_FNTABLE_CALLTYPE(EVRSceneApplicationState)),
         ("performApplicationPrelaunchCheck", OPENVR_FNTABLE_CALLTYPE(EVRApplicationError, c_char_p)),
-        ("getApplicationsTransitionStateNameFromEnum", OPENVR_FNTABLE_CALLTYPE(c_char_p, EVRApplicationTransitionState)),
-        ("isQuitUserPromptRequested", OPENVR_FNTABLE_CALLTYPE(openvr_bool)),
+        ("getSceneApplicationStateNameFromEnum", OPENVR_FNTABLE_CALLTYPE(c_char_p, EVRSceneApplicationState)),
         ("launchInternalProcess", OPENVR_FNTABLE_CALLTYPE(EVRApplicationError, c_char_p, c_char_p, c_char_p)),
         ("getCurrentSceneProcessId", OPENVR_FNTABLE_CALLTYPE(c_uint32)),
     ]
@@ -3565,9 +3560,9 @@ class IVRApplications(object):
         openvr.error_code.ApplicationError.check_error_value(error)
         return bytes(appKeyBuffer.value).decode('utf-8')
 
-    def getTransitionState(self):
+    def getSceneApplicationState(self):
         """Returns the application transition state"""
-        fn = self.function_table.getTransitionState
+        fn = self.function_table.getSceneApplicationState
         result = fn()
         return result
 
@@ -3588,17 +3583,11 @@ class IVRApplications(object):
         error = fn(appKey)
         openvr.error_code.ApplicationError.check_error_value(error)
 
-    def getApplicationsTransitionStateNameFromEnum(self, state):
+    def getSceneApplicationStateNameFromEnum(self, state):
         """Returns a string for an application transition state"""
-        fn = self.function_table.getApplicationsTransitionStateNameFromEnum
+        fn = self.function_table.getSceneApplicationStateNameFromEnum
         result = fn(state)
         return result.decode('utf-8')
-
-    def isQuitUserPromptRequested(self):
-        """Returns true if the outgoing scene app has requested a save prompt before exiting"""
-        fn = self.function_table.isQuitUserPromptRequested
-        result = fn()
-        return result
 
     def launchInternalProcess(self, binaryPath: str, arguments: str, workingDirectory: str) -> None:
         """
@@ -4667,8 +4656,8 @@ class IVROverlay_FnTable(Structure):
         ("getOverlaySortOrder", OPENVR_FNTABLE_CALLTYPE(EVROverlayError, VROverlayHandle_t, POINTER(c_uint32))),
         ("setOverlayWidthInMeters", OPENVR_FNTABLE_CALLTYPE(EVROverlayError, VROverlayHandle_t, c_float)),
         ("getOverlayWidthInMeters", OPENVR_FNTABLE_CALLTYPE(EVROverlayError, VROverlayHandle_t, POINTER(c_float))),
-        ("setOverlayAutoCurveDistanceRangeInMeters", OPENVR_FNTABLE_CALLTYPE(EVROverlayError, VROverlayHandle_t, c_float, c_float)),
-        ("getOverlayAutoCurveDistanceRangeInMeters", OPENVR_FNTABLE_CALLTYPE(EVROverlayError, VROverlayHandle_t, POINTER(c_float), POINTER(c_float))),
+        ("setOverlayCurvature", OPENVR_FNTABLE_CALLTYPE(EVROverlayError, VROverlayHandle_t, c_float)),
+        ("getOverlayCurvature", OPENVR_FNTABLE_CALLTYPE(EVROverlayError, VROverlayHandle_t, POINTER(c_float))),
         ("setOverlayTextureColorSpace", OPENVR_FNTABLE_CALLTYPE(EVROverlayError, VROverlayHandle_t, EColorSpace)),
         ("getOverlayTextureColorSpace", OPENVR_FNTABLE_CALLTYPE(EVROverlayError, VROverlayHandle_t, POINTER(EColorSpace))),
         ("setOverlayTextureBounds", OPENVR_FNTABLE_CALLTYPE(EVROverlayError, VROverlayHandle_t, POINTER(VRTextureBounds_t))),
@@ -4695,10 +4684,6 @@ class IVROverlay_FnTable(Structure):
         ("setOverlayMouseScale", OPENVR_FNTABLE_CALLTYPE(EVROverlayError, VROverlayHandle_t, POINTER(HmdVector2_t))),
         ("computeOverlayIntersection", OPENVR_FNTABLE_CALLTYPE(openvr_bool, VROverlayHandle_t, POINTER(VROverlayIntersectionParams_t), POINTER(VROverlayIntersectionResults_t))),
         ("isHoverTargetOverlay", OPENVR_FNTABLE_CALLTYPE(openvr_bool, VROverlayHandle_t)),
-        ("getGamepadFocusOverlay", OPENVR_FNTABLE_CALLTYPE(VROverlayHandle_t)),
-        ("setGamepadFocusOverlay", OPENVR_FNTABLE_CALLTYPE(EVROverlayError, VROverlayHandle_t)),
-        ("setOverlayNeighbor", OPENVR_FNTABLE_CALLTYPE(EVROverlayError, EOverlayDirection, VROverlayHandle_t, VROverlayHandle_t)),
-        ("moveGamepadFocusToNeighbor", OPENVR_FNTABLE_CALLTYPE(EVROverlayError, EOverlayDirection, VROverlayHandle_t)),
         ("setOverlayDualAnalogTransform", OPENVR_FNTABLE_CALLTYPE(EVROverlayError, VROverlayHandle_t, EDualAnalogWhich, POINTER(HmdVector2_t), c_float)),
         ("getOverlayDualAnalogTransform", OPENVR_FNTABLE_CALLTYPE(EVROverlayError, VROverlayHandle_t, EDualAnalogWhich, POINTER(HmdVector2_t), POINTER(c_float))),
         ("setOverlayTexture", OPENVR_FNTABLE_CALLTYPE(EVROverlayError, VROverlayHandle_t, POINTER(Texture_t))),
@@ -4947,26 +4932,22 @@ class IVROverlay(object):
         openvr.error_code.OverlayError.check_error_value(error)
         return widthInMeters.value
 
-    def setOverlayAutoCurveDistanceRangeInMeters(self, overlayHandle, minDistanceInMeters: float, maxDistanceInMeters: float) -> None:
+    def setOverlayCurvature(self, overlayHandle, curvature: float) -> None:
         """
-        For high-quality curved overlays only, sets the distance range in meters from the overlay used to automatically curve
-        the surface around the viewer.  Min is distance is when the surface will be most curved.  Max is when least curved.
+        Use to draw overlay as a curved surface. Curvature is a percentage from (0..1] where 1 is a fully closed cylinder.
+        For a specific radius, curvature can be computed as: overlay.width / (2 PI r).
         """
-        fn = self.function_table.setOverlayAutoCurveDistanceRangeInMeters
-        error = fn(overlayHandle, minDistanceInMeters, maxDistanceInMeters)
+        fn = self.function_table.setOverlayCurvature
+        error = fn(overlayHandle, curvature)
         openvr.error_code.OverlayError.check_error_value(error)
 
-    def getOverlayAutoCurveDistanceRangeInMeters(self, overlayHandle):
-        """
-        For high-quality curved overlays only, gets the distance range in meters from the overlay used to automatically curve
-        the surface around the viewer.  Min is distance is when the surface will be most curved.  Max is when least curved.
-        """
-        fn = self.function_table.getOverlayAutoCurveDistanceRangeInMeters
-        minDistanceInMeters = c_float()
-        maxDistanceInMeters = c_float()
-        error = fn(overlayHandle, byref(minDistanceInMeters), byref(maxDistanceInMeters))
+    def getOverlayCurvature(self, overlayHandle):
+        """Returns the curvature of the overlay as a percentage from (0..1] where 1 is a fully closed cylinder."""
+        fn = self.function_table.getOverlayCurvature
+        curvature = c_float()
+        error = fn(overlayHandle, byref(curvature))
         openvr.error_code.OverlayError.check_error_value(error)
-        return minDistanceInMeters.value, maxDistanceInMeters.value
+        return curvature.value
 
     def setOverlayTextureColorSpace(self, overlayHandle, textureColorSpace) -> None:
         """
@@ -5191,37 +5172,6 @@ class IVROverlay(object):
         fn = self.function_table.isHoverTargetOverlay
         result = fn(overlayHandle)
         return result
-
-    def getGamepadFocusOverlay(self):
-        """Returns the current Gamepad focus overlay"""
-        fn = self.function_table.getGamepadFocusOverlay
-        result = fn()
-        return result
-
-    def setGamepadFocusOverlay(self, newFocusOverlay) -> None:
-        """Sets the current Gamepad focus overlay"""
-        fn = self.function_table.setGamepadFocusOverlay
-        error = fn(newFocusOverlay)
-        openvr.error_code.OverlayError.check_error_value(error)
-
-    def setOverlayNeighbor(self, direction, from_, to) -> None:
-        """
-        Sets an overlay's neighbor. This will also set the neighbor of the "to" overlay
-        to point back to the "from" overlay. If an overlay's neighbor is set to invalid both
-        ends will be cleared
-        """
-        fn = self.function_table.setOverlayNeighbor
-        error = fn(direction, from_, to)
-        openvr.error_code.OverlayError.check_error_value(error)
-
-    def moveGamepadFocusToNeighbor(self, direction, from_) -> None:
-        """
-        Changes the Gamepad focus from one overlay to one of its neighbors. Returns VROverlayError_NoNeighbor if there is no
-        neighbor in that direction
-        """
-        fn = self.function_table.moveGamepadFocusToNeighbor
-        error = fn(direction, from_)
-        openvr.error_code.OverlayError.check_error_value(error)
 
     def setOverlayDualAnalogTransform(self, overlay, which, center, radius: float) -> None:
         """Sets the analog input to Dual Analog coordinate scale for the specified overlay."""
@@ -6239,6 +6189,7 @@ class IVRInput_FnTable(Structure):
         ("showActionOrigins", OPENVR_FNTABLE_CALLTYPE(EVRInputError, VRActionSetHandle_t, VRActionHandle_t)),
         ("showBindingsForActionSet", OPENVR_FNTABLE_CALLTYPE(EVRInputError, POINTER(VRActiveActionSet_t), c_uint32, c_uint32, VRInputValueHandle_t)),
         ("isUsingLegacyInput", OPENVR_FNTABLE_CALLTYPE(openvr_bool)),
+        ("openBindingUI", OPENVR_FNTABLE_CALLTYPE(EVRInputError, c_char_p, VRActionSetHandle_t, VRInputValueHandle_t, openvr_bool)),
     ]
 
 
@@ -6579,6 +6530,17 @@ class IVRInput(object):
         fn = self.function_table.isUsingLegacyInput
         result = fn()
         return result
+
+    def openBindingUI(self, appKey: str, actionSetHandle, deviceHandle, showOnDesktop) -> None:
+        """
+        Opens the binding user interface. If no app key is provided it will use the key from the calling process.
+        If no set is provided it will open to the root of the app binding page.
+        """
+        fn = self.function_table.openBindingUI
+        if appKey is not None:
+            appKey = bytes(appKey, encoding='utf-8')
+        error = fn(appKey, actionSetHandle, deviceHandle, showOnDesktop)
+        openvr.error_code.InputError.check_error_value(error)
 
 
 class IVRIOBuffer_FnTable(Structure):

@@ -684,6 +684,10 @@ class InitError_Init_PropertyManagerInitFailed(InitError):
     pass
 
 
+class InitError_Init_WebServerFailed(InitError):
+    pass
+
+
 class InitError_Driver_Failed(InitError):
     pass
 
@@ -1128,6 +1132,10 @@ class InitError_Compositor_FailedToCreateVirtualDisplayBackbuffer(InitError):
     pass
 
 
+class InitError_Compositor_DisplayModeNotSupported(InitError):
+    pass
+
+
 class InitError_VendorSpecific_UnableToConnectToOculusRuntime(InitError):
     pass
 
@@ -1248,6 +1256,7 @@ InitError.error_index[142] = InitError_Init_TrackerManagerInitFailed
 InitError.error_index[143] = InitError_Init_AlreadyRunning
 InitError.error_index[144] = InitError_Init_FailedForVrMonitor
 InitError.error_index[145] = InitError_Init_PropertyManagerInitFailed
+InitError.error_index[146] = InitError_Init_WebServerFailed
 InitError.error_index[200] = InitError_Driver_Failed
 InitError.error_index[201] = InitError_Driver_Unknown
 InitError.error_index[202] = InitError_Driver_HmdUnknown
@@ -1359,6 +1368,7 @@ InitError.error_index[483] = InitError_Compositor_CreateMirrorTextures
 InitError.error_index[484] = InitError_Compositor_CreateLastFrameRenderTexture
 InitError.error_index[485] = InitError_Compositor_CreateMirrorOverlay
 InitError.error_index[486] = InitError_Compositor_FailedToCreateVirtualDisplayBackbuffer
+InitError.error_index[487] = InitError_Compositor_DisplayModeNotSupported
 InitError.error_index[1000] = InitError_VendorSpecific_UnableToConnectToOculusRuntime
 InitError.error_index[1001] = InitError_VendorSpecific_WindowsNotInDevMode
 InitError.error_index[1101] = InitError_VendorSpecific_HmdFound_CantOpenDevice
