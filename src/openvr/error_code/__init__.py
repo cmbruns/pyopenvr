@@ -91,6 +91,14 @@ class TrackedProp_IPCReadFailure(TrackedPropertyError):
     pass
 
 
+class TrackedProp_OutOfMemory(TrackedPropertyError):
+    pass
+
+
+class TrackedProp_InvalidContainer(TrackedPropertyError):
+    pass
+
+
 TrackedPropertyError.error_index[0] = TrackedProp_Success
 TrackedPropertyError.error_index[1] = TrackedProp_WrongDataType
 TrackedPropertyError.error_index[2] = TrackedProp_WrongDeviceClass
@@ -105,6 +113,8 @@ TrackedPropertyError.error_index[10] = TrackedProp_PermissionDenied
 TrackedPropertyError.error_index[11] = TrackedProp_InvalidOperation
 TrackedPropertyError.error_index[12] = TrackedProp_CannotWriteToWildcards
 TrackedPropertyError.error_index[13] = TrackedProp_IPCReadFailure
+TrackedPropertyError.error_index[14] = TrackedProp_OutOfMemory
+TrackedPropertyError.error_index[15] = TrackedProp_InvalidContainer
 
 
 class HDCPError(ErrorCode):
@@ -1679,6 +1689,10 @@ class CompositorError_InvalidBounds(CompositorError):
     pass
 
 
+class CompositorError_AlreadySet(CompositorError):
+    pass
+
+
 CompositorError.error_index[0] = CompositorError_None
 CompositorError.error_index[1] = CompositorError_RequestFailed
 CompositorError.error_index[100] = CompositorError_IncompatibleVersion
@@ -1691,6 +1705,7 @@ CompositorError.error_index[106] = CompositorError_SharedTexturesNotSupported
 CompositorError.error_index[107] = CompositorError_IndexOutOfRange
 CompositorError.error_index[108] = CompositorError_AlreadySubmitted
 CompositorError.error_index[109] = CompositorError_InvalidBounds
+CompositorError.error_index[110] = CompositorError_AlreadySet
 
 
 class RenderModelError(ErrorCode):

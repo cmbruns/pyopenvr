@@ -1,6 +1,6 @@
 #!/bin/env python
 
-# Unofficial python bindings for OpenVR API version 1.8.19
+# Unofficial python bindings for OpenVR API version 1.9.16
 # from https://github.com/cmbruns/pyopenvr
 # based on OpenVR C++ API at https://github.com/ValveSoftware/openvr
 
@@ -108,8 +108,8 @@ class ID3D12CommandQueue(Structure):
 ####################
 
 k_nSteamVRVersionMajor = 1
-k_nSteamVRVersionMinor = 8
-k_nSteamVRVersionBuild = 19
+k_nSteamVRVersionMinor = 9
+k_nSteamVRVersionBuild = 16
 k_nDriverNone = 0xFFFFFFFF
 k_unMaxDriverDebugResponseSize = 32768
 k_unTrackedDeviceIndex_Hmd = 0
@@ -124,6 +124,7 @@ k_unInt32PropertyTag = 2
 k_unUint64PropertyTag = 3
 k_unBoolPropertyTag = 4
 k_unStringPropertyTag = 5
+k_unErrorPropertyTag = 6
 k_unHmdMatrix34PropertyTag = 20
 k_unHmdMatrix44PropertyTag = 21
 k_unHmdVector3PropertyTag = 22
@@ -163,7 +164,7 @@ k_pch_MimeType_HomeApp = 'vr/home'  # Currently recognized mime types
 k_pch_MimeType_GameTheater = 'vr/game_theater'
 IVRApplications_Version = 'IVRApplications_007'
 k_unMaxSettingsKeyLength = 128  # The maximum length of a settings key
-IVRSettings_Version = 'IVRSettings_002'
+IVRSettings_Version = 'IVRSettings_003'
 k_pch_SteamVR_Section = 'steamvr'
 k_pch_SteamVR_RequireHmd_String = 'requireHmd'
 k_pch_SteamVR_ForcedDriverKey_String = 'forcedDriver'
@@ -202,6 +203,7 @@ k_pch_SteamVR_MirrorViewDisplayMode_Int32 = 'mirrorViewDisplayMode'
 k_pch_SteamVR_MirrorViewEye_Int32 = 'mirrorViewEye'
 k_pch_SteamVR_MirrorViewGeometry_String = 'mirrorViewGeometry'
 k_pch_SteamVR_MirrorViewGeometryMaximized_String = 'mirrorViewGeometryMaximized'
+k_pch_SteamVR_PerfGraphVisibility_Bool = 'showPerfGraph'
 k_pch_SteamVR_StartMonitorFromAppLaunch = 'startMonitorFromAppLaunch'
 k_pch_SteamVR_StartCompositorFromAppLaunch_Bool = 'startCompositorFromAppLaunch'
 k_pch_SteamVR_StartDashboardFromAppLaunch_Bool = 'startDashboardFromAppLaunch'
@@ -216,7 +218,6 @@ k_pch_SteamVR_EnableLinuxVulkanAsync_Bool = 'enableLinuxVulkanAsync'
 k_pch_SteamVR_AllowDisplayLockedMode_Bool = 'allowDisplayLockedMode'
 k_pch_SteamVR_HaveStartedTutorialForNativeChaperoneDriver_Bool = 'haveStartedTutorialForNativeChaperoneDriver'
 k_pch_SteamVR_ForceWindows32bitVRMonitor = 'forceWindows32BitVRMonitor'
-k_pch_SteamVR_DebugInput = 'debugInput'
 k_pch_SteamVR_DebugInputBinding = 'debugInputBinding'
 k_pch_SteamVR_DoNotFadeToGrid = 'doNotFadeToGrid'
 k_pch_SteamVR_RenderCameraMode = 'renderCameraMode'
@@ -330,6 +331,9 @@ k_pch_Dashboard_EnableDashboard_Bool = 'enableDashboard'
 k_pch_Dashboard_ArcadeMode_Bool = 'arcadeMode'
 k_pch_Dashboard_UseWebKeyboard = 'useWebKeyboard'
 k_pch_Dashboard_UseWebSettings = 'useWebSettings'
+k_pch_Dashboard_Position = 'position'
+k_pch_Dashboard_DesktopScale = 'desktopScale'
+k_pch_Dashboard_DashboardScale = 'dashboardScale'
 k_pch_modelskin_Section = 'modelskins'
 k_pch_Driver_Enable_Bool = 'enable'
 k_pch_Driver_LoadPriority_Int32 = 'loadPriority'
@@ -340,6 +344,7 @@ k_pch_VRWebHelper_DebuggerPort_Int32 = 'DebuggerPort'
 k_pch_TrackingOverride_Section = 'TrackingOverrides'
 k_pch_App_BindingAutosaveURLSuffix_String = 'AutosaveURL'
 k_pch_App_BindingCurrentURLSuffix_String = 'CurrentURL'
+k_pch_App_BindingPreviousURLSuffix_String = 'PreviousURL'
 k_pch_App_NeedToUpdateAutosaveSuffix_Bool = 'NeedToUpdateAutosave'
 k_pch_Trackers_Section = 'trackers'
 k_pch_DesktopUI_Section = 'DesktopUI'
@@ -351,16 +356,17 @@ k_pch_Input_Section = 'input'
 k_pch_Input_LeftThumbstickRotation_Float = 'leftThumbstickRotation'
 k_pch_Input_RightThumbstickRotation_Float = 'rightThumbstickRotation'
 k_pch_Input_ThumbstickDeadzone_Float = 'thumbstickDeadzone'
+k_pch_GpuSpeed_Section = 'GpuSpeed'
 IVRChaperone_Version = 'IVRChaperone_003'
 IVRChaperoneSetup_Version = 'IVRChaperoneSetup_006'
-IVRCompositor_Version = 'IVRCompositor_022'
+IVRCompositor_Version = 'IVRCompositor_024'
 k_unNotificationTextMaxSize = 256
 IVRNotifications_Version = 'IVRNotifications_002'
 k_unVROverlayMaxKeyLength = 128  # The maximum length of an overlay key in bytes, counting the terminating null character.
 k_unVROverlayMaxNameLength = 128  # The maximum length of an overlay name in bytes, counting the terminating null character.
-k_unMaxOverlayCount = 64  # The maximum number of overlays that can exist in the system at one time.
+k_unMaxOverlayCount = 128  # The maximum number of overlays that can exist in the system at one time.
 k_unMaxOverlayIntersectionMaskPrimitivesCount = 32  # The maximum number of overlay intersection mask primitives per overlay
-IVROverlay_Version = 'IVROverlay_021'
+IVROverlay_Version = 'IVROverlay_022'
 k_pch_Controller_Component_GDC2015 = 'gdc2015'  # Canonical coordinate system of the gdc 2015 wired controller, provided for backwards compatibility
 k_pch_Controller_Component_Base = 'base'  # For controllers with an unambiguous 'base'.
 k_pch_Controller_Component_Tip = 'tip'  # For controllers with an unambiguous 'tip' (used for 'laser-pointing')
@@ -433,6 +439,7 @@ TrackedControllerRole_LeftHand = ENUM_VALUE_TYPE(1)
 TrackedControllerRole_RightHand = ENUM_VALUE_TYPE(2)
 TrackedControllerRole_OptOut = ENUM_VALUE_TYPE(3)
 TrackedControllerRole_Treadmill = ENUM_VALUE_TYPE(4)
+TrackedControllerRole_Stylus = ENUM_VALUE_TYPE(5)
 TrackedControllerRole_Max = ENUM_VALUE_TYPE(5)
 
 ETrackingUniverseOrigin = ENUM_TYPE
@@ -496,6 +503,10 @@ Prop_BootloaderVersion_Uint64 = ENUM_VALUE_TYPE(1044)
 Prop_AdditionalSystemReportData_String = ENUM_VALUE_TYPE(1045)
 Prop_CompositeFirmwareVersion_String = ENUM_VALUE_TYPE(1046)
 Prop_Firmware_RemindUpdate_Bool = ENUM_VALUE_TYPE(1047)
+Prop_PeripheralApplicationVersion_Uint64 = ENUM_VALUE_TYPE(1048)
+Prop_ManufacturerSerialNumber_String = ENUM_VALUE_TYPE(1049)
+Prop_ComputedSerialNumber_String = ENUM_VALUE_TYPE(1050)
+Prop_EstimatedDeviceFirstUseTime_Int32 = ENUM_VALUE_TYPE(1051)
 Prop_ReportsTimeSinceVSync_Bool = ENUM_VALUE_TYPE(2000)
 Prop_SecondsFromVsyncToPhotons_Float = ENUM_VALUE_TYPE(2001)
 Prop_DisplayFrequency_Float = ENUM_VALUE_TYPE(2002)
@@ -570,11 +581,16 @@ Prop_CameraDistortionCoefficients_Float_Array = ENUM_VALUE_TYPE(2073)
 Prop_ExpectedControllerType_String = ENUM_VALUE_TYPE(2074)
 Prop_HmdTrackingStyle_Int32 = ENUM_VALUE_TYPE(2075)
 Prop_DriverProvidedChaperoneVisibility_Bool = ENUM_VALUE_TYPE(2076)
-Prop_HmdProvidesDisplaySettings_Bool = ENUM_VALUE_TYPE(2077)
+Prop_HmdColumnCorrectionSettingPrefix_String = ENUM_VALUE_TYPE(2077)
+Prop_CameraSupportsCompatibilityModes_Bool = ENUM_VALUE_TYPE(2078)
 Prop_DisplayAvailableFrameRates_Float_Array = ENUM_VALUE_TYPE(2080)
 Prop_DisplaySupportsMultipleFramerates_Bool = ENUM_VALUE_TYPE(2081)
 Prop_DisplayColorMultLeft_Vector3 = ENUM_VALUE_TYPE(2082)
 Prop_DisplayColorMultRight_Vector3 = ENUM_VALUE_TYPE(2083)
+Prop_DisplaySupportsRuntimeFramerateChange_Bool = ENUM_VALUE_TYPE(2084)
+Prop_DisplaySupportsAnalogGain_Bool = ENUM_VALUE_TYPE(2085)
+Prop_DisplayMinAnalogGain_Float = ENUM_VALUE_TYPE(2086)
+Prop_DisplayMaxAnalogGain_Float = ENUM_VALUE_TYPE(2087)
 Prop_DashboardLayoutPathName_String = ENUM_VALUE_TYPE(2090)
 Prop_DashboardScale_Float = ENUM_VALUE_TYPE(2091)
 Prop_IpdUIRangeMinMeters_Float = ENUM_VALUE_TYPE(2100)
@@ -651,6 +667,8 @@ TrackedProp_PermissionDenied = ENUM_VALUE_TYPE(10)
 TrackedProp_InvalidOperation = ENUM_VALUE_TYPE(11)
 TrackedProp_CannotWriteToWildcards = ENUM_VALUE_TYPE(12)
 TrackedProp_IPCReadFailure = ENUM_VALUE_TYPE(13)
+TrackedProp_OutOfMemory = ENUM_VALUE_TYPE(14)
+TrackedProp_InvalidContainer = ENUM_VALUE_TYPE(15)
 
 EHmdTrackingStyle = ENUM_TYPE
 HmdTrackingStyle_Unknown = ENUM_VALUE_TYPE(0)
@@ -791,6 +809,7 @@ VREvent_WebInterfaceSectionSettingChanged = ENUM_VALUE_TYPE(865)
 VREvent_TrackersSectionSettingChanged = ENUM_VALUE_TYPE(866)
 VREvent_LastKnownSectionSettingChanged = ENUM_VALUE_TYPE(867)
 VREvent_DismissedWarningsSectionSettingChanged = ENUM_VALUE_TYPE(868)
+VREvent_GpuSpeedSectionSettingChanged = ENUM_VALUE_TYPE(869)
 VREvent_StatusUpdate = ENUM_VALUE_TYPE(900)
 VREvent_WebInterface_InstallDriverCompleted = ENUM_VALUE_TYPE(950)
 VREvent_MCImageUpdated = ENUM_VALUE_TYPE(1000)
@@ -812,6 +831,7 @@ VREvent_Compositor_ApplicationNotResponding = ENUM_VALUE_TYPE(1415)
 VREvent_Compositor_ApplicationResumed = ENUM_VALUE_TYPE(1416)
 VREvent_Compositor_OutOfVideoMemory = ENUM_VALUE_TYPE(1417)
 VREvent_Compositor_DisplayModeNotSupported = ENUM_VALUE_TYPE(1418)
+VREvent_Compositor_StageOverrideReady = ENUM_VALUE_TYPE(1419)
 VREvent_TrackedCamera_StartVideoStream = ENUM_VALUE_TYPE(1500)
 VREvent_TrackedCamera_StopVideoStream = ENUM_VALUE_TYPE(1501)
 VREvent_TrackedCamera_PauseVideoStream = ENUM_VALUE_TYPE(1502)
@@ -830,6 +850,7 @@ VREvent_Input_ActionManifestLoadFailed = ENUM_VALUE_TYPE(1704)
 VREvent_Input_ProgressUpdate = ENUM_VALUE_TYPE(1705)
 VREvent_Input_TrackerActivated = ENUM_VALUE_TYPE(1706)
 VREvent_Input_BindingsUpdated = ENUM_VALUE_TYPE(1707)
+VREvent_Input_BindingSubscriptionChanged = ENUM_VALUE_TYPE(1708)
 VREvent_SpatialAnchors_PoseUpdated = ENUM_VALUE_TYPE(1800)
 VREvent_SpatialAnchors_DescriptorUpdated = ENUM_VALUE_TYPE(1801)
 VREvent_SpatialAnchors_RequestPoseUpdate = ENUM_VALUE_TYPE(1802)
@@ -886,6 +907,7 @@ ShowUI_ManageTrackers = ENUM_VALUE_TYPE(1)
 ShowUI_Pairing = ENUM_VALUE_TYPE(3)
 ShowUI_Settings = ENUM_VALUE_TYPE(4)
 ShowUI_DebugCommands = ENUM_VALUE_TYPE(5)
+ShowUI_FullControllerBinding = ENUM_VALUE_TYPE(6)
 
 EHDCPError = ENUM_TYPE
 HDCPError_None = ENUM_VALUE_TYPE(0)
@@ -1352,6 +1374,7 @@ VRCompositorError_SharedTexturesNotSupported = ENUM_VALUE_TYPE(106)
 VRCompositorError_IndexOutOfRange = ENUM_VALUE_TYPE(107)
 VRCompositorError_AlreadySubmitted = ENUM_VALUE_TYPE(108)
 VRCompositorError_InvalidBounds = ENUM_VALUE_TYPE(109)
+VRCompositorError_AlreadySet = ENUM_VALUE_TYPE(110)
 
 EVRCompositorTimingMode = ENUM_TYPE
 VRCompositorTimingMode_Implicit = ENUM_VALUE_TYPE(0)
@@ -1376,10 +1399,14 @@ VROverlayInputMethod_Mouse = ENUM_VALUE_TYPE(1)
 VROverlayInputMethod_DualAnalog = ENUM_VALUE_TYPE(2)
 
 VROverlayTransformType = ENUM_TYPE
+VROverlayTransform_Invalid = ENUM_VALUE_TYPE(-1)
 VROverlayTransform_Absolute = ENUM_VALUE_TYPE(0)
 VROverlayTransform_TrackedDeviceRelative = ENUM_VALUE_TYPE(1)
 VROverlayTransform_SystemOverlay = ENUM_VALUE_TYPE(2)
 VROverlayTransform_TrackedComponent = ENUM_VALUE_TYPE(3)
+VROverlayTransform_Cursor = ENUM_VALUE_TYPE(4)
+VROverlayTransform_DashboardTab = ENUM_VALUE_TYPE(5)
+VROverlayTransform_DashboardThumb = ENUM_VALUE_TYPE(6)
 
 VROverlayFlags = ENUM_TYPE
 VROverlayFlags_NoDashboardTab = ENUM_VALUE_TYPE(8)
@@ -2251,6 +2278,19 @@ class Compositor_CumulativeStats(Structure):
         ("m_nNumFramePresentsTimedOut", c_uint32),
         ("m_nNumDroppedFramesTimedOut", c_uint32),
         ("m_nNumReprojectedFramesTimedOut", c_uint32),
+    ]
+
+
+class Compositor_StageRenderSettings(Structure):
+    _fields_ = [
+        ("m_PrimaryColor", HmdColor_t),
+        ("m_SecondaryColor", HmdColor_t),
+        ("m_flVignetteInnerRadius", c_float),
+        ("m_flVignetteOuterRadius", c_float),
+        ("m_flFresnelStrength", c_float),
+        ("m_bBackfaceCulling", openvr_bool),
+        ("m_bGreyscale", openvr_bool),
+        ("m_bWireframe", openvr_bool),
     ]
 
 
@@ -3621,7 +3661,6 @@ class IVRApplications(object):
 class IVRSettings_FnTable(Structure):
     _fields_ = [
         ("getSettingsErrorNameFromEnum", OPENVR_FNTABLE_CALLTYPE(c_char_p, EVRSettingsError)),
-        ("sync", OPENVR_FNTABLE_CALLTYPE(openvr_bool, openvr_bool, POINTER(EVRSettingsError))),
         ("setBool", OPENVR_FNTABLE_CALLTYPE(None, c_char_p, c_char_p, openvr_bool, POINTER(EVRSettingsError))),
         ("setInt32", OPENVR_FNTABLE_CALLTYPE(None, c_char_p, c_char_p, c_int32, POINTER(EVRSettingsError))),
         ("setFloat", OPENVR_FNTABLE_CALLTYPE(None, c_char_p, c_char_p, c_float, POINTER(EVRSettingsError))),
@@ -3651,14 +3690,6 @@ class IVRSettings(object):
         fn = self.function_table.getSettingsErrorNameFromEnum
         result = fn(error)
         return result.decode('utf-8')
-
-    def sync(self, force=False):
-        """Returns true if file sync occurred (force or settings dirty)"""
-        fn = self.function_table.sync
-        error = EVRSettingsError()
-        result = fn(force, byref(error))
-        openvr.error_code.SettingsError.check_error_value(error.value)
-        return result
 
     def setBool(self, section: str, settingsKey: str, value) -> None:
         fn = self.function_table.setBool
@@ -4129,6 +4160,8 @@ class IVRCompositor_FnTable(Structure):
         ("isMotionSmoothingEnabled", OPENVR_FNTABLE_CALLTYPE(openvr_bool)),
         ("isMotionSmoothingSupported", OPENVR_FNTABLE_CALLTYPE(openvr_bool)),
         ("isCurrentSceneFocusAppLoading", OPENVR_FNTABLE_CALLTYPE(openvr_bool)),
+        ("setStageOverride_Async", OPENVR_FNTABLE_CALLTYPE(EVRCompositorError, c_char_p, POINTER(HmdMatrix34_t), POINTER(Compositor_StageRenderSettings), c_uint32)),
+        ("clearStageOverride", OPENVR_FNTABLE_CALLTYPE(None)),
     ]
 
 
@@ -4585,6 +4618,23 @@ class IVRCompositor(object):
         result = fn()
         return result
 
+    def setStageOverride_Async(self, renderModelPath: str, transform=None, renderSettings=None, sizeOfRenderSettings=0) -> None:
+        """
+        Override the stage model used in the compositor to replace the grid.  RenderModelPath is a full path the an OBJ file to load.
+        This file will be loaded asynchronously from disk and uploaded to the gpu by the runtime.  Once ready for rendering, the
+        VREvent StageOverrideReady will be sent.  Use FadeToGrid to reveal.  Call ClearStageOverride to free the associated resources when finished.
+        """
+        fn = self.function_table.setStageOverride_Async
+        if renderModelPath is not None:
+            renderModelPath = bytes(renderModelPath, encoding='utf-8')
+        error = fn(renderModelPath, byref(transform), byref(renderSettings), sizeOfRenderSettings)
+        openvr.error_code.CompositorError.check_error_value(error)
+
+    def clearStageOverride(self) -> None:
+        """Resets the stage to its default user specified setting."""
+        fn = self.function_table.clearStageOverride
+        fn()
+
 
 class IVRNotifications_FnTable(Structure):
     _fields_ = [
@@ -4646,6 +4696,7 @@ class IVROverlay_FnTable(Structure):
         ("getOverlayRenderingPid", OPENVR_FNTABLE_CALLTYPE(c_uint32, VROverlayHandle_t)),
         ("setOverlayFlag", OPENVR_FNTABLE_CALLTYPE(EVROverlayError, VROverlayHandle_t, VROverlayFlags, openvr_bool)),
         ("getOverlayFlag", OPENVR_FNTABLE_CALLTYPE(EVROverlayError, VROverlayHandle_t, VROverlayFlags, POINTER(openvr_bool))),
+        ("getOverlayFlags", OPENVR_FNTABLE_CALLTYPE(EVROverlayError, VROverlayHandle_t, POINTER(c_uint32))),
         ("setOverlayColor", OPENVR_FNTABLE_CALLTYPE(EVROverlayError, VROverlayHandle_t, c_float, c_float, c_float)),
         ("getOverlayColor", OPENVR_FNTABLE_CALLTYPE(EVROverlayError, VROverlayHandle_t, POINTER(c_float), POINTER(c_float), POINTER(c_float))),
         ("setOverlayAlpha", OPENVR_FNTABLE_CALLTYPE(EVROverlayError, VROverlayHandle_t, c_float)),
@@ -4673,6 +4724,8 @@ class IVROverlay_FnTable(Structure):
         ("getOverlayTransformTrackedDeviceComponent", OPENVR_FNTABLE_CALLTYPE(EVROverlayError, VROverlayHandle_t, POINTER(TrackedDeviceIndex_t), c_char_p, c_uint32)),
         ("getOverlayTransformOverlayRelative", OPENVR_FNTABLE_CALLTYPE(EVROverlayError, VROverlayHandle_t, POINTER(VROverlayHandle_t), POINTER(HmdMatrix34_t))),
         ("setOverlayTransformOverlayRelative", OPENVR_FNTABLE_CALLTYPE(EVROverlayError, VROverlayHandle_t, VROverlayHandle_t, POINTER(HmdMatrix34_t))),
+        ("setOverlayTransformCursor", OPENVR_FNTABLE_CALLTYPE(EVROverlayError, VROverlayHandle_t, POINTER(HmdVector2_t))),
+        ("getOverlayTransformCursor", OPENVR_FNTABLE_CALLTYPE(EVROverlayError, VROverlayHandle_t, POINTER(HmdVector2_t))),
         ("showOverlay", OPENVR_FNTABLE_CALLTYPE(EVROverlayError, VROverlayHandle_t)),
         ("hideOverlay", OPENVR_FNTABLE_CALLTYPE(EVROverlayError, VROverlayHandle_t)),
         ("isOverlayVisible", OPENVR_FNTABLE_CALLTYPE(openvr_bool, VROverlayHandle_t)),
@@ -4686,6 +4739,11 @@ class IVROverlay_FnTable(Structure):
         ("isHoverTargetOverlay", OPENVR_FNTABLE_CALLTYPE(openvr_bool, VROverlayHandle_t)),
         ("setOverlayDualAnalogTransform", OPENVR_FNTABLE_CALLTYPE(EVROverlayError, VROverlayHandle_t, EDualAnalogWhich, POINTER(HmdVector2_t), c_float)),
         ("getOverlayDualAnalogTransform", OPENVR_FNTABLE_CALLTYPE(EVROverlayError, VROverlayHandle_t, EDualAnalogWhich, POINTER(HmdVector2_t), POINTER(c_float))),
+        ("setOverlayIntersectionMask", OPENVR_FNTABLE_CALLTYPE(EVROverlayError, VROverlayHandle_t, POINTER(VROverlayIntersectionMaskPrimitive_t), c_uint32, c_uint32)),
+        ("triggerLaserMouseHapticVibration", OPENVR_FNTABLE_CALLTYPE(EVROverlayError, VROverlayHandle_t, c_float, c_float, c_float)),
+        ("setOverlayCursor", OPENVR_FNTABLE_CALLTYPE(EVROverlayError, VROverlayHandle_t, VROverlayHandle_t)),
+        ("setOverlayCursorPositionOverride", OPENVR_FNTABLE_CALLTYPE(EVROverlayError, VROverlayHandle_t, POINTER(HmdVector2_t))),
+        ("clearOverlayCursorPositionOverride", OPENVR_FNTABLE_CALLTYPE(EVROverlayError, VROverlayHandle_t)),
         ("setOverlayTexture", OPENVR_FNTABLE_CALLTYPE(EVROverlayError, VROverlayHandle_t, POINTER(Texture_t))),
         ("clearOverlayTexture", OPENVR_FNTABLE_CALLTYPE(EVROverlayError, VROverlayHandle_t)),
         ("setOverlayRaw", OPENVR_FNTABLE_CALLTYPE(EVROverlayError, VROverlayHandle_t, c_void_p, c_uint32, c_uint32, c_uint32)),
@@ -4706,8 +4764,6 @@ class IVROverlay_FnTable(Structure):
         ("hideKeyboard", OPENVR_FNTABLE_CALLTYPE(None)),
         ("setKeyboardTransformAbsolute", OPENVR_FNTABLE_CALLTYPE(None, ETrackingUniverseOrigin, POINTER(HmdMatrix34_t))),
         ("setKeyboardPositionForOverlay", OPENVR_FNTABLE_CALLTYPE(None, VROverlayHandle_t, HmdRect2_t)),
-        ("setOverlayIntersectionMask", OPENVR_FNTABLE_CALLTYPE(EVROverlayError, VROverlayHandle_t, POINTER(VROverlayIntersectionMaskPrimitive_t), c_uint32, c_uint32)),
-        ("getOverlayFlags", OPENVR_FNTABLE_CALLTYPE(EVROverlayError, VROverlayHandle_t, POINTER(c_uint32))),
         ("showMessageOverlay", OPENVR_FNTABLE_CALLTYPE(VRMessageOverlayResponse, c_char_p, c_char_p, c_char_p, c_char_p, c_char_p, c_char_p)),
         ("closeMessageOverlay", OPENVR_FNTABLE_CALLTYPE(None)),
     ]
@@ -4847,6 +4903,14 @@ class IVROverlay(object):
         error = fn(overlayHandle, overlayFlag, byref(enabled))
         openvr.error_code.OverlayError.check_error_value(error)
         return enabled
+
+    def getOverlayFlags(self, overlayHandle):
+        """Gets all the flags for a given overlay"""
+        fn = self.function_table.getOverlayFlags
+        flags = c_uint32()
+        error = fn(overlayHandle, byref(flags))
+        openvr.error_code.OverlayError.check_error_value(error)
+        return flags.value
 
     def setOverlayColor(self, overlayHandle, red: float, green: float, blue: float) -> None:
         """Sets the color tint of the overlay quad. Use 0.0 to 1.0 per channel."""
@@ -5084,6 +5148,23 @@ class IVROverlay(object):
         error = fn(overlayHandle, overlayHandleParent, byref(parentOverlayToOverlayTransform))
         openvr.error_code.OverlayError.check_error_value(error)
 
+    def setOverlayTransformCursor(self, cursorOverlayHandle, hotspot) -> None:
+        """
+        Sets the hotspot for the specified overlay when that overlay is used as a cursor. These are in texture space with 0,0 in the upper left corner of
+        the texture and 1,1 in the lower right corner of the texture.
+        """
+        fn = self.function_table.setOverlayTransformCursor
+        error = fn(cursorOverlayHandle, byref(hotspot))
+        openvr.error_code.OverlayError.check_error_value(error)
+
+    def getOverlayTransformCursor(self, overlayHandle):
+        """Gets cursor hotspot/transform for the specified overlay"""
+        fn = self.function_table.getOverlayTransformCursor
+        hotspot = HmdVector2_t()
+        error = fn(overlayHandle, byref(hotspot))
+        openvr.error_code.OverlayError.check_error_value(error)
+        return hotspot
+
     def showOverlay(self, overlayHandle) -> None:
         """Shows the VR overlay.  For dashboard overlays, only the Dashboard Manager is allowed to call this."""
         fn = self.function_table.showOverlay
@@ -5188,6 +5269,44 @@ class IVROverlay(object):
         openvr.error_code.OverlayError.check_error_value(error)
         return center, radius.value
 
+    def setOverlayIntersectionMask(self, overlayHandle, numMaskPrimitives, primitiveSize=sizeof(VROverlayIntersectionMaskPrimitive_t)):
+        """
+        Sets a list of primitives to be used for controller ray intersection
+        typically the size of the underlying UI in pixels (not in world space).
+        """
+        fn = self.function_table.setOverlayIntersectionMask
+        maskPrimitives = VROverlayIntersectionMaskPrimitive_t()
+        error = fn(overlayHandle, byref(maskPrimitives), numMaskPrimitives, primitiveSize)
+        openvr.error_code.OverlayError.check_error_value(error)
+        return maskPrimitives
+
+    def triggerLaserMouseHapticVibration(self, overlayHandle, durationSeconds: float, frequency: float, amplitude: float) -> None:
+        """Triggers a haptic event on the laser mouse controller for the specified overlay"""
+        fn = self.function_table.triggerLaserMouseHapticVibration
+        error = fn(overlayHandle, durationSeconds, frequency, amplitude)
+        openvr.error_code.OverlayError.check_error_value(error)
+
+    def setOverlayCursor(self, overlayHandle, cursorHandle) -> None:
+        """Sets the cursor to use for the specified overlay. This will be drawn instead of the generic blob when the laser mouse is pointed at the specified overlay"""
+        fn = self.function_table.setOverlayCursor
+        error = fn(overlayHandle, cursorHandle)
+        openvr.error_code.OverlayError.check_error_value(error)
+
+    def setOverlayCursorPositionOverride(self, overlayHandle, cursor) -> None:
+        """
+        Sets the override cursor position to use for this overlay in overlay mouse coordinates. This position will be used to draw the cursor
+        instead of whatever the laser mouse cursor position is.
+        """
+        fn = self.function_table.setOverlayCursorPositionOverride
+        error = fn(overlayHandle, byref(cursor))
+        openvr.error_code.OverlayError.check_error_value(error)
+
+    def clearOverlayCursorPositionOverride(self, overlayHandle) -> None:
+        """Clears the override cursor position for this overlay"""
+        fn = self.function_table.clearOverlayCursorPositionOverride
+        error = fn(overlayHandle)
+        openvr.error_code.OverlayError.check_error_value(error)
+
     def setOverlayTexture(self, overlayHandle, texture) -> None:
         """
         Texture to draw for the overlay. This function can only be called by the overlay's creator or renderer process (see SetOverlayRenderingPid) .
@@ -5205,13 +5324,13 @@ class IVROverlay(object):
         error = fn(overlayHandle)
         openvr.error_code.OverlayError.check_error_value(error)
 
-    def setOverlayRaw(self, overlayHandle, buffer, width, height, depth) -> None:
+    def setOverlayRaw(self, overlayHandle, buffer, width, height, bytesPerPixel) -> None:
         """
         Separate interface for providing the data as a stream of bytes, but there is an upper bound on data 
         that can be sent. This function can only be called by the overlay's renderer process.
         """
         fn = self.function_table.setOverlayRaw
-        error = fn(overlayHandle, byref(buffer), width, height, depth)
+        error = fn(overlayHandle, byref(buffer), width, height, bytesPerPixel)
         openvr.error_code.OverlayError.check_error_value(error)
 
     def setOverlayFromFile(self, overlayHandle, filePath: str) -> None:
@@ -5360,24 +5479,6 @@ class IVROverlay(object):
         """Set the position of the keyboard in overlay space by telling it to avoid a rectangle in the overlay. Rectangle coords have (0,0) in the bottom left"""
         fn = self.function_table.setKeyboardPositionForOverlay
         fn(overlayHandle, rect)
-
-    def setOverlayIntersectionMask(self, overlayHandle, numMaskPrimitives, primitiveSize=sizeof(VROverlayIntersectionMaskPrimitive_t)):
-        """
-        Sets a list of primitives to be used for controller ray intersection
-        typically the size of the underlying UI in pixels (not in world space).
-        """
-        fn = self.function_table.setOverlayIntersectionMask
-        maskPrimitives = VROverlayIntersectionMaskPrimitive_t()
-        error = fn(overlayHandle, byref(maskPrimitives), numMaskPrimitives, primitiveSize)
-        openvr.error_code.OverlayError.check_error_value(error)
-        return maskPrimitives
-
-    def getOverlayFlags(self, overlayHandle):
-        fn = self.function_table.getOverlayFlags
-        flags = c_uint32()
-        error = fn(overlayHandle, byref(flags))
-        openvr.error_code.OverlayError.check_error_value(error)
-        return flags.value
 
     def showMessageOverlay(self, text: str, caption: str, button0Text: str, button1Text: str=None, button2Text: str=None, button3Text: str=None):
         """Show the message overlay. This will block and return you a result."""
