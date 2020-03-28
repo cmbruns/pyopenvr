@@ -1,6 +1,6 @@
 #!/bin/env python
 
-# Unofficial python bindings for OpenVR API version 1.9.16
+# Unofficial python bindings for OpenVR API version 1.10.30
 # from https://github.com/cmbruns/pyopenvr
 # based on OpenVR C++ API at https://github.com/ValveSoftware/openvr
 
@@ -108,8 +108,8 @@ class ID3D12CommandQueue(Structure):
 ####################
 
 k_nSteamVRVersionMajor = 1
-k_nSteamVRVersionMinor = 9
-k_nSteamVRVersionBuild = 16
+k_nSteamVRVersionMinor = 10
+k_nSteamVRVersionBuild = 30
 k_nDriverNone = 0xFFFFFFFF
 k_unMaxDriverDebugResponseSize = 32768
 k_unTrackedDeviceIndex_Hmd = 0
@@ -125,6 +125,7 @@ k_unUint64PropertyTag = 3
 k_unBoolPropertyTag = 4
 k_unStringPropertyTag = 5
 k_unErrorPropertyTag = 6
+k_unDoublePropertyTag = 7
 k_unHmdMatrix34PropertyTag = 20
 k_unHmdMatrix44PropertyTag = 21
 k_unHmdVector3PropertyTag = 22
@@ -158,6 +159,9 @@ VRCompositor_ReprojectionAsync = 0x04  # This flag indicates the async reproject
 VRCompositor_ReprojectionMotion = 0x08  # This flag indicates whether or not motion smoothing was triggered for this frame
 VRCompositor_PredictionMask = 0x30  # The runtime may predict more than one frame (up to four) ahead if
 VRCompositor_ThrottleMask = 0xC0  # Number of frames the compositor is throttling the application.
+VRCompositor_ReprojectionMotion_Enabled = 0x100  # Motion Smoothing is enabled in the UI for the currently running application
+VRCompositor_ReprojectionMotion_ForcedOn = 0x200  # Motion Smoothing is forced on in the UI for the currently running application
+VRCompositor_ReprojectionMotion_AppThrottled = 0x400  # Application is requesting throttling via ForceInterleavedReprojectionOn
 IVRSystem_Version = 'IVRSystem_021'
 k_unMaxApplicationKeyLength = 128  # The maximum length of an application key
 k_pch_MimeType_HomeApp = 'vr/home'  # Currently recognized mime types
@@ -232,6 +236,8 @@ k_pch_SteamVR_HmdDisplayColorGainB_Float = 'hmdDisplayColorGainB'
 k_pch_SteamVR_CustomIconStyle_String = 'customIconStyle'
 k_pch_SteamVR_CustomOffIconStyle_String = 'customOffIconStyle'
 k_pch_SteamVR_CustomIconForceUpdate_String = 'customIconForceUpdate'
+k_pch_SteamVR_AllowGlobalActionSetPriority = 'globalActionSetPriority'
+k_pch_SteamVR_OverlayRenderQuality = 'overlayRenderQuality_2'
 k_pch_DirectMode_Section = 'direct_mode'
 k_pch_DirectMode_Enable_Bool = 'enable'
 k_pch_DirectMode_Count_Int32 = 'count'
@@ -329,13 +335,13 @@ k_pch_Power_PauseCompositorOnStandby_Bool = 'pauseCompositorOnStandby'
 k_pch_Dashboard_Section = 'dashboard'
 k_pch_Dashboard_EnableDashboard_Bool = 'enableDashboard'
 k_pch_Dashboard_ArcadeMode_Bool = 'arcadeMode'
-k_pch_Dashboard_UseWebKeyboard = 'useWebKeyboard'
 k_pch_Dashboard_UseWebSettings = 'useWebSettings'
 k_pch_Dashboard_Position = 'position'
 k_pch_Dashboard_DesktopScale = 'desktopScale'
 k_pch_Dashboard_DashboardScale = 'dashboardScale'
 k_pch_modelskin_Section = 'modelskins'
 k_pch_Driver_Enable_Bool = 'enable'
+k_pch_Driver_BlockedBySafemode_Bool = 'blocked_by_safe_mode'
 k_pch_Driver_LoadPriority_Int32 = 'loadPriority'
 k_pch_WebInterface_Section = 'WebInterface'
 k_pch_VRWebHelper_Section = 'VRWebHelper'
@@ -343,9 +349,12 @@ k_pch_VRWebHelper_DebuggerEnabled_Bool = 'DebuggerEnabled'
 k_pch_VRWebHelper_DebuggerPort_Int32 = 'DebuggerPort'
 k_pch_TrackingOverride_Section = 'TrackingOverrides'
 k_pch_App_BindingAutosaveURLSuffix_String = 'AutosaveURL'
+k_pch_App_BindingLegacyAPISuffix_String = '_legacy'
+k_pch_App_BindingSteamVRInputAPISuffix_String = '_steamvrinput'
 k_pch_App_BindingCurrentURLSuffix_String = 'CurrentURL'
 k_pch_App_BindingPreviousURLSuffix_String = 'PreviousURL'
 k_pch_App_NeedToUpdateAutosaveSuffix_Bool = 'NeedToUpdateAutosave'
+k_pch_App_DominantHand_Int32 = 'DominantHand'
 k_pch_Trackers_Section = 'trackers'
 k_pch_DesktopUI_Section = 'DesktopUI'
 k_pch_LastKnown_Section = 'LastKnown'
@@ -359,14 +368,19 @@ k_pch_Input_ThumbstickDeadzone_Float = 'thumbstickDeadzone'
 k_pch_GpuSpeed_Section = 'GpuSpeed'
 IVRChaperone_Version = 'IVRChaperone_003'
 IVRChaperoneSetup_Version = 'IVRChaperoneSetup_006'
-IVRCompositor_Version = 'IVRCompositor_024'
+IVRCompositor_Version = 'IVRCompositor_026'
+k_unHeadsetViewMaxWidth = 3840
+k_unHeadsetViewMaxHeight = 2160
+k_pchHeadsetViewOverlayKey = 'system.HeadsetView'
+IVRHeadsetView_Version = 'IVRHeadsetView_001'
 k_unNotificationTextMaxSize = 256
 IVRNotifications_Version = 'IVRNotifications_002'
 k_unVROverlayMaxKeyLength = 128  # The maximum length of an overlay key in bytes, counting the terminating null character.
 k_unVROverlayMaxNameLength = 128  # The maximum length of an overlay name in bytes, counting the terminating null character.
 k_unMaxOverlayCount = 128  # The maximum number of overlays that can exist in the system at one time.
 k_unMaxOverlayIntersectionMaskPrimitivesCount = 32  # The maximum number of overlay intersection mask primitives per overlay
-IVROverlay_Version = 'IVROverlay_022'
+IVROverlay_Version = 'IVROverlay_024'
+IVROverlayView_Version = 'IVROverlayView_003'
 k_pch_Controller_Component_GDC2015 = 'gdc2015'  # Canonical coordinate system of the gdc 2015 wired controller, provided for backwards compatibility
 k_pch_Controller_Component_Base = 'base'  # For controllers with an unambiguous 'base'.
 k_pch_Controller_Component_Tip = 'tip'  # For controllers with an unambiguous 'tip' (used for 'laser-pointing')
@@ -379,11 +393,14 @@ IVRTrackedCamera_Version = 'IVRTrackedCamera_006'
 IVRScreenshots_Version = 'IVRScreenshots_001'
 IVRResources_Version = 'IVRResources_001'
 IVRDriverManager_Version = 'IVRDriverManager_001'
-k_unMaxActionNameLength = 64
-k_unMaxActionSetNameLength = 64
-k_unMaxActionOriginCount = 16
-k_unMaxBoneNameLength = 32
-IVRInput_Version = 'IVRInput_007'
+k_unMaxActionNameLength = 64  # Maximum number of characters in an action name, including the trailing null
+k_unMaxActionSetNameLength = 64  # Maximum number of characters in an action set name, including the trailing null
+k_unMaxActionOriginCount = 16  # Maximum number of origins for an action
+k_unMaxBoneNameLength = 32  # Maximum number of characters in a bone name, including the trailing null
+k_nActionSetOverlayGlobalPriorityMin = 0x01000000  # * Experimental global action set priority * These constants are part of the experimental support in SteamVR for overlay apps selectively overriding input in the base scene application. This may be useful for overlay applications that need to use part or all of a controller without taking away all input to the game. This system must be enabled by the "Experimental overlay input overrides" setting in the developer section of SteamVR settings.
+k_nActionSetOverlayGlobalPriorityMax = 0x01FFFFFF
+k_nActionSetPriorityReservedMin = 0x02000000
+IVRInput_Version = 'IVRInput_010'
 k_ulInvalidIOBufferHandle = 0
 IVRIOBuffer_Version = 'IVRIOBuffer_002'
 k_ulInvalidSpatialAnchorHandle = 0
@@ -591,7 +608,6 @@ Prop_DisplaySupportsRuntimeFramerateChange_Bool = ENUM_VALUE_TYPE(2084)
 Prop_DisplaySupportsAnalogGain_Bool = ENUM_VALUE_TYPE(2085)
 Prop_DisplayMinAnalogGain_Float = ENUM_VALUE_TYPE(2086)
 Prop_DisplayMaxAnalogGain_Float = ENUM_VALUE_TYPE(2087)
-Prop_DashboardLayoutPathName_String = ENUM_VALUE_TYPE(2090)
 Prop_DashboardScale_Float = ENUM_VALUE_TYPE(2091)
 Prop_IpdUIRangeMinMeters_Float = ENUM_VALUE_TYPE(2100)
 Prop_IpdUIRangeMaxMeters_Float = ENUM_VALUE_TYPE(2101)
@@ -683,6 +699,7 @@ Submit_GlRenderBuffer = ENUM_VALUE_TYPE(2)
 Submit_Reserved = ENUM_VALUE_TYPE(4)
 Submit_TextureWithPose = ENUM_VALUE_TYPE(8)
 Submit_TextureWithDepth = ENUM_VALUE_TYPE(16)
+Submit_FrameDiscontinuty = ENUM_VALUE_TYPE(32)
 
 EVRState = ENUM_TYPE
 VRState_Undefined = ENUM_VALUE_TYPE(-1)
@@ -715,14 +732,7 @@ VREvent_ButtonPress = ENUM_VALUE_TYPE(200)
 VREvent_ButtonUnpress = ENUM_VALUE_TYPE(201)
 VREvent_ButtonTouch = ENUM_VALUE_TYPE(202)
 VREvent_ButtonUntouch = ENUM_VALUE_TYPE(203)
-VREvent_DualAnalog_Press = ENUM_VALUE_TYPE(250)
-VREvent_DualAnalog_Unpress = ENUM_VALUE_TYPE(251)
-VREvent_DualAnalog_Touch = ENUM_VALUE_TYPE(252)
-VREvent_DualAnalog_Untouch = ENUM_VALUE_TYPE(253)
-VREvent_DualAnalog_Move = ENUM_VALUE_TYPE(254)
-VREvent_DualAnalog_ModeSwitch1 = ENUM_VALUE_TYPE(255)
-VREvent_DualAnalog_ModeSwitch2 = ENUM_VALUE_TYPE(256)
-VREvent_DualAnalog_Cancel = ENUM_VALUE_TYPE(257)
+VREvent_Modal_Cancel = ENUM_VALUE_TYPE(257)
 VREvent_MouseMove = ENUM_VALUE_TYPE(300)
 VREvent_MouseButtonDown = ENUM_VALUE_TYPE(301)
 VREvent_MouseButtonUp = ENUM_VALUE_TYPE(302)
@@ -733,6 +743,8 @@ VREvent_TouchPadMove = ENUM_VALUE_TYPE(306)
 VREvent_OverlayFocusChanged = ENUM_VALUE_TYPE(307)
 VREvent_ReloadOverlays = ENUM_VALUE_TYPE(308)
 VREvent_ScrollSmooth = ENUM_VALUE_TYPE(309)
+VREvent_LockMousePosition = ENUM_VALUE_TYPE(310)
+VREvent_UnlockMousePosition = ENUM_VALUE_TYPE(311)
 VREvent_InputFocusCaptured = ENUM_VALUE_TYPE(400)
 VREvent_InputFocusReleased = ENUM_VALUE_TYPE(401)
 VREvent_SceneApplicationChanged = ENUM_VALUE_TYPE(404)
@@ -897,10 +909,6 @@ VRMouseButton_Left = ENUM_VALUE_TYPE(1)
 VRMouseButton_Right = ENUM_VALUE_TYPE(2)
 VRMouseButton_Middle = ENUM_VALUE_TYPE(4)
 
-EDualAnalogWhich = ENUM_TYPE
-k_EDualAnalog_Left = ENUM_VALUE_TYPE(0)
-k_EDualAnalog_Right = ENUM_VALUE_TYPE(1)
-
 EShowUIType = ENUM_TYPE
 ShowUI_ControllerBinding = ENUM_VALUE_TYPE(0)
 ShowUI_ManageTrackers = ENUM_VALUE_TYPE(1)
@@ -908,6 +916,7 @@ ShowUI_Pairing = ENUM_VALUE_TYPE(3)
 ShowUI_Settings = ENUM_VALUE_TYPE(4)
 ShowUI_DebugCommands = ENUM_VALUE_TYPE(5)
 ShowUI_FullControllerBinding = ENUM_VALUE_TYPE(6)
+ShowUI_ManageDrivers = ENUM_VALUE_TYPE(7)
 
 EHDCPError = ENUM_TYPE
 HDCPError_None = ENUM_VALUE_TYPE(0)
@@ -915,6 +924,14 @@ HDCPError_LinkLost = ENUM_VALUE_TYPE(1)
 HDCPError_Tampered = ENUM_VALUE_TYPE(2)
 HDCPError_DeviceRevoked = ENUM_VALUE_TYPE(3)
 HDCPError_Unknown = ENUM_VALUE_TYPE(4)
+
+EVRComponentProperty = ENUM_TYPE
+VRComponentProperty_IsStatic = ENUM_VALUE_TYPE(1)
+VRComponentProperty_IsVisible = ENUM_VALUE_TYPE(2)
+VRComponentProperty_IsTouched = ENUM_VALUE_TYPE(4)
+VRComponentProperty_IsPressed = ENUM_VALUE_TYPE(8)
+VRComponentProperty_IsScrolled = ENUM_VALUE_TYPE(16)
+VRComponentProperty_IsHighlighted = ENUM_VALUE_TYPE(32)
 
 EVRInputError = ENUM_TYPE
 VRInputError_None = ENUM_VALUE_TYPE(0)
@@ -935,6 +952,9 @@ VRInputError_BufferTooSmall = ENUM_VALUE_TYPE(14)
 VRInputError_MismatchedActionManifest = ENUM_VALUE_TYPE(15)
 VRInputError_MissingSkeletonData = ENUM_VALUE_TYPE(16)
 VRInputError_InvalidBoneIndex = ENUM_VALUE_TYPE(17)
+VRInputError_InvalidPriority = ENUM_VALUE_TYPE(18)
+VRInputError_PermissionDenied = ENUM_VALUE_TYPE(19)
+VRInputError_InvalidRenderModel = ENUM_VALUE_TYPE(20)
 
 EVRSpatialAnchorError = ENUM_TYPE
 VRSpatialAnchorError_Success = ENUM_VALUE_TYPE(0)
@@ -1191,7 +1211,7 @@ VRInitError_Compositor_OpenDriverDirectModeResolveTextures = ENUM_VALUE_TYPE(476
 VRInitError_Compositor_CreateFallbackSyncTexture = ENUM_VALUE_TYPE(477)
 VRInitError_Compositor_ShareFallbackSyncTexture = ENUM_VALUE_TYPE(478)
 VRInitError_Compositor_CreateOverlayIndexBuffer = ENUM_VALUE_TYPE(479)
-VRInitError_Compositor_CreateOverlayVertextBuffer = ENUM_VALUE_TYPE(480)
+VRInitError_Compositor_CreateOverlayVertexBuffer = ENUM_VALUE_TYPE(480)
 VRInitError_Compositor_CreateTextVertexBuffer = ENUM_VALUE_TYPE(481)
 VRInitError_Compositor_CreateTextIndexBuffer = ENUM_VALUE_TYPE(482)
 VRInitError_Compositor_CreateMirrorTextures = ENUM_VALUE_TYPE(483)
@@ -1199,6 +1219,9 @@ VRInitError_Compositor_CreateLastFrameRenderTexture = ENUM_VALUE_TYPE(484)
 VRInitError_Compositor_CreateMirrorOverlay = ENUM_VALUE_TYPE(485)
 VRInitError_Compositor_FailedToCreateVirtualDisplayBackbuffer = ENUM_VALUE_TYPE(486)
 VRInitError_Compositor_DisplayModeNotSupported = ENUM_VALUE_TYPE(487)
+VRInitError_Compositor_CreateOverlayInvalidCall = ENUM_VALUE_TYPE(488)
+VRInitError_Compositor_CreateOverlayAlreadyInitialized = ENUM_VALUE_TYPE(489)
+VRInitError_Compositor_FailedToCreateMailbox = ENUM_VALUE_TYPE(490)
 VRInitError_VendorSpecific_UnableToConnectToOculusRuntime = ENUM_VALUE_TYPE(1000)
 VRInitError_VendorSpecific_WindowsNotInDevMode = ENUM_VALUE_TYPE(1001)
 VRInitError_VendorSpecific_HmdFound_CantOpenDevice = ENUM_VALUE_TYPE(1101)
@@ -1381,6 +1404,11 @@ VRCompositorTimingMode_Implicit = ENUM_VALUE_TYPE(0)
 VRCompositorTimingMode_Explicit_RuntimePerformsPostPresentHandoff = ENUM_VALUE_TYPE(1)
 VRCompositorTimingMode_Explicit_ApplicationPerformsPostPresentHandoff = ENUM_VALUE_TYPE(2)
 
+HeadsetViewMode_t = ENUM_TYPE
+HeadsetViewMode_Left = ENUM_VALUE_TYPE(0)
+HeadsetViewMode_Right = ENUM_VALUE_TYPE(1)
+HeadsetViewMode_Both = ENUM_VALUE_TYPE(2)
+
 EVRNotificationType = ENUM_TYPE
 EVRNotificationType_Transient = ENUM_VALUE_TYPE(0)
 EVRNotificationType_Persistent = ENUM_VALUE_TYPE(1)
@@ -1396,7 +1424,6 @@ EVRNotificationStyle_Contact_Active = ENUM_VALUE_TYPE(202)
 VROverlayInputMethod = ENUM_TYPE
 VROverlayInputMethod_None = ENUM_VALUE_TYPE(0)
 VROverlayInputMethod_Mouse = ENUM_VALUE_TYPE(1)
-VROverlayInputMethod_DualAnalog = ENUM_VALUE_TYPE(2)
 
 VROverlayTransformType = ENUM_TYPE
 VROverlayTransform_Invalid = ENUM_VALUE_TYPE(-1)
@@ -1407,6 +1434,7 @@ VROverlayTransform_TrackedComponent = ENUM_VALUE_TYPE(3)
 VROverlayTransform_Cursor = ENUM_VALUE_TYPE(4)
 VROverlayTransform_DashboardTab = ENUM_VALUE_TYPE(5)
 VROverlayTransform_DashboardThumb = ENUM_VALUE_TYPE(6)
+VROverlayTransform_Mountable = ENUM_VALUE_TYPE(7)
 
 VROverlayFlags = ENUM_TYPE
 VROverlayFlags_NoDashboardTab = ENUM_VALUE_TYPE(8)
@@ -1424,6 +1452,8 @@ VROverlayFlags_MakeOverlaysInteractiveIfVisible = ENUM_VALUE_TYPE(65536)
 VROverlayFlags_SendVRSmoothScrollEvents = ENUM_VALUE_TYPE(131072)
 VROverlayFlags_ProtectedContent = ENUM_VALUE_TYPE(262144)
 VROverlayFlags_HideLaserIntersection = ENUM_VALUE_TYPE(524288)
+VROverlayFlags_WantsModalBehavior = ENUM_VALUE_TYPE(1048576)
+VROverlayFlags_IsPremultiplied = ENUM_VALUE_TYPE(2097152)
 
 VRMessageOverlayResponse = ENUM_TYPE
 VRMessageOverlayResponse_ButtonPress_0 = ENUM_VALUE_TYPE(0)
@@ -1447,6 +1477,15 @@ EVROverlayIntersectionMaskPrimitiveType = ENUM_TYPE
 OverlayIntersectionPrimitiveType_Rectangle = ENUM_VALUE_TYPE(0)
 OverlayIntersectionPrimitiveType_Circle = ENUM_VALUE_TYPE(1)
 
+EKeyboardFlags = ENUM_TYPE
+KeyboardFlag_Minimal = ENUM_VALUE_TYPE(1)
+KeyboardFlag_Modal = ENUM_VALUE_TYPE(2)
+
+EDeviceType = ENUM_TYPE
+DeviceType_Invalid = ENUM_VALUE_TYPE(-1)
+DeviceType_DirectX11 = ENUM_VALUE_TYPE(0)
+DeviceType_Vulkan = ENUM_VALUE_TYPE(1)
+
 EVRRenderModelError = ENUM_TYPE
 VRRenderModelError_None = ENUM_VALUE_TYPE(0)
 VRRenderModelError_Loading = ENUM_VALUE_TYPE(100)
@@ -1461,13 +1500,6 @@ VRRenderModelError_BufferTooSmall = ENUM_VALUE_TYPE(306)
 VRRenderModelError_NotEnoughNormals = ENUM_VALUE_TYPE(307)
 VRRenderModelError_NotEnoughTexCoords = ENUM_VALUE_TYPE(308)
 VRRenderModelError_InvalidTexture = ENUM_VALUE_TYPE(400)
-
-EVRComponentProperty = ENUM_TYPE
-VRComponentProperty_IsStatic = ENUM_VALUE_TYPE(1)
-VRComponentProperty_IsVisible = ENUM_VALUE_TYPE(2)
-VRComponentProperty_IsTouched = ENUM_VALUE_TYPE(4)
-VRComponentProperty_IsPressed = ENUM_VALUE_TYPE(8)
-VRComponentProperty_IsScrolled = ENUM_VALUE_TYPE(16)
 
 EVRScreenshotError = ENUM_TYPE
 VRScreenshotError_None = ENUM_VALUE_TYPE(0)
@@ -1556,12 +1588,12 @@ DriverHandle_t = PropertyContainerHandle_t
 VRActionHandle_t = c_uint64
 VRActionSetHandle_t = c_uint64
 VRInputValueHandle_t = c_uint64
+VRComponentProperties = c_uint32
 VROverlayHandle_t = c_uint64
 BoneIndex_t = c_int32
 TrackedCameraHandle_t = c_uint64
 ScreenshotHandle_t = c_uint32
 VRNotificationId = c_uint32
-VRComponentProperties = c_uint32
 TextureID_t = c_int32
 IOBufferHandle_t = c_uint64
 VrProfilerEventHandle_t = c_uint64
@@ -1992,16 +2024,6 @@ class VREvent_Property_t(Structure):
     ]
 
 
-class VREvent_DualAnalog_t(Structure):
-    _fields_ = [
-        ("x", c_float),
-        ("y", c_float),
-        ("transformedX", c_float),
-        ("transformedY", c_float),
-        ("which", EDualAnalogWhich),
-    ]
-
-
 class VREvent_HapticVibration_t(Structure):
     _fields_ = [
         ("containerHandle", c_uint64),
@@ -2093,7 +2115,6 @@ class VREvent_Data_t(Union):
         ("cameraSurface", VREvent_EditingCameraSurface_t),
         ("messageOverlay", VREvent_MessageOverlay_t),
         ("property", VREvent_Property_t),
-        ("dualAnalog", VREvent_DualAnalog_t),
         ("hapticVibration", VREvent_HapticVibration_t),
         ("webConsole", VREvent_WebConsole_t),
         ("inputBinding", VREvent_InputBindingLoad_t),
@@ -2114,6 +2135,16 @@ class VREvent_t(PackHackStructure):
         ("trackedDeviceIndex", TrackedDeviceIndex_t),
         ("eventAgeSeconds", c_float),
         ("data", VREvent_Data_t),
+    ]
+
+
+class RenderModel_ComponentState_t(Structure):
+    """Describes state information about a render-model component, including transforms and other dynamic properties"""
+
+    _fields_ = [
+        ("mTrackingToComponentRenderModel", HmdMatrix34_t),
+        ("mTrackingToComponentLocal", HmdMatrix34_t),
+        ("uProperties", VRComponentProperties),
     ]
 
 
@@ -2150,27 +2181,6 @@ class VRControllerState_t(PackHackStructure):
         ("ulButtonPressed", c_uint64),
         ("ulButtonTouched", c_uint64),
         ("rAxis", VRControllerAxis_t * 5),
-    ]
-
-
-class Compositor_OverlaySettings(Structure):
-    """Allows the application to customize how the overlay appears in the compositor"""
-
-    _fields_ = [
-        ("size", c_uint32),
-        ("curved", openvr_bool),
-        ("antialias", openvr_bool),
-        ("scale", c_float),
-        ("distance", c_float),
-        ("alpha", c_float),
-        ("uOffset", c_float),
-        ("vOffset", c_float),
-        ("uScale", c_float),
-        ("vScale", c_float),
-        ("gridDivs", c_float),
-        ("gridWidth", c_float),
-        ("gridScale", c_float),
-        ("transform", HmdMatrix44_t),
     ]
 
 
@@ -2225,6 +2235,15 @@ class Compositor_FrameTiming(Structure):
         ("m_HmdPose", TrackedDevicePose_t),
         ("m_nNumVSyncsReadyForUse", c_uint32),
         ("m_nNumVSyncsToFirstView", c_uint32),
+    ]
+
+
+class Compositor_BenchmarkResults(Structure):
+    """Provides compositor benchmark results to the app"""
+
+    _fields_ = [
+        ("m_flMegaPixelsPerSecond", c_float),
+        ("m_flHmdRecommendedMegaPixelsPerSecond", c_float),
     ]
 
 
@@ -2355,13 +2374,28 @@ class VROverlayIntersectionMaskPrimitive_t(Structure):
     ]
 
 
-class RenderModel_ComponentState_t(Structure):
-    """Describes state information about a render-model component, including transforms and other dynamic properties"""
-
+class VROverlayView_t(Structure):
     _fields_ = [
-        ("mTrackingToComponentRenderModel", HmdMatrix34_t),
-        ("mTrackingToComponentLocal", HmdMatrix34_t),
-        ("uProperties", VRComponentProperties),
+        ("overlayHandle", VROverlayHandle_t),
+        ("texture", Texture_t),
+        ("textureBounds", VRTextureBounds_t),
+    ]
+
+
+class VRVulkanDevice_t(Structure):
+    _fields_ = [
+        ("m_pInstance", POINTER(VkInstance_T)),
+        ("m_pDevice", POINTER(VkDevice_T)),
+        ("m_pPhysicalDevice", POINTER(VkPhysicalDevice_T)),
+        ("m_pQueue", POINTER(VkQueue_T)),
+        ("m_uQueueFamilyIndex", c_uint32),
+    ]
+
+
+class VRNativeDevice_t(Structure):
+    _fields_ = [
+        ("handle", c_void_p),
+        ("eType", EDeviceType),
     ]
 
 
@@ -2452,6 +2486,7 @@ class InputBindingInfo_t(Structure):
         ("rchInputPathName", c_char * 128),
         ("rchModeName", c_char * 128),
         ("rchSlotName", c_char * 128),
+        ("rchInputSourceType", c_char * 32),
     ]
 
 
@@ -2486,7 +2521,9 @@ class COpenVRContext(object):
         self.m_pVRChaperone = None
         self.m_pVRChaperoneSetup = None
         self.m_pVRCompositor = None
+        self.m_pVRHeadsetView = None
         self.m_pVROverlay = None
+        self.m_pVROverlayView = None
         self.m_pVRResources = None
         self.m_pVRRenderModels = None
         self.m_pVRExtendedDisplay = None
@@ -2512,7 +2549,9 @@ class COpenVRContext(object):
         self.m_pVRChaperone = None
         self.m_pVRChaperoneSetup = None
         self.m_pVRCompositor = None
+        self.m_pVRHeadsetView = None
         self.m_pVROverlay = None
+        self.m_pVROverlayView = None
         self.m_pVRResources = None
         self.m_pVRRenderModels = None
         self.m_pVRExtendedDisplay = None
@@ -2556,6 +2595,18 @@ class COpenVRContext(object):
         if self.m_pVROverlay is None:
             self.m_pVROverlay = IVROverlay()
         return self.m_pVROverlay
+
+    def VROverlayView(self):
+        self.checkClear()
+        if self.m_pVROverlayView is None:
+            self.m_pVROverlayView = IVROverlayView()
+        return self.m_pVROverlayView
+
+    def VRHeadsetView(self):
+        self.checkClear()
+        if self.m_pVRHeadsetView is None:
+            self.m_pVRHeadsetView = IVRHeadsetView()
+        return self.m_pVRHeadsetView
 
     def VRResources(self):
         self.checkClear()
@@ -2659,6 +2710,14 @@ def VRCompositor():
 
 def VROverlay():
     return _internal_module_context.VROverlay()
+
+
+def VROverlayView():
+    return _internal_module_context.VROverlayView()
+
+
+def VRHeadsetView():
+    return _internal_module_context.VRHeadsetView()
 
 
 def VRResources():
@@ -2768,8 +2827,7 @@ class IVRSystem_FnTable(Structure):
 class IVRSystem(object):
     def __init__(self):
         version_key = IVRSystem_Version
-        if not isInterfaceVersionValid(version_key):
-            _checkInitError(VRInitError_Init_InterfaceNotFound)
+        _checkInterfaceVersion(version_key)
         fn_key = 'FnTable:' + version_key
         fn_type = IVRSystem_FnTable
         fn_table_ptr = cast(getGenericInterface(fn_key), POINTER(fn_type))
@@ -2921,15 +2979,15 @@ class IVRSystem(object):
         """
         fn = self.function_table.getDeviceToAbsoluteTrackingPose
         if trackedDevicePoseArray is None:
-            trackedDevicePoseArrayCount = 0
             trackedDevicePoseArrayArg = None
+            trackedDevicePoseArrayCount = 0
         elif isinstance(trackedDevicePoseArray, ctypes.Array):
+            trackedDevicePoseArrayArg = byref(trackedDevicePoseArray[0])
             trackedDevicePoseArrayCount = len(trackedDevicePoseArray)
-            trackedDevicePoseArrayArg = byref(trackedDevicePoseArray[0])
         else:
-            trackedDevicePoseArrayCount = k_unMaxTrackedDeviceCount
-            trackedDevicePoseArray = (TrackedDevicePose_t * trackedDevicePoseArrayCount)()
+            trackedDevicePoseArray = (TrackedDevicePose_t * k_unMaxTrackedDeviceCount)()
             trackedDevicePoseArrayArg = byref(trackedDevicePoseArray[0])
+            trackedDevicePoseArrayCount = k_unMaxTrackedDeviceCount
         fn(origin, predictedSecondsToPhotonsFromNow, trackedDevicePoseArrayArg, trackedDevicePoseArrayCount)
         return trackedDevicePoseArray
 
@@ -2977,15 +3035,15 @@ class IVRSystem(object):
         """
         fn = self.function_table.getSortedTrackedDeviceIndicesOfClass
         if trackedDeviceIndexArray is None:
-            trackedDeviceIndexArrayCount = 0
             trackedDeviceIndexArrayArg = None
+            trackedDeviceIndexArrayCount = 0
         elif isinstance(trackedDeviceIndexArray, ctypes.Array):
+            trackedDeviceIndexArrayArg = byref(trackedDeviceIndexArray[0])
             trackedDeviceIndexArrayCount = len(trackedDeviceIndexArray)
-            trackedDeviceIndexArrayArg = byref(trackedDeviceIndexArray[0])
         else:
-            trackedDeviceIndexArrayCount = k_unMaxTrackedDeviceCount
-            trackedDeviceIndexArray = (TrackedDeviceIndex_t * trackedDeviceIndexArrayCount)()
+            trackedDeviceIndexArray = (TrackedDeviceIndex_t * k_unMaxTrackedDeviceCount)()
             trackedDeviceIndexArrayArg = byref(trackedDeviceIndexArray[0])
+            trackedDeviceIndexArrayCount = k_unMaxTrackedDeviceCount
         result = fn(trackedDeviceClass, trackedDeviceIndexArrayArg, trackedDeviceIndexArrayCount, relativeToTrackedDeviceIndex)
         return result, trackedDeviceIndexArray
 
@@ -3322,8 +3380,7 @@ class IVRApplications_FnTable(Structure):
 class IVRApplications(object):
     def __init__(self):
         version_key = IVRApplications_Version
-        if not isInterfaceVersionValid(version_key):
-            _checkInitError(VRInitError_Init_InterfaceNotFound)
+        _checkInterfaceVersion(version_key)
         fn_key = 'FnTable:' + version_key
         fn_type = IVRApplications_FnTable
         fn_table_ptr = cast(getGenericInterface(fn_key), POINTER(fn_type))
@@ -3372,10 +3429,6 @@ class IVRApplications(object):
         """
         fn = self.function_table.getApplicationKeyByIndex
         appKeyBufferLen = fn(applicationIndex, None, 0)
-        try:
-            openvr.error_code.ApplicationError.check_error_value(error.value)
-        except openvr.error_code.BufferTooSmallError:
-            pass
         appKeyBuffer = ctypes.create_string_buffer(appKeyBufferLen)
         error = fn(applicationIndex, appKeyBuffer, appKeyBufferLen)
         openvr.error_code.ApplicationError.check_error_value(error)
@@ -3388,10 +3441,6 @@ class IVRApplications(object):
         """
         fn = self.function_table.getApplicationKeyByProcessId
         appKeyBufferLen = fn(processId, None, 0)
-        try:
-            openvr.error_code.ApplicationError.check_error_value(error.value)
-        except openvr.error_code.BufferTooSmallError:
-            pass
         appKeyBuffer = ctypes.create_string_buffer(appKeyBufferLen)
         error = fn(processId, appKeyBuffer, appKeyBufferLen)
         openvr.error_code.ApplicationError.check_error_value(error)
@@ -3419,15 +3468,15 @@ class IVRApplications(object):
         if newAppKey is not None:
             newAppKey = bytes(newAppKey, encoding='utf-8')
         if keys is None:
-            keys = 0
             keysArg = None
+            keys = 0
         elif isinstance(keys, ctypes.Array):
+            keysArg = byref(keys[0])
             keys = len(keys)
-            keysArg = byref(keys[0])
         else:
-            keys = 1
-            keys = (AppOverrideKeys_t * keys)()
+            keys = (AppOverrideKeys_t * 1)()
             keysArg = byref(keys[0])
+            keys = 1
         error = fn(templateAppKey, newAppKey, keysArg, keys)
         openvr.error_code.ApplicationError.check_error_value(error)
 
@@ -3591,10 +3640,6 @@ class IVRApplications(object):
         """Returns the app key for the application that is starting up"""
         fn = self.function_table.getStartingApplication
         appKeyBufferLen = fn(None, 0)
-        try:
-            openvr.error_code.ApplicationError.check_error_value(error.value)
-        except openvr.error_code.BufferTooSmallError:
-            pass
         appKeyBuffer = ctypes.create_string_buffer(appKeyBufferLen)
         error = fn(appKeyBuffer, appKeyBufferLen)
         openvr.error_code.ApplicationError.check_error_value(error)
@@ -3677,8 +3722,7 @@ class IVRSettings_FnTable(Structure):
 class IVRSettings(object):
     def __init__(self):
         version_key = IVRSettings_Version
-        if not isInterfaceVersionValid(version_key):
-            _checkInitError(VRInitError_Init_InterfaceNotFound)
+        _checkInterfaceVersion(version_key)
         fn_key = 'FnTable:' + version_key
         fn_type = IVRSettings_FnTable
         fn_table_ptr = cast(getGenericInterface(fn_key), POINTER(fn_type))
@@ -3829,8 +3873,7 @@ class IVRChaperone(object):
 
     def __init__(self):
         version_key = IVRChaperone_Version
-        if not isInterfaceVersionValid(version_key):
-            _checkInitError(VRInitError_Init_InterfaceNotFound)
+        _checkInterfaceVersion(version_key)
         fn_key = 'FnTable:' + version_key
         fn_type = IVRChaperone_FnTable
         fn_table_ptr = cast(getGenericInterface(fn_key), POINTER(fn_type))
@@ -3934,8 +3977,7 @@ class IVRChaperoneSetup(object):
 
     def __init__(self):
         version_key = IVRChaperoneSetup_Version
-        if not isInterfaceVersionValid(version_key):
-            _checkInitError(VRInitError_Init_InterfaceNotFound)
+        _checkInterfaceVersion(version_key)
         fn_key = 'FnTable:' + version_key
         fn_type = IVRChaperoneSetup_FnTable
         fn_table_ptr = cast(getGenericInterface(fn_key), POINTER(fn_type))
@@ -4028,15 +4070,15 @@ class IVRChaperoneSetup(object):
         """Sets the Collision Bounds in the working copy."""
         fn = self.function_table.setWorkingCollisionBoundsInfo
         if quadsBuffer is None:
-            quadsCount = 0
             quadsBufferArg = None
+            quadsCount = 0
         elif isinstance(quadsBuffer, ctypes.Array):
+            quadsBufferArg = byref(quadsBuffer[0])
             quadsCount = len(quadsBuffer)
-            quadsBufferArg = byref(quadsBuffer[0])
         else:
-            quadsCount = 1
-            quadsBuffer = (HmdQuad_t * quadsCount)()
+            quadsBuffer = (HmdQuad_t * 1)()
             quadsBufferArg = byref(quadsBuffer[0])
+            quadsCount = 1
         fn(quadsBufferArg, quadsCount)
         return quadsBuffer
 
@@ -4044,15 +4086,15 @@ class IVRChaperoneSetup(object):
         """Sets the Collision Bounds in the working copy."""
         fn = self.function_table.setWorkingPerimeter
         if pointBuffer is None:
-            pointCount = 0
             pointBufferArg = None
+            pointCount = 0
         elif isinstance(pointBuffer, ctypes.Array):
+            pointBufferArg = byref(pointBuffer[0])
             pointCount = len(pointBuffer)
-            pointBufferArg = byref(pointBuffer[0])
         else:
-            pointCount = 1
-            pointBuffer = (HmdVector2_t * pointCount)()
+            pointBuffer = (HmdVector2_t * 1)()
             pointBufferArg = byref(pointBuffer[0])
+            pointCount = 1
         fn(pointBufferArg, pointCount)
         return pointBuffer
 
@@ -4162,6 +4204,9 @@ class IVRCompositor_FnTable(Structure):
         ("isCurrentSceneFocusAppLoading", OPENVR_FNTABLE_CALLTYPE(openvr_bool)),
         ("setStageOverride_Async", OPENVR_FNTABLE_CALLTYPE(EVRCompositorError, c_char_p, POINTER(HmdMatrix34_t), POINTER(Compositor_StageRenderSettings), c_uint32)),
         ("clearStageOverride", OPENVR_FNTABLE_CALLTYPE(None)),
+        ("getCompositorBenchmarkResults", OPENVR_FNTABLE_CALLTYPE(openvr_bool, POINTER(Compositor_BenchmarkResults), c_uint32)),
+        ("getLastPosePredictionIDs", OPENVR_FNTABLE_CALLTYPE(EVRCompositorError, POINTER(c_uint32), POINTER(c_uint32))),
+        ("getPosesForFrame", OPENVR_FNTABLE_CALLTYPE(EVRCompositorError, c_uint32, POINTER(TrackedDevicePose_t), c_uint32)),
     ]
 
 
@@ -4170,8 +4215,7 @@ class IVRCompositor(object):
 
     def __init__(self):
         version_key = IVRCompositor_Version
-        if not isInterfaceVersionValid(version_key):
-            _checkInitError(VRInitError_Init_InterfaceNotFound)
+        _checkInterfaceVersion(version_key)
         fn_key = 'FnTable:' + version_key
         fn_type = IVRCompositor_FnTable
         fn_table_ptr = cast(getGenericInterface(fn_key), POINTER(fn_type))
@@ -4202,25 +4246,25 @@ class IVRCompositor(object):
         """
         fn = self.function_table.waitGetPoses
         if renderPoseArray is None:
-            renderPoseArrayCount = 0
             renderPoseArrayArg = None
+            renderPoseArrayCount = 0
         elif isinstance(renderPoseArray, ctypes.Array):
+            renderPoseArrayArg = byref(renderPoseArray[0])
             renderPoseArrayCount = len(renderPoseArray)
-            renderPoseArrayArg = byref(renderPoseArray[0])
         else:
+            renderPoseArray = (TrackedDevicePose_t * k_unMaxTrackedDeviceCount)()
+            renderPoseArrayArg = byref(renderPoseArray[0])
             renderPoseArrayCount = k_unMaxTrackedDeviceCount
-            renderPoseArray = (TrackedDevicePose_t * renderPoseArrayCount)()
-            renderPoseArrayArg = byref(renderPoseArray[0])
         if gamePoseArray is None:
-            gamePoseArrayCount = 0
             gamePoseArrayArg = None
+            gamePoseArrayCount = 0
         elif isinstance(gamePoseArray, ctypes.Array):
+            gamePoseArrayArg = byref(gamePoseArray[0])
             gamePoseArrayCount = len(gamePoseArray)
-            gamePoseArrayArg = byref(gamePoseArray[0])
         else:
-            gamePoseArrayCount = k_unMaxTrackedDeviceCount
-            gamePoseArray = (TrackedDevicePose_t * gamePoseArrayCount)()
+            gamePoseArray = (TrackedDevicePose_t * k_unMaxTrackedDeviceCount)()
             gamePoseArrayArg = byref(gamePoseArray[0])
+            gamePoseArrayCount = k_unMaxTrackedDeviceCount
         error = fn(renderPoseArrayArg, renderPoseArrayCount, gamePoseArrayArg, gamePoseArrayCount)
         openvr.error_code.CompositorError.check_error_value(error)
         return renderPoseArray, gamePoseArray
@@ -4229,25 +4273,25 @@ class IVRCompositor(object):
         """Get the last set of poses returned by WaitGetPoses."""
         fn = self.function_table.getLastPoses
         if renderPoseArray is None:
-            renderPoseArrayCount = 0
             renderPoseArrayArg = None
+            renderPoseArrayCount = 0
         elif isinstance(renderPoseArray, ctypes.Array):
+            renderPoseArrayArg = byref(renderPoseArray[0])
             renderPoseArrayCount = len(renderPoseArray)
-            renderPoseArrayArg = byref(renderPoseArray[0])
         else:
+            renderPoseArray = (TrackedDevicePose_t * k_unMaxTrackedDeviceCount)()
+            renderPoseArrayArg = byref(renderPoseArray[0])
             renderPoseArrayCount = k_unMaxTrackedDeviceCount
-            renderPoseArray = (TrackedDevicePose_t * renderPoseArrayCount)()
-            renderPoseArrayArg = byref(renderPoseArray[0])
         if gamePoseArray is None:
-            gamePoseArrayCount = 0
             gamePoseArrayArg = None
+            gamePoseArrayCount = 0
         elif isinstance(gamePoseArray, ctypes.Array):
+            gamePoseArrayArg = byref(gamePoseArray[0])
             gamePoseArrayCount = len(gamePoseArray)
-            gamePoseArrayArg = byref(gamePoseArray[0])
         else:
-            gamePoseArrayCount = k_unMaxTrackedDeviceCount
-            gamePoseArray = (TrackedDevicePose_t * gamePoseArrayCount)()
+            gamePoseArray = (TrackedDevicePose_t * k_unMaxTrackedDeviceCount)()
             gamePoseArrayArg = byref(gamePoseArray[0])
+            gamePoseArrayCount = k_unMaxTrackedDeviceCount
         error = fn(renderPoseArrayArg, renderPoseArrayCount, gamePoseArrayArg, gamePoseArrayCount)
         openvr.error_code.CompositorError.check_error_value(error)
         return renderPoseArray, gamePoseArray
@@ -4322,15 +4366,15 @@ class IVRCompositor(object):
         """
         fn = self.function_table.getFrameTimings
         if timing is None:
-            frames = 0
             timingArg = None
+            frames = 0
         elif isinstance(timing, ctypes.Array):
+            timingArg = byref(timing[0])
             frames = len(timing)
-            timingArg = byref(timing[0])
         else:
-            frames = 1
-            timing = (Compositor_FrameTiming * frames)()
+            timing = (Compositor_FrameTiming * 1)()
             timingArg = byref(timing[0])
+            frames = 1
         result = fn(timingArg, frames)
         return result, timing
 
@@ -4384,15 +4428,15 @@ class IVRCompositor(object):
         """
         fn = self.function_table.setSkyboxOverride
         if textures is None:
-            textureCount = 0
             texturesArg = None
+            textureCount = 0
         elif isinstance(textures, ctypes.Array):
+            texturesArg = byref(textures[0])
             textureCount = len(textures)
-            texturesArg = byref(textures[0])
         else:
-            textureCount = 1
-            textures = (Texture_t * textureCount)()
+            textures = (Texture_t * 1)()
             texturesArg = byref(textures[0])
+            textureCount = 1
         error = fn(texturesArg, textureCount)
         openvr.error_code.CompositorError.check_error_value(error)
 
@@ -4635,6 +4679,128 @@ class IVRCompositor(object):
         fn = self.function_table.clearStageOverride
         fn()
 
+    def getCompositorBenchmarkResults(self, sizeOfBenchmarkResults):
+        """
+        Returns true if pBenchmarkResults is filled it.  Sets pBenchmarkResults with the result of the compositor benchmark.
+        nSizeOfBenchmarkResults should be set to sizeof(Compositor_BenchmarkResults)
+        """
+        fn = self.function_table.getCompositorBenchmarkResults
+        benchmarkResults = Compositor_BenchmarkResults()
+        result = fn(byref(benchmarkResults), sizeOfBenchmarkResults)
+        return result, benchmarkResults
+
+    def getLastPosePredictionIDs(self):
+        """Returns the frame id associated with the poses last returned by WaitGetPoses.  Deltas between IDs correspond to number of headset vsync intervals."""
+        fn = self.function_table.getLastPosePredictionIDs
+        renderPosePredictionID = c_uint32()
+        gamePosePredictionID = c_uint32()
+        error = fn(byref(renderPosePredictionID), byref(gamePosePredictionID))
+        openvr.error_code.CompositorError.check_error_value(error)
+        return renderPosePredictionID.value, gamePosePredictionID.value
+
+    def getPosesForFrame(self, posePredictionID, poseArray):
+        """Get the most up-to-date predicted (or recorded - up to 100ms old) set of poses for a given frame id."""
+        fn = self.function_table.getPosesForFrame
+        if poseArray is None:
+            poseArrayArg = None
+            poseArrayCount = 0
+        elif isinstance(poseArray, ctypes.Array):
+            poseArrayArg = byref(poseArray[0])
+            poseArrayCount = len(poseArray)
+        else:
+            poseArray = (TrackedDevicePose_t * 1)()
+            poseArrayArg = byref(poseArray[0])
+            poseArrayCount = 1
+        error = fn(posePredictionID, poseArrayArg, poseArrayCount)
+        openvr.error_code.CompositorError.check_error_value(error)
+        return poseArray
+
+
+class IVRHeadsetView_FnTable(Structure):
+    _fields_ = [
+        ("setHeadsetViewSize", OPENVR_FNTABLE_CALLTYPE(None, c_uint32, c_uint32)),
+        ("getHeadsetViewSize", OPENVR_FNTABLE_CALLTYPE(None, POINTER(c_uint32), POINTER(c_uint32))),
+        ("setHeadsetViewMode", OPENVR_FNTABLE_CALLTYPE(None, HeadsetViewMode_t)),
+        ("getHeadsetViewMode", OPENVR_FNTABLE_CALLTYPE(HeadsetViewMode_t)),
+        ("setHeadsetViewCropped", OPENVR_FNTABLE_CALLTYPE(None, openvr_bool)),
+        ("getHeadsetViewCropped", OPENVR_FNTABLE_CALLTYPE(openvr_bool)),
+        ("getHeadsetViewAspectRatio", OPENVR_FNTABLE_CALLTYPE(c_float)),
+        ("setHeadsetViewBlendRange", OPENVR_FNTABLE_CALLTYPE(None, c_float, c_float)),
+        ("getHeadsetViewBlendRange", OPENVR_FNTABLE_CALLTYPE(None, POINTER(c_float), POINTER(c_float))),
+    ]
+
+
+class IVRHeadsetView(object):
+    def __init__(self):
+        version_key = IVRHeadsetView_Version
+        _checkInterfaceVersion(version_key)
+        fn_key = 'FnTable:' + version_key
+        fn_type = IVRHeadsetView_FnTable
+        fn_table_ptr = cast(getGenericInterface(fn_key), POINTER(fn_type))
+        if fn_table_ptr is None:
+            raise OpenVRError("Error retrieving VR API for IVRHeadsetView")
+        self.function_table = fn_table_ptr.contents
+
+    def setHeadsetViewSize(self, width, height) -> None:
+        """
+        Sets the resolution in pixels to render the headset view. These values are clamped to k_unHeadsetViewMaxWidth
+        and k_unHeadsetViewMaxHeight respectively. For cropped views, the rendered output will be fit to aspect ratio
+        defined by the the specified dimensions. For uncropped views, the caller should use GetHeadsetViewAspectRation
+        to adjust the requested render size to avoid squashing or stretching, and then apply letterboxing to compensate
+        when displaying the results.
+        """
+        fn = self.function_table.setHeadsetViewSize
+        fn(width, height)
+
+    def getHeadsetViewSize(self):
+        """Gets the current resolution used to render the headset view."""
+        fn = self.function_table.getHeadsetViewSize
+        width = c_uint32()
+        height = c_uint32()
+        fn(byref(width), byref(height))
+        return width.value, height.value
+
+    def setHeadsetViewMode(self, headsetViewMode) -> None:
+        """Set the mode used to render the headset view."""
+        fn = self.function_table.setHeadsetViewMode
+        fn(headsetViewMode)
+
+    def getHeadsetViewMode(self):
+        """Get the current mode used to render the headset view."""
+        fn = self.function_table.getHeadsetViewMode
+        result = fn()
+        return result
+
+    def setHeadsetViewCropped(self, cropped) -> None:
+        """Set whether or not the headset view should be rendered cropped to hide the hidden area mesh or not."""
+        fn = self.function_table.setHeadsetViewCropped
+        fn(cropped)
+
+    def getHeadsetViewCropped(self):
+        """Get the current cropping status of the headset view."""
+        fn = self.function_table.getHeadsetViewCropped
+        result = fn()
+        return result
+
+    def getHeadsetViewAspectRatio(self):
+        """Get the aspect ratio (width:height) of the uncropped headset view (accounting for the current set mode)."""
+        fn = self.function_table.getHeadsetViewAspectRatio
+        result = fn()
+        return result
+
+    def setHeadsetViewBlendRange(self, startPct: float, endPct: float) -> None:
+        """Set the range [0..1] that the headset view blends across the stereo overlapped area in cropped both mode."""
+        fn = self.function_table.setHeadsetViewBlendRange
+        fn(startPct, endPct)
+
+    def getHeadsetViewBlendRange(self):
+        """Get the current range [0..1] that the headset view blends across the stereo overlapped area in cropped both mode."""
+        fn = self.function_table.getHeadsetViewBlendRange
+        startPct = c_float()
+        endPct = c_float()
+        fn(byref(startPct), byref(endPct))
+        return startPct.value, endPct.value
+
 
 class IVRNotifications_FnTable(Structure):
     _fields_ = [
@@ -4651,8 +4817,7 @@ class IVRNotifications(object):
 
     def __init__(self):
         version_key = IVRNotifications_Version
-        if not isInterfaceVersionValid(version_key):
-            _checkInitError(VRInitError_Init_InterfaceNotFound)
+        _checkInterfaceVersion(version_key)
         fn_key = 'FnTable:' + version_key
         fn_type = IVRNotifications_FnTable
         fn_table_ptr = cast(getGenericInterface(fn_key), POINTER(fn_type))
@@ -4713,8 +4878,6 @@ class IVROverlay_FnTable(Structure):
         ("getOverlayTextureColorSpace", OPENVR_FNTABLE_CALLTYPE(EVROverlayError, VROverlayHandle_t, POINTER(EColorSpace))),
         ("setOverlayTextureBounds", OPENVR_FNTABLE_CALLTYPE(EVROverlayError, VROverlayHandle_t, POINTER(VRTextureBounds_t))),
         ("getOverlayTextureBounds", OPENVR_FNTABLE_CALLTYPE(EVROverlayError, VROverlayHandle_t, POINTER(VRTextureBounds_t))),
-        ("getOverlayRenderModel", OPENVR_FNTABLE_CALLTYPE(c_uint32, VROverlayHandle_t, c_char_p, c_uint32, POINTER(HmdColor_t), POINTER(EVROverlayError))),
-        ("setOverlayRenderModel", OPENVR_FNTABLE_CALLTYPE(EVROverlayError, VROverlayHandle_t, c_char_p, POINTER(HmdColor_t))),
         ("getOverlayTransformType", OPENVR_FNTABLE_CALLTYPE(EVROverlayError, VROverlayHandle_t, POINTER(VROverlayTransformType))),
         ("setOverlayTransformAbsolute", OPENVR_FNTABLE_CALLTYPE(EVROverlayError, VROverlayHandle_t, ETrackingUniverseOrigin, POINTER(HmdMatrix34_t))),
         ("getOverlayTransformAbsolute", OPENVR_FNTABLE_CALLTYPE(EVROverlayError, VROverlayHandle_t, POINTER(ETrackingUniverseOrigin), POINTER(HmdMatrix34_t))),
@@ -4737,8 +4900,6 @@ class IVROverlay_FnTable(Structure):
         ("setOverlayMouseScale", OPENVR_FNTABLE_CALLTYPE(EVROverlayError, VROverlayHandle_t, POINTER(HmdVector2_t))),
         ("computeOverlayIntersection", OPENVR_FNTABLE_CALLTYPE(openvr_bool, VROverlayHandle_t, POINTER(VROverlayIntersectionParams_t), POINTER(VROverlayIntersectionResults_t))),
         ("isHoverTargetOverlay", OPENVR_FNTABLE_CALLTYPE(openvr_bool, VROverlayHandle_t)),
-        ("setOverlayDualAnalogTransform", OPENVR_FNTABLE_CALLTYPE(EVROverlayError, VROverlayHandle_t, EDualAnalogWhich, POINTER(HmdVector2_t), c_float)),
-        ("getOverlayDualAnalogTransform", OPENVR_FNTABLE_CALLTYPE(EVROverlayError, VROverlayHandle_t, EDualAnalogWhich, POINTER(HmdVector2_t), POINTER(c_float))),
         ("setOverlayIntersectionMask", OPENVR_FNTABLE_CALLTYPE(EVROverlayError, VROverlayHandle_t, POINTER(VROverlayIntersectionMaskPrimitive_t), c_uint32, c_uint32)),
         ("triggerLaserMouseHapticVibration", OPENVR_FNTABLE_CALLTYPE(EVROverlayError, VROverlayHandle_t, c_float, c_float, c_float)),
         ("setOverlayCursor", OPENVR_FNTABLE_CALLTYPE(EVROverlayError, VROverlayHandle_t, VROverlayHandle_t)),
@@ -4758,8 +4919,8 @@ class IVROverlay_FnTable(Structure):
         ("getDashboardOverlaySceneProcess", OPENVR_FNTABLE_CALLTYPE(EVROverlayError, VROverlayHandle_t, POINTER(c_uint32))),
         ("showDashboard", OPENVR_FNTABLE_CALLTYPE(None, c_char_p)),
         ("getPrimaryDashboardDevice", OPENVR_FNTABLE_CALLTYPE(TrackedDeviceIndex_t)),
-        ("showKeyboard", OPENVR_FNTABLE_CALLTYPE(EVROverlayError, EGamepadTextInputMode, EGamepadTextInputLineMode, c_char_p, c_uint32, c_char_p, openvr_bool, c_uint64)),
-        ("showKeyboardForOverlay", OPENVR_FNTABLE_CALLTYPE(EVROverlayError, VROverlayHandle_t, EGamepadTextInputMode, EGamepadTextInputLineMode, c_char_p, c_uint32, c_char_p, openvr_bool, c_uint64)),
+        ("showKeyboard", OPENVR_FNTABLE_CALLTYPE(EVROverlayError, EGamepadTextInputMode, EGamepadTextInputLineMode, c_uint32, c_char_p, c_uint32, c_char_p, c_uint64)),
+        ("showKeyboardForOverlay", OPENVR_FNTABLE_CALLTYPE(EVROverlayError, VROverlayHandle_t, EGamepadTextInputMode, EGamepadTextInputLineMode, c_uint32, c_char_p, c_uint32, c_char_p, c_uint64)),
         ("getKeyboardText", OPENVR_FNTABLE_CALLTYPE(c_uint32, c_char_p, c_uint32)),
         ("hideKeyboard", OPENVR_FNTABLE_CALLTYPE(None)),
         ("setKeyboardTransformAbsolute", OPENVR_FNTABLE_CALLTYPE(None, ETrackingUniverseOrigin, POINTER(HmdMatrix34_t))),
@@ -4772,8 +4933,7 @@ class IVROverlay_FnTable(Structure):
 class IVROverlay(object):
     def __init__(self):
         version_key = IVROverlay_Version
-        if not isInterfaceVersionValid(version_key):
-            _checkInitError(VRInitError_Init_InterfaceNotFound)
+        _checkInterfaceVersion(version_key)
         fn_key = 'FnTable:' + version_key
         fn_type = IVROverlay_FnTable
         fn_table_ptr = cast(getGenericInterface(fn_key), POINTER(fn_type))
@@ -5044,32 +5204,6 @@ class IVROverlay(object):
         openvr.error_code.OverlayError.check_error_value(error)
         return overlayTextureBounds
 
-    def getOverlayRenderModel(self, overlayHandle):
-        """Gets render model to draw behind this overlay"""
-        fn = self.function_table.getOverlayRenderModel
-        color = HmdColor_t()
-        error = EVROverlayError()
-        bufferSize = fn(overlayHandle, None, 0, byref(color), byref(error))
-        try:
-            openvr.error_code.OverlayError.check_error_value(error.value)
-        except openvr.error_code.BufferTooSmallError:
-            pass
-        value = ctypes.create_string_buffer(bufferSize)
-        fn(overlayHandle, value, bufferSize, byref(color), byref(error))
-        openvr.error_code.OverlayError.check_error_value(error.value)
-        return bytes(value.value).decode('utf-8'), color
-
-    def setOverlayRenderModel(self, overlayHandle, renderModel: str, color) -> None:
-        """
-        Sets render model to draw behind this overlay and the vertex color to use, pass null for pColor to match the overlays vertex color. 
-        The model is scaled by the same amount as the overlay, with a default of 1m.
-        """
-        fn = self.function_table.setOverlayRenderModel
-        if renderModel is not None:
-            renderModel = bytes(renderModel, encoding='utf-8')
-        error = fn(overlayHandle, renderModel, byref(color))
-        openvr.error_code.OverlayError.check_error_value(error)
-
     def getOverlayTransformType(self, overlayHandle):
         """Returns the transform type of this overlay."""
         fn = self.function_table.getOverlayTransformType
@@ -5124,10 +5258,6 @@ class IVROverlay(object):
         fn = self.function_table.getOverlayTransformTrackedDeviceComponent
         deviceIndex = TrackedDeviceIndex_t()
         componentNameSize = fn(overlayHandle, byref(deviceIndex), None, 0)
-        try:
-            openvr.error_code.OverlayError.check_error_value(error.value)
-        except openvr.error_code.BufferTooSmallError:
-            pass
         componentName = ctypes.create_string_buffer(componentNameSize)
         error = fn(overlayHandle, byref(deviceIndex), componentName, componentNameSize)
         openvr.error_code.OverlayError.check_error_value(error)
@@ -5253,21 +5383,6 @@ class IVROverlay(object):
         fn = self.function_table.isHoverTargetOverlay
         result = fn(overlayHandle)
         return result
-
-    def setOverlayDualAnalogTransform(self, overlay, which, center, radius: float) -> None:
-        """Sets the analog input to Dual Analog coordinate scale for the specified overlay."""
-        fn = self.function_table.setOverlayDualAnalogTransform
-        error = fn(overlay, which, byref(center), radius)
-        openvr.error_code.OverlayError.check_error_value(error)
-
-    def getOverlayDualAnalogTransform(self, overlay, which):
-        """Gets the analog input to Dual Analog coordinate scale for the specified overlay."""
-        fn = self.function_table.getOverlayDualAnalogTransform
-        center = HmdVector2_t()
-        radius = c_float()
-        error = fn(overlay, which, byref(center), byref(radius))
-        openvr.error_code.OverlayError.check_error_value(error)
-        return center, radius.value
 
     def setOverlayIntersectionMask(self, overlayHandle, numMaskPrimitives, primitiveSize=sizeof(VROverlayIntersectionMaskPrimitive_t)):
         """
@@ -5438,23 +5553,30 @@ class IVROverlay(object):
         result = fn()
         return result
 
-    def showKeyboard(self, inputMode, lineInputMode, description: str, charMax, existingText: str, useMinimalMode, userValue) -> None:
-        """Show the virtual keyboard to accept input"""
+    def showKeyboard(self, inputMode, lineInputMode, flags, description: str, charMax, existingText: str, userValue) -> None:
+        """
+        Show the virtual keyboard to accept input. In most cases, you should pass KeyboardFlag_Modal to enable modal overlay 
+        behavior on the keyboard itself. See EKeyboardFlags for more.
+        """
         fn = self.function_table.showKeyboard
         if description is not None:
             description = bytes(description, encoding='utf-8')
         if existingText is not None:
             existingText = bytes(existingText, encoding='utf-8')
-        error = fn(inputMode, lineInputMode, description, charMax, existingText, useMinimalMode, userValue)
+        error = fn(inputMode, lineInputMode, flags, description, charMax, existingText, userValue)
         openvr.error_code.OverlayError.check_error_value(error)
 
-    def showKeyboardForOverlay(self, overlayHandle, inputMode, lineInputMode, description: str, charMax, existingText: str, useMinimalMode, userValue) -> None:
+    def showKeyboardForOverlay(self, overlayHandle, inputMode, lineInputMode, flags, description: str, charMax, existingText: str, userValue) -> None:
+        """
+        Show the virtual keyboard to accept input for an overlay. In most cases, you should pass KeyboardFlag_Modal to enable modal 
+        overlay behavior on the keyboard itself. See EKeyboardFlags for more.
+        """
         fn = self.function_table.showKeyboardForOverlay
         if description is not None:
             description = bytes(description, encoding='utf-8')
         if existingText is not None:
             existingText = bytes(existingText, encoding='utf-8')
-        error = fn(overlayHandle, inputMode, lineInputMode, description, charMax, existingText, useMinimalMode, userValue)
+        error = fn(overlayHandle, inputMode, lineInputMode, flags, description, charMax, existingText, userValue)
         openvr.error_code.OverlayError.check_error_value(error)
 
     def getKeyboardText(self):
@@ -5480,7 +5602,7 @@ class IVROverlay(object):
         fn = self.function_table.setKeyboardPositionForOverlay
         fn(overlayHandle, rect)
 
-    def showMessageOverlay(self, text: str, caption: str, button0Text: str, button1Text: str=None, button2Text: str=None, button3Text: str=None):
+    def showMessageOverlay(self, text: str, caption: str, button0Text: str, button1Text: str = None, button2Text: str = None, button3Text: str = None):
         """Show the message overlay. This will block and return you a result."""
         fn = self.function_table.showMessageOverlay
         if text is not None:
@@ -5502,6 +5624,82 @@ class IVROverlay(object):
         """If the calling process owns the overlay and it's open, this will close it."""
         fn = self.function_table.closeMessageOverlay
         fn()
+
+
+class IVROverlayView_FnTable(Structure):
+    _fields_ = [
+        ("acquireOverlayView", OPENVR_FNTABLE_CALLTYPE(EVROverlayError, VROverlayHandle_t, POINTER(VRNativeDevice_t), POINTER(VROverlayView_t), c_uint32)),
+        ("releaseOverlayView", OPENVR_FNTABLE_CALLTYPE(EVROverlayError, POINTER(VROverlayView_t))),
+        ("postOverlayEvent", OPENVR_FNTABLE_CALLTYPE(None, VROverlayHandle_t, POINTER(VREvent_t))),
+        ("isViewingPermitted", OPENVR_FNTABLE_CALLTYPE(openvr_bool, VROverlayHandle_t)),
+    ]
+
+
+class IVROverlayView(object):
+    def __init__(self):
+        version_key = IVROverlayView_Version
+        _checkInterfaceVersion(version_key)
+        fn_key = 'FnTable:' + version_key
+        fn_type = IVROverlayView_FnTable
+        fn_table_ptr = cast(getGenericInterface(fn_key), POINTER(fn_type))
+        if fn_table_ptr is None:
+            raise OpenVRError("Error retrieving VR API for IVROverlayView")
+        self.function_table = fn_table_ptr.contents
+
+    def acquireOverlayView(self, overlayHandle):
+        """
+        Acquire an OverlayView_t from an overlay handle
+
+        The overlay view can be used to sample the contents directly by a native API. The
+        contents of the OverlayView_t will remain unchanged through the lifetime of the
+        OverlayView_t.
+
+        The caller acquires read privileges over the OverlayView_t, but should not
+        write to it.
+
+        AcquireOverlayView() may be called on the same ulOverlayHandle multiple times to
+        refresh the image contents. In this case the caller is strongly encouraged to re-use
+        the same pOverlayView for all re-acquisition calls.
+
+        If the producer has not yet queued an image, AcquireOverlayView will return success,
+        and the Texture_t will have the expected ETextureType. However, the Texture_t->handle
+        will be nullptr. Once the producer generates the first overlay frame, Texture_t->handle
+        will become a valid handle.
+        """
+        fn = self.function_table.acquireOverlayView
+        nativeDevice = VRNativeDevice_t()
+        overlayView = VROverlayView_t()
+        overlayViewSize = sizeof(VROverlayView_t)
+        error = fn(overlayHandle, byref(nativeDevice), byref(overlayView), overlayViewSize)
+        openvr.error_code.OverlayError.check_error_value(error)
+        return nativeDevice, overlayView
+
+    def releaseOverlayView(self):
+        """
+        Release an acquired OverlayView_t
+
+        Denotes that pOverlayView will no longer require access to the resources it acquired in
+        all previous calls to AcquireOverlayView().
+
+        All OverlayView_t*'s provided to AcquireOverlayView() as pOverlayViews must be
+        passed into ReleaseOverlayView() in order for the underlying GPU resources to be freed.
+        """
+        fn = self.function_table.releaseOverlayView
+        overlayView = VROverlayView_t()
+        error = fn(byref(overlayView))
+        openvr.error_code.OverlayError.check_error_value(error)
+        return overlayView
+
+    def postOverlayEvent(self, overlayHandle, event) -> None:
+        """Posts an overlay event"""
+        fn = self.function_table.postOverlayEvent
+        fn(overlayHandle, byref(event))
+
+    def isViewingPermitted(self, overlayHandle):
+        """Determines whether this process is permitted to view an overlay's content."""
+        fn = self.function_table.isViewingPermitted
+        result = fn(overlayHandle)
+        return result
 
 
 class IVRRenderModels_FnTable(Structure):
@@ -5531,8 +5729,7 @@ class IVRRenderModels_FnTable(Structure):
 class IVRRenderModels(object):
     def __init__(self):
         version_key = IVRRenderModels_Version
-        if not isInterfaceVersionValid(version_key):
-            _checkInitError(VRInitError_Init_InterfaceNotFound)
+        _checkInterfaceVersion(version_key)
         fn_key = 'FnTable:' + version_key
         fn_type = IVRRenderModels_FnTable
         fn_table_ptr = cast(getGenericInterface(fn_key), POINTER(fn_type))
@@ -5790,8 +5987,7 @@ class IVRExtendedDisplay(object):
 
     def __init__(self):
         version_key = IVRExtendedDisplay_Version
-        if not isInterfaceVersionValid(version_key):
-            _checkInitError(VRInitError_Init_InterfaceNotFound)
+        _checkInterfaceVersion(version_key)
         fn_key = 'FnTable:' + version_key
         fn_type = IVRExtendedDisplay_FnTable
         fn_table_ptr = cast(getGenericInterface(fn_key), POINTER(fn_type))
@@ -5854,8 +6050,7 @@ class IVRTrackedCamera_FnTable(Structure):
 class IVRTrackedCamera(object):
     def __init__(self):
         version_key = IVRTrackedCamera_Version
-        if not isInterfaceVersionValid(version_key):
-            _checkInitError(VRInitError_Init_InterfaceNotFound)
+        _checkInterfaceVersion(version_key)
         fn_key = 'FnTable:' + version_key
         fn_type = IVRTrackedCamera_FnTable
         fn_table_ptr = cast(getGenericInterface(fn_key), POINTER(fn_type))
@@ -6004,8 +6199,7 @@ class IVRScreenshots(object):
 
     def __init__(self):
         version_key = IVRScreenshots_Version
-        if not isInterfaceVersionValid(version_key):
-            _checkInitError(VRInitError_Init_InterfaceNotFound)
+        _checkInterfaceVersion(version_key)
         fn_key = 'FnTable:' + version_key
         fn_type = IVRScreenshots_FnTable
         fn_table_ptr = cast(getGenericInterface(fn_key), POINTER(fn_type))
@@ -6070,15 +6264,15 @@ class IVRScreenshots(object):
         """
         fn = self.function_table.hookScreenshot
         if supportedTypes is None:
-            types = 0
             supportedTypesArg = None
+            types = 0
         elif isinstance(supportedTypes, ctypes.Array):
+            supportedTypesArg = byref(supportedTypes[0])
             types = len(supportedTypes)
-            supportedTypesArg = byref(supportedTypes[0])
         else:
-            types = 1
-            supportedTypes = (EVRScreenshotType * types)()
+            supportedTypes = (EVRScreenshotType * 1)()
             supportedTypesArg = byref(supportedTypes[0])
+            types = 1
         error = fn(supportedTypesArg, types)
         openvr.error_code.ScreenshotError.check_error_value(error)
 
@@ -6176,8 +6370,7 @@ class IVRResources_FnTable(Structure):
 class IVRResources(object):
     def __init__(self):
         version_key = IVRResources_Version
-        if not isInterfaceVersionValid(version_key):
-            _checkInitError(VRInitError_Init_InterfaceNotFound)
+        _checkInterfaceVersion(version_key)
         fn_key = 'FnTable:' + version_key
         fn_type = IVRResources_FnTable
         fn_table_ptr = cast(getGenericInterface(fn_key), POINTER(fn_type))
@@ -6226,8 +6419,7 @@ class IVRDriverManager_FnTable(Structure):
 class IVRDriverManager(object):
     def __init__(self):
         version_key = IVRDriverManager_Version
-        if not isInterfaceVersionValid(version_key):
-            _checkInitError(VRInitError_Init_InterfaceNotFound)
+        _checkInterfaceVersion(version_key)
         fn_key = 'FnTable:' + version_key
         fn_type = IVRDriverManager_FnTable
         fn_table_ptr = cast(getGenericInterface(fn_key), POINTER(fn_type))
@@ -6273,6 +6465,8 @@ class IVRInput_FnTable(Structure):
         ("getPoseActionDataRelativeToNow", OPENVR_FNTABLE_CALLTYPE(EVRInputError, VRActionHandle_t, ETrackingUniverseOrigin, c_float, POINTER(InputPoseActionData_t), c_uint32, VRInputValueHandle_t)),
         ("getPoseActionDataForNextFrame", OPENVR_FNTABLE_CALLTYPE(EVRInputError, VRActionHandle_t, ETrackingUniverseOrigin, POINTER(InputPoseActionData_t), c_uint32, VRInputValueHandle_t)),
         ("getSkeletalActionData", OPENVR_FNTABLE_CALLTYPE(EVRInputError, VRActionHandle_t, POINTER(InputSkeletalActionData_t), c_uint32)),
+        ("getDominantHand", OPENVR_FNTABLE_CALLTYPE(EVRInputError, POINTER(ETrackedControllerRole))),
+        ("setDominantHand", OPENVR_FNTABLE_CALLTYPE(EVRInputError, ETrackedControllerRole)),
         ("getBoneCount", OPENVR_FNTABLE_CALLTYPE(EVRInputError, VRActionHandle_t, POINTER(c_uint32))),
         ("getBoneHierarchy", OPENVR_FNTABLE_CALLTYPE(EVRInputError, VRActionHandle_t, POINTER(BoneIndex_t), c_uint32)),
         ("getBoneName", OPENVR_FNTABLE_CALLTYPE(EVRInputError, VRActionHandle_t, BoneIndex_t, c_char_p, c_uint32)),
@@ -6289,16 +6483,17 @@ class IVRInput_FnTable(Structure):
         ("getActionBindingInfo", OPENVR_FNTABLE_CALLTYPE(EVRInputError, VRActionHandle_t, POINTER(InputBindingInfo_t), c_uint32, c_uint32, POINTER(c_uint32))),
         ("showActionOrigins", OPENVR_FNTABLE_CALLTYPE(EVRInputError, VRActionSetHandle_t, VRActionHandle_t)),
         ("showBindingsForActionSet", OPENVR_FNTABLE_CALLTYPE(EVRInputError, POINTER(VRActiveActionSet_t), c_uint32, c_uint32, VRInputValueHandle_t)),
+        ("getComponentStateForBinding", OPENVR_FNTABLE_CALLTYPE(EVRInputError, c_char_p, c_char_p, POINTER(InputBindingInfo_t), c_uint32, c_uint32, POINTER(RenderModel_ComponentState_t))),
         ("isUsingLegacyInput", OPENVR_FNTABLE_CALLTYPE(openvr_bool)),
         ("openBindingUI", OPENVR_FNTABLE_CALLTYPE(EVRInputError, c_char_p, VRActionSetHandle_t, VRInputValueHandle_t, openvr_bool)),
+        ("getBindingVariant", OPENVR_FNTABLE_CALLTYPE(EVRInputError, VRInputValueHandle_t, c_char_p, c_uint32)),
     ]
 
 
 class IVRInput(object):
     def __init__(self):
         version_key = IVRInput_Version
-        if not isInterfaceVersionValid(version_key):
-            _checkInitError(VRInitError_Init_InterfaceNotFound)
+        _checkInterfaceVersion(version_key)
         fn_key = 'FnTable:' + version_key
         fn_type = IVRInput_FnTable
         fn_table_ptr = cast(getGenericInterface(fn_key), POINTER(fn_type))
@@ -6356,15 +6551,15 @@ class IVRInput(object):
         """
         fn = self.function_table.updateActionState
         if sets is None:
-            setCount = 0
             setsArg = None
+            setCount = 0
         elif isinstance(sets, ctypes.Array):
+            setsArg = byref(sets[0])
             setCount = len(sets)
-            setsArg = byref(sets[0])
         else:
-            setCount = 1
-            sets = (VRActiveActionSet_t * setCount)()
+            sets = (VRActiveActionSet_t * 1)()
             setsArg = byref(sets[0])
+            setCount = 1
         sizeOfVRSelectedActionSet_t = sizeof(VRActiveActionSet_t)
         error = fn(setsArg, sizeOfVRSelectedActionSet_t, setCount)
         openvr.error_code.InputError.check_error_value(error)
@@ -6427,6 +6622,24 @@ class IVRInput(object):
         openvr.error_code.InputError.check_error_value(error)
         return actionData
 
+    def getDominantHand(self):
+        """
+        Returns the current dominant hand for the user for this application. This function will only return success for applications
+        which include "supports_dominant_hand_setting": true in their action manifests. The dominant hand will only change after
+        a call to UpdateActionState, and the action data returned after that point will use the new dominant hand.
+        """
+        fn = self.function_table.getDominantHand
+        dominantHand = ETrackedControllerRole()
+        error = fn(byref(dominantHand))
+        openvr.error_code.InputError.check_error_value(error)
+        return dominantHand
+
+    def setDominantHand(self, dominantHand) -> None:
+        """Sets the dominant hand for the user for this application."""
+        fn = self.function_table.setDominantHand
+        error = fn(dominantHand)
+        openvr.error_code.InputError.check_error_value(error)
+
     def getBoneCount(self, action):
         """Reads the number of bones in skeleton associated with the given action"""
         fn = self.function_table.getBoneCount
@@ -6439,15 +6652,15 @@ class IVRInput(object):
         """Fills the given array with the index of each bone's parent in the skeleton associated with the given action"""
         fn = self.function_table.getBoneHierarchy
         if parentIndices is None:
-            indexArayCount = 0
             parentIndicesArg = None
+            indexArayCount = 0
         elif isinstance(parentIndices, ctypes.Array):
+            parentIndicesArg = byref(parentIndices[0])
             indexArayCount = len(parentIndices)
-            parentIndicesArg = byref(parentIndices[0])
         else:
-            indexArayCount = 1
-            parentIndices = (BoneIndex_t * indexArayCount)()
+            parentIndices = (BoneIndex_t * 1)()
             parentIndicesArg = byref(parentIndices[0])
+            indexArayCount = 1
         error = fn(action, parentIndicesArg, indexArayCount)
         openvr.error_code.InputError.check_error_value(error)
         return parentIndices
@@ -6456,10 +6669,6 @@ class IVRInput(object):
         """Fills the given buffer with the name of the bone at the given index in the skeleton associated with the given action"""
         fn = self.function_table.getBoneName
         nameBufferSize = fn(action, boneIndex, None, 0)
-        try:
-            openvr.error_code.InputError.check_error_value(error.value)
-        except openvr.error_code.BufferTooSmallError:
-            pass
         boneName = ctypes.create_string_buffer(nameBufferSize)
         error = fn(action, boneIndex, boneName, nameBufferSize)
         openvr.error_code.InputError.check_error_value(error)
@@ -6469,15 +6678,15 @@ class IVRInput(object):
         """Fills the given buffer with the transforms for a specific static skeletal reference pose"""
         fn = self.function_table.getSkeletalReferenceTransforms
         if transformArray is None:
-            transformArrayCount = 0
             transformArrayArg = None
+            transformArrayCount = 0
         elif isinstance(transformArray, ctypes.Array):
+            transformArrayArg = byref(transformArray[0])
             transformArrayCount = len(transformArray)
-            transformArrayArg = byref(transformArray[0])
         else:
-            transformArrayCount = 1
-            transformArray = (VRBoneTransform_t * transformArrayCount)()
+            transformArray = (VRBoneTransform_t * 1)()
             transformArrayArg = byref(transformArray[0])
+            transformArrayCount = 1
         error = fn(action, transformSpace, referencePose, transformArrayArg, transformArrayCount)
         openvr.error_code.InputError.check_error_value(error)
         return transformArray
@@ -6494,15 +6703,15 @@ class IVRInput(object):
         """Reads the state of the skeletal bone data associated with this action and copies it into the given buffer."""
         fn = self.function_table.getSkeletalBoneData
         if transformArray is None:
-            transformArrayCount = 0
             transformArrayArg = None
+            transformArrayCount = 0
         elif isinstance(transformArray, ctypes.Array):
+            transformArrayArg = byref(transformArray[0])
             transformArrayCount = len(transformArray)
-            transformArrayArg = byref(transformArray[0])
         else:
-            transformArrayCount = 1
-            transformArray = (VRBoneTransform_t * transformArrayCount)()
+            transformArray = (VRBoneTransform_t * 1)()
             transformArrayArg = byref(transformArray[0])
+            transformArrayCount = 1
         error = fn(action, transformSpace, motionRange, transformArrayArg, transformArrayCount)
         openvr.error_code.InputError.check_error_value(error)
         return transformArray
@@ -6531,15 +6740,15 @@ class IVRInput(object):
         """Turns a compressed buffer from GetSkeletalBoneDataCompressed and turns it back into a bone transform array."""
         fn = self.function_table.decompressSkeletalBoneData
         if transformArray is None:
-            transformArrayCount = 0
             transformArrayArg = None
+            transformArrayCount = 0
         elif isinstance(transformArray, ctypes.Array):
+            transformArrayArg = byref(transformArray[0])
             transformArrayCount = len(transformArray)
-            transformArrayArg = byref(transformArray[0])
         else:
-            transformArrayCount = 1
-            transformArray = (VRBoneTransform_t * transformArrayCount)()
+            transformArray = (VRBoneTransform_t * 1)()
             transformArrayArg = byref(transformArray[0])
+            transformArrayCount = 1
         error = fn(byref(compressedBuffer), compressedBufferSize, transformSpace, transformArrayArg, transformArrayCount)
         openvr.error_code.InputError.check_error_value(error)
         return transformArray
@@ -6554,15 +6763,15 @@ class IVRInput(object):
         """Retrieve origin handles for an action"""
         fn = self.function_table.getActionOrigins
         if originsOut is None:
-            originOutCount = 0
             originsOutArg = None
+            originOutCount = 0
         elif isinstance(originsOut, ctypes.Array):
+            originsOutArg = byref(originsOut[0])
             originOutCount = len(originsOut)
-            originsOutArg = byref(originsOut[0])
         else:
-            originOutCount = 1
-            originsOut = (VRInputValueHandle_t * originOutCount)()
+            originsOut = (VRInputValueHandle_t * 1)()
             originsOutArg = byref(originsOut[0])
+            originOutCount = 1
         error = fn(actionSetHandle, digitalActionHandle, originsOutArg, originOutCount)
         openvr.error_code.InputError.check_error_value(error)
         return originsOut.value
@@ -6574,10 +6783,6 @@ class IVRInput(object):
         """
         fn = self.function_table.getOriginLocalizedName
         nameArraySize = fn(origin, None, 0, stringSectionsToInclude)
-        try:
-            openvr.error_code.InputError.check_error_value(error.value)
-        except openvr.error_code.BufferTooSmallError:
-            pass
         nameArray = ctypes.create_string_buffer(nameArraySize)
         error = fn(origin, nameArray, nameArraySize, stringSectionsToInclude)
         openvr.error_code.InputError.check_error_value(error)
@@ -6612,19 +6817,32 @@ class IVRInput(object):
         """Shows the current binding all the actions in the specified action sets"""
         fn = self.function_table.showBindingsForActionSet
         if sets is None:
-            setCount = 0
             setsArg = None
+            setCount = 0
         elif isinstance(sets, ctypes.Array):
+            setsArg = byref(sets[0])
             setCount = len(sets)
-            setsArg = byref(sets[0])
         else:
-            setCount = 1
-            sets = (VRActiveActionSet_t * setCount)()
+            sets = (VRActiveActionSet_t * 1)()
             setsArg = byref(sets[0])
+            setCount = 1
         sizeOfVRSelectedActionSet_t = sizeof(VRActiveActionSet_t)
         error = fn(setsArg, sizeOfVRSelectedActionSet_t, setCount, originToHighlight)
         openvr.error_code.InputError.check_error_value(error)
         return sets
+
+    def getComponentStateForBinding(self, renderModelName: str, componentName: str, originInfo, bindingInfoCount):
+        """Use this to query what action on the component returned by GetOriginTrackedDeviceInfo would trigger this binding."""
+        fn = self.function_table.getComponentStateForBinding
+        if renderModelName is not None:
+            renderModelName = bytes(renderModelName, encoding='utf-8')
+        if componentName is not None:
+            componentName = bytes(componentName, encoding='utf-8')
+        bindingInfoSize = sizeof(InputBindingInfo_t)
+        componentState = RenderModel_ComponentState_t()
+        error = fn(renderModelName, componentName, byref(originInfo), bindingInfoSize, bindingInfoCount, byref(componentState))
+        openvr.error_code.InputError.check_error_value(error)
+        return componentState
 
     def isUsingLegacyInput(self):
         """--------------- Legacy Input -------------------"""
@@ -6642,6 +6860,18 @@ class IVRInput(object):
             appKey = bytes(appKey, encoding='utf-8')
         error = fn(appKey, actionSetHandle, deviceHandle, showOnDesktop)
         openvr.error_code.InputError.check_error_value(error)
+
+    def getBindingVariant(self, devicePath):
+        """
+        Returns the variant set in the current bindings. If the binding doesn't include a variant setting, this function 
+        will return an empty string
+        """
+        fn = self.function_table.getBindingVariant
+        variantArraySize = fn(devicePath, None, 0)
+        variantArray = ctypes.create_string_buffer(variantArraySize)
+        error = fn(devicePath, variantArray, variantArraySize)
+        openvr.error_code.InputError.check_error_value(error)
+        return bytes(variantArray.value).decode('utf-8')
 
 
 class IVRIOBuffer_FnTable(Structure):
@@ -6664,8 +6894,7 @@ class IVRIOBuffer(object):
 
     def __init__(self):
         version_key = IVRIOBuffer_Version
-        if not isInterfaceVersionValid(version_key):
-            _checkInitError(VRInitError_Init_InterfaceNotFound)
+        _checkInterfaceVersion(version_key)
         fn_key = 'FnTable:' + version_key
         fn_type = IVRIOBuffer_FnTable
         fn_table_ptr = cast(getGenericInterface(fn_key), POINTER(fn_type))
@@ -6728,8 +6957,7 @@ class IVRSpatialAnchors_FnTable(Structure):
 class IVRSpatialAnchors(object):
     def __init__(self):
         version_key = IVRSpatialAnchors_Version
-        if not isInterfaceVersionValid(version_key):
-            _checkInitError(VRInitError_Init_InterfaceNotFound)
+        _checkInterfaceVersion(version_key)
         fn_key = 'FnTable:' + version_key
         fn_type = IVRSpatialAnchors_FnTable
         fn_table_ptr = cast(getGenericInterface(fn_key), POINTER(fn_type))
@@ -6796,10 +7024,6 @@ class IVRSpatialAnchors(object):
         """
         fn = self.function_table.getSpatialAnchorDescriptor
         descriptorBufferLenInOut = fn(handle, None, 0)
-        try:
-            openvr.error_code.SpatialAnchorError.check_error_value(error.value)
-        except openvr.error_code.BufferTooSmallError:
-            pass
         descriptorOut = ctypes.create_string_buffer(descriptorBufferLenInOut)
         error = fn(handle, descriptorOut, descriptorBufferLenInOut)
         openvr.error_code.SpatialAnchorError.check_error_value(error)
@@ -6818,8 +7042,7 @@ class IVRDebug_FnTable(Structure):
 class IVRDebug(object):
     def __init__(self):
         version_key = IVRDebug_Version
-        if not isInterfaceVersionValid(version_key):
-            _checkInitError(VRInitError_Init_InterfaceNotFound)
+        _checkInterfaceVersion(version_key)
         fn_key = 'FnTable:' + version_key
         fn_type = IVRDebug_FnTable
         fn_table_ptr = cast(getGenericInterface(fn_key), POINTER(fn_type))
@@ -6883,13 +7106,18 @@ class IVRDebug(object):
 # Expose functions #
 ####################
 
-def _checkInitError(error):
+def _checkInterfaceVersion(version_key):
     """
     Replace openvr error return code with a python exception
     """
-    if error != VRInitError_None:
-        shutdown()
-        raise OpenVRError("%s (error number %d)" % (getVRInitErrorAsSymbol(error), error))
+    if isInterfaceVersionValid(version_key):
+        return
+    shutdown()
+    error = VRInitError_Init_InterfaceNotFound
+    msg = f"The installed SteamVR runtime could not provide API version {version_key} requested by pyopenvr. "\
+          f"You may need to update SteamVR or use an older version of pyopenvr. "\
+          f"{getVRInitErrorAsSymbol(error)} (error number {error})."
+    raise OpenVRError(msg)
 
 
 # Copying VR_Init inline implementation from https://github.com/ValveSoftware/openvr/blob/master/headers/openvr.h

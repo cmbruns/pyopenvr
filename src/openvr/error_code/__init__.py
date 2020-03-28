@@ -224,6 +224,18 @@ class InputError_InvalidBoneIndex(InputError):
     pass
 
 
+class InputError_InvalidPriority(InputError):
+    pass
+
+
+class InputError_PermissionDenied(InputError):
+    pass
+
+
+class InputError_InvalidRenderModel(InputError):
+    pass
+
+
 InputError.error_index[0] = InputError_None
 InputError.error_index[1] = InputError_NameNotFound
 InputError.error_index[2] = InputError_WrongType
@@ -242,6 +254,9 @@ InputError.error_index[14] = InputError_BufferTooSmall
 InputError.error_index[15] = InputError_MismatchedActionManifest
 InputError.error_index[16] = InputError_MissingSkeletonData
 InputError.error_index[17] = InputError_InvalidBoneIndex
+InputError.error_index[18] = InputError_InvalidPriority
+InputError.error_index[19] = InputError_PermissionDenied
+InputError.error_index[20] = InputError_InvalidRenderModel
 
 
 class SpatialAnchorError(ErrorCode):
@@ -1114,7 +1129,7 @@ class InitError_Compositor_CreateOverlayIndexBuffer(InitError):
     pass
 
 
-class InitError_Compositor_CreateOverlayVertextBuffer(InitError):
+class InitError_Compositor_CreateOverlayVertexBuffer(InitError):
     pass
 
 
@@ -1143,6 +1158,18 @@ class InitError_Compositor_FailedToCreateVirtualDisplayBackbuffer(InitError):
 
 
 class InitError_Compositor_DisplayModeNotSupported(InitError):
+    pass
+
+
+class InitError_Compositor_CreateOverlayInvalidCall(InitError):
+    pass
+
+
+class InitError_Compositor_CreateOverlayAlreadyInitialized(InitError):
+    pass
+
+
+class InitError_Compositor_FailedToCreateMailbox(InitError):
     pass
 
 
@@ -1371,7 +1398,7 @@ InitError.error_index[476] = InitError_Compositor_OpenDriverDirectModeResolveTex
 InitError.error_index[477] = InitError_Compositor_CreateFallbackSyncTexture
 InitError.error_index[478] = InitError_Compositor_ShareFallbackSyncTexture
 InitError.error_index[479] = InitError_Compositor_CreateOverlayIndexBuffer
-InitError.error_index[480] = InitError_Compositor_CreateOverlayVertextBuffer
+InitError.error_index[480] = InitError_Compositor_CreateOverlayVertexBuffer
 InitError.error_index[481] = InitError_Compositor_CreateTextVertexBuffer
 InitError.error_index[482] = InitError_Compositor_CreateTextIndexBuffer
 InitError.error_index[483] = InitError_Compositor_CreateMirrorTextures
@@ -1379,6 +1406,9 @@ InitError.error_index[484] = InitError_Compositor_CreateLastFrameRenderTexture
 InitError.error_index[485] = InitError_Compositor_CreateMirrorOverlay
 InitError.error_index[486] = InitError_Compositor_FailedToCreateVirtualDisplayBackbuffer
 InitError.error_index[487] = InitError_Compositor_DisplayModeNotSupported
+InitError.error_index[488] = InitError_Compositor_CreateOverlayInvalidCall
+InitError.error_index[489] = InitError_Compositor_CreateOverlayAlreadyInitialized
+InitError.error_index[490] = InitError_Compositor_FailedToCreateMailbox
 InitError.error_index[1000] = InitError_VendorSpecific_UnableToConnectToOculusRuntime
 InitError.error_index[1001] = InitError_VendorSpecific_WindowsNotInDevMode
 InitError.error_index[1101] = InitError_VendorSpecific_HmdFound_CantOpenDevice
