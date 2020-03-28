@@ -286,13 +286,18 @@ class CTypesGenerator(object):
             # Expose functions #
             ####################
             
-            def _checkInitError(error):
+            def _checkInterfaceVersion(version_key):
                 """
                 Replace openvr error return code with a python exception
                 """
-                if error != VRInitError_None:
-                    shutdown()
-                    raise OpenVRError("%s (error number %d)" % (getVRInitErrorAsSymbol(error), error))
+                if isInterfaceVersionValid(version_key):
+                    return
+                shutdown()
+                error = VRInitError_Init_InterfaceNotFound
+                msg = f"The installed SteamVR runtime could not provide API version {version_key} requested by pyopenvr. "\\
+                      f"You may need to update SteamVR or use an older version of pyopenvr. "\\
+                      f"{getVRInitErrorAsSymbol(error)} (error number {error})."
+                raise OpenVRError(msg)
             
             
             # Copying VR_Init inline implementation from https://github.com/ValveSoftware/openvr/blob/master/headers/openvr.h
