@@ -102,9 +102,7 @@ class FunctionBase(Declaration):
                     ''')
                     error_category = None
                     error_param_name = 'error'
-                    if self.raise_error_code():
-                        error_category = translate_error_category(self.type)
-                    else:
+                    if not self.raise_error_code():
                         for p2 in self.parameters:
                             if p2.is_error():
                                 assert p2.type.kind == TypeKind.POINTER
@@ -277,8 +275,7 @@ class IVRClass(Declaration):
             class {name}({self.base}):{docstring}
                 def __init__(self):
                     version_key = {name}_Version
-                    if not isInterfaceVersionValid(version_key):
-                        _checkInitError(VRInitError_Init_InterfaceNotFound)
+                    _checkInterfaceVersion(version_key)
                     fn_key = 'FnTable:' + version_key
                     fn_type = {name}_FnTable
                     fn_table_ptr = cast(getGenericInterface(fn_key), POINTER(fn_type))
@@ -505,15 +502,15 @@ class Parameter(Declaration):
                 default_length = 'k_unMaxTrackedDeviceCount'
             result += textwrap.dedent(f'''\
                 if {self.py_name} is None:
-                    {count_param} = 0
                     {self.py_name}Arg = None
+                    {count_param} = 0
                 elif isinstance({self.py_name}, ctypes.Array):
+                    {self.py_name}Arg = byref({self.py_name}[0])
                     {count_param} = len({self.py_name})
-                    {self.py_name}Arg = byref({self.py_name}[0])
                 else:
-                    {count_param} = {default_length}
-                    {self.py_name} = ({element_t} * {count_param})()
+                    {self.py_name} = ({element_t} * {default_length})()
                     {self.py_name}Arg = byref({self.py_name}[0])
+                    {count_param} = {default_length}
                 ''')
             return result
         elif self.is_output_string():
@@ -559,14 +556,21 @@ class Parameter(Declaration):
         if not self.is_input():
             return None
         n = self.py_name
+        has_type_annotation = False
         if self.is_input_string():
             n = f'{n}: str'
+            has_type_annotation = True
         elif self.is_int():
             n = f'{n}: int'
+            has_type_annotation = True
         elif self.is_float():
             n = f'{n}: float'
+            has_type_annotation = True
         if self.default_value:
-            n = f'{n}={self.default_value}'
+            if has_type_annotation:
+                n = f'{n} = {self.default_value}'
+            else:
+                n = f'{n}={self.default_value}'
         return n
 
     def call_param_name(self):
