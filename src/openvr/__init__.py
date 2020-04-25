@@ -1,6 +1,6 @@
 #!/bin/env python
 
-# Unofficial python bindings for OpenVR API version 1.10.30
+# Unofficial python bindings for OpenVR API version 1.11.11
 # from https://github.com/cmbruns/pyopenvr
 # based on OpenVR C++ API at https://github.com/ValveSoftware/openvr
 
@@ -108,8 +108,8 @@ class ID3D12CommandQueue(Structure):
 ####################
 
 k_nSteamVRVersionMajor = 1
-k_nSteamVRVersionMinor = 10
-k_nSteamVRVersionBuild = 30
+k_nSteamVRVersionMinor = 11
+k_nSteamVRVersionBuild = 11
 k_nDriverNone = 0xFFFFFFFF
 k_unMaxDriverDebugResponseSize = 32768
 k_unTrackedDeviceIndex_Hmd = 0
@@ -266,6 +266,7 @@ k_pch_Null_RenderWidth_Int32 = 'renderWidth'
 k_pch_Null_RenderHeight_Int32 = 'renderHeight'
 k_pch_Null_SecondsFromVsyncToPhotons_Float = 'secondsFromVsyncToPhotons'
 k_pch_Null_DisplayFrequency_Float = 'displayFrequency'
+k_pch_WindowsMR_Section = 'driver_holographic'
 k_pch_UserInterface_Section = 'userinterface'
 k_pch_UserInterface_StatusAlwaysOnTop_Bool = 'StatusAlwaysOnTop'
 k_pch_UserInterface_MinimizeToTray_Bool = 'MinimizeToTray'
@@ -294,6 +295,7 @@ k_pch_CollisionBounds_GroundPerimeterOn_Bool = 'CollisionBoundsGroundPerimeterOn
 k_pch_CollisionBounds_CenterMarkerOn_Bool = 'CollisionBoundsCenterMarkerOn'
 k_pch_CollisionBounds_PlaySpaceOn_Bool = 'CollisionBoundsPlaySpaceOn'
 k_pch_CollisionBounds_FadeDistance_Float = 'CollisionBoundsFadeDistance'
+k_pch_CollisionBounds_WallHeight_Float = 'CollisionBoundsWallHeight'
 k_pch_CollisionBounds_ColorGammaR_Int32 = 'CollisionBoundsColorGammaR'
 k_pch_CollisionBounds_ColorGammaG_Int32 = 'CollisionBoundsColorGammaG'
 k_pch_CollisionBounds_ColorGammaB_Int32 = 'CollisionBoundsColorGammaB'
@@ -323,6 +325,8 @@ k_pch_audio_EnablePlaybackMirror_Bool = 'enablePlaybackMirror'
 k_pch_audio_PlaybackMirrorDevice_String = 'playbackMirrorDevice'
 k_pch_audio_PlaybackMirrorDeviceName_String = 'playbackMirrorDeviceName'
 k_pch_audio_OldPlaybackMirrorDevice_String = 'onPlaybackMirrorDevice'
+k_pch_audio_ActiveMirrorDevice_String = 'activePlaybackMirrorDevice'
+k_pch_audio_EnablePlaybackMirrorIndependentVolume_Bool = 'enablePlaybackMirrorIndependentVolume'
 k_pch_audio_LastHmdPlaybackDeviceId_String = 'lastHmdPlaybackDeviceId'
 k_pch_audio_VIVEHDMIGain = 'viveHDMIGain'
 k_pch_Power_Section = 'power'
@@ -335,7 +339,6 @@ k_pch_Power_PauseCompositorOnStandby_Bool = 'pauseCompositorOnStandby'
 k_pch_Dashboard_Section = 'dashboard'
 k_pch_Dashboard_EnableDashboard_Bool = 'enableDashboard'
 k_pch_Dashboard_ArcadeMode_Bool = 'arcadeMode'
-k_pch_Dashboard_UseWebSettings = 'useWebSettings'
 k_pch_Dashboard_Position = 'position'
 k_pch_Dashboard_DesktopScale = 'desktopScale'
 k_pch_Dashboard_DashboardScale = 'dashboardScale'
@@ -763,7 +766,6 @@ VREvent_DashboardActivated = ENUM_VALUE_TYPE(502)
 VREvent_DashboardDeactivated = ENUM_VALUE_TYPE(503)
 VREvent_DashboardRequested = ENUM_VALUE_TYPE(505)
 VREvent_ResetDashboard = ENUM_VALUE_TYPE(506)
-VREvent_RenderToast = ENUM_VALUE_TYPE(507)
 VREvent_ImageLoaded = ENUM_VALUE_TYPE(508)
 VREvent_ShowKeyboard = ENUM_VALUE_TYPE(509)
 VREvent_HideKeyboard = ENUM_VALUE_TYPE(510)
@@ -822,6 +824,8 @@ VREvent_TrackersSectionSettingChanged = ENUM_VALUE_TYPE(866)
 VREvent_LastKnownSectionSettingChanged = ENUM_VALUE_TYPE(867)
 VREvent_DismissedWarningsSectionSettingChanged = ENUM_VALUE_TYPE(868)
 VREvent_GpuSpeedSectionSettingChanged = ENUM_VALUE_TYPE(869)
+VREvent_WindowsMRSectionSettingChanged = ENUM_VALUE_TYPE(870)
+VREvent_OtherSectionSettingChanged = ENUM_VALUE_TYPE(871)
 VREvent_StatusUpdate = ENUM_VALUE_TYPE(900)
 VREvent_WebInterface_InstallDriverCompleted = ENUM_VALUE_TYPE(950)
 VREvent_MCImageUpdated = ENUM_VALUE_TYPE(1000)
@@ -1500,6 +1504,13 @@ VRRenderModelError_BufferTooSmall = ENUM_VALUE_TYPE(306)
 VRRenderModelError_NotEnoughNormals = ENUM_VALUE_TYPE(307)
 VRRenderModelError_NotEnoughTexCoords = ENUM_VALUE_TYPE(308)
 VRRenderModelError_InvalidTexture = ENUM_VALUE_TYPE(400)
+
+EVRRenderModelTextureFormat = ENUM_TYPE
+VRRenderModelTextureFormat_RGBA8_SRGB = ENUM_VALUE_TYPE(0)
+VRRenderModelTextureFormat_BC2 = ENUM_VALUE_TYPE(1)
+VRRenderModelTextureFormat_BC4 = ENUM_VALUE_TYPE(2)
+VRRenderModelTextureFormat_BC7 = ENUM_VALUE_TYPE(3)
+VRRenderModelTextureFormat_BC7_SRGB = ENUM_VALUE_TYPE(4)
 
 EVRScreenshotError = ENUM_TYPE
 VRScreenshotError_None = ENUM_VALUE_TYPE(0)
@@ -2414,6 +2425,7 @@ class RenderModel_TextureMap_t(Structure):
         ("unWidth", c_uint16),
         ("unHeight", c_uint16),
         ("rubTextureMapData", POINTER(c_uint8)),
+        ("format", EVRRenderModelTextureFormat),
     ]
 
 
@@ -4067,7 +4079,7 @@ class IVRChaperoneSetup(object):
         fn(x, z)
 
     def setWorkingCollisionBoundsInfo(self, quadsBuffer):
-        """Sets the Collision Bounds in the working copy."""
+        """Sets the Collision Bounds in the working copy. Note: ceiling height is ignored."""
         fn = self.function_table.setWorkingCollisionBoundsInfo
         if quadsBuffer is None:
             quadsBufferArg = None
