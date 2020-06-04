@@ -51,7 +51,7 @@ class MyGlWidget(QGLWidget):
         self.makeCurrent()
         self.paintGL()
         self.doneCurrent()
-        self.timer.start() # render again real soon now
+        self.timer.start()  # render again real soon now
 
     def disposeGL(self):
         if self.renderer is not None:

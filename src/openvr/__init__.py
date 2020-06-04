@@ -1,6 +1,6 @@
 #!/bin/env python
 
-# Unofficial python bindings for OpenVR API version 1.11.11
+# Unofficial python bindings for OpenVR API version 1.12.5
 # from https://github.com/cmbruns/pyopenvr
 # based on OpenVR C++ API at https://github.com/ValveSoftware/openvr
 
@@ -108,8 +108,8 @@ class ID3D12CommandQueue(Structure):
 ####################
 
 k_nSteamVRVersionMajor = 1
-k_nSteamVRVersionMinor = 11
-k_nSteamVRVersionBuild = 11
+k_nSteamVRVersionMinor = 12
+k_nSteamVRVersionBuild = 5
 k_nDriverNone = 0xFFFFFFFF
 k_unMaxDriverDebugResponseSize = 32768
 k_unTrackedDeviceIndex_Hmd = 0
@@ -238,6 +238,8 @@ k_pch_SteamVR_CustomOffIconStyle_String = 'customOffIconStyle'
 k_pch_SteamVR_CustomIconForceUpdate_String = 'customIconForceUpdate'
 k_pch_SteamVR_AllowGlobalActionSetPriority = 'globalActionSetPriority'
 k_pch_SteamVR_OverlayRenderQuality = 'overlayRenderQuality_2'
+k_pch_SteamVR_BlockOculusSDKOnOpenVRLaunchOption_Bool = 'blockOculusSDKOnOpenVRLaunchOption'
+k_pch_SteamVR_BlockOculusSDKOnAllLaunches_Bool = 'blockOculusSDKOnAllLaunches'
 k_pch_DirectMode_Section = 'direct_mode'
 k_pch_DirectMode_Enable_Bool = 'enable'
 k_pch_DirectMode_Count_Int32 = 'count'
@@ -358,6 +360,7 @@ k_pch_App_BindingCurrentURLSuffix_String = 'CurrentURL'
 k_pch_App_BindingPreviousURLSuffix_String = 'PreviousURL'
 k_pch_App_NeedToUpdateAutosaveSuffix_Bool = 'NeedToUpdateAutosave'
 k_pch_App_DominantHand_Int32 = 'DominantHand'
+k_pch_App_BlockOculusSDK_Bool = 'blockOculusSDK'
 k_pch_Trackers_Section = 'trackers'
 k_pch_DesktopUI_Section = 'DesktopUI'
 k_pch_LastKnown_Section = 'LastKnown'
@@ -703,6 +706,7 @@ Submit_Reserved = ENUM_VALUE_TYPE(4)
 Submit_TextureWithPose = ENUM_VALUE_TYPE(8)
 Submit_TextureWithDepth = ENUM_VALUE_TYPE(16)
 Submit_FrameDiscontinuty = ENUM_VALUE_TYPE(32)
+Submit_VulkanTextureWithArrayData = ENUM_VALUE_TYPE(64)
 
 EVRState = ENUM_TYPE
 VRState_Undefined = ENUM_VALUE_TYPE(-1)
@@ -1849,6 +1853,19 @@ class VRVulkanTextureData_t(Structure):
         ("m_nHeight", c_uint32),
         ("m_nFormat", c_uint32),
         ("m_nSampleCount", c_uint32),
+    ]
+
+
+class VRVulkanTextureArrayData_t(VRVulkanTextureData_t):
+    """
+    Data required for passing Vulkan texture arrays to IVRCompositor::Submit.
+    Be sure to call OpenVR_Shutdown before destroying these resources. 
+    Please see https://github.com/ValveSoftware/openvr/wiki/Vulkan for Vulkan-specific documentation
+    """
+
+    _fields_ = [
+        ("m_unArrayIndex", c_uint32),
+        ("m_unArraySize", c_uint32),
     ]
 
 
