@@ -1,6 +1,6 @@
 #!/bin/env python
 
-# Unofficial python bindings for OpenVR API version 1.12.5
+# Unofficial python bindings for OpenVR API version 1.14.15
 # from https://github.com/cmbruns/pyopenvr
 # based on OpenVR C++ API at https://github.com/ValveSoftware/openvr
 
@@ -108,8 +108,8 @@ class ID3D12CommandQueue(Structure):
 ####################
 
 k_nSteamVRVersionMajor = 1
-k_nSteamVRVersionMinor = 12
-k_nSteamVRVersionBuild = 5
+k_nSteamVRVersionMinor = 14
+k_nSteamVRVersionBuild = 15
 k_nDriverNone = 0xFFFFFFFF
 k_unMaxDriverDebugResponseSize = 32768
 k_unTrackedDeviceIndex_Hmd = 0
@@ -162,7 +162,7 @@ VRCompositor_ThrottleMask = 0xC0  # Number of frames the compositor is throttlin
 VRCompositor_ReprojectionMotion_Enabled = 0x100  # Motion Smoothing is enabled in the UI for the currently running application
 VRCompositor_ReprojectionMotion_ForcedOn = 0x200  # Motion Smoothing is forced on in the UI for the currently running application
 VRCompositor_ReprojectionMotion_AppThrottled = 0x400  # Application is requesting throttling via ForceInterleavedReprojectionOn
-IVRSystem_Version = 'IVRSystem_021'
+IVRSystem_Version = 'IVRSystem_022'
 k_unMaxApplicationKeyLength = 128  # The maximum length of an application key
 k_pch_MimeType_HomeApp = 'vr/home'  # Currently recognized mime types
 k_pch_MimeType_GameTheater = 'vr/game_theater'
@@ -305,15 +305,15 @@ k_pch_CollisionBounds_ColorGammaA_Int32 = 'CollisionBoundsColorGammaA'
 k_pch_CollisionBounds_EnableDriverImport = 'enableDriverBoundsImport'
 k_pch_Camera_Section = 'camera'
 k_pch_Camera_EnableCamera_Bool = 'enableCamera'
-k_pch_Camera_EnableCameraInDashboard_Bool = 'enableCameraInDashboard'
+k_pch_Camera_ShowOnController_Bool = 'showOnController'
 k_pch_Camera_EnableCameraForCollisionBounds_Bool = 'enableCameraForCollisionBounds'
-k_pch_Camera_EnableCameraForRoomView_Bool = 'enableCameraForRoomView'
+k_pch_Camera_RoomView_Int32 = 'roomView'
 k_pch_Camera_BoundsColorGammaR_Int32 = 'cameraBoundsColorGammaR'
 k_pch_Camera_BoundsColorGammaG_Int32 = 'cameraBoundsColorGammaG'
 k_pch_Camera_BoundsColorGammaB_Int32 = 'cameraBoundsColorGammaB'
 k_pch_Camera_BoundsColorGammaA_Int32 = 'cameraBoundsColorGammaA'
 k_pch_Camera_BoundsStrength_Int32 = 'cameraBoundsStrength'
-k_pch_Camera_RoomViewMode_Int32 = 'cameraRoomViewMode'
+k_pch_Camera_RoomViewStyle_Int32 = 'roomViewStyle'
 k_pch_audio_Section = 'audio'
 k_pch_audio_SetOsDefaultPlaybackDevice_Bool = 'setOsDefaultPlaybackDevice'
 k_pch_audio_EnablePlaybackDeviceOverride_Bool = 'enablePlaybackDeviceOverride'
@@ -331,6 +331,7 @@ k_pch_audio_ActiveMirrorDevice_String = 'activePlaybackMirrorDevice'
 k_pch_audio_EnablePlaybackMirrorIndependentVolume_Bool = 'enablePlaybackMirrorIndependentVolume'
 k_pch_audio_LastHmdPlaybackDeviceId_String = 'lastHmdPlaybackDeviceId'
 k_pch_audio_VIVEHDMIGain = 'viveHDMIGain'
+k_pch_audio_DualSpeakerAndJackOutput_Bool = 'dualSpeakerAndJackOutput'
 k_pch_Power_Section = 'power'
 k_pch_Power_PowerOffOnExit_Bool = 'powerOffOnExit'
 k_pch_Power_TurnOffScreensTimeout_Float = 'turnOffScreensTimeout'
@@ -372,7 +373,7 @@ k_pch_Input_LeftThumbstickRotation_Float = 'leftThumbstickRotation'
 k_pch_Input_RightThumbstickRotation_Float = 'rightThumbstickRotation'
 k_pch_Input_ThumbstickDeadzone_Float = 'thumbstickDeadzone'
 k_pch_GpuSpeed_Section = 'GpuSpeed'
-IVRChaperone_Version = 'IVRChaperone_003'
+IVRChaperone_Version = 'IVRChaperone_004'
 IVRChaperoneSetup_Version = 'IVRChaperoneSetup_006'
 IVRCompositor_Version = 'IVRCompositor_026'
 k_unHeadsetViewMaxWidth = 3840
@@ -606,6 +607,7 @@ Prop_HmdTrackingStyle_Int32 = ENUM_VALUE_TYPE(2075)
 Prop_DriverProvidedChaperoneVisibility_Bool = ENUM_VALUE_TYPE(2076)
 Prop_HmdColumnCorrectionSettingPrefix_String = ENUM_VALUE_TYPE(2077)
 Prop_CameraSupportsCompatibilityModes_Bool = ENUM_VALUE_TYPE(2078)
+Prop_SupportsRoomViewDepthProjection_Bool = ENUM_VALUE_TYPE(2079)
 Prop_DisplayAvailableFrameRates_Float_Array = ENUM_VALUE_TYPE(2080)
 Prop_DisplaySupportsMultipleFramerates_Bool = ENUM_VALUE_TYPE(2081)
 Prop_DisplayColorMultLeft_Vector3 = ENUM_VALUE_TYPE(2082)
@@ -629,6 +631,7 @@ Prop_DriverRequestedMuraFeather_OuterBottom_Int32 = ENUM_VALUE_TYPE(2208)
 Prop_Audio_DefaultPlaybackDeviceId_String = ENUM_VALUE_TYPE(2300)
 Prop_Audio_DefaultRecordingDeviceId_String = ENUM_VALUE_TYPE(2301)
 Prop_Audio_DefaultPlaybackDeviceVolume_Float = ENUM_VALUE_TYPE(2302)
+Prop_Audio_SupportsDualSpeakerAndJackOutput_Bool = ENUM_VALUE_TYPE(2303)
 Prop_AttachedDeviceId_String = ENUM_VALUE_TYPE(3000)
 Prop_SupportedButtons_Uint64 = ENUM_VALUE_TYPE(3001)
 Prop_Axis0Type_Int32 = ENUM_VALUE_TYPE(3002)
@@ -790,6 +793,8 @@ VREvent_RoomViewShown = ENUM_VALUE_TYPE(526)
 VREvent_RoomViewHidden = ENUM_VALUE_TYPE(527)
 VREvent_ShowUI = ENUM_VALUE_TYPE(528)
 VREvent_ShowDevTools = ENUM_VALUE_TYPE(529)
+VREvent_DesktopViewUpdating = ENUM_VALUE_TYPE(530)
+VREvent_DesktopViewReady = ENUM_VALUE_TYPE(531)
 VREvent_Notification_Shown = ENUM_VALUE_TYPE(600)
 VREvent_Notification_Hidden = ENUM_VALUE_TYPE(601)
 VREvent_Notification_BeginInteraction = ENUM_VALUE_TYPE(602)
@@ -807,6 +812,7 @@ VREvent_SeatedZeroPoseReset = ENUM_VALUE_TYPE(804)
 VREvent_ChaperoneFlushCache = ENUM_VALUE_TYPE(805)
 VREvent_ChaperoneRoomSetupStarting = ENUM_VALUE_TYPE(806)
 VREvent_ChaperoneRoomSetupFinished = ENUM_VALUE_TYPE(807)
+VREvent_StandingZeroPoseReset = ENUM_VALUE_TYPE(808)
 VREvent_AudioSettingsHaveChanged = ENUM_VALUE_TYPE(820)
 VREvent_BackgroundSettingHasChanged = ENUM_VALUE_TYPE(850)
 VREvent_CameraSettingsHaveChanged = ENUM_VALUE_TYPE(851)
@@ -1040,7 +1046,8 @@ VRApplication_VRMonitor = ENUM_VALUE_TYPE(5)
 VRApplication_SteamWatchdog = ENUM_VALUE_TYPE(6)
 VRApplication_Bootstrapper = ENUM_VALUE_TYPE(7)
 VRApplication_WebHelper = ENUM_VALUE_TYPE(8)
-VRApplication_Max = ENUM_VALUE_TYPE(9)
+VRApplication_OpenXR = ENUM_VALUE_TYPE(9)
+VRApplication_Max = ENUM_VALUE_TYPE(10)
 
 EVRFirmwareError = ENUM_TYPE
 VRFirmwareError_None = ENUM_VALUE_TYPE(0)
@@ -2815,7 +2822,6 @@ class IVRSystem_FnTable(Structure):
         ("isDisplayOnDesktop", OPENVR_FNTABLE_CALLTYPE(openvr_bool)),
         ("setDisplayVisibility", OPENVR_FNTABLE_CALLTYPE(openvr_bool, openvr_bool)),
         ("getDeviceToAbsoluteTrackingPose", OPENVR_FNTABLE_CALLTYPE(None, ETrackingUniverseOrigin, c_float, POINTER(TrackedDevicePose_t), c_uint32)),
-        ("resetSeatedZeroPose", OPENVR_FNTABLE_CALLTYPE(None)),
         ("getSeatedZeroPoseToStandingAbsoluteTrackingPose", OPENVR_FNTABLE_CALLTYPE(HmdMatrix34_t)),
         ("getRawZeroPoseToStandingAbsoluteTrackingPose", OPENVR_FNTABLE_CALLTYPE(HmdMatrix34_t)),
         ("getSortedTrackedDeviceIndicesOfClass", OPENVR_FNTABLE_CALLTYPE(c_uint32, ETrackedDeviceClass, POINTER(TrackedDeviceIndex_t), c_uint32, TrackedDeviceIndex_t)),
@@ -3019,20 +3025,6 @@ class IVRSystem(object):
             trackedDevicePoseArrayCount = k_unMaxTrackedDeviceCount
         fn(origin, predictedSecondsToPhotonsFromNow, trackedDevicePoseArrayArg, trackedDevicePoseArrayCount)
         return trackedDevicePoseArray
-
-    def resetSeatedZeroPose(self) -> None:
-        """
-        Sets the zero pose for the seated tracker coordinate system to the current position and yaw of the HMD. After 
-        ResetSeatedZeroPose all GetDeviceToAbsoluteTrackingPose calls that pass TrackingUniverseSeated as the origin 
-        will be relative to this new zero pose. The new zero coordinate system will not change the fact that the Y axis 
-        is up in the real world, so the next pose returned from GetDeviceToAbsoluteTrackingPose after a call to 
-        ResetSeatedZeroPose may not be exactly an identity matrix.
-
-        NOTE: This function overrides the user's previously saved seated zero pose and should only be called as the result of a user action. 
-        Users are also able to set their seated zero pose via the OpenVR Dashboard.
-        """
-        fn = self.function_table.resetSeatedZeroPose
-        fn()
 
     def getSeatedZeroPoseToStandingAbsoluteTrackingPose(self):
         """
@@ -3889,6 +3881,7 @@ class IVRChaperone_FnTable(Structure):
         ("getBoundsColor", OPENVR_FNTABLE_CALLTYPE(None, POINTER(HmdColor_t), c_int, c_float, POINTER(HmdColor_t))),
         ("areBoundsVisible", OPENVR_FNTABLE_CALLTYPE(openvr_bool)),
         ("forceBoundsVisible", OPENVR_FNTABLE_CALLTYPE(None, openvr_bool)),
+        ("resetZeroPose", OPENVR_FNTABLE_CALLTYPE(None, ETrackingUniverseOrigin)),
     ]
 
 
@@ -3969,6 +3962,20 @@ class IVRChaperone(object):
         """Force the bounds to show, mostly for utilities"""
         fn = self.function_table.forceBoundsVisible
         fn(force)
+
+    def resetZeroPose(self, trackingUniverseOrigin) -> None:
+        """
+        Sets the zero pose for the given tracker coordinate system to the current position and yaw of the HMD. After
+        ResetZeroPose all GetDeviceToAbsoluteTrackingPose calls as the origin will be relative to this new zero pose.
+        The new zero coordinate system will not change the fact that the Y axis is up in the real world, so the next
+        pose returned from GetDeviceToAbsoluteTrackingPose after a call to ResetZeroPose may not be exactly an
+        identity matrix.
+
+        NOTE: This function overrides the user's previously saved zero pose and should only be called as the result of a user action. 
+        Users are also able to set their zero pose via the OpenVR Dashboard.
+        """
+        fn = self.function_table.resetZeroPose
+        fn(trackingUniverseOrigin)
 
 
 class IVRChaperoneSetup_FnTable(Structure):
