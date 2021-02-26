@@ -713,6 +713,42 @@ class InitError_Init_WebServerFailed(InitError):
     pass
 
 
+class InitError_Init_IllegalTypeTransition(InitError):
+    pass
+
+
+class InitError_Init_MismatchedRuntimes(InitError):
+    pass
+
+
+class InitError_Init_InvalidProcessId(InitError):
+    pass
+
+
+class InitError_Init_VRServiceStartupFailed(InitError):
+    pass
+
+
+class InitError_Init_PrismNeedsNewDrivers(InitError):
+    pass
+
+
+class InitError_Init_PrismStartupTimedOut(InitError):
+    pass
+
+
+class InitError_Init_CouldNotStartPrism(InitError):
+    pass
+
+
+class InitError_Init_CreateDriverDirectDeviceFailed(InitError):
+    pass
+
+
+class InitError_Init_PrismExitedUnexpectedly(InitError):
+    pass
+
+
 class InitError_Driver_Failed(InitError):
     pass
 
@@ -1173,6 +1209,18 @@ class InitError_Compositor_FailedToCreateMailbox(InitError):
     pass
 
 
+class InitError_Compositor_WindowInterfaceIsNull(InitError):
+    pass
+
+
+class InitError_Compositor_SystemLayerCreateInstance(InitError):
+    pass
+
+
+class InitError_Compositor_SystemLayerCreateSession(InitError):
+    pass
+
+
 class InitError_VendorSpecific_UnableToConnectToOculusRuntime(InitError):
     pass
 
@@ -1294,6 +1342,15 @@ InitError.error_index[143] = InitError_Init_AlreadyRunning
 InitError.error_index[144] = InitError_Init_FailedForVrMonitor
 InitError.error_index[145] = InitError_Init_PropertyManagerInitFailed
 InitError.error_index[146] = InitError_Init_WebServerFailed
+InitError.error_index[147] = InitError_Init_IllegalTypeTransition
+InitError.error_index[148] = InitError_Init_MismatchedRuntimes
+InitError.error_index[149] = InitError_Init_InvalidProcessId
+InitError.error_index[150] = InitError_Init_VRServiceStartupFailed
+InitError.error_index[151] = InitError_Init_PrismNeedsNewDrivers
+InitError.error_index[152] = InitError_Init_PrismStartupTimedOut
+InitError.error_index[153] = InitError_Init_CouldNotStartPrism
+InitError.error_index[154] = InitError_Init_CreateDriverDirectDeviceFailed
+InitError.error_index[155] = InitError_Init_PrismExitedUnexpectedly
 InitError.error_index[200] = InitError_Driver_Failed
 InitError.error_index[201] = InitError_Driver_Unknown
 InitError.error_index[202] = InitError_Driver_HmdUnknown
@@ -1409,6 +1466,9 @@ InitError.error_index[487] = InitError_Compositor_DisplayModeNotSupported
 InitError.error_index[488] = InitError_Compositor_CreateOverlayInvalidCall
 InitError.error_index[489] = InitError_Compositor_CreateOverlayAlreadyInitialized
 InitError.error_index[490] = InitError_Compositor_FailedToCreateMailbox
+InitError.error_index[491] = InitError_Compositor_WindowInterfaceIsNull
+InitError.error_index[492] = InitError_Compositor_SystemLayerCreateInstance
+InitError.error_index[493] = InitError_Compositor_SystemLayerCreateSession
 InitError.error_index[1000] = InitError_VendorSpecific_UnableToConnectToOculusRuntime
 InitError.error_index[1001] = InitError_VendorSpecific_WindowsNotInDevMode
 InitError.error_index[1101] = InitError_VendorSpecific_HmdFound_CantOpenDevice
@@ -1608,6 +1668,10 @@ class ApplicationError_InvalidParameter(ApplicationError):
     pass
 
 
+class ApplicationError_NotImplemented(ApplicationError):
+    pass
+
+
 ApplicationError.error_index[0] = ApplicationError_None
 ApplicationError.error_index[100] = ApplicationError_AppKeyAlreadyExists
 ApplicationError.error_index[101] = ApplicationError_NoManifest
@@ -1629,6 +1693,7 @@ ApplicationError.error_index[200] = ApplicationError_BufferTooSmall
 ApplicationError.error_index[201] = ApplicationError_PropertyNotSet
 ApplicationError.error_index[202] = ApplicationError_UnknownProperty
 ApplicationError.error_index[203] = ApplicationError_InvalidParameter
+ApplicationError.error_index[300] = ApplicationError_NotImplemented
 
 
 class SettingsError(ErrorCode):

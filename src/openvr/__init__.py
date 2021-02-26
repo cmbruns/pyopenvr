@@ -1,6 +1,6 @@
 #!/bin/env python
 
-# Unofficial python bindings for OpenVR API version 1.14.15
+# Unofficial python bindings for OpenVR API version 1.16.8
 # from https://github.com/cmbruns/pyopenvr
 # based on OpenVR C++ API at https://github.com/ValveSoftware/openvr
 
@@ -108,8 +108,8 @@ class ID3D12CommandQueue(Structure):
 ####################
 
 k_nSteamVRVersionMajor = 1
-k_nSteamVRVersionMinor = 14
-k_nSteamVRVersionBuild = 15
+k_nSteamVRVersionMinor = 16
+k_nSteamVRVersionBuild = 8
 k_nDriverNone = 0xFFFFFFFF
 k_unMaxDriverDebugResponseSize = 32768
 k_unTrackedDeviceIndex_Hmd = 0
@@ -157,8 +157,8 @@ VRCompositor_ReprojectionReason_Cpu = 0x01  # Compositor frame timing reprojecti
 VRCompositor_ReprojectionReason_Gpu = 0x02
 VRCompositor_ReprojectionAsync = 0x04  # This flag indicates the async reprojection mode is active,
 VRCompositor_ReprojectionMotion = 0x08  # This flag indicates whether or not motion smoothing was triggered for this frame
-VRCompositor_PredictionMask = 0x30  # The runtime may predict more than one frame (up to four) ahead if
-VRCompositor_ThrottleMask = 0xC0  # Number of frames the compositor is throttling the application.
+VRCompositor_PredictionMask = 0xF0  # The runtime may predict more than one frame (up to four) ahead if
+VRCompositor_ThrottleMask = 0xF00  # Number of frames the compositor is throttling the application.
 VRCompositor_ReprojectionMotion_Enabled = 0x100  # Motion Smoothing is enabled in the UI for the currently running application
 VRCompositor_ReprojectionMotion_ForcedOn = 0x200  # Motion Smoothing is forced on in the UI for the currently running application
 VRCompositor_ReprojectionMotion_AppThrottled = 0x400  # Application is requesting throttling via ForceInterleavedReprojectionOn
@@ -188,6 +188,7 @@ k_pch_SteamVR_GridColor_String = 'gridColor'
 k_pch_SteamVR_PlayAreaColor_String = 'playAreaColor'
 k_pch_SteamVR_TrackingLossColor_String = 'trackingLossColor'
 k_pch_SteamVR_ShowStage_Bool = 'showStage'
+k_pch_SteamVR_DrawTrackingReferences_Bool = 'drawTrackingReferences'
 k_pch_SteamVR_ActivateMultipleDrivers_Bool = 'activateMultipleDrivers'
 k_pch_SteamVR_UsingSpeakers_Bool = 'usingSpeakers'
 k_pch_SteamVR_SpeakersForwardYawOffsetDegrees_Float = 'speakersForwardYawOffsetDegrees'
@@ -198,6 +199,8 @@ k_pch_SteamVR_SupersampleScale_Float = 'supersampleScale'
 k_pch_SteamVR_MaxRecommendedResolution_Int32 = 'maxRecommendedResolution'
 k_pch_SteamVR_MotionSmoothing_Bool = 'motionSmoothing'
 k_pch_SteamVR_MotionSmoothingOverride_Int32 = 'motionSmoothingOverride'
+k_pch_SteamVR_FramesToThrottle_Int32 = 'framesToThrottle'
+k_pch_SteamVR_AdditionalFramesToPredict_Int32 = 'additionalFramesToPredict'
 k_pch_SteamVR_DisableAsyncReprojection_Bool = 'disableAsync'
 k_pch_SteamVR_ForceFadeOnBadTracking_Bool = 'forceFadeOnBadTracking'
 k_pch_SteamVR_DefaultMirrorView_Int32 = 'mirrorView'
@@ -240,6 +243,8 @@ k_pch_SteamVR_AllowGlobalActionSetPriority = 'globalActionSetPriority'
 k_pch_SteamVR_OverlayRenderQuality = 'overlayRenderQuality_2'
 k_pch_SteamVR_BlockOculusSDKOnOpenVRLaunchOption_Bool = 'blockOculusSDKOnOpenVRLaunchOption'
 k_pch_SteamVR_BlockOculusSDKOnAllLaunches_Bool = 'blockOculusSDKOnAllLaunches'
+k_pch_SteamVR_HDCPLegacyCompatibility_Bool = 'hdcp14legacyCompatibility'
+k_pch_SteamVR_UsePrism_Bool = 'usePrism'
 k_pch_DirectMode_Section = 'direct_mode'
 k_pch_DirectMode_Enable_Bool = 'enable'
 k_pch_DirectMode_Count_Int32 = 'count'
@@ -332,6 +337,7 @@ k_pch_audio_EnablePlaybackMirrorIndependentVolume_Bool = 'enablePlaybackMirrorIn
 k_pch_audio_LastHmdPlaybackDeviceId_String = 'lastHmdPlaybackDeviceId'
 k_pch_audio_VIVEHDMIGain = 'viveHDMIGain'
 k_pch_audio_DualSpeakerAndJackOutput_Bool = 'dualSpeakerAndJackOutput'
+k_pch_audio_MuteMicMonitor_Bool = 'muteMicMonitor'
 k_pch_Power_Section = 'power'
 k_pch_Power_PowerOffOnExit_Bool = 'powerOffOnExit'
 k_pch_Power_TurnOffScreensTimeout_Float = 'turnOffScreensTimeout'
@@ -345,6 +351,7 @@ k_pch_Dashboard_ArcadeMode_Bool = 'arcadeMode'
 k_pch_Dashboard_Position = 'position'
 k_pch_Dashboard_DesktopScale = 'desktopScale'
 k_pch_Dashboard_DashboardScale = 'dashboardScale'
+k_pch_Dashboard_UseStandaloneSystemLayer = 'standaloneSystemLayer'
 k_pch_modelskin_Section = 'modelskins'
 k_pch_Driver_Enable_Bool = 'enable'
 k_pch_Driver_BlockedBySafemode_Bool = 'blocked_by_safe_mode'
@@ -375,7 +382,7 @@ k_pch_Input_ThumbstickDeadzone_Float = 'thumbstickDeadzone'
 k_pch_GpuSpeed_Section = 'GpuSpeed'
 IVRChaperone_Version = 'IVRChaperone_004'
 IVRChaperoneSetup_Version = 'IVRChaperoneSetup_006'
-IVRCompositor_Version = 'IVRCompositor_026'
+IVRCompositor_Version = 'IVRCompositor_027'
 k_unHeadsetViewMaxWidth = 3840
 k_unHeadsetViewMaxHeight = 2160
 k_pchHeadsetViewOverlayKey = 'system.HeadsetView'
@@ -386,7 +393,7 @@ k_unVROverlayMaxKeyLength = 128  # The maximum length of an overlay key in bytes
 k_unVROverlayMaxNameLength = 128  # The maximum length of an overlay name in bytes, counting the terminating null character.
 k_unMaxOverlayCount = 128  # The maximum number of overlays that can exist in the system at one time.
 k_unMaxOverlayIntersectionMaskPrimitivesCount = 32  # The maximum number of overlay intersection mask primitives per overlay
-IVROverlay_Version = 'IVROverlay_024'
+IVROverlay_Version = 'IVROverlay_025'
 IVROverlayView_Version = 'IVROverlayView_003'
 k_pch_Controller_Component_GDC2015 = 'gdc2015'  # Canonical coordinate system of the gdc 2015 wired controller, provided for backwards compatibility
 k_pch_Controller_Component_Base = 'base'  # For controllers with an unambiguous 'base'.
@@ -616,9 +623,13 @@ Prop_DisplaySupportsRuntimeFramerateChange_Bool = ENUM_VALUE_TYPE(2084)
 Prop_DisplaySupportsAnalogGain_Bool = ENUM_VALUE_TYPE(2085)
 Prop_DisplayMinAnalogGain_Float = ENUM_VALUE_TYPE(2086)
 Prop_DisplayMaxAnalogGain_Float = ENUM_VALUE_TYPE(2087)
+Prop_CameraExposureTime_Float = ENUM_VALUE_TYPE(2088)
+Prop_CameraGlobalGain_Float = ENUM_VALUE_TYPE(2089)
 Prop_DashboardScale_Float = ENUM_VALUE_TYPE(2091)
 Prop_IpdUIRangeMinMeters_Float = ENUM_VALUE_TYPE(2100)
 Prop_IpdUIRangeMaxMeters_Float = ENUM_VALUE_TYPE(2101)
+Prop_Hmd_SupportsHDCP14LegacyCompat_Bool = ENUM_VALUE_TYPE(2102)
+Prop_Hmd_SupportsMicMonitoring_Bool = ENUM_VALUE_TYPE(2103)
 Prop_DriverRequestedMuraCorrectionMode_Int32 = ENUM_VALUE_TYPE(2200)
 Prop_DriverRequestedMuraFeather_InnerLeft_Int32 = ENUM_VALUE_TYPE(2201)
 Prop_DriverRequestedMuraFeather_InnerRight_Int32 = ENUM_VALUE_TYPE(2202)
@@ -710,6 +721,8 @@ Submit_TextureWithPose = ENUM_VALUE_TYPE(8)
 Submit_TextureWithDepth = ENUM_VALUE_TYPE(16)
 Submit_FrameDiscontinuty = ENUM_VALUE_TYPE(32)
 Submit_VulkanTextureWithArrayData = ENUM_VALUE_TYPE(64)
+Submit_GlArrayTexture = ENUM_VALUE_TYPE(128)
+Submit_Reserved2 = ENUM_VALUE_TYPE(32768)
 
 EVRState = ENUM_TYPE
 VRState_Undefined = ENUM_VALUE_TYPE(-1)
@@ -1046,8 +1059,11 @@ VRApplication_VRMonitor = ENUM_VALUE_TYPE(5)
 VRApplication_SteamWatchdog = ENUM_VALUE_TYPE(6)
 VRApplication_Bootstrapper = ENUM_VALUE_TYPE(7)
 VRApplication_WebHelper = ENUM_VALUE_TYPE(8)
-VRApplication_OpenXR = ENUM_VALUE_TYPE(9)
-VRApplication_Max = ENUM_VALUE_TYPE(10)
+VRApplication_OpenXRInstance = ENUM_VALUE_TYPE(9)
+VRApplication_OpenXRScene = ENUM_VALUE_TYPE(10)
+VRApplication_OpenXROverlay = ENUM_VALUE_TYPE(11)
+VRApplication_Prism = ENUM_VALUE_TYPE(12)
+VRApplication_Max = ENUM_VALUE_TYPE(13)
 
 EVRFirmwareError = ENUM_TYPE
 VRFirmwareError_None = ENUM_VALUE_TYPE(0)
@@ -1122,6 +1138,15 @@ VRInitError_Init_AlreadyRunning = ENUM_VALUE_TYPE(143)
 VRInitError_Init_FailedForVrMonitor = ENUM_VALUE_TYPE(144)
 VRInitError_Init_PropertyManagerInitFailed = ENUM_VALUE_TYPE(145)
 VRInitError_Init_WebServerFailed = ENUM_VALUE_TYPE(146)
+VRInitError_Init_IllegalTypeTransition = ENUM_VALUE_TYPE(147)
+VRInitError_Init_MismatchedRuntimes = ENUM_VALUE_TYPE(148)
+VRInitError_Init_InvalidProcessId = ENUM_VALUE_TYPE(149)
+VRInitError_Init_VRServiceStartupFailed = ENUM_VALUE_TYPE(150)
+VRInitError_Init_PrismNeedsNewDrivers = ENUM_VALUE_TYPE(151)
+VRInitError_Init_PrismStartupTimedOut = ENUM_VALUE_TYPE(152)
+VRInitError_Init_CouldNotStartPrism = ENUM_VALUE_TYPE(153)
+VRInitError_Init_CreateDriverDirectDeviceFailed = ENUM_VALUE_TYPE(154)
+VRInitError_Init_PrismExitedUnexpectedly = ENUM_VALUE_TYPE(155)
 VRInitError_Driver_Failed = ENUM_VALUE_TYPE(200)
 VRInitError_Driver_Unknown = ENUM_VALUE_TYPE(201)
 VRInitError_Driver_HmdUnknown = ENUM_VALUE_TYPE(202)
@@ -1237,6 +1262,9 @@ VRInitError_Compositor_DisplayModeNotSupported = ENUM_VALUE_TYPE(487)
 VRInitError_Compositor_CreateOverlayInvalidCall = ENUM_VALUE_TYPE(488)
 VRInitError_Compositor_CreateOverlayAlreadyInitialized = ENUM_VALUE_TYPE(489)
 VRInitError_Compositor_FailedToCreateMailbox = ENUM_VALUE_TYPE(490)
+VRInitError_Compositor_WindowInterfaceIsNull = ENUM_VALUE_TYPE(491)
+VRInitError_Compositor_SystemLayerCreateInstance = ENUM_VALUE_TYPE(492)
+VRInitError_Compositor_SystemLayerCreateSession = ENUM_VALUE_TYPE(493)
 VRInitError_VendorSpecific_UnableToConnectToOculusRuntime = ENUM_VALUE_TYPE(1000)
 VRInitError_VendorSpecific_WindowsNotInDevMode = ENUM_VALUE_TYPE(1001)
 VRInitError_VendorSpecific_HmdFound_CantOpenDevice = ENUM_VALUE_TYPE(1101)
@@ -1344,6 +1372,7 @@ VRApplicationError_BufferTooSmall = ENUM_VALUE_TYPE(200)
 VRApplicationError_PropertyNotSet = ENUM_VALUE_TYPE(201)
 VRApplicationError_UnknownProperty = ENUM_VALUE_TYPE(202)
 VRApplicationError_InvalidParameter = ENUM_VALUE_TYPE(203)
+VRApplicationError_NotImplemented = ENUM_VALUE_TYPE(300)
 
 EVRApplicationProperty = ENUM_TYPE
 VRApplicationProperty_Name_String = ENUM_VALUE_TYPE(0)
@@ -1450,6 +1479,7 @@ VROverlayTransform_Cursor = ENUM_VALUE_TYPE(4)
 VROverlayTransform_DashboardTab = ENUM_VALUE_TYPE(5)
 VROverlayTransform_DashboardThumb = ENUM_VALUE_TYPE(6)
 VROverlayTransform_Mountable = ENUM_VALUE_TYPE(7)
+VROverlayTransform_Projection = ENUM_VALUE_TYPE(8)
 
 VROverlayFlags = ENUM_TYPE
 VROverlayFlags_NoDashboardTab = ENUM_VALUE_TYPE(8)
@@ -1765,10 +1795,19 @@ class HmdRect2_t(Structure):
     ]
 
 
+class VRBoneTransform_t(Structure):
+    """Holds the transform for a single bone"""
+
+    _fields_ = [
+        ("position", HmdVector4_t),
+        ("orientation", HmdQuaternionf_t),
+    ]
+
+
 class DistortionCoordinates_t(Structure):
     """
-    Used to return the post-distortion UVs for each color channel. 
-    UVs range from 0 to 1 with 0,0 in the upper left corner of the 
+    Used to return the post-distortion UVs for each color channel.
+    UVs range from 0 to 1 with 0,0 in the upper left corner of the
     source render target. The 0,0 to 1,1 range covers a single eye.
     """
 
@@ -1845,7 +1884,7 @@ class VRTextureWithPoseAndDepth_t(VRTextureWithPose_t):
 class VRVulkanTextureData_t(Structure):
     """
     Data required for passing Vulkan textures to IVRCompositor::Submit.
-    Be sure to call OpenVR_Shutdown before destroying these resources. 
+    Be sure to call OpenVR_Shutdown before destroying these resources.
     Please see https://github.com/ValveSoftware/openvr/wiki/Vulkan for Vulkan-specific documentation
     """
 
@@ -1866,7 +1905,7 @@ class VRVulkanTextureData_t(Structure):
 class VRVulkanTextureArrayData_t(VRVulkanTextureData_t):
     """
     Data required for passing Vulkan texture arrays to IVRCompositor::Submit.
-    Be sure to call OpenVR_Shutdown before destroying these resources. 
+    Be sure to call OpenVR_Shutdown before destroying these resources.
     Please see https://github.com/ValveSoftware/openvr/wiki/Vulkan for Vulkan-specific documentation
     """
 
@@ -1961,6 +2000,7 @@ class VREvent_Overlay_t(Structure):
     _fields_ = [
         ("overlayHandle", c_uint64),
         ("devicePath", c_uint64),
+        ("memoryBlockId", c_uint64),
     ]
 
 
@@ -2185,9 +2225,9 @@ class RenderModel_ComponentState_t(Structure):
 
 class HiddenAreaMesh_t(Structure):
     """
-    The mesh to draw into the stencil (or depth) buffer to perform 
+    The mesh to draw into the stencil (or depth) buffer to perform
     early stencil (or depth) kills of pixels that will never appear on the HMD.
-    This mesh draws on all the pixels that will be hidden after distortion. 
+    This mesh draws on all the pixels that will be hidden after distortion.
 
     If the HMD does not provide a visible area mesh pVertexData will be
     NULL and unTriangleCount will be 0.
@@ -2216,15 +2256,6 @@ class VRControllerState_t(PackHackStructure):
         ("ulButtonPressed", c_uint64),
         ("ulButtonTouched", c_uint64),
         ("rAxis", VRControllerAxis_t * 5),
-    ]
-
-
-class VRBoneTransform_t(Structure):
-    """Holds the transform for a single bone"""
-
-    _fields_ = [
-        ("position", HmdVector4_t),
-        ("orientation", HmdQuaternionf_t),
     ]
 
 
@@ -2406,6 +2437,17 @@ class VROverlayIntersectionMaskPrimitive_t(Structure):
     _fields_ = [
         ("m_nPrimitiveType", EVROverlayIntersectionMaskPrimitiveType),
         ("m_Primitive", VROverlayIntersectionMaskPrimitive_Data_t),
+    ]
+
+
+class VROverlayProjection_t(Structure):
+    """Defines the project used in an overlay that is using SetOverlayTransformProjection"""
+
+    _fields_ = [
+        ("fLeft", c_float),
+        ("fRight", c_float),
+        ("fTop", c_float),
+        ("fBottom", c_float),
     ]
 
 
@@ -2899,7 +2941,7 @@ class IVRSystem(object):
 
     def computeDistortion(self, eye, u: float, v: float):
         """
-        Gets the result of the distortion function for the specified eye and input UVs. UVs go from 0,0 in 
+        Gets the result of the distortion function for the specified eye and input UVs. UVs go from 0,0 in
         the upper left of that eye's viewport and 1,1 in the lower right of that eye's viewport.
         Returns true for success. Otherwise, returns false, and distortion coordinates are not suitable.
         """
@@ -2911,7 +2953,7 @@ class IVRSystem(object):
     def getEyeToHeadTransform(self, eye):
         """
         Returns the transform from eye space to the head space. Eye space is the per-eye flavor of head
-        space that provides stereo disparity. Instead of Model * View * Projection the sequence is Model * View * Eye^-1 * Projection. 
+        space that provides stereo disparity. Instead of Model * View * Projection the sequence is Model * View * Eye^-1 * Projection.
         Normally View and Eye^-1 will be multiplied together and treated as View in your application.
         """
         fn = self.function_table.getEyeToHeadTransform
@@ -2920,9 +2962,9 @@ class IVRSystem(object):
 
     def getTimeSinceLastVsync(self):
         """
-        Returns the number of elapsed seconds since the last recorded vsync event. This 
+        Returns the number of elapsed seconds since the last recorded vsync event. This
         will come from a vsync timer event in the timer if possible or from the application-reported
-        time if that is not available. If no vsync times are available the function will 
+        time if that is not available. If no vsync times are available the function will
         return zero for vsync time and frame counter and return false from the method.
         """
         fn = self.function_table.getTimeSinceLastVsync
@@ -2944,7 +2986,7 @@ class IVRSystem(object):
     def getDXGIOutputInfo(self):
         """
         [D3D10/11 Only]
-        Returns the adapter index that the user should pass into EnumAdapters to create the device 
+        Returns the adapter index that the user should pass into EnumAdapters to create the device
         and swap chain in DX10 and DX11. If an error occurs the index will be set to -1.
         """
         fn = self.function_table.getDXGIOutputInfo
@@ -2995,20 +3037,20 @@ class IVRSystem(object):
 
     def getDeviceToAbsoluteTrackingPose(self, origin, predictedSecondsToPhotonsFromNow: float, trackedDevicePoseArray):
         """
-        The pose that the tracker thinks that the HMD will be in at the specified number of seconds into the 
+        The pose that the tracker thinks that the HMD will be in at the specified number of seconds into the
         future. Pass 0 to get the state at the instant the method is called. Most of the time the application should
         calculate the time until the photons will be emitted from the display and pass that time into the method.
 
-        This is roughly analogous to the inverse of the view matrix in most applications, though 
+        This is roughly analogous to the inverse of the view matrix in most applications, though
         many games will need to do some additional rotation or translation on top of the rotation
         and translation provided by the head pose.
 
         For devices where bPoseIsValid is true the application can use the pose to position the device
-        in question. The provided array can be any size up to k_unMaxTrackedDeviceCount. 
+        in question. The provided array can be any size up to k_unMaxTrackedDeviceCount.
 
         Seated experiences should call this method with TrackingUniverseSeated and receive poses relative
-        to the seated zero pose. Standing experiences should call this method with TrackingUniverseStanding 
-        and receive poses relative to the Chaperone Play Area. TrackingUniverseRawAndUncalibrated should 
+        to the seated zero pose. Standing experiences should call this method with TrackingUniverseStanding
+        and receive poses relative to the Chaperone Play Area. TrackingUniverseRawAndUncalibrated should
         probably not be used unless the application is the Chaperone calibration tool itself, but will provide
         poses relative to the hardware-specific coordinate system in the driver.
         """
@@ -3028,11 +3070,11 @@ class IVRSystem(object):
 
     def getSeatedZeroPoseToStandingAbsoluteTrackingPose(self):
         """
-        Returns the transform from the seated zero pose to the standing absolute tracking system. This allows 
+        Returns the transform from the seated zero pose to the standing absolute tracking system. This allows
         applications to represent the seated origin to used or transform object positions from one coordinate
-        system to the other. 
+        system to the other.
 
-        The seated origin may or may not be inside the Play Area or Collision Bounds returned by IVRChaperone. Its position 
+        The seated origin may or may not be inside the Play Area or Collision Bounds returned by IVRChaperone. Its position
         depends on what the user has set from the Dashboard settings and previous calls to ResetSeatedZeroPose.
         """
         fn = self.function_table.getSeatedZeroPoseToStandingAbsoluteTrackingPose
@@ -3100,10 +3142,10 @@ class IVRSystem(object):
         """
         Returns the device class of a tracked device. If there has not been a device connected in this slot
         since the application started this function will return TrackedDevice_Invalid. For previous detected
-        devices the function will return the previously observed device class. 
+        devices the function will return the previously observed device class.
 
         To determine which devices exist on the system, just loop from 0 to k_unMaxTrackedDeviceCount and check
-        the device class. Every device with something other than TrackedDevice_Invalid is associated with an 
+        the device class. Every device with something other than TrackedDevice_Invalid is associated with an
         actual tracked device.
         """
         fn = self.function_table.getTrackedDeviceClass
@@ -3170,7 +3212,7 @@ class IVRSystem(object):
 
     def getStringTrackedDeviceProperty(self, deviceIndex, prop):
         """
-        Returns a string property. If the device index is not valid or the property is not a string type this function will 
+        Returns a string property. If the device index is not valid or the property is not a string type this function will
         return 0. Otherwise it returns the length of the number of bytes necessary to hold this string including the trailing
         null. Strings will always fit in buffers of k_unMaxPropertyStringSize characters.
         """
@@ -3188,7 +3230,7 @@ class IVRSystem(object):
 
     def getPropErrorNameFromEnum(self, error):
         """
-        returns a string that corresponds with the specified property error. The string will be the name 
+        returns a string that corresponds with the specified property error. The string will be the name
         of the error enum value for all valid error codes
         """
         fn = self.function_table.getPropErrorNameFromEnum
@@ -3208,8 +3250,8 @@ class IVRSystem(object):
     def pollNextEventWithPose(self, origin, event):
         """
         Returns true and fills the event with the next event on the queue if there is one. If there are no events
-          this method returns false. Fills in the pose of the associated tracked device in the provided pose struct. 
-          This pose will always be older than the call to this function and should not be used to render the device. 
+          this method returns false. Fills in the pose of the associated tracked device in the provided pose struct.
+          This pose will always be older than the call to this function and should not be used to render the device.
         uncbVREvent should be the size in bytes of the VREvent_t struct
         """
         fn = self.function_table.pollNextEventWithPose
@@ -3228,7 +3270,7 @@ class IVRSystem(object):
         """
         Returns the hidden area mesh for the current HMD. The pixels covered by this mesh will never be seen by the user after the lens distortion is
         applied based on visibility to the panels. If this HMD does not have a hidden area mesh, the vertex data and count will be NULL and 0 respectively.
-        This mesh is meant to be rendered into the stencil buffer (or into the depth buffer setting nearz) before rendering each eye's view. 
+        This mesh is meant to be rendered into the stencil buffer (or into the depth buffer setting nearz) before rendering each eye's view.
         This will improve performance by letting the GPU early-reject pixels the user will never see before running the pixel shader.
         NOTE: Render this mesh with backface culling disabled since the winding order of the vertices can be different per-HMD or per-eye.
         Setting the bInverse argument to true will produce the visible area mesh that is commonly used in place of full-screen quads. The visible area mesh covers all of the pixels the hidden area mesh does not cover.
@@ -3251,7 +3293,7 @@ class IVRSystem(object):
 
     def getControllerStateWithPose(self, origin, controllerDeviceIndex):
         """
-        fills the supplied struct with the current state of the controller and the provided pose with the pose of 
+        fills the supplied struct with the current state of the controller and the provided pose with the pose of
         the controller when the controller state was updated most recently. Use this form if you need a precise controller
         pose as input to your application when the user presses or releases a button. This function is deprecated in favor of the new IVRInput system.
         """
@@ -3284,7 +3326,7 @@ class IVRSystem(object):
 
     def isInputAvailable(self):
         """
-        Returns true if this application is receiving input from the system. This would return false if 
+        Returns true if this application is receiving input from the system. This would return false if
         system-related functionality is consuming the input stream.
         """
         fn = self.function_table.isInputAvailable
@@ -3320,10 +3362,10 @@ class IVRSystem(object):
 
     def performFirmwareUpdate(self, deviceIndex) -> None:
         """
-        Performs the actual firmware update if applicable. 
-        The following events will be sent, if VRFirmwareError_None was returned: VREvent_FirmwareUpdateStarted, VREvent_FirmwareUpdateFinished 
+        Performs the actual firmware update if applicable.
+        The following events will be sent, if VRFirmwareError_None was returned: VREvent_FirmwareUpdateStarted, VREvent_FirmwareUpdateFinished
         Use the properties Prop_Firmware_UpdateAvailable_Bool, Prop_Firmware_ManualUpdate_Bool, and Prop_Firmware_ManualUpdateURL_String
-        to figure our whether a firmware update is available, and to figure out whether its a manual update 
+        to figure our whether a firmware update is available, and to figure out whether its a manual update
         Prop_Firmware_ManualUpdateURL_String should point to an URL describing the manual update process
         """
         fn = self.function_table.performFirmwareUpdate
@@ -3340,7 +3382,7 @@ class IVRSystem(object):
 
     def getAppContainerFilePaths(self):
         """
-        Retrieves a null-terminated, semicolon-delimited list of UTF8 file paths that an application 
+        Retrieves a null-terminated, semicolon-delimited list of UTF8 file paths that an application
         must have read access to when running inside of an app container. Returns the number of bytes
         needed to hold the list.
         """
@@ -3411,7 +3453,7 @@ class IVRApplications(object):
 
     def addApplicationManifest(self, applicationManifestFullPath: str, temporary=False) -> None:
         """
-        Adds an application manifest to the list to load when building the list of installed applications. 
+        Adds an application manifest to the list to load when building the list of installed applications.
         Temporary manifests are not automatically loaded
         """
         fn = self.function_table.addApplicationManifest
@@ -3444,8 +3486,8 @@ class IVRApplications(object):
 
     def getApplicationKeyByIndex(self, applicationIndex):
         """
-        Returns the key of the specified application. The index is at least 0 and is less than the return 
-        value of GetApplicationCount(). The buffer should be at least k_unMaxApplicationKeyLength in order to 
+        Returns the key of the specified application. The index is at least 0 and is less than the return
+        value of GetApplicationCount(). The buffer should be at least k_unMaxApplicationKeyLength in order to
         fit the key.
         """
         fn = self.function_table.getApplicationKeyByIndex
@@ -3457,7 +3499,7 @@ class IVRApplications(object):
 
     def getApplicationKeyByProcessId(self, processId):
         """
-        Returns the key of the application for the specified Process Id. The buffer should be at least 
+        Returns the key of the application for the specified Process Id. The buffer should be at least
         k_unMaxApplicationKeyLength in order to fit the key.
         """
         fn = self.function_table.getApplicationKeyByProcessId
@@ -3513,7 +3555,7 @@ class IVRApplications(object):
 
     def launchDashboardOverlay(self, appKey: str) -> None:
         """
-        Launches the dashboard overlay application if it is not already running. This call is only valid for 
+        Launches the dashboard overlay application if it is not already running. This call is only valid for
         dashboard overlay applications.
         """
         fn = self.function_table.launchDashboardOverlay
@@ -3533,8 +3575,8 @@ class IVRApplications(object):
     def identifyApplication(self, processId, appKey: str) -> None:
         """
         Identifies a running application. OpenVR can't always tell which process started in response
-        to a URL. This function allows a URL handler (or the process itself) to identify the app key 
-        for the now running application. Passing a process ID of 0 identifies the calling process. 
+        to a URL. This function allows a URL handler (or the process itself) to identify the app key
+        for the now running application. Passing a process ID of 0 identifies the calling process.
         The application must be one that's known to the system via a call to AddApplicationManifest.
         """
         fn = self.function_table.identifyApplication
@@ -3698,9 +3740,9 @@ class IVRApplications(object):
     def launchInternalProcess(self, binaryPath: str, arguments: str, workingDirectory: str) -> None:
         """
         Starts a subprocess within the calling application. This
-        suppresses all application transition UI and automatically identifies the new executable 
-        as part of the same application. On success the calling process should exit immediately. 
-        If working directory is NULL or "" the directory portion of the binary path will be 
+        suppresses all application transition UI and automatically identifies the new executable
+        as part of the same application. On success the calling process should exit immediately.
+        If working directory is NULL or "" the directory portion of the binary path will be
         the working directory.
         """
         fn = self.function_table.launchInternalProcess
@@ -3911,7 +3953,7 @@ class IVRChaperone(object):
 
     def getPlayAreaSize(self):
         """
-        Returns the width and depth of the Play Area (formerly named Soft Bounds) in X and Z. 
+        Returns the width and depth of the Play Area (formerly named Soft Bounds) in X and Z.
         Tracking space center (0,0,0) is the center of the Play Area.
         """
         fn = self.function_table.getPlayAreaSize
@@ -3971,7 +4013,7 @@ class IVRChaperone(object):
         pose returned from GetDeviceToAbsoluteTrackingPose after a call to ResetZeroPose may not be exactly an
         identity matrix.
 
-        NOTE: This function overrides the user's previously saved zero pose and should only be called as the result of a user action. 
+        NOTE: This function overrides the user's previously saved zero pose and should only be called as the result of a user action.
         Users are also able to set their zero pose via the OpenVR Dashboard.
         """
         fn = self.function_table.resetZeroPose
@@ -4005,9 +4047,9 @@ class IVRChaperoneSetup_FnTable(Structure):
 
 class IVRChaperoneSetup(object):
     """
-    Manages the working copy of the chaperone info. By default this will be the same as the 
-    live copy. Any changes made with this interface will stay in the working copy until 
-    CommitWorkingCopy() is called, at which point the working copy and the live copy will be 
+    Manages the working copy of the chaperone info. By default this will be the same as the
+    live copy. Any changes made with this interface will stay in the working copy until
+    CommitWorkingCopy() is called, at which point the working copy and the live copy will be
     the same again.
     """
 
@@ -4063,7 +4105,7 @@ class IVRChaperoneSetup(object):
 
     def getWorkingCollisionBoundsInfo(self):
         """
-        Returns the number of Quads if the buffer points to null. Otherwise it returns Quads 
+        Returns the number of Quads if the buffer points to null. Otherwise it returns Quads
         into the buffer up to the max specified from the working copy.
         """
         fn = self.function_table.getWorkingCollisionBoundsInfo
@@ -4074,7 +4116,7 @@ class IVRChaperoneSetup(object):
 
     def getLiveCollisionBoundsInfo(self):
         """
-        Returns the number of Quads if the buffer points to null. Otherwise it returns Quads 
+        Returns the number of Quads if the buffer points to null. Otherwise it returns Quads
         into the buffer up to the max specified.
         """
         fn = self.function_table.getLiveCollisionBoundsInfo
@@ -4368,7 +4410,7 @@ class IVRCompositor(object):
 
     def clearLastSubmittedFrame(self) -> None:
         """
-        Clears the frame that was sent with the last call to Submit. This will cause the 
+        Clears the frame that was sent with the last call to Submit. This will cause the
         compositor to show the grid until Submit is called again.
         """
         fn = self.function_table.clearLastSubmittedFrame
@@ -4433,7 +4475,7 @@ class IVRCompositor(object):
     def fadeToColor(self, seconds: float, red: float, green: float, blue: float, alpha: float, background=False) -> None:
         """
         Fades the view on the HMD to the specified color. The fade will take fSeconds, and the color values are between
-        0.0 and 1.0. This color is faded on top of the scene based on the alpha parameter. Removing the fade color instantly 
+        0.0 and 1.0. This color is faded on top of the scene based on the alpha parameter. Removing the fade color instantly
         would be FadeToColor( 0.0, 0.0, 0.0, 0.0, 0.0 ).  Values are in un-premultiplied alpha space.
         """
         fn = self.function_table.fadeToColor
@@ -4445,10 +4487,10 @@ class IVRCompositor(object):
         result = fn(background)
         return result
 
-    def fadeGrid(self, seconds: float, fadeIn) -> None:
+    def fadeGrid(self, seconds: float, fadeGridIn) -> None:
         """Fading the Grid in or out in fSeconds"""
         fn = self.function_table.fadeGrid
-        fn(seconds, fadeIn)
+        fn(seconds, fadeGridIn)
 
     def getCurrentGridAlpha(self):
         """Get current alpha value of grid."""
@@ -4496,8 +4538,8 @@ class IVRCompositor(object):
 
     def compositorQuit(self) -> None:
         """
-        Tells the compositor process to clean up and exit. You do not need to call this function at shutdown. Under normal 
-        circumstances the compositor will manage its own life cycle based on what applications are running.
+        DEPRECATED: Tells the compositor process to clean up and exit. You do not need to call this function at shutdown.
+        Under normal circumstances the compositor will manage its own life cycle based on what applications are running.
         """
         fn = self.function_table.compositorQuit
         fn()
@@ -4646,9 +4688,9 @@ class IVRCompositor(object):
 
         More accurate GPU timestamp for the start of the frame is achieved by the application calling
         SubmitExplicitTimingData immediately before its first submission to the Vulkan/D3D12 queue.
-        This is more accurate because normally this GPU timestamp is recorded during WaitGetPoses.  In D3D11, 
-        WaitGetPoses queues a GPU timestamp write, but it does not actually get submitted to the GPU until the 
-        application flushes.  By using SubmitExplicitTimingData, the timestamp is recorded at the same place for 
+        This is more accurate because normally this GPU timestamp is recorded during WaitGetPoses.  In D3D11,
+        WaitGetPoses queues a GPU timestamp write, but it does not actually get submitted to the GPU until the
+        application flushes.  By using SubmitExplicitTimingData, the timestamp is recorded at the same place for
         Vulkan/D3D12 as it is for D3D11, resulting in a more accurate GPU time measurement for the frame.
 
         Avoiding WaitGetPoses accessing the Vulkan queue can be achieved using SetExplicitTimingMode as well.  If this is desired,
@@ -4925,6 +4967,7 @@ class IVROverlay_FnTable(Structure):
         ("setOverlayTransformOverlayRelative", OPENVR_FNTABLE_CALLTYPE(EVROverlayError, VROverlayHandle_t, VROverlayHandle_t, POINTER(HmdMatrix34_t))),
         ("setOverlayTransformCursor", OPENVR_FNTABLE_CALLTYPE(EVROverlayError, VROverlayHandle_t, POINTER(HmdVector2_t))),
         ("getOverlayTransformCursor", OPENVR_FNTABLE_CALLTYPE(EVROverlayError, VROverlayHandle_t, POINTER(HmdVector2_t))),
+        ("setOverlayTransformProjection", OPENVR_FNTABLE_CALLTYPE(EVROverlayError, VROverlayHandle_t, ETrackingUniverseOrigin, POINTER(HmdMatrix34_t), POINTER(VROverlayProjection_t), EVREye)),
         ("showOverlay", OPENVR_FNTABLE_CALLTYPE(EVROverlayError, VROverlayHandle_t)),
         ("hideOverlay", OPENVR_FNTABLE_CALLTYPE(EVROverlayError, VROverlayHandle_t)),
         ("isOverlayVisible", OPENVR_FNTABLE_CALLTYPE(openvr_bool, VROverlayHandle_t)),
@@ -5052,7 +5095,7 @@ class IVROverlay(object):
 
     def getOverlayImageData(self, overlayHandle, buffer, bufferSize):
         """
-        Gets the raw image data from an overlay. Overlay image data is always returned as RGBA data, 4 bytes per pixel. If the buffer is not large enough, width and height 
+        Gets the raw image data from an overlay. Overlay image data is always returned as RGBA data, 4 bytes per pixel. If the buffer is not large enough, width and height
         will be set and VROverlayError_ArrayTooSmall is returned.
         """
         fn = self.function_table.getOverlayImageData
@@ -5064,7 +5107,7 @@ class IVROverlay(object):
 
     def getOverlayErrorNameFromEnum(self, error):
         """
-        returns a string that corresponds with the specified overlay error. The string will be the name 
+        returns a string that corresponds with the specified overlay error. The string will be the name
         of the error enum value for all valid error codes
         """
         fn = self.function_table.getOverlayErrorNameFromEnum
@@ -5161,7 +5204,7 @@ class IVROverlay(object):
            Overlays owned by the scene application
            Overlays owned by some other application
 
-        Within a category overlays are rendered lowest sort order to highest sort order. Overlays with the same 
+        Within a category overlays are rendered lowest sort order to highest sort order. Overlays with the same
         sort order are rendered back to front base on distance from the HMD.
 
         Sort order defaults to 0.
@@ -5331,6 +5374,12 @@ class IVROverlay(object):
         openvr.error_code.OverlayError.check_error_value(error)
         return hotspot
 
+    def setOverlayTransformProjection(self, overlayHandle, trackingOrigin, trackingOriginToOverlayTransform, projection, eye) -> None:
+        """Sets the overlay as a projection overlay"""
+        fn = self.function_table.setOverlayTransformProjection
+        error = fn(overlayHandle, trackingOrigin, byref(trackingOriginToOverlayTransform), byref(projection), eye)
+        openvr.error_code.OverlayError.check_error_value(error)
+
     def showOverlay(self, overlayHandle) -> None:
         """Shows the VR overlay.  For dashboard overlays, only the Dashboard Manager is allowed to call this."""
         fn = self.function_table.showOverlay
@@ -5359,7 +5408,7 @@ class IVROverlay(object):
 
     def pollNextOverlayEvent(self, overlayHandle, event):
         """
-        Returns true and fills the event with the next event on the overlay's event queue, if there is one. 
+        Returns true and fills the event with the next event on the overlay's event queue, if there is one.
         If there are no events this method returns false. uncbVREvent should be the size in bytes of the VREvent_t struct
         """
         fn = self.function_table.pollNextOverlayEvent
@@ -5413,7 +5462,7 @@ class IVROverlay(object):
 
     def isHoverTargetOverlay(self, overlayHandle):
         """
-        Returns true if the specified overlay is the hover target. An overlay is the hover target when it is the last overlay "moused over" 
+        Returns true if the specified overlay is the hover target. An overlay is the hover target when it is the last overlay "moused over"
         by the virtual mouse pointer
         """
         fn = self.function_table.isHoverTargetOverlay
@@ -5477,7 +5526,7 @@ class IVROverlay(object):
 
     def setOverlayRaw(self, overlayHandle, buffer, width, height, bytesPerPixel) -> None:
         """
-        Separate interface for providing the data as a stream of bytes, but there is an upper bound on data 
+        Separate interface for providing the data as a stream of bytes, but there is an upper bound on data
         that can be sent. This function can only be called by the overlay's renderer process.
         """
         fn = self.function_table.setOverlayRaw
@@ -5591,7 +5640,7 @@ class IVROverlay(object):
 
     def showKeyboard(self, inputMode, lineInputMode, flags, description: str, charMax, existingText: str, userValue) -> None:
         """
-        Show the virtual keyboard to accept input. In most cases, you should pass KeyboardFlag_Modal to enable modal overlay 
+        Show the virtual keyboard to accept input. In most cases, you should pass KeyboardFlag_Modal to enable modal overlay
         behavior on the keyboard itself. See EKeyboardFlags for more.
         """
         fn = self.function_table.showKeyboard
@@ -5604,7 +5653,7 @@ class IVROverlay(object):
 
     def showKeyboardForOverlay(self, overlayHandle, inputMode, lineInputMode, flags, description: str, charMax, existingText: str, userValue) -> None:
         """
-        Show the virtual keyboard to accept input for an overlay. In most cases, you should pass KeyboardFlag_Modal to enable modal 
+        Show the virtual keyboard to accept input for an overlay. In most cases, you should pass KeyboardFlag_Modal to enable modal
         overlay behavior on the keyboard itself. See EKeyboardFlags for more.
         """
         fn = self.function_table.showKeyboardForOverlay
@@ -5776,9 +5825,9 @@ class IVRRenderModels(object):
     def loadRenderModel_Async(self, renderModelName: str):
         """
         Loads and returns a render model for use in the application. pchRenderModelName should be a render model name
-        from the Prop_RenderModelName_String property or an absolute path name to a render model on disk. 
+        from the Prop_RenderModelName_String property or an absolute path name to a render model on disk.
 
-        The resulting render model is valid until VR_Shutdown() is called or until FreeRenderModel() is called. When the 
+        The resulting render model is valid until VR_Shutdown() is called or until FreeRenderModel() is called. When the
         application is finished with the render model it should call FreeRenderModel() to free the memory associated
         with the model.
 
@@ -6155,7 +6204,7 @@ class IVRTrackedCamera(object):
         """
         Copies the image frame into a caller's provided buffer. The image data is currently provided as RGBA data, 4 bytes per pixel.
         A caller can provide null for the framebuffer or frameheader if not desired. Requesting the frame header first, followed by the frame buffer allows
-        the caller to determine if the frame as advanced per the frame header sequence. 
+        the caller to determine if the frame as advanced per the frame header sequence.
         If there is no frame available yet, due to initial camera spinup or re-activation, the error will be VRTrackedCameraError_NoFrameAvailable.
         Ideally a caller should be polling at ~16ms intervals
         """
@@ -6182,7 +6231,7 @@ class IVRTrackedCamera(object):
         The camera frame type VRTrackedCameraFrameType_Undistorted is not supported directly as a shared texture. It is an interior subregion of the shared texture VRTrackedCameraFrameType_MaximumUndistorted.
         Instead, use GetVideoStreamTextureSize() with VRTrackedCameraFrameType_Undistorted to determine the proper interior subregion bounds along with GetVideoStreamTextureD3D11() with
         VRTrackedCameraFrameType_MaximumUndistorted to provide the texture. The VRTrackedCameraFrameType_MaximumUndistorted will yield an image where the invalid regions are decoded
-        by the alpha channel having a zero component. The valid regions all have a non-zero alpha component. The subregion as described by VRTrackedCameraFrameType_Undistorted 
+        by the alpha channel having a zero component. The valid regions all have a non-zero alpha component. The subregion as described by VRTrackedCameraFrameType_Undistorted
         guarantees a rectangle where all pixels are valid.
         """
         fn = self.function_table.getVideoStreamTextureD3D11
@@ -6429,7 +6478,7 @@ class IVRResources(object):
     def getResourceFullPath(self, resourceName: str, resourceTypeDirectory: str):
         """
         Provides the full path to the specified resource. Resource names can include named directories for
-        drivers and other things, and this resolves all of those and returns the actual physical path. 
+        drivers and other things, and this resolves all of those and returns the actual physical path.
         pchResourceTypeDirectory is the subdirectory of resources to look in.
         """
         fn = self.function_table.getResourceFullPath
@@ -6541,7 +6590,7 @@ class IVRInput(object):
         """
         Sets the path to the action manifest JSON file that is used by this application. If this information
         was set on the Steam partner site, calls to this function are ignored. If the Steam partner site
-        setting and the path provided by this call are different, VRInputError_MismatchedActionManifest is returned. 
+        setting and the path provided by this call are different, VRInputError_MismatchedActionManifest is returned.
         This call must be made before the first call to UpdateActionState or IVRSystem::PollNextEvent.
         """
         fn = self.function_table.setActionManifestPath
@@ -6582,7 +6631,7 @@ class IVRInput(object):
 
     def updateActionState(self, sets):
         """
-        Reads the current state into all actions. After this call, the results of Get*Action calls 
+        Reads the current state into all actions. After this call, the results of Get*Action calls
         will be the same until the next call to UpdateActionState.
         """
         fn = self.function_table.updateActionState
@@ -6814,7 +6863,7 @@ class IVRInput(object):
 
     def getOriginLocalizedName(self, origin, stringSectionsToInclude):
         """
-        Retrieves the name of the origin in the current language. unStringSectionsToInclude is a bitfield of values in EVRInputStringBits that allows the 
+        Retrieves the name of the origin in the current language. unStringSectionsToInclude is a bitfield of values in EVRInputStringBits that allows the
         application to specify which parts of the origin's information it wants a string for.
         """
         fn = self.function_table.getOriginLocalizedName
@@ -6899,7 +6948,7 @@ class IVRInput(object):
 
     def getBindingVariant(self, devicePath):
         """
-        Returns the variant set in the current bindings. If the binding doesn't include a variant setting, this function 
+        Returns the variant set in the current bindings. If the binding doesn't include a variant setting, this function
         will return an empty string
         """
         fn = self.function_table.getBindingVariant
@@ -7028,7 +7077,7 @@ class IVRSpatialAnchors(object):
         This should be called when the user is close to (and ideally looking at/interacting with) the target physical
         location.  At that moment, the driver will have the most information about how to recover that physical point
         in the future, and the quality of the anchor (when the descriptor is re-used) will be highest.
-        The caller may decide to apply offsets from this initial pose, but is advised to stay relatively close to the 
+        The caller may decide to apply offsets from this initial pose, but is advised to stay relatively close to the
         original pose location for highest fidelity.
         """
         fn = self.function_table.createSpatialAnchorFromPose
