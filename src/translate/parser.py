@@ -4,10 +4,15 @@ Parses translate header files to create a model of the code to be generated
 
 import inspect
 import pkg_resources
+import platform
 
-from clang.cindex import CursorKind, Index, TypeKind
+from clang.cindex import Config, CursorKind, Index, TypeKind
 
 import translate.model as model
+
+
+if platform.system() == "Windows":
+    Config.set_library_file('C:/Program Files/LLVM/bin/libclang.dll')
 
 
 def clean_comment(cursor):
