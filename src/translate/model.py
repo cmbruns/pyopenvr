@@ -618,9 +618,12 @@ class Struct(Declaration):
         super().__init__(name=name, docstring=docstring)
         self.fields = []
         self.base = None
-        if name == 'VRControllerState_t':
-            self.base = 'PackHackStructure'
-        if name == 'vr::VREvent_t':
+        if name in [
+            'VRControllerState_t',
+            'vr::VREvent_t',
+            'vr::RenderModel_TextureMap_t',
+            'vr::RenderModel_t',
+        ]:
             self.base = 'PackHackStructure'
 
     def add_field(self, field):

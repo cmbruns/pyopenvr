@@ -2444,7 +2444,7 @@ class RenderModel_Vertex_t(Structure):
     ]
 
 
-class RenderModel_TextureMap_t(Structure):
+class RenderModel_TextureMap_t(PackHackStructure):
     _fields_ = [
         ("unWidth", c_uint16),
         ("unHeight", c_uint16),
@@ -2453,7 +2453,7 @@ class RenderModel_TextureMap_t(Structure):
     ]
 
 
-class RenderModel_t(Structure):
+class RenderModel_t(PackHackStructure):
     _fields_ = [
         ("rVertexData", POINTER(RenderModel_Vertex_t)),
         ("unVertexCount", c_uint32),
