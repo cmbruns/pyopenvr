@@ -1,6 +1,10 @@
 # pyopenvr
 ### Unofficial python bindings for Valve's OpenVR virtual reality SDK, located at https://github.com/ValveSoftware/openvr
 
+## DEPRECATION NOTICE
+
+Our upstream SDK OpenVR is no longer being updated. Everyone is switching to OpenXR instead. We are working on similar bindings for OpenXR at https://github.com/cmbruns/pyopenxr
+
 ## Installation
 - [ ] Install Python 3.5+ https://www.python.org/download/
 - [ ] Install HTC Vive SteamVR
