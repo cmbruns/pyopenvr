@@ -563,12 +563,12 @@ class CMainApplication(object):
             self.render_stereo_targets()
             self.render_companion_window()
             left_eye_texture = openvr.Texture_t(
-                handle=self.left_eye_desc.resolve_texture_id,
+                handle=int(self.left_eye_desc.resolve_texture_id),
                 eType=openvr.TextureType_OpenGL,
                 eColorSpace=openvr.ColorSpace_Gamma,
             )
             right_eye_texture = openvr.Texture_t(
-                handle=self.right_eye_desc.resolve_texture_id,
+                handle=int(self.right_eye_desc.resolve_texture_id),
                 eType=openvr.TextureType_OpenGL,
                 eColorSpace=openvr.ColorSpace_Gamma,
             )
