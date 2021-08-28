@@ -54,7 +54,7 @@ class CGLRenderModel(object):
                         vr_model.rIndexData, GL.GL_STATIC_DRAW)
         GL.glBindVertexArray(0)
         # create and populate the texture
-        self.texture = GL.glGenTextures(1)
+        self.texture = int(GL.glGenTextures(1))
         GL.glBindTexture(GL.GL_TEXTURE_2D, self.texture)
         GL.glTexImage2D(GL.GL_TEXTURE_2D, 0, GL.GL_RGBA, vr_diffuse_texture.unWidth, vr_diffuse_texture.unHeight,
                         0, GL.GL_RGBA, GL.GL_UNSIGNED_BYTE, vr_diffuse_texture.rubTextureMapData)
@@ -563,12 +563,12 @@ class CMainApplication(object):
             self.render_stereo_targets()
             self.render_companion_window()
             left_eye_texture = openvr.Texture_t(
-                handle=int(self.left_eye_desc.resolve_texture_id),
+                handle=self.left_eye_desc.resolve_texture_id,
                 eType=openvr.TextureType_OpenGL,
                 eColorSpace=openvr.ColorSpace_Gamma,
             )
             right_eye_texture = openvr.Texture_t(
-                handle=int(self.right_eye_desc.resolve_texture_id),
+                handle=self.right_eye_desc.resolve_texture_id,
                 eType=openvr.TextureType_OpenGL,
                 eColorSpace=openvr.ColorSpace_Gamma,
             )
@@ -744,7 +744,7 @@ class CMainApplication(object):
         image = Image.open(ts).convert('RGBA')
         width, height = image.size
         image_data = numpy.array(list(image.getdata()), numpy.uint8)
-        self.i_texture = GL.glGenTextures(1)
+        self.i_texture = int(GL.glGenTextures(1))
         GL.glBindTexture(GL.GL_TEXTURE_2D, self.i_texture)
         GL.glTexImage2D(
             GL.GL_TEXTURE_2D,
@@ -845,7 +845,7 @@ class FramebufferDesc(object):
         GL.glFramebufferRenderbuffer(GL.GL_FRAMEBUFFER, GL.GL_DEPTH_ATTACHMENT, GL.GL_RENDERBUFFER,
                                      self.depth_buffer_id)
         #
-        self.render_texture_id = GL.glGenTextures(1)
+        self.render_texture_id = int(GL.glGenTextures(1))
         GL.glBindTexture(GL.GL_TEXTURE_2D_MULTISAMPLE, self.render_texture_id)
         GL.glTexImage2DMultisample(GL.GL_TEXTURE_2D_MULTISAMPLE, 4, GL.GL_RGBA8, width, height, True)
         GL.glFramebufferTexture2D(GL.GL_FRAMEBUFFER, GL.GL_COLOR_ATTACHMENT0, GL.GL_TEXTURE_2D_MULTISAMPLE,
@@ -854,7 +854,7 @@ class FramebufferDesc(object):
         self.resolve_framebuffer_id = GL.glGenFramebuffers(1)
         GL.glBindFramebuffer(GL.GL_FRAMEBUFFER, self.resolve_framebuffer_id)
         #
-        self.resolve_texture_id = GL.glGenTextures(1)
+        self.resolve_texture_id = int(GL.glGenTextures(1))
         GL.glBindTexture(GL.GL_TEXTURE_2D, self.resolve_texture_id)
         GL.glTexParameteri(GL.GL_TEXTURE_2D, GL.GL_TEXTURE_MIN_FILTER, GL.GL_LINEAR)
         GL.glTexParameteri(GL.GL_TEXTURE_2D, GL.GL_TEXTURE_MAX_LEVEL, 0)
