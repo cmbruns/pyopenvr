@@ -2,7 +2,7 @@ import os
 import shutil
 
 # Copy libraries from openvr project
-openvr_path = 'C:/Users/cmbruns2/git/openvr'
+openvr_path = 'C:/Users/cmbruns/Documents/git/openvr'
 
 this_path = os.path.dirname(os.path.abspath(__file__))
 pyopenvr_path = os.path.dirname(this_path)
