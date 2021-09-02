@@ -4,11 +4,12 @@
 # from https://github.com/cmbruns/pyopenvr
 # based on OpenVR C++ API at https://github.com/ValveSoftware/openvr
 
-import os
-import pkg_resources
-import platform
+import atexit
+from contextlib import ExitStack
 import ctypes
 from ctypes import *
+import importlib.resources
+import platform
 
 from .version import __version__
 import openvr.error_code
@@ -32,7 +33,7 @@ else:
 # Detect platform
 if sizeof(c_void_p) == 4:
     if platform.system() == 'Windows':
-        _openvr_lib_name = "libopenvr_api_32"
+        _openvr_lib_name = "libopenvr_api_32.dll"
     elif platform.system() == 'Linux':
         _openvr_lib_name = "libopenvr_api_32.so"
     elif platform.system() == 'Darwin':
@@ -41,7 +42,7 @@ if sizeof(c_void_p) == 4:
         raise ValueError("Libraries not available for this platform: " + platform.system())
 else:
     if platform.system() == 'Windows':
-        _openvr_lib_name = "libopenvr_api_64"
+        _openvr_lib_name = "libopenvr_api_64.dll"
     elif platform.system() == 'Linux':
         _openvr_lib_name = "libopenvr_api_64.so"
     elif platform.system() == 'Darwin':
@@ -50,8 +51,11 @@ else:
         raise ValueError("Libraries not available for this platform: " + platform.system())
 
 # Load library
-_openvr_lib_path = pkg_resources.resource_filename("openvr", _openvr_lib_name)
-_openvr = ctypes.cdll.LoadLibrary(_openvr_lib_path)
+_lib_manager = ExitStack()
+atexit.register(_lib_manager.close)
+_lib_ref = importlib.resources.files(openvr) / _openvr_lib_name
+_openvr_lib_path = _lib_manager.enter_context(importlib.resources.as_file(_lib_ref))
+_openvr = ctypes.cdll.LoadLibrary(str(_openvr_lib_path))
 
 # Function pointer table calling convention
 if platform.system() == 'Windows':
