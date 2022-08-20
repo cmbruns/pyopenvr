@@ -435,6 +435,10 @@ class OverlayError_TextureNotLocked(OverlayError):
     pass
 
 
+class OverlayError_TimedOut(OverlayError):
+    pass
+
+
 OverlayError.error_index[0] = OverlayError_None
 OverlayError.error_index[10] = OverlayError_UnknownOverlay
 OverlayError.error_index[11] = OverlayError_InvalidHandle
@@ -459,6 +463,7 @@ OverlayError.error_index[30] = OverlayError_BadMaskPrimitive
 OverlayError.error_index[31] = OverlayError_TextureAlreadyLocked
 OverlayError.error_index[32] = OverlayError_TextureLockCapacityReached
 OverlayError.error_index[33] = OverlayError_TextureNotLocked
+OverlayError.error_index[34] = OverlayError_TimedOut
 
 
 class FirmwareError(ErrorCode):
@@ -741,11 +746,59 @@ class InitError_Init_CouldNotStartPrism(InitError):
     pass
 
 
-class InitError_Init_CreateDriverDirectDeviceFailed(InitError):
+class InitError_Init_PrismClientInitFailed(InitError):
+    pass
+
+
+class InitError_Init_PrismClientStartFailed(InitError):
     pass
 
 
 class InitError_Init_PrismExitedUnexpectedly(InitError):
+    pass
+
+
+class InitError_Init_BadLuid(InitError):
+    pass
+
+
+class InitError_Init_NoServerForAppContainer(InitError):
+    pass
+
+
+class InitError_Init_DuplicateBootstrapper(InitError):
+    pass
+
+
+class InitError_Init_VRDashboardServicePending(InitError):
+    pass
+
+
+class InitError_Init_VRDashboardServiceTimeout(InitError):
+    pass
+
+
+class InitError_Init_VRDashboardServiceStopped(InitError):
+    pass
+
+
+class InitError_Init_VRDashboardAlreadyStarted(InitError):
+    pass
+
+
+class InitError_Init_VRDashboardCopyFailed(InitError):
+    pass
+
+
+class InitError_Init_VRDashboardTokenFailure(InitError):
+    pass
+
+
+class InitError_Init_VRDashboardEnvironmentFailure(InitError):
+    pass
+
+
+class InitError_Init_VRDashboardPathFailure(InitError):
     pass
 
 
@@ -798,6 +851,14 @@ class InitError_Driver_HmdDisplayMirrored(InitError):
 
 
 class InitError_Driver_HmdDisplayNotFoundLaptop(InitError):
+    pass
+
+
+class InitError_Driver_PeerDriverNotInstalled(InitError):
+    pass
+
+
+class InitError_Driver_WirelessHmdNotConnected(InitError):
     pass
 
 
@@ -1221,11 +1282,23 @@ class InitError_Compositor_SystemLayerCreateSession(InitError):
     pass
 
 
+class InitError_Compositor_CreateInverseDistortUVs(InitError):
+    pass
+
+
+class InitError_Compositor_CreateBackbufferDepth(InitError):
+    pass
+
+
 class InitError_VendorSpecific_UnableToConnectToOculusRuntime(InitError):
     pass
 
 
 class InitError_VendorSpecific_WindowsNotInDevMode(InitError):
+    pass
+
+
+class InitError_VendorSpecific_OculusLinkNotEnabled(InitError):
     pass
 
 
@@ -1282,6 +1355,10 @@ class InitError_VendorSpecific_HmdFound_ConfigFailedSanityCheck(InitError):
 
 
 class InitError_VendorSpecific_OculusRuntimeBadInstall(InitError):
+    pass
+
+
+class InitError_VendorSpecific_HmdFound_UnexpectedConfiguration_1(InitError):
     pass
 
 
@@ -1349,8 +1426,20 @@ InitError.error_index[150] = InitError_Init_VRServiceStartupFailed
 InitError.error_index[151] = InitError_Init_PrismNeedsNewDrivers
 InitError.error_index[152] = InitError_Init_PrismStartupTimedOut
 InitError.error_index[153] = InitError_Init_CouldNotStartPrism
-InitError.error_index[154] = InitError_Init_CreateDriverDirectDeviceFailed
-InitError.error_index[155] = InitError_Init_PrismExitedUnexpectedly
+InitError.error_index[154] = InitError_Init_PrismClientInitFailed
+InitError.error_index[155] = InitError_Init_PrismClientStartFailed
+InitError.error_index[156] = InitError_Init_PrismExitedUnexpectedly
+InitError.error_index[157] = InitError_Init_BadLuid
+InitError.error_index[158] = InitError_Init_NoServerForAppContainer
+InitError.error_index[159] = InitError_Init_DuplicateBootstrapper
+InitError.error_index[160] = InitError_Init_VRDashboardServicePending
+InitError.error_index[161] = InitError_Init_VRDashboardServiceTimeout
+InitError.error_index[162] = InitError_Init_VRDashboardServiceStopped
+InitError.error_index[163] = InitError_Init_VRDashboardAlreadyStarted
+InitError.error_index[164] = InitError_Init_VRDashboardCopyFailed
+InitError.error_index[165] = InitError_Init_VRDashboardTokenFailure
+InitError.error_index[166] = InitError_Init_VRDashboardEnvironmentFailure
+InitError.error_index[167] = InitError_Init_VRDashboardPathFailure
 InitError.error_index[200] = InitError_Driver_Failed
 InitError.error_index[201] = InitError_Driver_Unknown
 InitError.error_index[202] = InitError_Driver_HmdUnknown
@@ -1364,6 +1453,8 @@ InitError.error_index[209] = InitError_Driver_TrackedDeviceInterfaceUnknown
 InitError.error_index[211] = InitError_Driver_HmdDriverIdOutOfBounds
 InitError.error_index[212] = InitError_Driver_HmdDisplayMirrored
 InitError.error_index[213] = InitError_Driver_HmdDisplayNotFoundLaptop
+InitError.error_index[214] = InitError_Driver_PeerDriverNotInstalled
+InitError.error_index[215] = InitError_Driver_WirelessHmdNotConnected
 InitError.error_index[300] = InitError_IPC_ServerInitFailed
 InitError.error_index[301] = InitError_IPC_ConnectFailed
 InitError.error_index[302] = InitError_IPC_SharedStateInitFailed
@@ -1469,8 +1560,11 @@ InitError.error_index[490] = InitError_Compositor_FailedToCreateMailbox
 InitError.error_index[491] = InitError_Compositor_WindowInterfaceIsNull
 InitError.error_index[492] = InitError_Compositor_SystemLayerCreateInstance
 InitError.error_index[493] = InitError_Compositor_SystemLayerCreateSession
+InitError.error_index[494] = InitError_Compositor_CreateInverseDistortUVs
+InitError.error_index[495] = InitError_Compositor_CreateBackbufferDepth
 InitError.error_index[1000] = InitError_VendorSpecific_UnableToConnectToOculusRuntime
 InitError.error_index[1001] = InitError_VendorSpecific_WindowsNotInDevMode
+InitError.error_index[1002] = InitError_VendorSpecific_OculusLinkNotEnabled
 InitError.error_index[1101] = InitError_VendorSpecific_HmdFound_CantOpenDevice
 InitError.error_index[1102] = InitError_VendorSpecific_HmdFound_UnableToRequestConfigStart
 InitError.error_index[1103] = InitError_VendorSpecific_HmdFound_NoStoredConfig
@@ -1485,6 +1579,7 @@ InitError.error_index[1111] = InitError_VendorSpecific_HmdFound_UserDataAddressR
 InitError.error_index[1112] = InitError_VendorSpecific_HmdFound_UserDataError
 InitError.error_index[1113] = InitError_VendorSpecific_HmdFound_ConfigFailedSanityCheck
 InitError.error_index[1114] = InitError_VendorSpecific_OculusRuntimeBadInstall
+InitError.error_index[1115] = InitError_VendorSpecific_HmdFound_UnexpectedConfiguration_1
 InitError.error_index[2000] = InitError_Steam_SteamInstallationNotFound
 InitError.error_index[2001] = InitError_LastError
 
