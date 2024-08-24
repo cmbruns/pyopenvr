@@ -511,11 +511,16 @@ class NotificationError_SystemWithUserValueAlreadyExists(NotificationError):
     pass
 
 
+class NotificationError_ServiceUnavailable(NotificationError):
+    pass
+
+
 NotificationError.error_index[0] = NotificationError_OK
 NotificationError.error_index[100] = NotificationError_InvalidNotificationId
 NotificationError.error_index[101] = NotificationError_NotificationQueueFull
 NotificationError.error_index[102] = NotificationError_InvalidOverlayHandle
 NotificationError.error_index[103] = NotificationError_SystemWithUserValueAlreadyExists
+NotificationError.error_index[104] = NotificationError_ServiceUnavailable
 
 
 class InitError(ErrorCode):
@@ -1290,6 +1295,26 @@ class InitError_Compositor_CreateBackbufferDepth(InitError):
     pass
 
 
+class InitError_Compositor_CannotDRMLeaseDisplay(InitError):
+    pass
+
+
+class InitError_Compositor_CannotConnectToDisplayServer(InitError):
+    pass
+
+
+class InitError_Compositor_GnomeNoDRMLeasing(InitError):
+    pass
+
+
+class InitError_Compositor_FailedToInitializeEncoder(InitError):
+    pass
+
+
+class InitError_Compositor_CreateBlurTexture(InitError):
+    pass
+
+
 class InitError_VendorSpecific_UnableToConnectToOculusRuntime(InitError):
     pass
 
@@ -1562,6 +1587,11 @@ InitError.error_index[492] = InitError_Compositor_SystemLayerCreateInstance
 InitError.error_index[493] = InitError_Compositor_SystemLayerCreateSession
 InitError.error_index[494] = InitError_Compositor_CreateInverseDistortUVs
 InitError.error_index[495] = InitError_Compositor_CreateBackbufferDepth
+InitError.error_index[496] = InitError_Compositor_CannotDRMLeaseDisplay
+InitError.error_index[497] = InitError_Compositor_CannotConnectToDisplayServer
+InitError.error_index[498] = InitError_Compositor_GnomeNoDRMLeasing
+InitError.error_index[499] = InitError_Compositor_FailedToInitializeEncoder
+InitError.error_index[500] = InitError_Compositor_CreateBlurTexture
 InitError.error_index[1000] = InitError_VendorSpecific_UnableToConnectToOculusRuntime
 InitError.error_index[1001] = InitError_VendorSpecific_WindowsNotInDevMode
 InitError.error_index[1002] = InitError_VendorSpecific_OculusLinkNotEnabled
@@ -1819,12 +1849,17 @@ class SettingsError_UnsetSettingHasNoDefault(SettingsError):
     pass
 
 
+class SettingsError_AccessDenied(SettingsError):
+    pass
+
+
 SettingsError.error_index[0] = SettingsError_None
 SettingsError.error_index[1] = SettingsError_IPCFailed
 SettingsError.error_index[2] = SettingsError_WriteFailed
 SettingsError.error_index[3] = SettingsError_ReadFailed
 SettingsError.error_index[4] = SettingsError_JsonParseFailed
 SettingsError.error_index[5] = SettingsError_UnsetSettingHasNoDefault
+SettingsError.error_index[6] = SettingsError_AccessDenied
 
 
 class CompositorError(ErrorCode):

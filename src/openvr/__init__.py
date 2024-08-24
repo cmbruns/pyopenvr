@@ -1,6 +1,6 @@
 #!/bin/env python
 
-# Unofficial python bindings for OpenVR API version 1.26.7
+# Unofficial python bindings for OpenVR API version 2.5.1
 # from https://github.com/cmbruns/pyopenvr
 # based on OpenVR C++ API at https://github.com/ValveSoftware/openvr
 
@@ -97,9 +97,9 @@ class ID3D12CommandQueue(Structure):
 # Expose constants #
 ####################
 
-k_nSteamVRVersionMajor = 1
-k_nSteamVRVersionMinor = 26
-k_nSteamVRVersionBuild = 7
+k_nSteamVRVersionMajor = 2
+k_nSteamVRVersionMinor = 5
+k_nSteamVRVersionBuild = 1
 k_nDriverNone = 0xFFFFFFFF
 k_unMaxDriverDebugResponseSize = 32768
 k_unTrackedDeviceIndex_Hmd = 0
@@ -147,7 +147,7 @@ VRCompositor_ReprojectionReason_Cpu = 0x01  # Compositor frame timing reprojecti
 VRCompositor_ReprojectionReason_Gpu = 0x02
 VRCompositor_ReprojectionAsync = 0x04  # This flag indicates the async reprojection mode is active,
 VRCompositor_ReprojectionMotion = 0x08  # This flag indicates whether or not motion smoothing was triggered for this frame
-VRCompositor_PredictionMask = 0xF0  # The runtime may predict more than one frame (up to four) ahead if
+VRCompositor_PredictionMask = 0xF0  # The runtime may predict more than one frame ahead if
 VRCompositor_ThrottleMask = 0xF00  # Number of frames the compositor is throttling the application.
 VRCompositor_ReprojectionMotion_Enabled = 0x100  # Motion Smoothing is enabled in the UI for the currently running application
 VRCompositor_ReprojectionMotion_ForcedOn = 0x200  # Motion Smoothing is forced on in the UI for the currently running application
@@ -193,6 +193,7 @@ k_pch_SteamVR_FramesToThrottle_Int32 = 'framesToThrottle'
 k_pch_SteamVR_AdditionalFramesToPredict_Int32 = 'additionalFramesToPredict'
 k_pch_SteamVR_WorldScale_Float = 'worldScale'
 k_pch_SteamVR_FovScale_Int32 = 'fovScale'
+k_pch_SteamVR_FovScaleLetterboxed_Bool = 'fovScaleLetterboxed'
 k_pch_SteamVR_DisableAsyncReprojection_Bool = 'disableAsync'
 k_pch_SteamVR_ForceFadeOnBadTracking_Bool = 'forceFadeOnBadTracking'
 k_pch_SteamVR_DefaultMirrorView_Int32 = 'mirrorView'
@@ -237,6 +238,9 @@ k_pch_SteamVR_BlockOculusSDKOnAllLaunches_Bool = 'blockOculusSDKOnAllLaunches'
 k_pch_SteamVR_HDCPLegacyCompatibility_Bool = 'hdcp14legacyCompatibility'
 k_pch_SteamVR_DisplayPortTrainingMode_Int = 'displayPortTrainingMode'
 k_pch_SteamVR_UsePrism_Bool = 'usePrism'
+k_pch_SteamVR_AllowFallbackMirrorWindowLinux_Bool = 'allowFallbackMirrorWindowLinux'
+k_pch_OpenXR_Section = 'openxr'
+k_pch_OpenXR_MetaUnityPluginCompatibility_Int32 = 'metaUnityPluginCompatibility'
 k_pch_DirectMode_Section = 'direct_mode'
 k_pch_DirectMode_Enable_Bool = 'enable'
 k_pch_DirectMode_Count_Int32 = 'count'
@@ -347,6 +351,9 @@ k_pch_Dashboard_DashboardScale = 'dashboardScale'
 k_pch_Dashboard_UseStandaloneSystemLayer = 'standaloneSystemLayer'
 k_pch_Dashboard_StickyDashboard = 'stickyDashboard'
 k_pch_Dashboard_AllowSteamOverlays_Bool = 'allowSteamOverlays'
+k_pch_Dashboard_AllowVRGamepadUI_Bool = 'allowVRGamepadUI'
+k_pch_Dashboard_AllowVRGamepadUIViaGamescope_Bool = 'allowVRGamepadUIViaGamescope'
+k_pch_Dashboard_SteamMatchesHMDFramerate = 'steamMatchesHMDFramerate'
 k_pch_modelskin_Section = 'modelskins'
 k_pch_Driver_Enable_Bool = 'enable'
 k_pch_Driver_BlockedBySafemode_Bool = 'blocked_by_safe_mode'
@@ -370,6 +377,7 @@ k_pch_DesktopUI_Section = 'DesktopUI'
 k_pch_LastKnown_Section = 'LastKnown'
 k_pch_LastKnown_HMDManufacturer_String = 'HMDManufacturer'
 k_pch_LastKnown_HMDModel_String = 'HMDModel'
+k_pch_LastKnown_ActualHMDDriver_String = 'ActualHMDDriver'
 k_pch_DismissedWarnings_Section = 'DismissedWarnings'
 k_pch_Input_Section = 'input'
 k_pch_Input_LeftThumbstickRotation_Float = 'leftThumbstickRotation'
@@ -378,7 +386,7 @@ k_pch_Input_ThumbstickDeadzone_Float = 'thumbstickDeadzone'
 k_pch_GpuSpeed_Section = 'GpuSpeed'
 IVRChaperone_Version = 'IVRChaperone_004'
 IVRChaperoneSetup_Version = 'IVRChaperoneSetup_006'
-IVRCompositor_Version = 'IVRCompositor_027'
+IVRCompositor_Version = 'IVRCompositor_028'
 k_unHeadsetViewMaxWidth = 3840
 k_unHeadsetViewMaxHeight = 2160
 k_pchHeadsetViewOverlayKey = 'system.HeadsetView'
@@ -393,8 +401,11 @@ IVROverlay_Version = 'IVROverlay_027'
 IVROverlayView_Version = 'IVROverlayView_003'
 k_pch_Controller_Component_GDC2015 = 'gdc2015'  # Canonical coordinate system of the gdc 2015 wired controller, provided for backwards compatibility
 k_pch_Controller_Component_Base = 'base'  # For controllers with an unambiguous 'base'.
-k_pch_Controller_Component_Tip = 'tip'  # For controllers with an unambiguous 'tip' (used for 'laser-pointing')
-k_pch_Controller_Component_HandGrip = 'handgrip'  # Neutral, ambidextrous hand-pose when holding controller. On plane between neutrally posed index finger and thumb
+k_pch_Controller_Component_Tip = 'tip'  # OpenVR: For controllers with an unambiguous 'tip' (used for 'laser-pointing')
+k_pch_Controller_Component_OpenXR_Aim = 'openxr_aim'  # OpenXR: For controllers with an unambiguous 'tip' (used for 'laser-pointing')
+k_pch_Controller_Component_HandGrip = 'handgrip'  # OpenVR: Neutral, ambidextrous hand-pose when holding controller. On plane between neutrally posed index finger and thumb
+k_pch_Controller_Component_OpenXR_Grip = 'openxr_grip'  # OpenXR: Neutral, ambidextrous hand-pose when holding controller. On plane between neutrally posed index finger and thumb
+k_pch_Controller_Component_OpenXR_HandModel = 'openxr_handmodel'  # OpenXR: Pose that can be used to place hand models & visuals that aren't reliant on the physical shape of a controller
 k_pch_Controller_Component_Status = 'status'  # 1:1 aspect ratio status area, with canonical [0,1] uv mapping
 INVALID_TEXTURE_ID = -1
 IVRRenderModels_Version = 'IVRRenderModels_006'
@@ -437,6 +448,7 @@ TextureType_IOSurface = ENUM_VALUE_TYPE(3)
 TextureType_DirectX12 = ENUM_VALUE_TYPE(4)
 TextureType_DXGISharedHandle = ENUM_VALUE_TYPE(5)
 TextureType_Metal = ENUM_VALUE_TYPE(6)
+TextureType_Reserved = ENUM_VALUE_TYPE(7)
 
 EColorSpace = ENUM_TYPE
 ColorSpace_Auto = ENUM_VALUE_TYPE(0)
@@ -536,6 +548,7 @@ Prop_ComputedSerialNumber_String = ENUM_VALUE_TYPE(1050)
 Prop_EstimatedDeviceFirstUseTime_Int32 = ENUM_VALUE_TYPE(1051)
 Prop_DevicePowerUsage_Float = ENUM_VALUE_TYPE(1052)
 Prop_IgnoreMotionForStandby_Bool = ENUM_VALUE_TYPE(1053)
+Prop_ActualTrackingSystemName_String = ENUM_VALUE_TYPE(1054)
 Prop_ReportsTimeSinceVSync_Bool = ENUM_VALUE_TYPE(2000)
 Prop_SecondsFromVsyncToPhotons_Float = ENUM_VALUE_TYPE(2001)
 Prop_DisplayFrequency_Float = ENUM_VALUE_TYPE(2002)
@@ -628,6 +641,7 @@ Prop_PeerButtonInfo_String = ENUM_VALUE_TYPE(2092)
 Prop_Hmd_SupportsHDR10_Bool = ENUM_VALUE_TYPE(2093)
 Prop_Hmd_EnableParallelRenderCameras_Bool = ENUM_VALUE_TYPE(2094)
 Prop_DriverProvidedChaperoneJson_String = ENUM_VALUE_TYPE(2095)
+Prop_ForceSystemLayerUseAppPoses_Bool = ENUM_VALUE_TYPE(2096)
 Prop_IpdUIRangeMinMeters_Float = ENUM_VALUE_TYPE(2100)
 Prop_IpdUIRangeMaxMeters_Float = ENUM_VALUE_TYPE(2101)
 Prop_Hmd_SupportsHDCP14LegacyCompat_Bool = ENUM_VALUE_TYPE(2102)
@@ -636,9 +650,14 @@ Prop_Hmd_SupportsDisplayPortTrainingMode_Bool = ENUM_VALUE_TYPE(2104)
 Prop_Hmd_SupportsRoomViewDirect_Bool = ENUM_VALUE_TYPE(2105)
 Prop_Hmd_SupportsAppThrottling_Bool = ENUM_VALUE_TYPE(2106)
 Prop_Hmd_SupportsGpuBusMonitoring_Bool = ENUM_VALUE_TYPE(2107)
+Prop_DriverDisplaysIPDChanges_Bool = ENUM_VALUE_TYPE(2108)
+Prop_Driver_Reserved_01 = ENUM_VALUE_TYPE(2109)
 Prop_DSCVersion_Int32 = ENUM_VALUE_TYPE(2110)
 Prop_DSCSliceCount_Int32 = ENUM_VALUE_TYPE(2111)
 Prop_DSCBPPx16_Int32 = ENUM_VALUE_TYPE(2112)
+Prop_Hmd_MaxDistortedTextureWidth_Int32 = ENUM_VALUE_TYPE(2113)
+Prop_Hmd_MaxDistortedTextureHeight_Int32 = ENUM_VALUE_TYPE(2114)
+Prop_Hmd_AllowSupersampleFiltering_Bool = ENUM_VALUE_TYPE(2115)
 Prop_DriverRequestedMuraCorrectionMode_Int32 = ENUM_VALUE_TYPE(2200)
 Prop_DriverRequestedMuraFeather_InnerLeft_Int32 = ENUM_VALUE_TYPE(2201)
 Prop_DriverRequestedMuraFeather_InnerRight_Int32 = ENUM_VALUE_TYPE(2202)
@@ -652,6 +671,12 @@ Prop_Audio_DefaultPlaybackDeviceId_String = ENUM_VALUE_TYPE(2300)
 Prop_Audio_DefaultRecordingDeviceId_String = ENUM_VALUE_TYPE(2301)
 Prop_Audio_DefaultPlaybackDeviceVolume_Float = ENUM_VALUE_TYPE(2302)
 Prop_Audio_SupportsDualSpeakerAndJackOutput_Bool = ENUM_VALUE_TYPE(2303)
+Prop_Audio_DriverManagesPlaybackVolumeControl_Bool = ENUM_VALUE_TYPE(2304)
+Prop_Audio_DriverPlaybackVolume_Float = ENUM_VALUE_TYPE(2305)
+Prop_Audio_DriverPlaybackMute_Bool = ENUM_VALUE_TYPE(2306)
+Prop_Audio_DriverManagesRecordingVolumeControl_Bool = ENUM_VALUE_TYPE(2307)
+Prop_Audio_DriverRecordingVolume_Float = ENUM_VALUE_TYPE(2308)
+Prop_Audio_DriverRecordingMute_Bool = ENUM_VALUE_TYPE(2309)
 Prop_AttachedDeviceId_String = ENUM_VALUE_TYPE(3000)
 Prop_SupportedButtons_Uint64 = ENUM_VALUE_TYPE(3001)
 Prop_Axis0Type_Int32 = ENUM_VALUE_TYPE(3002)
@@ -691,6 +716,7 @@ Prop_HasCameraComponent_Bool = ENUM_VALUE_TYPE(6004)
 Prop_HasDriverDirectModeComponent_Bool = ENUM_VALUE_TYPE(6005)
 Prop_HasVirtualDisplayComponent_Bool = ENUM_VALUE_TYPE(6006)
 Prop_HasSpatialAnchorsSupport_Bool = ENUM_VALUE_TYPE(6007)
+Prop_SupportsXrTextureSets_Bool = ENUM_VALUE_TYPE(6008)
 Prop_ControllerType_String = ENUM_VALUE_TYPE(7000)
 Prop_ControllerHandSelectionPriority_Int32 = ENUM_VALUE_TYPE(7002)
 Prop_VendorSpecific_Reserved_Start = ENUM_VALUE_TYPE(10000)
@@ -731,6 +757,7 @@ Submit_TextureWithDepth = ENUM_VALUE_TYPE(16)
 Submit_FrameDiscontinuty = ENUM_VALUE_TYPE(32)
 Submit_VulkanTextureWithArrayData = ENUM_VALUE_TYPE(64)
 Submit_GlArrayTexture = ENUM_VALUE_TYPE(128)
+Submit_IsEgl = ENUM_VALUE_TYPE(256)
 Submit_Reserved2 = ENUM_VALUE_TYPE(32768)
 Submit_Reserved3 = ENUM_VALUE_TYPE(65536)
 
@@ -761,6 +788,8 @@ VREvent_LensDistortionChanged = ENUM_VALUE_TYPE(110)
 VREvent_PropertyChanged = ENUM_VALUE_TYPE(111)
 VREvent_WirelessDisconnect = ENUM_VALUE_TYPE(112)
 VREvent_WirelessReconnect = ENUM_VALUE_TYPE(113)
+VREvent_Reserved_01 = ENUM_VALUE_TYPE(114)
+VREvent_Reserved_02 = ENUM_VALUE_TYPE(115)
 VREvent_ButtonPress = ENUM_VALUE_TYPE(200)
 VREvent_ButtonUnpress = ENUM_VALUE_TYPE(201)
 VREvent_ButtonTouch = ENUM_VALUE_TYPE(202)
@@ -821,6 +850,12 @@ VREvent_DesktopViewReady = ENUM_VALUE_TYPE(531)
 VREvent_StartDashboard = ENUM_VALUE_TYPE(532)
 VREvent_ElevatePrism = ENUM_VALUE_TYPE(533)
 VREvent_OverlayClosed = ENUM_VALUE_TYPE(534)
+VREvent_DashboardThumbChanged = ENUM_VALUE_TYPE(535)
+VREvent_DesktopMightBeVisible = ENUM_VALUE_TYPE(536)
+VREvent_DesktopMightBeHidden = ENUM_VALUE_TYPE(537)
+VREvent_MutualSteamCapabilitiesChanged = ENUM_VALUE_TYPE(538)
+VREvent_OverlayCreated = ENUM_VALUE_TYPE(539)
+VREvent_OverlayDestroyed = ENUM_VALUE_TYPE(540)
 VREvent_Notification_Shown = ENUM_VALUE_TYPE(600)
 VREvent_Notification_Hidden = ENUM_VALUE_TYPE(601)
 VREvent_Notification_BeginInteraction = ENUM_VALUE_TYPE(602)
@@ -863,6 +898,7 @@ VREvent_DismissedWarningsSectionSettingChanged = ENUM_VALUE_TYPE(868)
 VREvent_GpuSpeedSectionSettingChanged = ENUM_VALUE_TYPE(869)
 VREvent_WindowsMRSectionSettingChanged = ENUM_VALUE_TYPE(870)
 VREvent_OtherSectionSettingChanged = ENUM_VALUE_TYPE(871)
+VREvent_AnyDriverSettingsChanged = ENUM_VALUE_TYPE(872)
 VREvent_StatusUpdate = ENUM_VALUE_TYPE(900)
 VREvent_WebInterface_InstallDriverCompleted = ENUM_VALUE_TYPE(950)
 VREvent_MCImageUpdated = ENUM_VALUE_TYPE(1000)
@@ -871,6 +907,8 @@ VREvent_FirmwareUpdateFinished = ENUM_VALUE_TYPE(1101)
 VREvent_KeyboardClosed = ENUM_VALUE_TYPE(1200)
 VREvent_KeyboardCharInput = ENUM_VALUE_TYPE(1201)
 VREvent_KeyboardDone = ENUM_VALUE_TYPE(1202)
+VREvent_KeyboardOpened_Global = ENUM_VALUE_TYPE(1203)
+VREvent_KeyboardClosed_Global = ENUM_VALUE_TYPE(1204)
 VREvent_ApplicationListUpdated = ENUM_VALUE_TYPE(1303)
 VREvent_ApplicationMimeTypeLoad = ENUM_VALUE_TYPE(1304)
 VREvent_ProcessConnected = ENUM_VALUE_TYPE(1306)
@@ -912,6 +950,10 @@ VREvent_SpatialAnchors_RequestDescriptorUpdate = ENUM_VALUE_TYPE(1803)
 VREvent_SystemReport_Started = ENUM_VALUE_TYPE(1900)
 VREvent_Monitor_ShowHeadsetView = ENUM_VALUE_TYPE(2000)
 VREvent_Monitor_HideHeadsetView = ENUM_VALUE_TYPE(2001)
+VREvent_Audio_SetSpeakersVolume = ENUM_VALUE_TYPE(2100)
+VREvent_Audio_SetSpeakersMute = ENUM_VALUE_TYPE(2101)
+VREvent_Audio_SetMicrophoneVolume = ENUM_VALUE_TYPE(2102)
+VREvent_Audio_SetMicrophoneMute = ENUM_VALUE_TYPE(2103)
 VREvent_VendorSpecific_Reserved_Start = ENUM_VALUE_TYPE(10000)
 VREvent_VendorSpecific_Reserved_End = ENUM_VALUE_TYPE(19999)
 
@@ -1095,6 +1137,7 @@ VRNotificationError_InvalidNotificationId = ENUM_VALUE_TYPE(100)
 VRNotificationError_NotificationQueueFull = ENUM_VALUE_TYPE(101)
 VRNotificationError_InvalidOverlayHandle = ENUM_VALUE_TYPE(102)
 VRNotificationError_SystemWithUserValueAlreadyExists = ENUM_VALUE_TYPE(103)
+VRNotificationError_ServiceUnavailable = ENUM_VALUE_TYPE(104)
 
 EVRSkeletalMotionRange = ENUM_TYPE
 VRSkeletalMotionRange_WithController = ENUM_VALUE_TYPE(0)
@@ -1300,6 +1343,11 @@ VRInitError_Compositor_SystemLayerCreateInstance = ENUM_VALUE_TYPE(492)
 VRInitError_Compositor_SystemLayerCreateSession = ENUM_VALUE_TYPE(493)
 VRInitError_Compositor_CreateInverseDistortUVs = ENUM_VALUE_TYPE(494)
 VRInitError_Compositor_CreateBackbufferDepth = ENUM_VALUE_TYPE(495)
+VRInitError_Compositor_CannotDRMLeaseDisplay = ENUM_VALUE_TYPE(496)
+VRInitError_Compositor_CannotConnectToDisplayServer = ENUM_VALUE_TYPE(497)
+VRInitError_Compositor_GnomeNoDRMLeasing = ENUM_VALUE_TYPE(498)
+VRInitError_Compositor_FailedToInitializeEncoder = ENUM_VALUE_TYPE(499)
+VRInitError_Compositor_CreateBlurTexture = ENUM_VALUE_TYPE(500)
 VRInitError_VendorSpecific_UnableToConnectToOculusRuntime = ENUM_VALUE_TYPE(1000)
 VRInitError_VendorSpecific_WindowsNotInDevMode = ENUM_VALUE_TYPE(1001)
 VRInitError_VendorSpecific_OculusLinkNotEnabled = ENUM_VALUE_TYPE(1002)
@@ -1445,6 +1493,7 @@ VRSettingsError_WriteFailed = ENUM_VALUE_TYPE(2)
 VRSettingsError_ReadFailed = ENUM_VALUE_TYPE(3)
 VRSettingsError_JsonParseFailed = ENUM_VALUE_TYPE(4)
 VRSettingsError_UnsetSettingHasNoDefault = ENUM_VALUE_TYPE(5)
+VRSettingsError_AccessDenied = ENUM_VALUE_TYPE(6)
 
 ChaperoneCalibrationState = ENUM_TYPE
 ChaperoneCalibrationState_OK = ENUM_VALUE_TYPE(1)
@@ -1537,7 +1586,12 @@ VROverlayFlags_HideLaserIntersection = ENUM_VALUE_TYPE(524288)
 VROverlayFlags_WantsModalBehavior = ENUM_VALUE_TYPE(1048576)
 VROverlayFlags_IsPremultiplied = ENUM_VALUE_TYPE(2097152)
 VROverlayFlags_IgnoreTextureAlpha = ENUM_VALUE_TYPE(4194304)
+VROverlayFlags_EnableControlBar = ENUM_VALUE_TYPE(8388608)
+VROverlayFlags_EnableControlBarKeyboard = ENUM_VALUE_TYPE(16777216)
+VROverlayFlags_EnableControlBarClose = ENUM_VALUE_TYPE(33554432)
 VROverlayFlags_Reserved = ENUM_VALUE_TYPE(67108864)
+VROverlayFlags_EnableClickStabilization = ENUM_VALUE_TYPE(134217728)
+VROverlayFlags_MultiCursor = ENUM_VALUE_TYPE(268435456)
 
 VRMessageOverlayResponse = ENUM_TYPE
 VRMessageOverlayResponse_ButtonPress_0 = ENUM_VALUE_TYPE(0)
@@ -1564,6 +1618,8 @@ OverlayIntersectionPrimitiveType_Circle = ENUM_VALUE_TYPE(1)
 EKeyboardFlags = ENUM_TYPE
 KeyboardFlag_Minimal = ENUM_VALUE_TYPE(1)
 KeyboardFlag_Modal = ENUM_VALUE_TYPE(2)
+KeyboardFlag_ShowArrowKeys = ENUM_VALUE_TYPE(4)
+KeyboardFlag_HideDoneKey = ENUM_VALUE_TYPE(8)
 
 EDeviceType = ENUM_TYPE
 DeviceType_Invalid = ENUM_VALUE_TYPE(-1)
@@ -1986,6 +2042,7 @@ class VREvent_Mouse_t(Structure):
         ("x", c_float),
         ("y", c_float),
         ("button", c_uint32),
+        ("cursorIndex", c_uint32),
     ]
 
 
@@ -1997,6 +2054,7 @@ class VREvent_Scroll_t(Structure):
         ("ydelta", c_float),
         ("unused", c_uint32),
         ("viewportscale", c_float),
+        ("cursorIndex", c_uint32),
     ]
 
 
@@ -2044,6 +2102,7 @@ class VREvent_Overlay_t(Structure):
         ("overlayHandle", c_uint64),
         ("devicePath", c_uint64),
         ("memoryBlockId", c_uint64),
+        ("cursorIndex", c_uint32),
     ]
 
 
@@ -2061,6 +2120,7 @@ class VREvent_Keyboard_t(Structure):
     _fields_ = [
         ("cNewInput", c_char * 8),
         ("uUserValue", c_uint64),
+        ("overlayHandle", c_uint64),
     ]
 
 
@@ -2211,6 +2271,18 @@ class VREvent_HDCPError_t(Structure):
     ]
 
 
+class VREvent_AudioVolumeControl_t(Structure):
+    _fields_ = [
+        ("fVolumeLevel", c_float),
+    ]
+
+
+class VREvent_AudioMuteControl_t(Structure):
+    _fields_ = [
+        ("bMute", openvr_bool),
+    ]
+
+
 class VREvent_Data_t(Union):
     _fields_ = [
         ("reserved", VREvent_Reserved_t),
@@ -2242,6 +2314,8 @@ class VREvent_Data_t(Union):
         ("showUi", VREvent_ShowUI_t),
         ("showDevTools", VREvent_ShowDevTools_t),
         ("hdcpError", VREvent_HDCPError_t),
+        ("audioVolumeControl", VREvent_AudioVolumeControl_t),
+        ("audioMuteControl", VREvent_AudioMuteControl_t),
     ]
 
 
@@ -2344,6 +2418,7 @@ class Compositor_FrameTiming(Structure):
         ("m_HmdPose", TrackedDevicePose_t),
         ("m_nNumVSyncsReadyForUse", c_uint32),
         ("m_nNumVSyncsToFirstView", c_uint32),
+        ("m_flTransferLatencyMs", c_float),
     ]
 
 
@@ -4015,12 +4090,16 @@ class IVRChaperone(object):
 
     def getPlayAreaRect(self):
         """
-        Returns the 4 corner positions of the Play Area (formerly named Soft Bounds).
-        Corners are in counter-clockwise order.
-        Standing center (0,0,0) is the center of the Play Area.
-        It's a rectangle.
-        2 sides are parallel to the X axis and 2 sides are parallel to the Z axis.
-        Height of every corner is 0Y (on the floor).
+        Returns a quad describing the Play Area (formerly named Soft Bounds).
+        The corners form a rectangle.
+        Corners are in counter-clockwise order, starting at the front-right.
+        The positions are given relative to the standing origin.
+        The center of the rectangle is the center of the user's calibrated play space, not necessarily the standing
+        origin.
+        The Play Area's forward direction goes from its center through the mid-point of a line drawn between the
+        first and second corner.
+        The quad lies on the XZ plane (height = 0y), with 2 sides parallel to the X-axis and two sides parallel
+        to the Z-axis of the user's calibrated Play Area.
         """
         fn = self.function_table.getPlayAreaRect
         rect = HmdQuad_t()
@@ -4291,6 +4370,7 @@ class IVRCompositor_FnTable(Structure):
         ("getLastPoses", OPENVR_FNTABLE_CALLTYPE(EVRCompositorError, POINTER(TrackedDevicePose_t), c_uint32, POINTER(TrackedDevicePose_t), c_uint32)),
         ("getLastPoseForTrackedDeviceIndex", OPENVR_FNTABLE_CALLTYPE(EVRCompositorError, TrackedDeviceIndex_t, POINTER(TrackedDevicePose_t), POINTER(TrackedDevicePose_t))),
         ("submit", OPENVR_FNTABLE_CALLTYPE(EVRCompositorError, EVREye, POINTER(Texture_t), POINTER(VRTextureBounds_t), EVRSubmitFlags)),
+        ("submitWithArrayIndex", OPENVR_FNTABLE_CALLTYPE(EVRCompositorError, EVREye, POINTER(Texture_t), c_uint32, POINTER(VRTextureBounds_t), EVRSubmitFlags)),
         ("clearLastSubmittedFrame", OPENVR_FNTABLE_CALLTYPE(None)),
         ("postPresentHandoff", OPENVR_FNTABLE_CALLTYPE(None)),
         ("getFrameTiming", OPENVR_FNTABLE_CALLTYPE(openvr_bool, POINTER(Compositor_FrameTiming), c_uint32)),
@@ -4457,6 +4537,11 @@ class IVRCompositor(object):
         """
         fn = self.function_table.submit
         error = fn(eye, byref(texture), byref(bounds), submitFlags)
+        openvr.error_code.CompositorError.check_error_value(error)
+
+    def submitWithArrayIndex(self, eye, texture, textureArrayIndex, bounds=None, submitFlags=Submit_Default) -> None:
+        fn = self.function_table.submitWithArrayIndex
+        error = fn(eye, byref(texture), textureArrayIndex, byref(bounds), submitFlags)
         openvr.error_code.CompositorError.check_error_value(error)
 
     def clearLastSubmittedFrame(self) -> None:
@@ -5432,19 +5517,19 @@ class IVROverlay(object):
         openvr.error_code.OverlayError.check_error_value(error)
 
     def showOverlay(self, overlayHandle) -> None:
-        """Shows the VR overlay.  For dashboard overlays, only the Dashboard Manager is allowed to call this."""
+        """Shows the VR overlay. Not applicable for Dashboard Overlays."""
         fn = self.function_table.showOverlay
         error = fn(overlayHandle)
         openvr.error_code.OverlayError.check_error_value(error)
 
     def hideOverlay(self, overlayHandle) -> None:
-        """Hides the VR overlay.  For dashboard overlays, only the Dashboard Manager is allowed to call this."""
+        """Hides the VR overlay. Not applicable for Dashboard Overlays."""
         fn = self.function_table.hideOverlay
         error = fn(overlayHandle)
         openvr.error_code.OverlayError.check_error_value(error)
 
     def isOverlayVisible(self, overlayHandle):
-        """Returns true if the overlay is visible."""
+        """Returns true if the overlay is currently visible, applicable for all overlay types except Dashboard Thumbnail overlays. VREvent_OverlayShown and VREvent_OverlayHidden reflect changes to this value."""
         fn = self.function_table.isOverlayVisible
         result = fn(overlayHandle)
         return result
@@ -5694,7 +5779,7 @@ class IVROverlay(object):
         fn(overlayToShow)
 
     def getPrimaryDashboardDevice(self):
-        """Returns the tracked device that has the laser pointer in the dashboard"""
+        """Returns the tracked device index that has the laser pointer in the dashboard, or the last one that was used."""
         fn = self.function_table.getPrimaryDashboardDevice
         result = fn()
         return result
@@ -6943,13 +7028,22 @@ class IVRInput(object):
         openvr.error_code.InputError.check_error_value(error)
         return originInfo
 
-    def getActionBindingInfo(self, action, bindingInfoCount):
+    def getActionBindingInfo(self, action, originInfo):
         """Retrieves useful information about the bindings for an action"""
         fn = self.function_table.getActionBindingInfo
-        originInfo = InputBindingInfo_t()
+        if originInfo is None:
+            originInfoArg = None
+            bindingInfoCount = 0
+        elif isinstance(originInfo, ctypes.Array):
+            originInfoArg = byref(originInfo[0])
+            bindingInfoCount = len(originInfo)
+        else:
+            originInfo = (InputBindingInfo_t * 1)()
+            originInfoArg = byref(originInfo[0])
+            bindingInfoCount = 1
         bindingInfoSize = sizeof(InputBindingInfo_t)
         returnedBindingInfoCount = c_uint32()
-        error = fn(action, byref(originInfo), bindingInfoSize, bindingInfoCount, byref(returnedBindingInfoCount))
+        error = fn(action, originInfoArg, bindingInfoSize, bindingInfoCount, byref(returnedBindingInfoCount))
         openvr.error_code.InputError.check_error_value(error)
         return originInfo, returnedBindingInfoCount.value
 
