@@ -42,6 +42,7 @@ Development Status :: 5 - Production/Stable
         'opengl': ['numpy', 'PyOpenGL'],
         'PyQt5': ['numpy', 'PyOpenGL', 'PyQt5', 'jinja2'],
         'PySide2': ['numpy', 'PyOpenGL', 'PySide2'],
+        'PySide6': ['numpy', 'PyOpenGL', 'PySide6'],
         'sdl2': ['numpy', 'PyOpenGL', 'PySDL2'],
         'wx': ['numpy', 'PyOpenGL', 'wxPython'],
         'generate': ['clang', ]
