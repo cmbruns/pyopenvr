@@ -1,10 +1,10 @@
-from typing import Optional
-
+from ctypes import c_uint8, POINTER
 import sys
+from typing import Optional
 
 from PySide6 import QtGui, QtWidgets
 from PySide6.QtCore import QPoint
-from PySide6.QtGui import QColor, Qt
+from PySide6.QtGui import QColor, QImage, Qt
 from PySide6.QtWidgets import QSizePolicy
 
 import openvr
@@ -100,15 +100,35 @@ class CQCameraPreviewImage(QtWidgets.QWidget):
         )
         n_label_y += 20
 
+    def set_frame_image(self, p_frame_image: POINTER(c_uint8), n_frame_width: int, n_frame_height: int, frame_header: openvr.CameraVideoStreamFrameHeader_t):
+        if frame_header is not None:
+            self.m_CurrentFrameHeader = frame_header    
+        if p_frame_image and n_frame_width and n_frame_height:
+            if self.m_source_image and (self.m_source_image.width() != n_frame_width or self.m_source_image.height() != n_frame_height):
+                # dimension changed
+                self.m_source_image = None 
+            if not self.m_source_image:
+                # allocate to expected dimensions
+                self.m_source_image = QImage(n_frame_width, n_frame_height, QImage.Format_RGB32)
+            for y in range(n_frame_height):
+                for x in range(n_frame_width):
+                    self.m_source_image.setPixel(
+                        x, y,
+                        QColor(p_frame_image[0], p_frame_image[1], p_frame_image[2]).rgba()
+                    )
+                    p_frame_image += 4
+        # schedule a repaint
+        self.update()
+    
 
-class CQTrackedCameraOpenVR(QtWidgets.QMainWindow):
+class CQTrackedCameraOpenVRSample(QtWidgets.QMainWindow):
     def __init__(self, parent: QtWidgets.QWidget = None):
         super().__init__(parent)
 
 
 def main():
     a = QtWidgets.QApplication(sys.argv)
-    w = CQTrackedCameraOpenVR()
+    w = CQTrackedCameraOpenVRSample()
     w.show()
     sys.exit(a.exec())
 
