@@ -4,7 +4,6 @@
 # from https://github.com/cmbruns/pyopenvr
 # based on OpenVR C++ API at https://github.com/ValveSoftware/openvr
 
-import os
 import pkg_resources
 import platform
 import ctypes
@@ -2392,7 +2391,7 @@ class Compositor_FrameTiming(Structure):
     """Provides a single frame's timing information to the app"""
 
     def __init__(self):
-        super().__init__(m_nSize = sizeof(Compositor_FrameTiming))
+        super().__init__(m_nSize=sizeof(Compositor_FrameTiming))
 
     _fields_ = [
         ("m_nSize", c_uint32),
@@ -2436,6 +2435,9 @@ class Compositor_BenchmarkResults(Structure):
 
 class DriverDirectMode_FrameTiming(Structure):
     """Frame timing data provided by direct mode drivers."""
+
+    def __init__(self):
+        super().__init__(m_nSize=sizeof(DriverDirectMode_FrameTiming))
 
     _fields_ = [
         ("m_nSize", c_uint32),

@@ -15,8 +15,7 @@ class CTypesGenerator(object):
             # Unofficial python bindings for OpenVR API version {".".join([str(v) for v in version])}
             # from https://github.com/cmbruns/pyopenvr
             # based on OpenVR C++ API at https://github.com/ValveSoftware/openvr
-            
-            import os
+
             import pkg_resources
             import platform
             import ctypes
@@ -376,4 +375,4 @@ def write_version(version, file_out):
 
 if __name__ == '__main__':
     # Increase sub_version for additional python-only releases within a single openvr version
-    main(sub_version=1)
+    main(sub_version=2)

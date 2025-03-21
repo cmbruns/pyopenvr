@@ -645,8 +645,15 @@ class Struct(Declaration):
             base = f'_MatrixMixin, {base}'
         if name.startswith('HmdVector'):
             base = f'_VectorMixin, {base}'
+        ctor = ""
+        if name in ["Compositor_FrameTiming", "DriverDirectMode_FrameTiming"]:
+            assert "m_nSize" in fields
+            ctor = f"""
+                def __init__(self):
+                    super().__init__(m_nSize=sizeof({name}))
+            """
         return inspect.cleandoc(f'''
-            class {name}({base}):{docstring}
+            class {name}({base}):{docstring}{ctor}
                 _fields_ = [{fields}
                 ]
         ''')
