@@ -48,7 +48,7 @@ class CQCameraPreviewImage(QWidget):
             return
         painter.fillRect(self.contentsRect(), QColor(180, 180, 180))
         if self.m_source_image is not None and not self.m_source_image.isNull():
-            painter.drawImage(QPoint(0, 0), self.m_source_image)
+            painter.drawImage(QPoint(0, 0), self.m_source_image.rgbSwapped())
         draw_font = painter.font()
         draw_font.setBold(True)
         painter.setFont(draw_font)
@@ -124,16 +124,13 @@ class CQCameraPreviewImage(QWidget):
             if self.m_source_image and (self.m_source_image.width() != n_frame_width or self.m_source_image.height() != n_frame_height):
                 # dimension changed
                 self.m_source_image = None 
-            if not self.m_source_image:
+            if self.m_source_image is None:
                 # allocate to expected dimensions
-                self.m_source_image = QImage(n_frame_width, n_frame_height, QImage.Format_RGB32)
-            for y in range(n_frame_height):
-                for x in range(n_frame_width):
-                    self.m_source_image.setPixel(
-                        x, y,
-                        QColor(p_frame_image[0], p_frame_image[1], p_frame_image[2]).rgba()
-                    )
-                    p_frame_image += 4
+                self.m_source_image = QImage(
+                    p_frame_image,  # Attach to buffer for speed
+                    n_frame_width, n_frame_height,
+                    4 * n_frame_width, QImage.Format_RGB32,
+                )
         # schedule a repaint
         self.update()
     
@@ -149,6 +146,10 @@ class CQTrackedCameraOpenVRSample(QMainWindow):
         self.m_nCameraFrameBufferSize: int = 0
         self.m_pCameraFrameBuffer: POINTER(c_uint8) = None
         self.setWindowTitle("Tracked Camera OpenVR Test")
+        self.m_pMessageText = QTextEdit()
+        self.m_pSplitter = QSplitter(Qt.Vertical, self)
+        self.m_pCameraPreviewImage = CQCameraPreviewImage(self)
+        self.m_HMDSerialNumberString = None
         self.create_primary_windows()
         self.setFocusPolicy(Qt.StrongFocus)
         self.log_message(logging.INFO, f"Build: {datetime.datetime.now()}\n")
@@ -217,13 +218,11 @@ class CQTrackedCameraOpenVRSample(QMainWindow):
                 rgba_color = MESSAGE_COLOR_ERROR
             text_color = QColor((rgba_color >> 16) & 0xFF, (rgba_color >> 8) & 0xFF, (rgba_color & 0xFF), 0xFF)
             self.m_pMessageText.setTextColor(text_color)
-            self.m_pMessageText.insertPlainText(message)
+            self.m_pMessageText.insertPlainText(f"{message}\n")
             self.m_pMessageText.moveCursor(QTextCursor.End, QTextCursor.MoveAnchor)
         logger.log(log_level, message)
     
     def create_primary_windows(self):
-        self.m_pCameraPreviewImage = CQCameraPreviewImage(self)
-        self.m_pMessageText = QTextEdit()
         self.m_pMessageText.setLineWrapMode(QTextEdit.NoWrap)
         self.m_pMessageText.setReadOnly(True)
         self.m_pMessageText.setAlignment(Qt.AlignLeft | Qt.AlignTop)
@@ -231,7 +230,6 @@ class CQTrackedCameraOpenVRSample(QMainWindow):
         palette.setColor(QPalette.Base, QColor(180, 180, 180))
         self.m_pMessageText.setPalette(palette)
         self.m_pMessageText.setAutoFillBackground(True)
-        self.m_pSplitter = QSplitter(Qt.Vertical, self)
         self.m_pSplitter.setHandleWidth(8)
         self.m_pSplitter.setChildrenCollapsible(False)
         self.m_pCameraPreviewImage.setMinimumHeight(100)
@@ -250,15 +248,19 @@ class CQTrackedCameraOpenVRSample(QMainWindow):
             return
         if self.m_VideoSignalTime.elapsed() >= 2000:
             # No frames after 2 seconds...
-            self.log_message(logging.ERROR, "No Video Frames Arriving!\n")
+            self.log_message(logging.ERROR, "No Video Frames Arriving!")
             self.m_VideoSignalTime.restart()
         # get the frame header only
-        frame_header = self.m_pVRTrackedCamera.getVideoStreamFrameBuffer(
-            self.m_hTrackedCamera,
-            vr.VRTrackedCameraFrameType_Undistorted,
-            None,
-            0,
-        )
+        try:
+            frame_header = self.m_pVRTrackedCamera.getVideoStreamFrameBuffer(
+                self.m_hTrackedCamera,
+                vr.VRTrackedCameraFrameType_Undistorted,
+                None,
+                0,
+            )
+        except BaseException as exc:
+            print(exc)
+            return
         if frame_header.nFrameSequence == self.m_nLastFrameSequence:
             # frame hasn't changed yet, nothing to do
             return
@@ -283,9 +285,9 @@ class CQTrackedCameraOpenVRSample(QMainWindow):
             self.stop_video_preview()
     
     def start_video_preview(self) -> bool:
-        self.log_message(logging.INFO, "StartVideoPreview()\n")
+        self.log_message(logging.INFO, "StartVideoPreview()")
         # Allocate for camera frame buffer requirements
-        self.m_nCameraFrameWidth, self.m_nCameraFrameWidth, nCameraFrameBufferSize = (
+        self.m_nCameraFrameWidth, self.m_nCameraFrameHeight, nCameraFrameBufferSize = (
             self.m_pVRTrackedCamera.getCameraFrameSize(
                 vr.k_unTrackedDeviceIndex_Hmd, vr.VRTrackedCameraFrameType_Undistorted,
             )
@@ -293,25 +295,25 @@ class CQTrackedCameraOpenVRSample(QMainWindow):
         if nCameraFrameBufferSize and nCameraFrameBufferSize != self.m_nCameraFrameBufferSize:
             self.m_pCameraFrameBuffer = None
             self.m_nCameraFrameBufferSize = nCameraFrameBufferSize
-            self.m_pCameraFrameBuffer = c_uint8 * self.m_nCameraFrameBufferSize
+            self.m_pCameraFrameBuffer = (c_uint8 * self.m_nCameraFrameBufferSize)()
             # memset(self.m_pCameraFrameBuffer, 0, self.m_nCameraFrameBufferSize)
         self.m_nLastFrameSequence = 0
         self.m_VideoSignalTime.start()
         self.m_hTrackedCamera = self.m_pVRTrackedCamera.acquireVideoStreamingService(vr.k_unTrackedDeviceIndex_Hmd)
         if self.m_hTrackedCamera == INVALID_TRACKED_CAMERA_HANDLE:
-            self.log_message(logging.ERROR, "AcquireVideoStreamingService() Failed!\n")
+            self.log_message(logging.ERROR, "AcquireVideoStreamingService() Failed!")
             return False
         return True
     
     def stop_video_preview(self):
-        self.log_message(logging.INFO, "StopVideoPreview()\n")
+        self.log_message(logging.INFO, "StopVideoPreview()")
     
         self.m_pVRTrackedCamera.releaseVideoStreamingService(self.m_hTrackedCamera)
         self.m_hTrackedCamera = INVALID_TRACKED_CAMERA_HANDLE
     
     def init_openvr(self) -> bool:
         # Loading the SteamVR Runtime
-        self.log_message(logging.INFO, "\nStarting OpenVR...\n")
+        self.log_message(logging.INFO, "Starting OpenVR...")
         self.m_pVRSystem = vr.init(vr.VRApplication_Scene)
         system_name = self.m_pVRSystem.getStringTrackedDeviceProperty(
             vr.k_unTrackedDeviceIndex_Hmd,
@@ -320,24 +322,24 @@ class CQTrackedCameraOpenVRSample(QMainWindow):
             vr.k_unTrackedDeviceIndex_Hmd,
             vr.Prop_SerialNumber_String)
         self.m_HMDSerialNumberString = serial_number
-        self.log_message(logging.INFO, f"VR HMD: {system_name} {serial_number}\n")
+        self.log_message(logging.INFO, f"VR HMD: {system_name} {serial_number}")
     
         self.m_pVRTrackedCamera = vr.VRTrackedCamera()
         if not self.m_pVRTrackedCamera:
-            self.log_message(logging.ERROR, "Unable to get Tracked Camera interface.\n")
+            self.log_message(logging.ERROR, "Unable to get Tracked Camera interface.")
             return False
         b_has_camera = self.m_pVRTrackedCamera.hasCamera(vr.k_unTrackedDeviceIndex_Hmd)
         if not b_has_camera:
             self.log_message(
                 logging.ERROR,
-                f"No Tracked Camera Available!\n")
+                f"No Tracked Camera Available!")
             return False
         # Accessing the FW description is just a further check to ensure camera communication is valid as expected.
         buffer = self.m_pVRSystem.getStringTrackedDeviceProperty(
             vr.k_unTrackedDeviceIndex_Hmd,
             vr.Prop_CameraFirmwareDescription_String,
         )
-        self.log_message(logging.INFO, f"Camera Firmware: {buffer}\n\n")
+        self.log_message(logging.INFO, f"Camera Firmware: {buffer}")
         return True
 
 
