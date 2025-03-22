@@ -17,6 +17,8 @@ class TestCompositor_FrameTiming(unittest.TestCase):
     def test_ctor(self):
         cft = openvr.Compositor_FrameTiming()
         self.assertEqual(ctypes.sizeof(openvr.Compositor_FrameTiming), cft.m_nSize)
+        cft2 = openvr.Compositor_FrameTiming(m_nFrameIndex=7)
+        self.assertEqual(7, cft2.m_nFrameIndex)
 
 
 if __name__ == '__main__':

@@ -649,8 +649,10 @@ class Struct(Declaration):
         if name in ["Compositor_FrameTiming", "DriverDirectMode_FrameTiming"]:
             assert "m_nSize" in fields
             ctor = f"""
-                def __init__(self):
-                    super().__init__(m_nSize=sizeof({name}))
+                def __init__(self, m_nSize=None, *args, **kwargs):
+                    if m_nSize is None:
+                        m_nSize = sizeof({name})
+                    super().__init__(m_nSize, *args, **kwargs)
             """
         return inspect.cleandoc(f'''
             class {name}({base}):{docstring}{ctor}

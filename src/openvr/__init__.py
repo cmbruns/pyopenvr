@@ -2390,8 +2390,10 @@ class CameraVideoStreamFrameHeader_t(Structure):
 class Compositor_FrameTiming(Structure):
     """Provides a single frame's timing information to the app"""
 
-    def __init__(self):
-        super().__init__(m_nSize=sizeof(Compositor_FrameTiming))
+    def __init__(self, m_nSize=None, *args, **kwargs):
+        if m_nSize is None:
+            m_nSize = sizeof(Compositor_FrameTiming)
+        super().__init__(m_nSize, *args, **kwargs)
 
     _fields_ = [
         ("m_nSize", c_uint32),
