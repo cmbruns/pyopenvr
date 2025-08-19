@@ -1,6 +1,6 @@
 #!/bin/env python
 
-# Unofficial python bindings for OpenVR API version 2.5.1
+# Unofficial python bindings for OpenVR API version 2.12.14
 # from https://github.com/cmbruns/pyopenvr
 # based on OpenVR C++ API at https://github.com/ValveSoftware/openvr
 
@@ -97,8 +97,9 @@ class ID3D12CommandQueue(Structure):
 ####################
 
 k_nSteamVRVersionMajor = 2
-k_nSteamVRVersionMinor = 5
-k_nSteamVRVersionBuild = 1
+k_nSteamVRVersionMinor = 12
+k_nSteamVRVersionBuild = 14
+MaxDmabufPlaneCount = 4
 k_nDriverNone = 0xFFFFFFFF
 k_unMaxDriverDebugResponseSize = 32768
 k_unTrackedDeviceIndex_Hmd = 0
@@ -137,6 +138,7 @@ k_unMaxPropertyStringSize = 32*1024  # No string property will ever be longer th
 k_ulInvalidActionHandle = 0
 k_ulInvalidActionSetHandle = 0
 k_ulInvalidInputValueHandle = 0
+k_ulInvalidInputComponentHandle = 0
 k_unControllerStateAxisCount = 5  # the number of axes in the controller state
 k_ulOverlayHandleInvalid = 0
 k_unInvalidBoneIndex = -1
@@ -151,7 +153,7 @@ VRCompositor_ThrottleMask = 0xF00  # Number of frames the compositor is throttli
 VRCompositor_ReprojectionMotion_Enabled = 0x100  # Motion Smoothing is enabled in the UI for the currently running application
 VRCompositor_ReprojectionMotion_ForcedOn = 0x200  # Motion Smoothing is forced on in the UI for the currently running application
 VRCompositor_ReprojectionMotion_AppThrottled = 0x400  # Application is requesting throttling via ForceInterleavedReprojectionOn
-IVRSystem_Version = 'IVRSystem_022'
+IVRSystem_Version = 'IVRSystem_023'
 k_unMaxApplicationKeyLength = 128  # The maximum length of an application key
 k_pch_MimeType_HomeApp = 'vr/home'  # Currently recognized mime types
 k_pch_MimeType_GameTheater = 'vr/game_theater'
@@ -192,6 +194,10 @@ k_pch_SteamVR_FramesToThrottle_Int32 = 'framesToThrottle'
 k_pch_SteamVR_AdditionalFramesToPredict_Int32 = 'additionalFramesToPredict'
 k_pch_SteamVR_WorldScale_Float = 'worldScale'
 k_pch_SteamVR_FovScale_Int32 = 'fovScale'
+k_pch_SteamVR_FovScaleInner_Int32 = 'fovScaleInner'
+k_pch_SteamVR_FovScaleUpper_Int32 = 'fovScaleUpper'
+k_pch_SteamVR_FovScaleLower_Int32 = 'fovScaleLower'
+k_pch_SteamVR_FovScaleFormat_Int32 = 'fovScaleFormat'
 k_pch_SteamVR_FovScaleLetterboxed_Bool = 'fovScaleLetterboxed'
 k_pch_SteamVR_DisableAsyncReprojection_Bool = 'disableAsync'
 k_pch_SteamVR_ForceFadeOnBadTracking_Bool = 'forceFadeOnBadTracking'
@@ -216,7 +222,6 @@ k_pch_SteamVR_SupersampleManualOverride_Bool = 'supersampleManualOverride'
 k_pch_SteamVR_EnableLinuxVulkanAsync_Bool = 'enableLinuxVulkanAsync'
 k_pch_SteamVR_AllowDisplayLockedMode_Bool = 'allowDisplayLockedMode'
 k_pch_SteamVR_HaveStartedTutorialForNativeChaperoneDriver_Bool = 'haveStartedTutorialForNativeChaperoneDriver'
-k_pch_SteamVR_ForceWindows32bitVRMonitor = 'forceWindows32BitVRMonitor'
 k_pch_SteamVR_DebugInputBinding = 'debugInputBinding'
 k_pch_SteamVR_DoNotFadeToGrid = 'doNotFadeToGrid'
 k_pch_SteamVR_EnableSharedResourceJournaling = 'enableSharedResourceJournaling'
@@ -238,6 +243,7 @@ k_pch_SteamVR_HDCPLegacyCompatibility_Bool = 'hdcp14legacyCompatibility'
 k_pch_SteamVR_DisplayPortTrainingMode_Int = 'displayPortTrainingMode'
 k_pch_SteamVR_UsePrism_Bool = 'usePrism'
 k_pch_SteamVR_AllowFallbackMirrorWindowLinux_Bool = 'allowFallbackMirrorWindowLinux'
+k_pch_SteamVR_DisableKeyboardPrivacy_Bool = 'disableKeyboardPrivacy'
 k_pch_OpenXR_Section = 'openxr'
 k_pch_OpenXR_MetaUnityPluginCompatibility_Int32 = 'metaUnityPluginCompatibility'
 k_pch_DirectMode_Section = 'direct_mode'
@@ -275,6 +281,8 @@ k_pch_UserInterface_MinimizeToTray_Bool = 'MinimizeToTray'
 k_pch_UserInterface_HidePopupsWhenStatusMinimized_Bool = 'HidePopupsWhenStatusMinimized'
 k_pch_UserInterface_Screenshots_Bool = 'screenshots'
 k_pch_UserInterface_ScreenshotType_Int = 'screenshotType'
+k_pch_UserInterface_CheckStatusInterval_Int = 'vrmStatusCheckInterval'
+k_pch_UserInterface_CheckForSteam_Bool = 'vrmCheckForSteam'
 k_pch_Notifications_Section = 'notifications'
 k_pch_Notifications_DoNotDisturb_Bool = 'DoNotDisturb'
 k_pch_Keyboard_Section = 'keyboard'
@@ -348,15 +356,17 @@ k_pch_Dashboard_Position = 'position'
 k_pch_Dashboard_DesktopScale = 'desktopScale'
 k_pch_Dashboard_DashboardScale = 'dashboardScale'
 k_pch_Dashboard_UseStandaloneSystemLayer = 'standaloneSystemLayer'
-k_pch_Dashboard_StickyDashboard = 'stickyDashboard'
 k_pch_Dashboard_AllowSteamOverlays_Bool = 'allowSteamOverlays'
 k_pch_Dashboard_AllowVRGamepadUI_Bool = 'allowVRGamepadUI'
 k_pch_Dashboard_AllowVRGamepadUIViaGamescope_Bool = 'allowVRGamepadUIViaGamescope'
 k_pch_Dashboard_SteamMatchesHMDFramerate = 'steamMatchesHMDFramerate'
+k_pch_Dashboard_GrabHandleAcceleration = 'grabHandleAcceleration'
 k_pch_modelskin_Section = 'modelskins'
 k_pch_Driver_Enable_Bool = 'enable'
 k_pch_Driver_BlockedBySafemode_Bool = 'blocked_by_safe_mode'
 k_pch_Driver_LoadPriority_Int32 = 'loadPriority'
+k_pch_Driver_Hmd_AllowsClientToControlTextureIndex_Bool = 'hmdAllowsClientToControlTextureIndex'
+k_pch_Driver_ForceSystemLayerUseAppPoses_Bool = 'forceSystemLayerUseAppPoses'
 k_pch_WebInterface_Section = 'WebInterface'
 k_pch_VRWebHelper_Section = 'VRWebHelper'
 k_pch_VRWebHelper_DebuggerEnabled_Bool = 'DebuggerEnabled'
@@ -377,15 +387,18 @@ k_pch_LastKnown_Section = 'LastKnown'
 k_pch_LastKnown_HMDManufacturer_String = 'HMDManufacturer'
 k_pch_LastKnown_HMDModel_String = 'HMDModel'
 k_pch_LastKnown_ActualHMDDriver_String = 'ActualHMDDriver'
+k_pch_LastKnown_HMDSerialNumber_String = 'HMDSerialNumber'
+k_pch_LastKnown_HMDRemoteClientID_String = 'RemoteClientID'  # uint64 in string
 k_pch_DismissedWarnings_Section = 'DismissedWarnings'
 k_pch_Input_Section = 'input'
 k_pch_Input_LeftThumbstickRotation_Float = 'leftThumbstickRotation'
 k_pch_Input_RightThumbstickRotation_Float = 'rightThumbstickRotation'
 k_pch_Input_ThumbstickDeadzone_Float = 'thumbstickDeadzone'
 k_pch_GpuSpeed_Section = 'GpuSpeed'
+k_pch_XRRenderModelCache_Section = 'XRRenderModelUuidCache'
 IVRChaperone_Version = 'IVRChaperone_004'
 IVRChaperoneSetup_Version = 'IVRChaperoneSetup_006'
-IVRCompositor_Version = 'IVRCompositor_028'
+IVRCompositor_Version = 'IVRCompositor_029'
 k_unHeadsetViewMaxWidth = 3840
 k_unHeadsetViewMaxHeight = 2160
 k_pchHeadsetViewOverlayKey = 'system.HeadsetView'
@@ -396,7 +409,7 @@ k_unVROverlayMaxKeyLength = 128  # The maximum length of an overlay key in bytes
 k_unVROverlayMaxNameLength = 128  # The maximum length of an overlay name in bytes, counting the terminating null character.
 k_unMaxOverlayCount = 128  # The maximum number of overlays that can exist in the system at one time.
 k_unMaxOverlayIntersectionMaskPrimitivesCount = 32  # The maximum number of overlay intersection mask primitives per overlay
-IVROverlay_Version = 'IVROverlay_027'
+IVROverlay_Version = 'IVROverlay_028'
 IVROverlayView_Version = 'IVROverlayView_003'
 k_pch_Controller_Component_GDC2015 = 'gdc2015'  # Canonical coordinate system of the gdc 2015 wired controller, provided for backwards compatibility
 k_pch_Controller_Component_Base = 'base'  # For controllers with an unambiguous 'base'.
@@ -426,6 +439,7 @@ IVRIOBuffer_Version = 'IVRIOBuffer_002'
 k_ulInvalidSpatialAnchorHandle = 0
 IVRSpatialAnchors_Version = 'IVRSpatialAnchors_001'
 IVRDebug_Version = 'IVRDebug_001'
+IVRIPCResourceManagerClient_Version = 'IVRIPCResourceManagerClient_002'
 
 #########################
 # Expose enum constants #
@@ -448,6 +462,7 @@ TextureType_DirectX12 = ENUM_VALUE_TYPE(4)
 TextureType_DXGISharedHandle = ENUM_VALUE_TYPE(5)
 TextureType_Metal = ENUM_VALUE_TYPE(6)
 TextureType_Reserved = ENUM_VALUE_TYPE(7)
+TextureType_SharedTextureHandle = ENUM_VALUE_TYPE(8)
 
 EColorSpace = ENUM_TYPE
 ColorSpace_Auto = ENUM_VALUE_TYPE(0)
@@ -548,6 +563,10 @@ Prop_EstimatedDeviceFirstUseTime_Int32 = ENUM_VALUE_TYPE(1051)
 Prop_DevicePowerUsage_Float = ENUM_VALUE_TYPE(1052)
 Prop_IgnoreMotionForStandby_Bool = ENUM_VALUE_TYPE(1053)
 Prop_ActualTrackingSystemName_String = ENUM_VALUE_TYPE(1054)
+Prop_AllowCameraToggle_Bool = ENUM_VALUE_TYPE(1055)
+Prop_AllowLightSourceFrequency_Bool = ENUM_VALUE_TYPE(1056)
+Prop_SteamRemoteClientID_Uint64 = ENUM_VALUE_TYPE(1057)
+Prop_Reserved_1058 = ENUM_VALUE_TYPE(1058)
 Prop_ReportsTimeSinceVSync_Bool = ENUM_VALUE_TYPE(2000)
 Prop_SecondsFromVsyncToPhotons_Float = ENUM_VALUE_TYPE(2001)
 Prop_DisplayFrequency_Float = ENUM_VALUE_TYPE(2002)
@@ -636,11 +655,12 @@ Prop_DisplayMaxAnalogGain_Float = ENUM_VALUE_TYPE(2087)
 Prop_CameraExposureTime_Float = ENUM_VALUE_TYPE(2088)
 Prop_CameraGlobalGain_Float = ENUM_VALUE_TYPE(2089)
 Prop_DashboardScale_Float = ENUM_VALUE_TYPE(2091)
-Prop_PeerButtonInfo_String = ENUM_VALUE_TYPE(2092)
 Prop_Hmd_SupportsHDR10_Bool = ENUM_VALUE_TYPE(2093)
 Prop_Hmd_EnableParallelRenderCameras_Bool = ENUM_VALUE_TYPE(2094)
 Prop_DriverProvidedChaperoneJson_String = ENUM_VALUE_TYPE(2095)
 Prop_ForceSystemLayerUseAppPoses_Bool = ENUM_VALUE_TYPE(2096)
+Prop_DashboardLinkSupport_Int32 = ENUM_VALUE_TYPE(2097)
+Prop_DisplayMinUIAnalogGain_Float = ENUM_VALUE_TYPE(2098)
 Prop_IpdUIRangeMinMeters_Float = ENUM_VALUE_TYPE(2100)
 Prop_IpdUIRangeMaxMeters_Float = ENUM_VALUE_TYPE(2101)
 Prop_Hmd_SupportsHDCP14LegacyCompat_Bool = ENUM_VALUE_TYPE(2102)
@@ -650,13 +670,14 @@ Prop_Hmd_SupportsRoomViewDirect_Bool = ENUM_VALUE_TYPE(2105)
 Prop_Hmd_SupportsAppThrottling_Bool = ENUM_VALUE_TYPE(2106)
 Prop_Hmd_SupportsGpuBusMonitoring_Bool = ENUM_VALUE_TYPE(2107)
 Prop_DriverDisplaysIPDChanges_Bool = ENUM_VALUE_TYPE(2108)
-Prop_Driver_Reserved_01 = ENUM_VALUE_TYPE(2109)
-Prop_DSCVersion_Int32 = ENUM_VALUE_TYPE(2110)
-Prop_DSCSliceCount_Int32 = ENUM_VALUE_TYPE(2111)
-Prop_DSCBPPx16_Int32 = ENUM_VALUE_TYPE(2112)
+Prop_Reserved_2110 = ENUM_VALUE_TYPE(2110)
+Prop_Reserved_2111 = ENUM_VALUE_TYPE(2111)
+Prop_Reserved_2112 = ENUM_VALUE_TYPE(2112)
 Prop_Hmd_MaxDistortedTextureWidth_Int32 = ENUM_VALUE_TYPE(2113)
 Prop_Hmd_MaxDistortedTextureHeight_Int32 = ENUM_VALUE_TYPE(2114)
 Prop_Hmd_AllowSupersampleFiltering_Bool = ENUM_VALUE_TYPE(2115)
+Prop_Hmd_AllowsClientToControlTextureIndex = ENUM_VALUE_TYPE(2116)
+Prop_Reserved_2117 = ENUM_VALUE_TYPE(2117)
 Prop_DriverRequestedMuraCorrectionMode_Int32 = ENUM_VALUE_TYPE(2200)
 Prop_DriverRequestedMuraFeather_InnerLeft_Int32 = ENUM_VALUE_TYPE(2201)
 Prop_DriverRequestedMuraFeather_InnerRight_Int32 = ENUM_VALUE_TYPE(2202)
@@ -676,6 +697,8 @@ Prop_Audio_DriverPlaybackMute_Bool = ENUM_VALUE_TYPE(2306)
 Prop_Audio_DriverManagesRecordingVolumeControl_Bool = ENUM_VALUE_TYPE(2307)
 Prop_Audio_DriverRecordingVolume_Float = ENUM_VALUE_TYPE(2308)
 Prop_Audio_DriverRecordingMute_Bool = ENUM_VALUE_TYPE(2309)
+Prop_Audio_PipewirePlaybackNode_Int32 = ENUM_VALUE_TYPE(2400)
+Prop_Audio_PipewireRecordingNode_Int32 = ENUM_VALUE_TYPE(2401)
 Prop_AttachedDeviceId_String = ENUM_VALUE_TYPE(3000)
 Prop_SupportedButtons_Uint64 = ENUM_VALUE_TYPE(3001)
 Prop_Axis0Type_Int32 = ENUM_VALUE_TYPE(3002)
@@ -716,10 +739,18 @@ Prop_HasDriverDirectModeComponent_Bool = ENUM_VALUE_TYPE(6005)
 Prop_HasVirtualDisplayComponent_Bool = ENUM_VALUE_TYPE(6006)
 Prop_HasSpatialAnchorsSupport_Bool = ENUM_VALUE_TYPE(6007)
 Prop_SupportsXrTextureSets_Bool = ENUM_VALUE_TYPE(6008)
+Prop_SupportsXrEyeGazeInteraction_Bool = ENUM_VALUE_TYPE(6009)
+Prop_DeviceHasNoIMU_Bool = ENUM_VALUE_TYPE(6010)
+Prop_UseAdvancedPrediction_Bool = ENUM_VALUE_TYPE(6011)
 Prop_ControllerType_String = ENUM_VALUE_TYPE(7000)
 Prop_ControllerHandSelectionPriority_Int32 = ENUM_VALUE_TYPE(7002)
 Prop_VendorSpecific_Reserved_Start = ENUM_VALUE_TYPE(10000)
 Prop_VendorSpecific_Reserved_End = ENUM_VALUE_TYPE(10999)
+Prop_Reserved_11000 = ENUM_VALUE_TYPE(11000)
+Prop_Reserved_11001 = ENUM_VALUE_TYPE(11001)
+Prop_Reserved_11002 = ENUM_VALUE_TYPE(11002)
+Prop_Reserved_11003 = ENUM_VALUE_TYPE(11003)
+Prop_Reserved_11004 = ENUM_VALUE_TYPE(11004)
 Prop_TrackedDeviceProperty_Max = ENUM_VALUE_TYPE(1000000)
 
 ETrackedPropertyError = ENUM_TYPE
@@ -753,12 +784,14 @@ Submit_GlRenderBuffer = ENUM_VALUE_TYPE(2)
 Submit_Reserved = ENUM_VALUE_TYPE(4)
 Submit_TextureWithPose = ENUM_VALUE_TYPE(8)
 Submit_TextureWithDepth = ENUM_VALUE_TYPE(16)
-Submit_FrameDiscontinuty = ENUM_VALUE_TYPE(32)
+Submit_FrameDiscontinuity = ENUM_VALUE_TYPE(32)
 Submit_VulkanTextureWithArrayData = ENUM_VALUE_TYPE(64)
 Submit_GlArrayTexture = ENUM_VALUE_TYPE(128)
 Submit_IsEgl = ENUM_VALUE_TYPE(256)
 Submit_Reserved2 = ENUM_VALUE_TYPE(32768)
 Submit_Reserved3 = ENUM_VALUE_TYPE(65536)
+Submit_Reserved4 = ENUM_VALUE_TYPE(131072)
+Submit_Reserved5 = ENUM_VALUE_TYPE(262144)
 
 EVRState = ENUM_TYPE
 VRState_Undefined = ENUM_VALUE_TYPE(-1)
@@ -787,8 +820,8 @@ VREvent_LensDistortionChanged = ENUM_VALUE_TYPE(110)
 VREvent_PropertyChanged = ENUM_VALUE_TYPE(111)
 VREvent_WirelessDisconnect = ENUM_VALUE_TYPE(112)
 VREvent_WirelessReconnect = ENUM_VALUE_TYPE(113)
-VREvent_Reserved_01 = ENUM_VALUE_TYPE(114)
-VREvent_Reserved_02 = ENUM_VALUE_TYPE(115)
+VREvent_Reserved_0114 = ENUM_VALUE_TYPE(114)
+VREvent_Reserved_0115 = ENUM_VALUE_TYPE(115)
 VREvent_ButtonPress = ENUM_VALUE_TYPE(200)
 VREvent_ButtonUnpress = ENUM_VALUE_TYPE(201)
 VREvent_ButtonTouch = ENUM_VALUE_TYPE(202)
@@ -822,7 +855,6 @@ VREvent_OverlayShown = ENUM_VALUE_TYPE(500)
 VREvent_OverlayHidden = ENUM_VALUE_TYPE(501)
 VREvent_DashboardActivated = ENUM_VALUE_TYPE(502)
 VREvent_DashboardDeactivated = ENUM_VALUE_TYPE(503)
-VREvent_DashboardRequested = ENUM_VALUE_TYPE(505)
 VREvent_ResetDashboard = ENUM_VALUE_TYPE(506)
 VREvent_ImageLoaded = ENUM_VALUE_TYPE(508)
 VREvent_ShowKeyboard = ENUM_VALUE_TYPE(509)
@@ -855,6 +887,13 @@ VREvent_DesktopMightBeHidden = ENUM_VALUE_TYPE(537)
 VREvent_MutualSteamCapabilitiesChanged = ENUM_VALUE_TYPE(538)
 VREvent_OverlayCreated = ENUM_VALUE_TYPE(539)
 VREvent_OverlayDestroyed = ENUM_VALUE_TYPE(540)
+VREvent_TrackingRecordingStarted = ENUM_VALUE_TYPE(541)
+VREvent_TrackingRecordingStopped = ENUM_VALUE_TYPE(542)
+VREvent_SetTrackingRecordingPath = ENUM_VALUE_TYPE(543)
+VREvent_Reserved_0560 = ENUM_VALUE_TYPE(560)
+VREvent_Reserved_0561 = ENUM_VALUE_TYPE(561)
+VREvent_Reserved_0562 = ENUM_VALUE_TYPE(562)
+VREvent_Reserved_0563 = ENUM_VALUE_TYPE(563)
 VREvent_Notification_Shown = ENUM_VALUE_TYPE(600)
 VREvent_Notification_Hidden = ENUM_VALUE_TYPE(601)
 VREvent_Notification_BeginInteraction = ENUM_VALUE_TYPE(602)
@@ -865,6 +904,7 @@ VREvent_QuitAcknowledged = ENUM_VALUE_TYPE(703)
 VREvent_DriverRequestedQuit = ENUM_VALUE_TYPE(704)
 VREvent_RestartRequested = ENUM_VALUE_TYPE(705)
 VREvent_InvalidateSwapTextureSets = ENUM_VALUE_TYPE(706)
+VREvent_RequestDisconnectWirelessHMD = ENUM_VALUE_TYPE(707)
 VREvent_ChaperoneDataHasChanged = ENUM_VALUE_TYPE(800)
 VREvent_ChaperoneUniverseHasChanged = ENUM_VALUE_TYPE(801)
 VREvent_ChaperoneTempDataHasChanged = ENUM_VALUE_TYPE(802)
@@ -872,8 +912,11 @@ VREvent_ChaperoneSettingsHaveChanged = ENUM_VALUE_TYPE(803)
 VREvent_SeatedZeroPoseReset = ENUM_VALUE_TYPE(804)
 VREvent_ChaperoneFlushCache = ENUM_VALUE_TYPE(805)
 VREvent_ChaperoneRoomSetupStarting = ENUM_VALUE_TYPE(806)
-VREvent_ChaperoneRoomSetupFinished = ENUM_VALUE_TYPE(807)
+VREvent_ChaperoneRoomSetupCommitted = ENUM_VALUE_TYPE(807)
 VREvent_StandingZeroPoseReset = ENUM_VALUE_TYPE(808)
+VREvent_Reserved_0809 = ENUM_VALUE_TYPE(809)
+VREvent_Reserved_0810 = ENUM_VALUE_TYPE(810)
+VREvent_Reserved_0811 = ENUM_VALUE_TYPE(811)
 VREvent_AudioSettingsHaveChanged = ENUM_VALUE_TYPE(820)
 VREvent_BackgroundSettingHasChanged = ENUM_VALUE_TYPE(850)
 VREvent_CameraSettingsHaveChanged = ENUM_VALUE_TYPE(851)
@@ -953,6 +996,7 @@ VREvent_Audio_SetSpeakersVolume = ENUM_VALUE_TYPE(2100)
 VREvent_Audio_SetSpeakersMute = ENUM_VALUE_TYPE(2101)
 VREvent_Audio_SetMicrophoneVolume = ENUM_VALUE_TYPE(2102)
 VREvent_Audio_SetMicrophoneMute = ENUM_VALUE_TYPE(2103)
+VREvent_RenderModel_CountChanged = ENUM_VALUE_TYPE(2200)
 VREvent_VendorSpecific_Reserved_Start = ENUM_VALUE_TYPE(10000)
 VREvent_VendorSpecific_Reserved_End = ENUM_VALUE_TYPE(19999)
 
@@ -1468,6 +1512,7 @@ VRApplicationProperty_URL_String = ENUM_VALUE_TYPE(15)
 VRApplicationProperty_Description_String = ENUM_VALUE_TYPE(50)
 VRApplicationProperty_NewsURL_String = ENUM_VALUE_TYPE(51)
 VRApplicationProperty_ImagePath_String = ENUM_VALUE_TYPE(52)
+VRApplicationProperty_ImagePathCapsule_String = ENUM_VALUE_TYPE(55)
 VRApplicationProperty_Source_String = ENUM_VALUE_TYPE(53)
 VRApplicationProperty_ActionManifestURL_String = ENUM_VALUE_TYPE(54)
 VRApplicationProperty_IsDashboardOverlay_Bool = ENUM_VALUE_TYPE(60)
@@ -1527,6 +1572,11 @@ VRCompositorError_IndexOutOfRange = ENUM_VALUE_TYPE(107)
 VRCompositorError_AlreadySubmitted = ENUM_VALUE_TYPE(108)
 VRCompositorError_InvalidBounds = ENUM_VALUE_TYPE(109)
 VRCompositorError_AlreadySet = ENUM_VALUE_TYPE(110)
+
+EVRCompositorTextureUsage = ENUM_TYPE
+VRCompositorTextureUsage_Left = ENUM_VALUE_TYPE(0)
+VRCompositorTextureUsage_Right = ENUM_VALUE_TYPE(1)
+VRCompositorTextureUsage_Both = ENUM_VALUE_TYPE(2)
 
 EVRCompositorTimingMode = ENUM_TYPE
 VRCompositorTimingMode_Implicit = ENUM_VALUE_TYPE(0)
@@ -1588,7 +1638,7 @@ VROverlayFlags_IgnoreTextureAlpha = ENUM_VALUE_TYPE(4194304)
 VROverlayFlags_EnableControlBar = ENUM_VALUE_TYPE(8388608)
 VROverlayFlags_EnableControlBarKeyboard = ENUM_VALUE_TYPE(16777216)
 VROverlayFlags_EnableControlBarClose = ENUM_VALUE_TYPE(33554432)
-VROverlayFlags_Reserved = ENUM_VALUE_TYPE(67108864)
+VROverlayFlags_MinimalControlBar = ENUM_VALUE_TYPE(67108864)
 VROverlayFlags_EnableClickStabilization = ENUM_VALUE_TYPE(134217728)
 VROverlayFlags_MultiCursor = ENUM_VALUE_TYPE(268435456)
 
@@ -1738,6 +1788,7 @@ DriverHandle_t = PropertyContainerHandle_t
 VRActionHandle_t = c_uint64
 VRActionSetHandle_t = c_uint64
 VRInputValueHandle_t = c_uint64
+VRInputComponentHandle_t = c_uint64
 VRComponentProperties = c_uint32
 VROverlayHandle_t = c_uint64
 BoneIndex_t = c_int32
@@ -1902,6 +1953,16 @@ class VRBoneTransform_t(Structure):
     ]
 
 
+class VREyeTrackingData_t(Structure):
+    _fields_ = [
+        ("bActive", openvr_bool),
+        ("bValid", openvr_bool),
+        ("bTracked", openvr_bool),
+        ("vGazeOrigin", HmdVector3_t),
+        ("vGazeTarget", HmdVector3_t),
+    ]
+
+
 class DistortionCoordinates_t(Structure):
     """
     Used to return the post-distortion UVs for each color channel.
@@ -1963,6 +2024,30 @@ class VRTextureWithDepth_t(Texture_t):
 class VRTextureWithPoseAndDepth_t(VRTextureWithPose_t):
     _fields_ = [
         ("depth", VRTextureDepthInfo_t),
+    ]
+
+
+class DmabufPlane_t(Structure):
+    _fields_ = [
+        ("unOffset", c_uint32),
+        ("unStride", c_uint32),
+        ("nFd", c_int32),
+    ]
+
+
+class DmabufAttributes_t(Structure):
+    _fields_ = [
+        ("pNext", c_void_p),
+        ("unWidth", c_uint32),
+        ("unHeight", c_uint32),
+        ("unDepth", c_uint32),
+        ("unMipLevels", c_uint32),
+        ("unArrayLayers", c_uint32),
+        ("unSampleCount", c_uint32),
+        ("unFormat", c_uint32),
+        ("ulModifier", c_uint64),
+        ("unPlaneCount", c_uint32),
+        ("plane", DmabufPlane_t * 4),
     ]
 
 
@@ -2438,8 +2523,10 @@ class Compositor_BenchmarkResults(Structure):
 class DriverDirectMode_FrameTiming(Structure):
     """Frame timing data provided by direct mode drivers."""
 
-    def __init__(self):
-        super().__init__(m_nSize=sizeof(DriverDirectMode_FrameTiming))
+    def __init__(self, m_nSize=None, *args, **kwargs):
+        if m_nSize is None:
+            m_nSize = sizeof(DriverDirectMode_FrameTiming)
+        super().__init__(m_nSize, *args, **kwargs)
 
     _fields_ = [
         ("m_nSize", c_uint32),
@@ -2748,6 +2835,7 @@ class COpenVRContext(object):
         self.m_pVRSpatialAnchors = None
         self.m_pVRDebug = None
         self.m_pVRNotifications = None
+        self.m_pVRIPCResourceManagerClient = None
 
     def checkClear(self):
         global _vr_token
@@ -2776,6 +2864,7 @@ class COpenVRContext(object):
         self.m_pVRSpatialAnchors = None
         self.m_pVRDebug = None
         self.m_pVRNotifications = None
+        self.m_pVRIPCResourceManagerClient = None
 
     def VRSystem(self):
         self.checkClear()
@@ -2897,6 +2986,12 @@ class COpenVRContext(object):
             self.m_pVRNotifications = IVRNotifications()
         return self.m_pVRNotifications
 
+    def VRIPCResourceManager(self):
+        self.checkClear()
+        if self.m_pVRIPCResourceManager is None:
+            self.m_pVRIPCResourceManager = IVRIPCResourceManager()
+        return self.m_pVRIPCResourceManager
+
 
 # Globals for context management
 _vr_token = None
@@ -2983,6 +3078,10 @@ def VRNotifications():
     return _internal_module_context.VRNotifications()
 
 
+def VRIPCResourceManager():
+    return _internal_module_context.VRIPCResourceManager()
+
+
 class IVRSystem_FnTable(Structure):
     _fields_ = [
         ("getRecommendedRenderTargetSize", OPENVR_FNTABLE_CALLTYPE(None, POINTER(c_uint32), POINTER(c_uint32))),
@@ -3016,6 +3115,7 @@ class IVRSystem_FnTable(Structure):
         ("getPropErrorNameFromEnum", OPENVR_FNTABLE_CALLTYPE(c_char_p, ETrackedPropertyError)),
         ("pollNextEvent", OPENVR_FNTABLE_CALLTYPE(openvr_bool, POINTER(VREvent_t), c_uint32)),
         ("pollNextEventWithPose", OPENVR_FNTABLE_CALLTYPE(openvr_bool, ETrackingUniverseOrigin, POINTER(VREvent_t), c_uint32, POINTER(TrackedDevicePose_t))),
+        ("pollNextEventWithPoseAndOverlays", OPENVR_FNTABLE_CALLTYPE(openvr_bool, ETrackingUniverseOrigin, POINTER(VREvent_t), c_uint32, POINTER(TrackedDevicePose_t), POINTER(VROverlayHandle_t))),
         ("getEventTypeNameFromEnum", OPENVR_FNTABLE_CALLTYPE(c_char_p, EVREventType)),
         ("getHiddenAreaMesh", OPENVR_FNTABLE_CALLTYPE(HiddenAreaMesh_t, EVREye, EHiddenAreaMeshType)),
         ("getControllerState", OPENVR_FNTABLE_CALLTYPE(openvr_bool, TrackedDeviceIndex_t, POINTER(VRControllerState_t), c_uint32)),
@@ -3392,6 +3492,23 @@ class IVRSystem(object):
         trackedDevicePose = TrackedDevicePose_t()
         result = fn(origin, byref(event), vREvent, byref(trackedDevicePose))
         return result, event, trackedDevicePose
+
+    def pollNextEventWithPoseAndOverlays(self, origin, event):
+        """
+        Returns true and fills the event with the next event on the queue, including any of this user's overlay event queues,
+        if there are any. If there are no events this method returns false. uncbVREvent should be the size in bytes of the VREvent_t struct.
+        If the event is targeted at a specific overlay, *pulOverlayHandle will be set to the handle, else k_ulOverlayHandleInvalid.
+        This method is equivalent to calling both PollNextEventWithPose, and IVROverlay::PollNextOverlayEvent for every overlay you create,
+        but is more efficient. You may pass NULL for pTrackedDevicePose if you don't care about poses. You must pass a valid pointer for
+        pulOverlayHandle, because otherwise the target for some events (like ButtonPress) would be ambiguous even with one overlay.
+        If you call this, you should not call PollNextEvent/WithPose(), since they all share the same read pointer.
+        """
+        fn = self.function_table.pollNextEventWithPoseAndOverlays
+        vREvent = sizeof(VREvent_t)
+        trackedDevicePose = TrackedDevicePose_t()
+        overlayHandle = VROverlayHandle_t()
+        result = fn(origin, byref(event), vREvent, byref(trackedDevicePose), byref(overlayHandle))
+        return result, event, trackedDevicePose, overlayHandle.value
 
     def getEventTypeNameFromEnum(self, type_):
         """returns the name of an EVREvent enum value"""
@@ -4376,6 +4493,7 @@ class IVRCompositor_FnTable(Structure):
         ("waitGetPoses", OPENVR_FNTABLE_CALLTYPE(EVRCompositorError, POINTER(TrackedDevicePose_t), c_uint32, POINTER(TrackedDevicePose_t), c_uint32)),
         ("getLastPoses", OPENVR_FNTABLE_CALLTYPE(EVRCompositorError, POINTER(TrackedDevicePose_t), c_uint32, POINTER(TrackedDevicePose_t), c_uint32)),
         ("getLastPoseForTrackedDeviceIndex", OPENVR_FNTABLE_CALLTYPE(EVRCompositorError, TrackedDeviceIndex_t, POINTER(TrackedDevicePose_t), POINTER(TrackedDevicePose_t))),
+        ("getSubmitTexture", OPENVR_FNTABLE_CALLTYPE(EVRCompositorError, POINTER(Texture_t), POINTER(openvr_bool), EVRCompositorTextureUsage, POINTER(Texture_t), POINTER(VRTextureBounds_t), EVRSubmitFlags)),
         ("submit", OPENVR_FNTABLE_CALLTYPE(EVRCompositorError, EVREye, POINTER(Texture_t), POINTER(VRTextureBounds_t), EVRSubmitFlags)),
         ("submitWithArrayIndex", OPENVR_FNTABLE_CALLTYPE(EVRCompositorError, EVREye, POINTER(Texture_t), c_uint32, POINTER(VRTextureBounds_t), EVRSubmitFlags)),
         ("clearLastSubmittedFrame", OPENVR_FNTABLE_CALLTYPE(None)),
@@ -4524,6 +4642,15 @@ class IVRCompositor(object):
         error = fn(deviceIndex, byref(outputPose), byref(outputGamePose))
         openvr.error_code.CompositorError.check_error_value(error)
         return outputPose, outputGamePose
+
+    def getSubmitTexture(self, usage, texture, bounds=None, submitFlags=Submit_Default):
+        """Get the shared texture to copy into for submitting frames."""
+        fn = self.function_table.getSubmitTexture
+        outTexture = Texture_t()
+        needsFlush = openvr_bool()
+        error = fn(byref(outTexture), byref(needsFlush), usage, byref(texture), byref(bounds), submitFlags)
+        openvr.error_code.CompositorError.check_error_value(error)
+        return outTexture, needsFlush
 
     def submit(self, eye, texture, bounds=None, submitFlags=Submit_Default) -> None:
         """
@@ -5069,6 +5196,7 @@ class IVROverlay_FnTable(Structure):
     _fields_ = [
         ("findOverlay", OPENVR_FNTABLE_CALLTYPE(EVROverlayError, c_char_p, POINTER(VROverlayHandle_t))),
         ("createOverlay", OPENVR_FNTABLE_CALLTYPE(EVROverlayError, c_char_p, c_char_p, POINTER(VROverlayHandle_t))),
+        ("createSubviewOverlay", OPENVR_FNTABLE_CALLTYPE(EVROverlayError, VROverlayHandle_t, c_char_p, c_char_p, POINTER(VROverlayHandle_t))),
         ("destroyOverlay", OPENVR_FNTABLE_CALLTYPE(EVROverlayError, VROverlayHandle_t)),
         ("getOverlayKey", OPENVR_FNTABLE_CALLTYPE(c_uint32, VROverlayHandle_t, c_char_p, c_uint32, POINTER(EVROverlayError))),
         ("getOverlayName", OPENVR_FNTABLE_CALLTYPE(c_uint32, VROverlayHandle_t, c_char_p, c_uint32, POINTER(EVROverlayError))),
@@ -5108,6 +5236,7 @@ class IVROverlay_FnTable(Structure):
         ("setOverlayTransformCursor", OPENVR_FNTABLE_CALLTYPE(EVROverlayError, VROverlayHandle_t, POINTER(HmdVector2_t))),
         ("getOverlayTransformCursor", OPENVR_FNTABLE_CALLTYPE(EVROverlayError, VROverlayHandle_t, POINTER(HmdVector2_t))),
         ("setOverlayTransformProjection", OPENVR_FNTABLE_CALLTYPE(EVROverlayError, VROverlayHandle_t, ETrackingUniverseOrigin, POINTER(HmdMatrix34_t), POINTER(VROverlayProjection_t), EVREye)),
+        ("setSubviewPosition", OPENVR_FNTABLE_CALLTYPE(EVROverlayError, VROverlayHandle_t, c_float, c_float)),
         ("showOverlay", OPENVR_FNTABLE_CALLTYPE(EVROverlayError, VROverlayHandle_t)),
         ("hideOverlay", OPENVR_FNTABLE_CALLTYPE(EVROverlayError, VROverlayHandle_t)),
         ("isOverlayVisible", OPENVR_FNTABLE_CALLTYPE(openvr_bool, VROverlayHandle_t)),
@@ -5182,6 +5311,21 @@ class IVROverlay(object):
         error = fn(overlayKey, overlayName, byref(overlayHandle))
         openvr.error_code.OverlayError.check_error_value(error)
         return overlayHandle.value
+
+    def createSubviewOverlay(self, parentOverlayHandle, subviewOverlayKey: str, subviewOverlayName: str):
+        """
+        Creates a Subview Overlay, which is a separate image that gets composited onto an existing parent overlay based on a 2D transform.
+        Subview overlays may only be created for parent overlays of the same process.
+        """
+        fn = self.function_table.createSubviewOverlay
+        if subviewOverlayKey is not None:
+            subviewOverlayKey = bytes(subviewOverlayKey, encoding='utf-8')
+        if subviewOverlayName is not None:
+            subviewOverlayName = bytes(subviewOverlayName, encoding='utf-8')
+        subviewOverlayHandle = VROverlayHandle_t()
+        error = fn(parentOverlayHandle, subviewOverlayKey, subviewOverlayName, byref(subviewOverlayHandle))
+        openvr.error_code.OverlayError.check_error_value(error)
+        return subviewOverlayHandle.value
 
     def destroyOverlay(self, overlayHandle) -> None:
         """
@@ -5521,6 +5665,12 @@ class IVROverlay(object):
         """Sets the overlay as a projection overlay"""
         fn = self.function_table.setOverlayTransformProjection
         error = fn(overlayHandle, trackingOrigin, byref(trackingOriginToOverlayTransform), byref(projection), eye)
+        openvr.error_code.OverlayError.check_error_value(error)
+
+    def setSubviewPosition(self, overlayHandle, x: float, y: float) -> None:
+        """Positions a subview overlay to a position within the parent overlay, from the top-left corners of each overlay, in the pixel coordinate space of the parent standalone overlay."""
+        fn = self.function_table.setSubviewPosition
+        error = fn(overlayHandle, x, y)
         openvr.error_code.OverlayError.check_error_value(error)
 
     def showOverlay(self, overlayHandle) -> None:
@@ -7347,6 +7497,138 @@ class IVRDebug(object):
         responseBuffer = ctypes.create_string_buffer(responseBufferSize)
         fn(deviceIndex, request, responseBuffer, responseBufferSize)
         return bytes(responseBuffer.value).decode('utf-8')
+
+
+class IVRIPCResourceManagerClient_FnTable(Structure):
+    _fields_ = [
+        ("newSharedVulkanImage", OPENVR_FNTABLE_CALLTYPE(openvr_bool, c_uint32, c_uint32, c_uint32, openvr_bool, openvr_bool, openvr_bool, c_uint32, c_uint32, POINTER(SharedTextureHandle_t))),
+        ("newSharedVulkanBuffer", OPENVR_FNTABLE_CALLTYPE(openvr_bool, c_uint32, c_uint32, POINTER(SharedTextureHandle_t))),
+        ("newSharedVulkanSemaphore", OPENVR_FNTABLE_CALLTYPE(openvr_bool, openvr_bool, POINTER(SharedTextureHandle_t))),
+        ("refResource", OPENVR_FNTABLE_CALLTYPE(openvr_bool, SharedTextureHandle_t, POINTER(c_uint64))),
+        ("unrefResource", OPENVR_FNTABLE_CALLTYPE(openvr_bool, SharedTextureHandle_t)),
+        ("getDmabufFormats", OPENVR_FNTABLE_CALLTYPE(openvr_bool, POINTER(c_uint32), POINTER(c_uint32))),
+        ("getDmabufModifiers", OPENVR_FNTABLE_CALLTYPE(openvr_bool, EVRApplicationType, c_uint32, POINTER(c_uint32), POINTER(c_uint64))),
+        ("importDmabuf", OPENVR_FNTABLE_CALLTYPE(openvr_bool, EVRApplicationType, POINTER(DmabufAttributes_t), POINTER(SharedTextureHandle_t))),
+        ("receiveSharedFd", OPENVR_FNTABLE_CALLTYPE(openvr_bool, c_uint64, POINTER(c_int))),
+    ]
+
+
+class IVRIPCResourceManagerClient(object):
+    """
+    -----------------------------------------------------------------------------
+    Purpose: Interact with the IPCResourceManager
+    -----------------------------------------------------------------------------
+    """
+
+    def __init__(self):
+        version_key = IVRIPCResourceManagerClient_Version
+        _checkInterfaceVersion(version_key)
+        fn_key = 'FnTable:' + version_key
+        fn_type = IVRIPCResourceManagerClient_FnTable
+        fn_table_ptr = cast(getGenericInterface(fn_key), POINTER(fn_type))
+        if fn_table_ptr is None:
+            raise OpenVRError("Error retrieving VR API for IVRIPCResourceManagerClient")
+        self.function_table = fn_table_ptr.contents
+
+    def newSharedVulkanImage(self, imageFormat, width, height, renderable, mappable, computeAccess, mipLevels, arrayLayerCount):
+        """
+        Create a new tracked Vulkan Image
+
+        nImageFormat: in VkFormat
+        """
+        fn = self.function_table.newSharedVulkanImage
+        sharedHandle = SharedTextureHandle_t()
+        result = fn(imageFormat, width, height, renderable, mappable, computeAccess, mipLevels, arrayLayerCount, byref(sharedHandle))
+        return result, sharedHandle
+
+    def newSharedVulkanBuffer(self, size, usageFlags):
+        """Create a new tracked Vulkan Buffer"""
+        fn = self.function_table.newSharedVulkanBuffer
+        sharedHandle = SharedTextureHandle_t()
+        result = fn(size, usageFlags, byref(sharedHandle))
+        return result, sharedHandle
+
+    def newSharedVulkanSemaphore(self, counting):
+        """Create a new tracked Vulkan Semaphore"""
+        fn = self.function_table.newSharedVulkanSemaphore
+        sharedHandle = SharedTextureHandle_t()
+        result = fn(counting, byref(sharedHandle))
+        return result, sharedHandle
+
+    def refResource(self, sharedHandle):
+        """Grab a reference to hSharedHandle, and optionally generate a new IPC handle if pNewIpcHandle is not nullptr"""
+        fn = self.function_table.refResource
+        newIpcHandle = c_uint64()
+        result = fn(sharedHandle, byref(newIpcHandle))
+        return result, newIpcHandle.value
+
+    def unrefResource(self, sharedHandle):
+        """Drop a reference to hSharedHandle"""
+        fn = self.function_table.unrefResource
+        result = fn(sharedHandle)
+        return result
+
+    def getDmabufFormats(self):
+        """
+        Get all the DRM formats we support using DMA-BUF images for.
+
+        pOutFormatCount and pOutFormats function like Vulkan:
+          - If pOutFormats is NULL, then pOutFormatCount will be overwritten with the format count.
+          - If pOutFormats is not NULL, then pOutFormatCount specifies the size of the pOutFormats array,
+              and will be overwritten with the number of formats written to the array.
+
+        If the function fails, false is returned, and pOutFormatCount will be 0.
+        Supported on Linux only.
+        """
+        fn = self.function_table.getDmabufFormats
+        outFormatCount = c_uint32()
+        outFormats = c_uint32()
+        result = fn(byref(outFormatCount), byref(outFormats))
+        return result, outFormatCount.value, outFormats.value
+
+    def getDmabufModifiers(self, applicationType, dRMFormat):
+        """
+        Get dmabuf modifiers we are allowed to use.
+
+        pOutModifierCount and pOutModifiers function like Vulkan:
+          - If pOutModifiers is NULL, then pOutModifierCount will be overwritten with the modifier count.
+          - If pOutModifiers is not NULL, then pOutModifierCount specifies the size of the pOutModifiers array,
+              and will be overwritten with the number of modifiers written to the array.
+
+        If modifiers are not supported, a single DRM_FORMAT_MOD_INVALID entry will be returned.
+
+        If the function fails, false is returned, and pOutModifierCount will be 0.
+        Supported on Linux only.
+        """
+        fn = self.function_table.getDmabufModifiers
+        outModifierCount = c_uint32()
+        outModifiers = c_uint64()
+        result = fn(applicationType, dRMFormat, byref(outModifierCount), byref(outModifiers))
+        return result, outModifierCount.value, outModifiers.value
+
+    def importDmabuf(self, applicationType):
+        """
+        Import a dmabuf directly.
+        Note: the FD you pass in will be dup'ed, so you must close it yourself.
+        This function does NOT take ownership of the fd you pass in.
+        Supported on Linux only.
+        """
+        fn = self.function_table.importDmabuf
+        dmabufAttributes = DmabufAttributes_t()
+        sharedHandle = SharedTextureHandle_t()
+        result = fn(applicationType, byref(dmabufAttributes), byref(sharedHandle))
+        return result, dmabufAttributes, sharedHandle
+
+    def receiveSharedFd(self, ipcHandle):
+        """
+        Consumes an IPC handle (eg. from RefResource) and returns a file-descriptor.
+        Caller acquires ownership of fd and is responsible for closing it.
+        Supported on Linux only.
+        """
+        fn = self.function_table.receiveSharedFd
+        outFd = c_int()
+        result = fn(ipcHandle, byref(outFd))
+        return result, outFd.value
 
 
 ####################
