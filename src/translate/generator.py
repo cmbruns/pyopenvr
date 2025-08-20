@@ -1,8 +1,7 @@
 import inspect
-import pkg_resources
 import textwrap
 
-from translate.parser import Parser
+from translate.parser import Parser, resource_string
 import translate.model as model
 
 
@@ -16,10 +15,12 @@ class CTypesGenerator(object):
             # from https://github.com/cmbruns/pyopenvr
             # based on OpenVR C++ API at https://github.com/ValveSoftware/openvr
 
-            import pkg_resources
-            import platform
+            import atexit
+            import contextlib
             import ctypes
             from ctypes import *
+            import importlib.resources
+            import platform
             
             from .version import __version__
             import openvr.error_code
@@ -60,8 +61,19 @@ class CTypesGenerator(object):
                 else:
                     raise ValueError("Libraries not available for this platform: " + platform.system())
             
+            _exit_stack = contextlib.ExitStack()  # noqa
+            atexit.register(_exit_stack.close)
+            
+            
+            def resource_filename(package: str, resource_name: str) -> str:
+                """Replacement for pkg_resources.resource_filename"""
+                ref = importlib.resources.files(package) / resource_name
+                path = _exit_stack.enter_context(importlib.resources.as_file(ref))
+                return str(path)
+
+
             # Load library
-            _openvr_lib_path = pkg_resources.resource_filename("openvr", _openvr_lib_name)
+            _openvr_lib_path = resource_filename("openvr", _openvr_lib_name)
             _openvr = ctypes.cdll.LoadLibrary(_openvr_lib_path)
             
             # Function pointer table calling convention
@@ -340,7 +352,7 @@ def get_version(declarations):
 
 def main(sub_version=1):
     file_name1 = 'openvr.h'
-    file_string1 = pkg_resources.resource_string(__name__, file_name1)
+    file_string1 = resource_string(__name__, file_name1)
     declarations = Parser().parse_file(file_name=file_name1, file_string=file_string1)
     version = get_version(declarations)
     patch_version = str(version[2]).zfill(2) + str(sub_version).zfill(2)

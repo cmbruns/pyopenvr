@@ -4,10 +4,12 @@
 # from https://github.com/cmbruns/pyopenvr
 # based on OpenVR C++ API at https://github.com/ValveSoftware/openvr
 
-import pkg_resources
-import platform
+import atexit
+import contextlib
 import ctypes
 from ctypes import *
+import importlib.resources
+import platform
 
 from .version import __version__
 import openvr.error_code
@@ -48,8 +50,19 @@ else:
     else:
         raise ValueError("Libraries not available for this platform: " + platform.system())
 
+_exit_stack = contextlib.ExitStack()  # noqa
+atexit.register(_exit_stack.close)
+
+
+def resource_filename(package: str, resource_name: str) -> str:
+    """Replacement for pkg_resources.resource_filename"""
+    ref = importlib.resources.files(package) / resource_name
+    path = _exit_stack.enter_context(importlib.resources.as_file(ref))
+    return str(path)
+
+
 # Load library
-_openvr_lib_path = pkg_resources.resource_filename("openvr", _openvr_lib_name)
+_openvr_lib_path = resource_filename("openvr", _openvr_lib_name)
 _openvr = ctypes.cdll.LoadLibrary(_openvr_lib_path)
 
 # Function pointer table calling convention
@@ -2988,9 +3001,9 @@ class COpenVRContext(object):
 
     def VRIPCResourceManager(self):
         self.checkClear()
-        if self.m_pVRIPCResourceManager is None:
-            self.m_pVRIPCResourceManager = IVRIPCResourceManager()
-        return self.m_pVRIPCResourceManager
+        if self.m_pVRIPCResourceManagerClient is None:
+            self.m_pVRIPCResourceManagerClient = IVRIPCResourceManagerClient()
+        return self.m_pVRIPCResourceManagerClient
 
 
 # Globals for context management

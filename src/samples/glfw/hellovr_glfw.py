@@ -1,9 +1,11 @@
 #!/usr/bin/env python
 
 # Core python modules
+import atexit
+import contextlib
 from ctypes import c_float, c_uint16, c_void_p, cast, sizeof
+import importlib.resources
 import inspect
-import pkg_resources
 import sys
 import time
 
@@ -21,6 +23,21 @@ import openvr
 
 Left = 0
 Right = 1
+
+
+_exit_stack = contextlib.ExitStack()  # noqa
+atexit.register(_exit_stack.close)
+
+
+def resource_filename(package: str, resource_name: str) -> str:
+    """Replacement for pkg_resources.resource_filename"""
+    ref = importlib.resources.files(package) / resource_name
+    path = _exit_stack.enter_context(importlib.resources.as_file(ref))
+    return str(path)
+
+
+def resource_stream(package: str, resource_name: str):
+    return importlib.resources.open_binary(package, resource_name)
 
 
 class CGLRenderModel(object):
@@ -210,7 +227,7 @@ class CMainApplication(object):
         glfw.set_window_title(self.window, f'hello_vr -- {driver} {display}')
         self.b_init_gl()
         assert openvr.VRCompositor()
-        action_path = pkg_resources.resource_filename('samples', 'hellovr_actions.json')
+        action_path = resource_filename('samples', 'hellovr_actions.json')
         openvr.VRInput().setActionManifestPath(action_path)
         self.action_hide_cubes = openvr.VRInput().getActionHandle('/actions/demo/in/HideCubes')
         self.action_hide_this_controller = openvr.VRInput().getActionHandle('/actions/demo/in/HideThisController')
@@ -740,7 +757,7 @@ class CMainApplication(object):
         GL.glBindBuffer(GL.GL_ELEMENT_ARRAY_BUFFER, 0)
 
     def set_up_texture_maps(self):
-        ts = pkg_resources.resource_stream('samples', 'cube_texture.png')
+        ts = resource_stream('samples', 'cube_texture.png')
         image = Image.open(ts).convert('RGBA')
         width, height = image.size
         image_data = numpy.array(list(image.getdata()), numpy.uint8)
@@ -771,6 +788,7 @@ class CMainApplication(object):
         self.render_width, self.render_height = self.hmd.getRecommendedRenderTargetSize()
         self.left_eye_desc = FramebufferDesc(self.render_width, self.render_height)
         self.right_eye_desc = FramebufferDesc(self.render_width, self.render_height)
+        return True
 
     def shut_down(self):
         if self.hmd:

@@ -18,7 +18,7 @@ setup(
     package_dir={'': 'src'},
     packages=['openvr', 'openvr.glframework', 'openvr.error_code'],
     package_data={'openvr': ['*.dll', '*.so', '*.dylib']},
-    python_requires='>=3.7',
+    python_requires='>=3.9',
     keywords='openvr valve htc vive vr virtual reality 3d graphics',
     license='BSD',
     classifiers="""\

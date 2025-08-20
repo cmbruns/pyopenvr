@@ -2,8 +2,8 @@
 Parses translate header files to create a model of the code to be generated
 """
 
+import importlib.resources
 import inspect
-import pkg_resources
 import platform
 
 from clang.cindex import Config, CursorKind, Index, TypeKind
@@ -44,6 +44,12 @@ def clean_comment(cursor):
     if '\n' in docstring:
         docstring = f'\n{docstring}\n'
     return docstring
+
+
+def resource_string(package: str, resource_name: str) -> bytes:
+    """Replacement for pkg_resources.resource_string"""
+    ref = importlib.resources.files(package).joinpath(resource_name)
+    return ref.read_bytes()
 
 
 class Parser(object):
@@ -370,7 +376,7 @@ class Parser(object):
 
 if __name__ == '__main__':
     file_name1 = 'openvr.h'
-    file_string1 = pkg_resources.resource_string(__name__, file_name1)
+    file_string1 = resource_string(__name__, file_name1)
     model = Parser().parse_file(file_name=file_name1, file_string=file_string1)
     bDump = True
     if bDump:
