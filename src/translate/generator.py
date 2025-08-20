@@ -352,7 +352,7 @@ def get_version(declarations):
 
 def main(sub_version=1):
     file_name1 = 'openvr.h'
-    file_string1 = resource_string(__name__, file_name1)
+    file_string1 = resource_string("translate", file_name1)
     declarations = Parser().parse_file(file_name=file_name1, file_string=file_string1)
     version = get_version(declarations)
     patch_version = str(version[2]).zfill(2) + str(sub_version).zfill(2)
