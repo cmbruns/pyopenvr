@@ -216,12 +216,15 @@ class COpenVRContext(Declaration):
             class_string += ' '*8 + f'self.{m} = None\n'
         class_string += '\n'
         for m in self.vr_method_names:
+            m2 = m
+            if m == "VRIPCResourceManager":
+                m2 = "VRIPCResourceManagerClient"  # special case
             method_string = textwrap.dedent(f'''\
                 def {m}(self):
                     self.checkClear()
-                    if self.m_p{m} is None:
-                        self.m_p{m} = I{m}()
-                    return self.m_p{m}
+                    if self.m_p{m2} is None:
+                        self.m_p{m2} = I{m2}()
+                    return self.m_p{m2}
                               
             ''')
             class_string += textwrap.indent(method_string, ' '*4)
